@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ODDLY_VERSION, getAppMeta } from "./index.js";
+import { ODDLY_VERSION, getAppMeta } from "./index";
 
 describe("Shared package core verification", () => {
   it("exports correct version", () => {

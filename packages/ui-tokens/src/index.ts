@@ -1,3 +1,2 @@
-export * from "./tokens.js";
-export * from "./tailwind-preset.js";
-
+export * from "./tokens";
+export * from "./tailwind-preset";

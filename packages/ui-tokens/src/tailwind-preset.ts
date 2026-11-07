@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import { colors, radius, spacing, typography } from "./tokens.js";
+import { colors, radius, spacing, typography } from "./tokens";
 
 export const oddlyTailwindPreset: Partial<Config> = {
   darkMode: "class",
