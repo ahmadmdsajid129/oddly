@@ -1,0 +1,90 @@
+export const colors = {
+  light: {
+    midnight: "#14123A",
+    violet: "#6C4CF1",
+    violetPress: "#5538D6",
+    coral: "#FF6B5E",
+    mint: "#1FBF93",
+    cream: "#FFF8F0",
+    lavender: "#EEEAFE",
+    bg: "#FFF8F0",
+    surface: "#FFFFFF",
+    surface2: "#EEEAFE",
+    border: "#DDD6FA",
+    text: "#14123A",
+    textMuted: "#5B5780",
+    danger: "#D93C4B",
+    warning: "#E69A1A",
+    success: "#1FBF93",
+  },
+  dark: {
+    midnight: "#14123A",
+    violet: "#8B72FF",
+    violetPress: "#6C4CF1",
+    coral: "#FF8176",
+    mint: "#3DDBB0",
+    cream: "#14123A",
+    lavender: "#28245E",
+    bg: "#14123A",
+    surface: "#1E1B4B",
+    surface2: "#28245E",
+    border: "#3A3580",
+    text: "#F4F1FF",
+    textMuted: "#B3AEE0",
+    danger: "#FF6B7A",
+    warning: "#FFC857",
+    success: "#3DDBB0",
+  },
+  palette12: [
+    { label: "Crimson", hex: "#D7263D" },
+    { label: "Coral", hex: "#FF6B5E" },
+    { label: "Amber", hex: "#F59E0B" },
+    { label: "Sunshine", hex: "#FFD23F" },
+    { label: "Lime", hex: "#8BC34A" },
+    { label: "Mint", hex: "#3DDBB0" },
+    { label: "Teal", hex: "#0F9D9A" },
+    { label: "Sky", hex: "#4CC9F0" },
+    { label: "Indigo", hex: "#3F37C9" },
+    { label: "Violet", hex: "#8E5CF6" },
+    { label: "Pink", hex: "#F472B6" },
+    { label: "Slate", hex: "#64748B" },
+  ],
+} as const;
+
+export const spacing = {
+  0: "0px",
+  1: "4px",
+  2: "8px",
+  3: "12px",
+  4: "16px",
+  5: "20px",
+  6: "24px",
+  8: "32px",
+  10: "40px",
+  12: "48px",
+  16: "64px",
+  20: "80px",
+  24: "96px",
+} as const;
+
+export const radius = {
+  xs: "6px",
+  sm: "10px",
+  md: "16px",
+  lg: "24px",
+  xl: "32px",
+  full: "9999px",
+} as const;
+
+export const shadows = {
+  1: "0 1px 2px rgba(20, 18, 58, 0.08)",
+  2: "0 8px 24px rgba(20, 18, 58, 0.12)",
+  3: "0 20px 48px rgba(108, 76, 241, 0.25)",
+  glowMint: "0 0 32px rgba(61, 219, 176, 0.45)",
+  glowViolet: "0 0 32px rgba(108, 76, 241, 0.50)",
+} as const;
+
+export const typography = {
+  fontHeading: "var(--font-space-grotesk), sans-serif",
+  fontBody: "var(--font-inter), sans-serif",
+} as const;
