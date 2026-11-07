@@ -88,3 +88,4 @@ export const typography = {
   fontHeading: "var(--font-space-grotesk), sans-serif",
   fontBody: "var(--font-inter), sans-serif",
 } as const;
+

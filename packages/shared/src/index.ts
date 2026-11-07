@@ -18,3 +18,4 @@ export function getAppMeta(): HealthCheckResult {
     timestamp: new Date().toISOString(),
   };
 }
+

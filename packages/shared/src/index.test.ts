@@ -13,3 +13,4 @@ describe("Shared package core verification", () => {
     expect(typeof meta.timestamp).toBe("string");
   });
 });
+

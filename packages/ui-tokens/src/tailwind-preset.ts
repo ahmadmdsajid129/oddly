@@ -40,3 +40,4 @@ export const oddlyTailwindPreset: Partial<Config> = {
 };
 
 export { colors, radius, spacing, typography };
+
