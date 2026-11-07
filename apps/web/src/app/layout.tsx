@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import "../styles/globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -23,9 +25,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
-      <body className="bg-bg text-text antialiased min-h-screen flex flex-col justify-center items-center">
-        {children}
+    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`} suppressHydrationWarning>
+      <body className="bg-bg text-text antialiased min-h-screen">
+        <ThemeProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
