@@ -119,6 +119,10 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
   - `pnpm test`: Execute Vitest unit and integration suites
   - `pnpm db:migrate`: Run Prisma migrations
   - `pnpm db:seed`: Seed database with dynamic initial content
+- **Repository Remote:**
+  - GitHub Remote: `https://github.com/ahmadmdsajid129/oddly.git`
+  - Default Branch: `main`
+  - Stage 0 Tag: `stage-0-complete`
 
 ---
 
@@ -127,11 +131,11 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 - Plain English explanations with concise technical precision.
 - No unneeded hype, corporate buzzwords, or unsolicited feature bloat.
 - Strict adherence to the Stage Protocol: execute assigned stage, verify rigorously, update records, and STOP.
+- **Commit Cadence:** Make sure to commit all changes after completely writing each full file.
 
 ---
 
 ## 11. Next Steps
 
-1. Wait for Founder review of Stage 0 deliverables.
-2. Receive "proceed to Stage 1" instruction.
-3. In Stage 1: Build the complete design system and UI kit (buttons, answer tiles, number picker dial, 12-colour swatch grid, modals, bottom sheets, toast, and the `/design` showcase route).
+1. Wait for Founder instruction (e.g. "proceed to Stage 1") before beginning Stage 1.
+2. In Stage 1: Checkout branch `stage-1-design-system`, build the complete design system and UI kit (buttons, answer tiles, number picker dial, 12-colour swatch grid, modals, bottom sheets, toast, and the `/design` showcase route).
