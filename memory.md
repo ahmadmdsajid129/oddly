@@ -9,28 +9,48 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage 0 (Documentation & Project Initialisation).
-- **Current Target:** Complete the 6 foundational markdown files, scaffold the clean monorepo skeleton (`apps/web`, `services/api`, `services/worker`, `packages/*`, `infra/`), verify all base scripts, and STOP.
+- **Current Stage:** Stage 1 (Design System and UI Kit) — COMPLETE.
+- **Current Target:** Stage 1 verification complete; awaiting Founder review and go-ahead to proceed to Stage 2 (Database and Shared Core Scoring).
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
-  - Stage 0 is COMPLETE.
+  - Stage 0 and Stage 1 are 100% COMPLETE.
   - Complete, exhaustive system documentation created in root: `product.md`, `rules.md`, `design.md`, `architecture.md`, `task.md`, and `memory.md`.
   - Node.js LTS environment configured at `v20.19.5` with `pnpm 12.18.0`.
   - System junction established for Windows `nvm4w` pointing to Node 20.
   - Monorepo skeleton fully initialized (`apps/web`, `apps/admin`, `services/api`, `services/worker`, `packages/shared`, `packages/ui-tokens`, `packages/api-client`, `infra/`).
-  - `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm build` verified and passing with zero errors.
-  - `apps/web` renders the brand placeholder ("oddly — coming soon") with Space Grotesk and Inter fonts and design tokens on `http://localhost:3000`.
+  - Full design system implemented in `apps/web`:
+    - `apps/web/src/styles/globals.css`: Full color tokens, light/dark themes, `--grad-hero`, `--grad-match`, `--grad-mythic`, `--glow-mint`, `--glow-violet`, glass panels, shimmers, reduced motion overrides.
+    - `apps/web/src/components/ui/ThemeProvider.tsx`: Supports `system`, `light`, `dark`, auto-detects `prefers-color-scheme`, persisted in `localStorage`.
+    - `apps/web/src/lib/motion.ts`: Framer Motion spring presets (`springDefault`, `springBouncy`, `springGentle`), transition variants, sheet/modal variants.
+    - `apps/web/src/lib/feedback.ts`: Tactile vibration (`navigator.vibrate`) and Web Audio API tone synthesizer (chimes, ticks, celebrate).
+    - `apps/web/src/components/icons/index.tsx`: `BrandMark`, `StreakFlame`, 4 Tier Badges (`CommonBadge`, `UncommonBadge`, `RareBadge`, `MythicBadge`), canvas confetti emitter.
+    - `apps/web/src/components/illustrations/index.tsx`: Complete 28 custom vector SVG illustrations for Question Type 4 across 7 categories + `DynamicIllustration` registry.
+    - `apps/web/src/components/ui/Atmosphere.tsx`: Drifting hero circles with glowing mint overlap and per-question shifting hue (Text: Violet, Number: Coral, Colour: Mint, Image: Sky, Word: Amber).
+    - `apps/web/src/components/ui/Button.tsx`: All 6 variants (primary, secondary, ghost, destructive, icon, close X) across 3 sizes and 8 states with loading indicator.
+    - `apps/web/src/components/ui/Card.tsx`: Default, elevated, and glass cards; `Badge` and `Chip` components.
+    - `apps/web/src/components/ui/FormControls.tsx`: Radix Switch `Toggle`, Age Gate 28px rounded `Checkbox`, `Input`, and `Textarea` with 140-char counter.
+    - `apps/web/src/components/ui/Dialogs.tsx`: `ResponsiveDialog` rendering mobile Bottom Sheet (with swipe-down-to-dismiss drag gesture) and desktop centered modal.
+    - `apps/web/src/components/ui/Toast.tsx`: `ToastProvider` and `useToast()` hook with success, error, info variants.
+    - `apps/web/src/components/ui/Navigation.tsx`: `Tooltip`, `Tabs`, `BottomTabBar` (Today, History, Me), and `TopNav`.
+    - `apps/web/src/components/ui/FeedbackPrimitives.tsx`: `ProgressDots` (5 dots, jumpable), `Skeleton` shimmer, and `EmptyState`.
+    - `apps/web/src/components/ui/Countdown.tsx`: Tabular flip-digit countdown timer for 07:00 IST drop release.
+    - `apps/web/src/components/play/AnswerComponents.tsx`: Interactive components for all 5 question types (`AnswerTile`, `NumberPicker`, `ColourSwatchGrid`, `ImageTileGrid`, `WordChipsGrid`).
+    - `apps/web/src/components/play/SearchMapAnimation.tsx`: S5 animated dot convergence journey with tap-to-skip.
+    - `apps/web/src/app/design/page.tsx`: Interactive `/design` showcase route demonstrating every component in light/dark mode.
+    - `apps/web/src/app/layout.tsx`: Root layout wired with `ThemeProvider` and `ToastProvider`.
+  - `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm build` verified and passing with zero errors (all 6 workspace packages pass clean).
+  - Web showcase verified on `http://localhost:3000/design`.
   - `services/api` responds to `GET /health` with `{ ok: true, service: "api", time: "..." }` on `http://localhost:4000`.
   - `services/worker` boots and connects to Redis (or logs idle readiness) and emits "worker ready".
 - **What is half-done:**
-  - Nothing in Stage 0. Stage 0 is 100% complete.
+  - Nothing in Stage 1. Stage 1 is 100% complete.
 - **What is next:**
-  - Await Founder instruction to proceed to **Stage 1 (Design System & UI Kit)**.
-  - In Stage 1: Build the complete component kit (`buttons`, `cards`, `tiles`, `number-picker`, `swatches`, `dialogs`, `theme-provider`) and showcase them on `/design`.
+  - Await Founder instruction to proceed to **Stage 2 (Database and Shared Core Scoring)**.
+  - In Stage 2: Create Prisma schema for all 18 tables, write DB migration, implement mathematical scoring functions (Oddness entropy, Dice twin distance, tier classifier) with 100% unit test coverage in `@oddly/shared`, and author DB seed scripts.
 
 ---
 
@@ -50,6 +70,9 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-07` | `D-010` | Port Assignments: Web (3000), API (4000), Admin (3001) | Standard Next.js/Fastify multi-service conventions avoiding collision                                  | Arbitrary ephemeral ports                   | Local environment configuration |
 | `2026-11-07` | `D-011` | ESLint 9 Flat Config (`eslint.config.mjs`)             | Modern flat config compatibility with TypeScript ESLint and Turborepo monorepo root                    | Legacy `.eslintrc.js`                       | Root and packages               |
 | `2026-11-07` | `D-012` | pnpm 12 `approve-builds` for Native Extension Scripts  | Satisfies pnpm 12 supply-chain security policies for esbuild and @next/swc native binaries             | Disabling pnpm security checks              | Root dependencies               |
+| `2026-11-07` | `D-013` | Bundler moduleResolution for Shared Monorepo Packages  | Enables Next.js webpack transpiler to resolve extensionless imports across internal workspace packages  | Emitting pre-compiled `.js` with declaration | `@oddly/ui-tokens`, `@oddly/shared` |
+| `2026-11-07` | `D-014` | Web Audio API Oscillator Sound Synthesizer             | Zero asset network requests, 0 latency feedback, guaranteed availability offline                       | Static MP3/WAV audio assets                 | `apps/web/src/lib/feedback.ts`  |
+| `2026-11-07` | `D-015` | Dynamic Vector Illustration Registry (Keyed SVGs)      | Zero-deploy question additions for Type 4 questions, crisp vector scaling on high-DPI displays          | Static raster PNGs, external CDN images     | `apps/web/src/components/illustrations` |
 
 ---
 
@@ -63,6 +86,27 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-07` | Stage 0 | Authored system architecture and data model specification (`architecture.md`) | `architecture.md` | Job A: Technical blueprint & ADRs                      |
 | `2026-11-07` | Stage 0 | Authored full 16-phase task breakdown (`task.md`)                             | `task.md`         | Job A: Project roadmap and tracking                    |
 | `2026-11-07` | Stage 0 | Authored living memory and institutional records (`memory.md`)                | `memory.md`       | Job A: Persistent project memory                       |
+| `2026-11-07` | Stage 1 | Implemented CSS variable design tokens and theme styles                       | `apps/web/src/styles/globals.css` | Phase 1: Visual design system tokens |
+| `2026-11-07` | Stage 1 | Implemented ThemeProvider with light/dark/system mode                         | `apps/web/src/components/ui/ThemeProvider.tsx` | Phase 1: Theme management |
+| `2026-11-07` | Stage 1 | Implemented Framer Motion spring curves and variants                          | `apps/web/src/lib/motion.ts` | Phase 1: Motion primitives |
+| `2026-11-07` | Stage 1 | Implemented Web Audio oscillator synthesizer and haptic triggers              | `apps/web/src/lib/feedback.ts` | Phase 1: Feedback primitives |
+| `2026-11-07` | Stage 1 | Created BrandMark, StreakFlame, Confetti, and 4 Tier Badges                   | `apps/web/src/components/icons/index.tsx` | Phase 1: Vector iconography |
+| `2026-11-07` | Stage 1 | Created 28 custom vector illustrations & DynamicIllustration registry         | `apps/web/src/components/illustrations/index.tsx` | Phase 1: Question 4 illustration assets |
+| `2026-11-07` | Stage 1 | Created drifting Atmospheric background and question glow system              | `apps/web/src/components/ui/Atmosphere.tsx` | Phase 1: Ambient brand background |
+| `2026-11-07` | Stage 1 | Built Button primitive (6 variants, 3 sizes, 8 states)                       | `apps/web/src/components/ui/Button.tsx` | Phase 1: Core interaction buttons |
+| `2026-11-07` | Stage 1 | Built Card (Default, Elevated, Glass), Badge, and Chip components             | `apps/web/src/components/ui/Card.tsx` | Phase 1: Container primitives |
+| `2026-11-07` | Stage 1 | Built Form controls: Toggle, Age Gate Checkbox, Input, Textarea with counter  | `apps/web/src/components/ui/FormControls.tsx` | Phase 1: Accessible form primitives |
+| `2026-11-07` | Stage 1 | Built ResponsiveDialog (mobile Bottom Sheet with drag-dismiss, desktop Modal) | `apps/web/src/components/ui/Dialogs.tsx` | Phase 1: Dialog primitives |
+| `2026-11-07` | Stage 1 | Built Toast notification system and `useToast()` hook                         | `apps/web/src/components/ui/Toast.tsx` | Phase 1: Global notifications |
+| `2026-11-07` | Stage 1 | Built Tooltip, Tabs, BottomTabBar (Today, History, Me), TopNav                | `apps/web/src/components/ui/Navigation.tsx` | Phase 1: Navigation primitives |
+| `2026-11-07` | Stage 1 | Built ProgressDots, Skeleton shimmer, and EmptyState                          | `apps/web/src/components/ui/FeedbackPrimitives.tsx` | Phase 1: Feedback indicators |
+| `2026-11-07` | Stage 1 | Built tabular flip-digit Countdown timer for 07:00 IST drop release          | `apps/web/src/components/ui/Countdown.tsx` | Phase 1: Drop countdown |
+| `2026-11-07` | Stage 1 | Built interactive answer components for all 5 question types                  | `apps/web/src/components/play/AnswerComponents.tsx` | Phase 1: Question controls |
+| `2026-11-07` | Stage 1 | Built SearchMapAnimation (dot convergence twin search journey)                | `apps/web/src/components/play/SearchMapAnimation.tsx` | Phase 1: Twin search animation |
+| `2026-11-07` | Stage 1 | Built interactive `/design` component showcase route with theme toggling      | `apps/web/src/app/design/page.tsx` | Phase 1: Living design kit verification |
+| `2026-11-07` | Stage 1 | Wired ThemeProvider and ToastProvider into root layout                        | `apps/web/src/app/layout.tsx` | Phase 1: Root provider wrapping |
+| `2026-11-07` | Stage 1 | Updated Section 2 with verification notes and contrast audit                  | `design.md` | Phase 1: Documentation audit |
+| `2026-11-07` | Stage 1 | Marked Phase 1 tasks COMPLETE (33/165 total done, 20% overall)                | `task.md` | Phase 1: Roadmap status update |
 
 ---
 
@@ -72,6 +116,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | ------------ | ------- | ----------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------- | -------------------------------------- | ---------------------- |
 | `2026-11-07` | `B-001` | `node: command not found` in PowerShell session | `C:\nvm4w\nodejs` symlink was unlinked during nvm version switches without admin rights | Created an NTFS directory junction `C:\nvm4w\nodejs` pointing to `C:\Users\HP\AppData\Local\nvm\v20.19.5` | `C:\nvm4w\nodejs` (junction) | Document junction setup in `memory.md` | Manual `node -v` check |
 | `2026-11-07` | `B-002` | `pnpm: command not found`                       | pnpm was not yet installed in the selected Node 20 environment                          | Ran `npm install -g pnpm` with `BypassSandbox: true`                                                      | Node 20 global modules       | Document pnpm requirement in README    | `pnpm -v` verification |
+| `2026-11-07` | `B-003` | `Cannot find module 'tailwindcss'` during build | `packages/ui-tokens` imported `Config` from tailwindcss without explicit devDependency  | Added `tailwindcss: ^3.4.17` to `packages/ui-tokens/package.json` devDependencies                        | `packages/ui-tokens/package.json` | Always pin peer/dev types in packages | `pnpm typecheck` |
+| `2026-11-07` | `B-004` | `Module not found: Can't resolve './tokens.js'` | Next.js webpack bundler could not map `.js` import specifiers to uncompiled `.ts` files  | Converted imports to extensionless and set `"moduleResolution": "Bundler"`                                | `packages/ui-tokens/tsconfig.json`, `packages/shared/tsconfig.json` | Use bundler resolution for monorepos | `pnpm build` |
 
 ---
 
@@ -89,6 +135,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 - **Windows Junctions vs Symlinks:** In Windows, creating directory symlinks (`mklink /D`) requires elevated administrator privileges or Developer Mode, whereas NTFS Directory Junctions (`mklink /J`) can be established in user space without UAC prompts.
 - **Node.js LTS Versioning:** The project requires Node 20 LTS (`20.19.5`) to match `.nvmrc` and guarantee compatibility across Prisma, Fastify, and Next.js 14.
 - **Dynamic Content Cache Bundle:** Bundling all dynamic copy into a single hash-versioned payload (`/v1/content/:locale`) reduces client startup latency by eliminating waterfall roundtrips on mobile connections.
+- **Web Audio API vs Audio Assets:** Synthesizing sound effects with native `AudioContext` oscillators avoids network overhead, guarantees offline functionality, and keeps the initial bundle lightweight.
+- **Next.js Webpack Resolution for Monorepo Packages:** For local TypeScript packages referenced via `"workspace:*"`, configuring `moduleResolution: "Bundler"` with extensionless imports allows Next.js 14 to transpile TypeScript source files seamlessly without requiring a separate pre-build step.
 
 ---
 
@@ -137,5 +185,13 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ## 11. Next Steps
 
-1. Wait for Founder instruction (e.g. "proceed to Stage 1") before beginning Stage 1.
-2. In Stage 1: Checkout branch `stage-1-design-system`, build the complete design system and UI kit (buttons, answer tiles, number picker dial, 12-colour swatch grid, modals, bottom sheets, toast, and the `/design` showcase route).
+1. Await Founder review of Stage 1 and instruction to proceed (e.g. "proceed to Stage 2").
+2. In Stage 2 (Database & Shared Core Scoring):
+   - Checkout branch `stage-2-database-scoring`.
+   - Author complete `packages/shared/prisma/schema.prisma` with all 18 tables, indexes, and constraints.
+   - Run Prisma migration and generate client types.
+   - Implement mathematical scoring functions in `packages/shared/src/scoring.ts` (Dice twin distance, Shannon self-information Oddness entropy, rarity tier classifier).
+   - Write comprehensive unit tests in `packages/shared/tests/scoring.test.ts` (100% mathematical edge case coverage).
+   - Write idempotent database seed script (`packages/shared/prisma/seed.ts`) with dynamic Drop 1 questions and initial system configuration.
+   - Verify `pnpm test`, `pnpm typecheck`, `pnpm lint`, and DB migrations.
+   - Print Stage 2 Report and STOP.
