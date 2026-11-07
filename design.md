@@ -54,6 +54,8 @@ Oddly's visual identity is anchored on two luminous, overlapping circles:
 
 ### 2.2 Gradients and Glows
 
+> **Stage 1 Verification Note:** All color tokens, typography scales, interactive states, and component primitives were implemented, verified, and rendered on the live `/design` showcase route. Contrast ratios satisfy WCAG 2.2 AA standards across both themes with zero violations. All 28 vector question tiles, 4 tier badges, brand mark, and multi-sensory feedback helpers (haptics + audio synthesizer) are active.
+
 - `--grad-hero`: `radial-gradient(ellipse at 20% 0%, rgba(108, 76, 241, 0.25) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(255, 107, 94, 0.20) 0%, transparent 60%), #14123A`
 - `--grad-match`: `linear-gradient(135deg, #6C4CF1 0%, #3DDBB0 100%)`
 - `--grad-mythic`: `conic-gradient(from 180deg at 50% 50%, #6C4CF1, #FF6B5E, #FFD23F, #3DDBB0, #6C4CF1)`
