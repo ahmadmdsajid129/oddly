@@ -9,13 +9,13 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 
 | Metric                          | Current Value                                             |
 | ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[██░░░░░░░░░░░░░░░░░░] 8.5%`                             |
-| **Current Active Stage**        | **Stage 0 Complete (Awaiting Founder review for Stage 1)**|
+| **Overall Project Progress**    | `[████░░░░░░░░░░░░░░░░] 20%`                              |
+| **Current Active Stage**        | **Stage 1 Complete (Awaiting Founder review for Stage 2)**|
 | **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 14 tasks                                                  |
+| **Completed Tasks (`DONE`)**    | 33 tasks                                                  |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 151 tasks                                                 |
+| **Pending (`TODO`)**            | 132 tasks                                                 |
 
 ---
 
@@ -24,7 +24,7 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | Phase        | Phase Name                              | Priority | Status    | Progress Bar      | Tasks (Done/Total) | Stage That Builds It |
 | ------------ | --------------------------------------- | -------- | --------- | ----------------- | ------------------ | -------------------- |
 | **Phase 0**  | Documentation & Skeleton Initialisation | Critical | COMPLETE  | `[##########] 100%`| 14 / 14            | Stage 0              |
-| **Phase 1**  | Design System & UI Kit                  | High     | TODO        | `[----------] 0%` | 0 / 19             | Stage 1              |
+| **Phase 1**  | Design System & UI Kit                  | High     | COMPLETE  | `[##########] 100%`| 19 / 19            | Stage 1              |
 | **Phase 2**  | Database & Shared Core Scoring          | Critical | TODO        | `[----------] 0%` | 0 / 12             | Stage 2              |
 | **Phase 3**  | Fastify REST API Core                   | Critical | TODO        | `[----------] 0%` | 0 / 12             | Stage 3              |
 | **Phase 4**  | Play Flow Frontend (PWA)                | Critical | TODO        | `[----------] 0%` | 0 / 11             | Stage 4              |
@@ -69,29 +69,29 @@ _Status: COMPLETE | Target: Skeleton verified, zero features implemented._
 
 ### Phase 1: Design System and UI Kit (Stage 1)
 
-_Status: TODO | Target: Visual kit verified on `/design` route in light and dark mode._
+_Status: COMPLETE | Target: Visual kit verified on `/design` route in light and dark mode._
 
-| ID      | Task Description                                                                                                | Priority | Status | Depends On   | Owner | Done Date | Notes                              |
-| ------- | --------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------- |
-| `P1.01` | Implement CSS variable design tokens and Tailwind preset in `packages/ui-tokens`                                | High     | TODO   | P0.07        | Agent | —         | Color, spacing, radius tokens      |
-| `P1.02` | Self-host Space Grotesk and Inter fonts via `next/font` in `apps/web`                                           | High     | TODO   | P1.01        | Agent | —         | Zero external font CDN calls       |
-| `P1.03` | Build theme provider with system preference detection and manual light/dark toggle                              | Medium   | TODO   | P1.01        | Agent | —         | Persisted in cookie/localStorage   |
-| `P1.04` | Implement atmospheric hero backgrounds (drifting circles, star dots, question glows)                            | Medium   | TODO   | P1.01        | Agent | —         | Animated and reduce-motion modes   |
-| `P1.05` | Build core button primitives (Primary, Secondary, Ghost, Destructive, Icon, Close X)                            | High     | TODO   | P1.01        | Agent | —         | All 8 interactive states           |
-| `P1.06` | Build container components: Card (Default, Elevated, Glass), Badge, Chip, Link                                  | Medium   | TODO   | P1.01        | Agent | —         | Accessible primitives              |
-| `P1.07` | Build form controls: Toggle (Radix Switch), Checkbox (Age Gate), Input, Textarea                                | Medium   | TODO   | P1.01        | Agent | —         | Form states and validation styling |
-| `P1.08` | Build Modal and Bottom Sheet component (Radix Dialog, mobile drag-to-dismiss)                                   | High     | TODO   | P1.01        | Agent | —         | Accessible dialog wrapper          |
-| `P1.09` | Implement global Toast notification system                                                                      | Medium   | TODO   | P1.01        | Agent | —         | Success, Error, Info variants      |
-| `P1.10` | Build Tab Navigation and Mobile Bottom Tab Bar (Today, History, Me)                                             | Medium   | TODO   | P1.01        | Agent | —         | Responsive touch navigation        |
-| `P1.11` | Implement Progress Dots, Skeleton shimmers, and Empty state components                                          | Medium   | TODO   | P1.01        | Agent | —         | Polished transition primitives     |
-| `P1.12` | Build flip/tabular Countdown clock component for S2                                                             | Medium   | TODO   | P1.02        | Agent | —         | Next-drop countdown timer          |
-| `P1.13` | Create custom SVG vector components (Brand Mark, Streak Flame, 4 Tier Badges)                                   | High     | TODO   | P1.01        | Agent | —         | Bespoke SVG icons                  |
-| `P1.14` | Create vector illustration SVG library for image questions (28 illustrated tiles)                               | High     | TODO   | P1.01        | Agent | —         | Flat vector style in brand tones   |
-| `P1.15` | Build interactive question answer components (Text Tile, Image Tile, Number Picker, 12-Swatch Grid, Word Chips) | Critical | TODO   | P1.05, P1.14 | Agent | —         | Interactive, stateful UI controls  |
-| `P1.16` | Wire Framer Motion presets, reduce-motion hooks, and sound/haptic helpers                                       | Medium   | TODO   | P1.01        | Agent | —         | Accessibility-compliant feedback   |
-| `P1.17` | Build `/design` showcase route displaying every component across all states                                     | High     | TODO   | P1.05-P1.15  | Agent | —         | Living visual component library    |
-| `P1.18` | Execute automated accessibility audit (`axe-core`) on design kit                                                | High     | TODO   | P1.17        | Agent | —         | WCAG 2.2 AA validation             |
-| `P1.19` | Record token contrast ratios and component decisions in `design.md` and `memory.md`                             | Medium   | TODO   | P1.18        | Agent | —         | Documentation update               |
+| ID          | Task Description                                                                                                | Priority | Status | Depends On   | Owner | Done Date   | Notes                              |
+| ----------- | --------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------- |
+| `[x] P1.01` | Implement CSS variable design tokens and Tailwind preset in `packages/ui-tokens`                                | High     | DONE   | P0.07        | Agent | 2026-11-07  | Color, spacing, radius tokens      |
+| `[x] P1.02` | Self-host Space Grotesk and Inter fonts via `next/font` in `apps/web`                                           | High     | DONE   | P1.01        | Agent | 2026-11-07  | Zero external font CDN calls       |
+| `[x] P1.03` | Build theme provider with system preference detection and manual light/dark toggle                              | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Persisted in cookie/localStorage   |
+| `[x] P1.04` | Implement atmospheric hero backgrounds (drifting circles, star dots, question glows)                            | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Animated and reduce-motion modes   |
+| `[x] P1.05` | Build core button primitives (Primary, Secondary, Ghost, Destructive, Icon, Close X)                            | High     | DONE   | P1.01        | Agent | 2026-11-07  | All 8 interactive states           |
+| `[x] P1.06` | Build container components: Card (Default, Elevated, Glass), Badge, Chip, Link                                  | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Accessible primitives              |
+| `[x] P1.07` | Build form controls: Toggle (Radix Switch), Checkbox (Age Gate), Input, Textarea                                | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Form states and validation styling |
+| `[x] P1.08` | Build Modal and Bottom Sheet component (Radix Dialog, mobile drag-to-dismiss)                                   | High     | DONE   | P1.01        | Agent | 2026-11-07  | Accessible dialog wrapper          |
+| `[x] P1.09` | Implement global Toast notification system                                                                      | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Success, Error, Info variants      |
+| `[x] P1.10` | Build Tab Navigation and Mobile Bottom Tab Bar (Today, History, Me)                                             | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Responsive touch navigation        |
+| `[x] P1.11` | Implement Progress Dots, Skeleton shimmers, and Empty state components                                          | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Polished transition primitives     |
+| `[x] P1.12` | Build flip/tabular Countdown clock component for S2                                                             | Medium   | DONE   | P1.02        | Agent | 2026-11-07  | Next-drop countdown timer          |
+| `[x] P1.13` | Create custom SVG vector components (Brand Mark, Streak Flame, 4 Tier Badges)                                   | High     | DONE   | P1.01        | Agent | 2026-11-07  | Bespoke SVG icons                  |
+| `[x] P1.14` | Create vector illustration SVG library for image questions (28 illustrated tiles)                               | High     | DONE   | P1.01        | Agent | 2026-11-07  | Flat vector style in brand tones   |
+| `[x] P1.15` | Build interactive question answer components (Text Tile, Image Tile, Number Picker, 12-Swatch Grid, Word Chips) | Critical | DONE   | P1.05, P1.14 | Agent | 2026-11-07  | Interactive, stateful UI controls  |
+| `[x] P1.16` | Wire Framer Motion presets, reduce-motion hooks, and sound/haptic helpers                                       | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Accessibility-compliant feedback   |
+| `[x] P1.17` | Build `/design` showcase route displaying every component across all states                                     | High     | DONE   | P1.05-P1.15  | Agent | 2026-11-07  | Living visual component library    |
+| `[x] P1.18` | Execute automated accessibility audit (`axe-core`) on design kit                                                | High     | DONE   | P1.17        | Agent | 2026-11-07  | WCAG 2.2 AA validation             |
+| `[x] P1.19` | Record token contrast ratios and component decisions in `design.md` and `memory.md`                             | Medium   | DONE   | P1.18        | Agent | 2026-11-07  | Documentation update               |
 
 ---
 
@@ -412,3 +412,4 @@ _Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
 | `2026-11-07` | Architecture / Section 12 | Integrated Override Addendum: all content, questions, palettes, copy, and configs are dynamic from PostgreSQL. | Founder requirement: zero hard-coded content. |
 | `2026-11-07` | Phase 0 to 15             | Established initial 16-phase roadmap containing 165 granular, tracked engineering tasks.                       | Comprehensive project initialisation.         |
 | `2026-11-07` | Stage 0 Complete          | Verified monorepo skeleton, 6 core markdown documents, and base scripts (typecheck, lint, test, build, dev).    | Stage 0 Definition of Done achieved.          |
+| `2026-11-07` | Stage 1 Complete          | Built complete design system, UI kit, 28 SVGs, interactive controls, and `/design` showcase route. Verified.   | Stage 1 Definition of Done achieved.          |
