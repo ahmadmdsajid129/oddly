@@ -12,7 +12,8 @@ export * from "./scoring.js";
 export * from "./matching.js";
 export * from "./privacy.js";
 export * from "./dates.js";
-export * from "./db.js";
+export { PrismaClient } from "./db.js";
+export type { Prisma } from "./db.js";
 
 export function getAppMeta() {
   return {

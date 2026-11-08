@@ -21,7 +21,6 @@ import {
   classifyTier,
   oddnessScore,
   percentile,
-  submissionSimilarity,
 } from "./scoring.js";
 import type { AnswerFrequency, SubmissionForMatching } from "./types.js";
 
@@ -291,3 +290,4 @@ main().catch((err) => {
   console.error("Simulation failed:", err);
   process.exit(1);
 });
+
