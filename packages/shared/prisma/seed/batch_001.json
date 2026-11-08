@@ -1,0 +1,1398 @@
+{
+  "batch_id": "oddly_batch_001_first_14_days",
+  "version": "1.0",
+  "drops": [
+    {
+      "drop_date": "2026-11-08",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "If you had to pick one lifelong curse:",
+            "options": [
+              { "label": "Pizza always stone cold", "value": "cold_pizza" },
+              { "label": "Coffee always lukewarm", "value": "lukewarm_coffee" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Pizza always stone cold", "value": "cold_pizza", "display_order": 1 },
+            { "label": "Coffee always lukewarm", "value": "lukewarm_coffee", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Pick a number that feels quietly lucky to you (1–50)",
+            "min": 1,
+            "max": 50,
+            "step": 1,
+            "unit": ""
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "Pick the true colour of Monday morning",
+            "swatches": [
+              { "label": "Fog Slate", "value": "#64748B", "hex": "#64748B" },
+              { "label": "Amber Ray", "value": "#F59E0B", "hex": "#F59E0B" },
+              { "label": "Cold Cobalt", "value": "#3B82F6", "hex": "#3B82F6" },
+              { "label": "Pale Moss", "value": "#84CC16", "hex": "#84CC16" },
+              { "label": "Deep Ink", "value": "#1E1B4B", "hex": "#1E1B4B" },
+              { "label": "Muted Coral", "value": "#FB7185", "hex": "#FB7185" },
+              { "label": "Steel Mint", "value": "#2DD4BF", "hex": "#2DD4BF" },
+              { "label": "Lavender Gray", "value": "#A855F7", "hex": "#A855F7" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Fog Slate", "value": "#64748B", "display_order": 1 },
+            { "label": "Amber Ray", "value": "#F59E0B", "display_order": 2 },
+            { "label": "Cold Cobalt", "value": "#3B82F6", "display_order": 3 },
+            { "label": "Pale Moss", "value": "#84CC16", "display_order": 4 },
+            { "label": "Deep Ink", "value": "#1E1B4B", "display_order": 5 },
+            { "label": "Muted Coral", "value": "#FB7185", "display_order": 6 },
+            { "label": "Steel Mint", "value": "#2DD4BF", "display_order": 7 },
+            { "label": "Lavender Gray", "value": "#A855F7", "display_order": 8 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which sky matches your head right now?",
+            "illustrations": [
+              { "label": "Sunrise Sky", "value": "sunrise", "illustration_key": "sky-sunrise" },
+              { "label": "Storm Sky", "value": "storm", "illustration_key": "sky-storm" },
+              { "label": "Starry Night", "value": "starry", "illustration_key": "sky-starry" },
+              { "label": "Overcast Sky", "value": "overcast", "illustration_key": "sky-overcast" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Sunrise Sky", "value": "sunrise", "display_order": 1, "illustration_key": "sky-sunrise" },
+            { "label": "Storm Sky", "value": "storm", "display_order": 2, "illustration_key": "sky-storm" },
+            { "label": "Starry Night", "value": "starry", "display_order": 3, "illustration_key": "sky-starry" },
+            { "label": "Overcast Sky", "value": "overcast", "display_order": 4, "illustration_key": "sky-overcast" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick up to 2 words that describe your current frequency:",
+            "chips": [
+              { "label": "Cozy", "value": "cozy" },
+              { "label": "Restless", "value": "restless" },
+              { "label": "Curious", "value": "curious" },
+              { "label": "Sleepy", "value": "sleepy" },
+              { "label": "Bold", "value": "bold" },
+              { "label": "Calm", "value": "calm" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Cozy", "value": "cozy", "display_order": 1 },
+            { "label": "Restless", "value": "restless", "display_order": 2 },
+            { "label": "Curious", "value": "curious", "display_order": 3 },
+            { "label": "Sleepy", "value": "sleepy", "display_order": 4 },
+            { "label": "Bold", "value": "bold", "display_order": 5 },
+            { "label": "Calm", "value": "calm", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-09",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Choose your small superpower:",
+            "options": [
+              { "label": "Pause time for 10 min each day", "value": "pause_time" },
+              { "label": "Rewind 10 seconds anytime you want", "value": "rewind_time" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Pause time for 10 min each day", "value": "pause_time", "display_order": 1 },
+            { "label": "Rewind 10 seconds anytime you want", "value": "rewind_time", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "How many minutes would you wait at a café before leaving?",
+            "min": 5,
+            "max": 60,
+            "step": 5,
+            "unit": "min"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of your last genuinely good idea:",
+            "swatches": [
+              { "label": "Electric Lime", "value": "#84CC16", "hex": "#84CC16" },
+              { "label": "Deep Violet", "value": "#7C3AED", "hex": "#7C3AED" },
+              { "label": "Sunlit Amber", "value": "#F59E0B", "hex": "#F59E0B" },
+              { "label": "Midnight Blue", "value": "#1E3A8A", "hex": "#1E3A8A" },
+              { "label": "Copper Rose", "value": "#FB7185", "hex": "#FB7185" },
+              { "label": "Bioluminescent Cyan", "value": "#06B6D4", "hex": "#06B6D4" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Electric Lime", "value": "#84CC16", "display_order": 1 },
+            { "label": "Deep Violet", "value": "#7C3AED", "display_order": 2 },
+            { "label": "Sunlit Amber", "value": "#F59E0B", "display_order": 3 },
+            { "label": "Midnight Blue", "value": "#1E3A8A", "display_order": 4 },
+            { "label": "Copper Rose", "value": "#FB7185", "display_order": 5 },
+            { "label": "Bioluminescent Cyan", "value": "#06B6D4", "display_order": 6 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which doorway do you step through without hesitation?",
+            "illustrations": [
+              { "label": "The Red Door", "value": "door-red", "illustration_key": "door-red" },
+              { "label": "The Weathered Wood Door", "value": "door-wood", "illustration_key": "door-wood" },
+              { "label": "The Smoked Glass Door", "value": "door-glass", "illustration_key": "door-glass" },
+              { "label": "The Mysterious Tiny Door", "value": "door-tiny", "illustration_key": "door-tiny" }
+            ]
+          },
+          "answer_options": [
+            { "label": "The Red Door", "value": "door-red", "display_order": 1, "illustration_key": "door-red" },
+            { "label": "The Weathered Wood Door", "value": "door-wood", "display_order": 2, "illustration_key": "door-wood" },
+            { "label": "The Smoked Glass Door", "value": "door-glass", "display_order": 3, "illustration_key": "door-glass" },
+            { "label": "The Mysterious Tiny Door", "value": "door-tiny", "display_order": 4, "illustration_key": "door-tiny" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick 2 words that match your gut today:",
+            "chips": [
+              { "label": "Hopeful", "value": "hopeful" },
+              { "label": "Hungry", "value": "hungry" },
+              { "label": "Tired", "value": "tired" },
+              { "label": "Playful", "value": "playful" },
+              { "label": "Focused", "value": "focused" },
+              { "label": "Nostalgic", "value": "nostalgic" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Hopeful", "value": "hopeful", "display_order": 1 },
+            { "label": "Hungry", "value": "hungry", "display_order": 2 },
+            { "label": "Tired", "value": "tired", "display_order": 3 },
+            { "label": "Playful", "value": "playful", "display_order": 4 },
+            { "label": "Focused", "value": "focused", "display_order": 5 },
+            { "label": "Nostalgic", "value": "nostalgic", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-10",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "On a 5-hour train journey, your non-negotiable seat:",
+            "options": [
+              { "label": "Always window seat", "value": "window" },
+              { "label": "Always aisle seat", "value": "aisle" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Always window seat", "value": "window", "display_order": 1 },
+            { "label": "Always aisle seat", "value": "aisle", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "The ideal number of unread messages in your inbox:",
+            "min": 0,
+            "max": 50,
+            "step": 1,
+            "unit": "unread"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of a quiet Sunday afternoon:",
+            "swatches": [
+              { "label": "Warm Chai Ochre", "value": "#D97706", "hex": "#D97706" },
+              { "label": "Soft Sage", "value": "#10B981", "hex": "#10B981" },
+              { "label": "Dusty Indigo", "value": "#6366F1", "hex": "#6366F1" },
+              { "label": "Vintage Linen", "value": "#F59E0B", "hex": "#F59E0B" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Warm Chai Ochre", "value": "#D97706", "display_order": 1 },
+            { "label": "Soft Sage", "value": "#10B981", "display_order": 2 },
+            { "label": "Dusty Indigo", "value": "#6366F1", "display_order": 3 },
+            { "label": "Vintage Linen", "value": "#F59E0B", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Where would you rather spend the next hour alone?",
+            "illustrations": [
+              { "label": "Steaming Chai Lane", "value": "path-chai", "illustration_key": "path-chai" },
+              { "label": "Quiet Park Path", "value": "path-park", "illustration_key": "path-park" },
+              { "label": "Glowing Neon Market", "value": "path-neon", "illustration_key": "path-neon" },
+              { "label": "Empty Beach Promenade", "value": "path-beach", "illustration_key": "path-beach" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Steaming Chai Lane", "value": "path-chai", "display_order": 1, "illustration_key": "path-chai" },
+            { "label": "Quiet Park Path", "value": "path-park", "display_order": 2, "illustration_key": "path-park" },
+            { "label": "Glowing Neon Market", "value": "path-neon", "display_order": 3, "illustration_key": "path-neon" },
+            { "label": "Empty Beach Promenade", "value": "path-beach", "display_order": 4, "illustration_key": "path-beach" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "What does your soul crave most right now?",
+            "chips": [
+              { "label": "Rest", "value": "rest" },
+              { "label": "Adventure", "value": "adventure" },
+              { "label": "Company", "value": "company" },
+              { "label": "Quiet", "value": "quiet" },
+              { "label": "Snacks", "value": "snacks" },
+              { "label": "Sunshine", "value": "sunshine" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Rest", "value": "rest", "display_order": 1 },
+            { "label": "Adventure", "value": "adventure", "display_order": 2 },
+            { "label": "Company", "value": "company", "display_order": 3 },
+            { "label": "Quiet", "value": "quiet", "display_order": 4 },
+            { "label": "Snacks", "value": "snacks", "display_order": 5 },
+            { "label": "Sunshine", "value": "sunshine", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-11",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Messaging habits:",
+            "options": [
+              { "label": "Text back instantly", "value": "instant" },
+              { "label": "Craft the perfect reply an hour later", "value": "deliberate" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Text back instantly", "value": "instant", "display_order": 1 },
+            { "label": "Craft the perfect reply an hour later", "value": "deliberate", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Pick a number that genuinely feels friendly to you:",
+            "min": 1,
+            "max": 50,
+            "step": 1
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of rain against a window pane:",
+            "swatches": [
+              { "label": "Storm Petrol", "value": "#0F172A", "hex": "#0F172A" },
+              { "label": "Raindrop Silver", "value": "#94A3B8", "hex": "#94A3B8" },
+              { "label": "Puddle Teal", "value": "#14B8A6", "hex": "#14B8A6" },
+              { "label": "Electric Blue", "value": "#2563EB", "hex": "#2563EB" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Storm Petrol", "value": "#0F172A", "display_order": 1 },
+            { "label": "Raindrop Silver", "value": "#94A3B8", "display_order": 2 },
+            { "label": "Puddle Teal", "value": "#14B8A6", "display_order": 3 },
+            { "label": "Electric Blue", "value": "#2563EB", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "One item for a deserted island cabin:",
+            "illustrations": [
+              { "label": "Thick Book", "value": "island-book", "illustration_key": "island-book" },
+              { "label": "Acoustic Guitar", "value": "island-guitar", "illustration_key": "island-guitar" },
+              { "label": "Reliable Torch", "value": "island-torch", "illustration_key": "island-torch" },
+              { "label": "Blank Notebook", "value": "island-notebook", "illustration_key": "island-notebook" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Thick Book", "value": "island-book", "display_order": 1, "illustration_key": "island-book" },
+            { "label": "Acoustic Guitar", "value": "island-guitar", "display_order": 2, "illustration_key": "island-guitar" },
+            { "label": "Reliable Torch", "value": "island-torch", "display_order": 3, "illustration_key": "island-torch" },
+            { "label": "Blank Notebook", "value": "island-notebook", "display_order": 4, "illustration_key": "island-notebook" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick your battery status in two words:",
+            "chips": [
+              { "label": "Plenty", "value": "plenty" },
+              { "label": "Panic", "value": "panic" },
+              { "label": "Hopeful", "value": "hopeful" },
+              { "label": "Doomed", "value": "doomed" },
+              { "label": "Charging", "value": "charging" },
+              { "label": "Eco-mode", "value": "ecomode" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Plenty", "value": "plenty", "display_order": 1 },
+            { "label": "Panic", "value": "panic", "display_order": 2 },
+            { "label": "Hopeful", "value": "hopeful", "display_order": 3 },
+            { "label": "Doomed", "value": "doomed", "display_order": 4 },
+            { "label": "Charging", "value": "charging", "display_order": 5 },
+            { "label": "Eco-mode", "value": "ecomode", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-12",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Dining etiquette you secretly hold:",
+            "options": [
+              { "label": "Dessert first, always", "value": "dessert_first" },
+              { "label": "Dessert strictly last", "value": "dessert_last" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Dessert first, always", "value": "dessert_first", "display_order": 1 },
+            { "label": "Dessert strictly last", "value": "dessert_last", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Pick a number that sounds like a Friday evening:",
+            "min": 1,
+            "max": 50,
+            "step": 1
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of pure celebration:",
+            "swatches": [
+              { "label": "Neon Gold", "value": "#FBBF24", "hex": "#FBBF24" },
+              { "label": "Hot Coral", "value": "#F43F5E", "hex": "#F43F5E" },
+              { "label": "Cosmic Violet", "value": "#8B5CF6", "hex": "#8B5CF6" },
+              { "label": "Midnight Emerald", "value": "#059669", "hex": "#059669" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Neon Gold", "value": "#FBBF24", "display_order": 1 },
+            { "label": "Hot Coral", "value": "#F43F5E", "display_order": 2 },
+            { "label": "Cosmic Violet", "value": "#8B5CF6", "display_order": 3 },
+            { "label": "Midnight Emerald", "value": "#059669", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Pick your Friday evening vibe:",
+            "illustrations": [
+              { "label": "Indie Cinema", "value": "weekend-cinema", "illustration_key": "weekend-cinema" },
+              { "label": "Spontaneous Road Trip", "value": "weekend-roadtrip", "illustration_key": "weekend-roadtrip" },
+              { "label": "Uninterrupted Long Nap", "value": "weekend-nap", "illustration_key": "weekend-nap" },
+              { "label": "Street Food Night Crawl", "value": "weekend-streetfood", "illustration_key": "weekend-streetfood" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Indie Cinema", "value": "weekend-cinema", "display_order": 1, "illustration_key": "weekend-cinema" },
+            { "label": "Spontaneous Road Trip", "value": "weekend-roadtrip", "display_order": 2, "illustration_key": "weekend-roadtrip" },
+            { "label": "Uninterrupted Long Nap", "value": "weekend-nap", "display_order": 3, "illustration_key": "weekend-nap" },
+            { "label": "Street Food Night Crawl", "value": "weekend-streetfood", "display_order": 4, "illustration_key": "weekend-streetfood" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick your spirit creature for today:",
+            "chips": [
+              { "label": "Rocket", "value": "rocket" },
+              { "label": "Sloth", "value": "sloth" },
+              { "label": "Disco", "value": "disco" },
+              { "label": "Cat", "value": "cat" },
+              { "label": "Owl", "value": "owl" },
+              { "label": "Chill", "value": "chill" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Rocket", "value": "rocket", "display_order": 1 },
+            { "label": "Sloth", "value": "sloth", "display_order": 2 },
+            { "label": "Disco", "value": "disco", "display_order": 3 },
+            { "label": "Cat", "value": "cat", "display_order": 4 },
+            { "label": "Owl", "value": "owl", "display_order": 5 },
+            { "label": "Chill", "value": "chill", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-13",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "If given one perfect unhurried day:",
+            "options": [
+              { "label": "Misty mountain cabin", "value": "mountains" },
+              { "label": "Warm breezy ocean shoreline", "value": "beach" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Misty mountain cabin", "value": "mountains", "display_order": 1 },
+            { "label": "Warm breezy ocean shoreline", "value": "beach", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "How many snacks count as 'just a few'?",
+            "min": 1,
+            "max": 20,
+            "step": 1,
+            "unit": "snacks"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of your all-time favourite song:",
+            "swatches": [
+              { "label": "Velvet Navy", "value": "#1E1B4B", "hex": "#1E1B4B" },
+              { "label": "Sunset Tangerine", "value": "#F97316", "hex": "#F97316" },
+              { "label": "Seafoam Green", "value": "#34D399", "hex": "#34D399" },
+              { "label": "Electric Magenta", "value": "#EC4899", "hex": "#EC4899" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Velvet Navy", "value": "#1E1B4B", "display_order": 1 },
+            { "label": "Sunset Tangerine", "value": "#F97316", "display_order": 2 },
+            { "label": "Seafoam Green", "value": "#34D399", "display_order": 3 },
+            { "label": "Electric Magenta", "value": "#EC4899", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which stall do you wander toward at a bustling bazaar?",
+            "illustrations": [
+              { "label": "Fresh Fruit Pyramid", "value": "market-fruit", "illustration_key": "market-fruit" },
+              { "label": "Second-hand Books", "value": "market-books", "illustration_key": "market-books" },
+              { "label": "Gleaming Bangles", "value": "market-bangles", "illustration_key": "market-bangles" },
+              { "label": "Warm Syrupy Sweets", "value": "market-sweets", "illustration_key": "market-sweets" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Fresh Fruit Pyramid", "value": "market-fruit", "display_order": 1, "illustration_key": "market-fruit" },
+            { "label": "Second-hand Books", "value": "market-books", "display_order": 2, "illustration_key": "market-books" },
+            { "label": "Gleaming Bangles", "value": "market-bangles", "display_order": 3, "illustration_key": "market-bangles" },
+            { "label": "Warm Syrupy Sweets", "value": "market-sweets", "display_order": 4, "illustration_key": "market-sweets" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "If today was a movie, what role are you playing?",
+            "chips": [
+              { "label": "Hero", "value": "hero" },
+              { "label": "Sidekick", "value": "sidekick" },
+              { "label": "Villain", "value": "villain" },
+              { "label": "Narrator", "value": "narrator" },
+              { "label": "Extra", "value": "extra" },
+              { "label": "Plot Twist", "value": "plottwist" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Hero", "value": "hero", "display_order": 1 },
+            { "label": "Sidekick", "value": "sidekick", "display_order": 2 },
+            { "label": "Villain", "value": "villain", "display_order": 3 },
+            { "label": "Narrator", "value": "narrator", "display_order": 4 },
+            { "label": "Extra", "value": "extra", "display_order": 5 },
+            { "label": "Plot Twist", "value": "plottwist", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-14",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Sunday evening mindset:",
+            "options": [
+              { "label": "Carefully plan the upcoming week tonight", "value": "plan" },
+              { "label": "Let Monday morning completely surprise you", "value": "surprise" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Carefully plan the upcoming week tonight", "value": "plan", "display_order": 1 },
+            { "label": "Let Monday morning completely surprise you", "value": "surprise", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Pick a clean slate number for tomorrow:",
+            "min": 1,
+            "max": 50,
+            "step": 1
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of a completely fresh start:",
+            "swatches": [
+              { "label": "Pure Dawn White", "value": "#F8FAFC", "hex": "#F8FAFC" },
+              { "label": "Golden Glow", "value": "#FCD34D", "hex": "#FCD34D" },
+              { "label": "Morning Sky Blue", "value": "#38BDF8", "hex": "#38BDF8" },
+              { "label": "Fresh Sprout Green", "value": "#4ADE80", "hex": "#4ADE80" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Pure Dawn White", "value": "#F8FAFC", "display_order": 1 },
+            { "label": "Golden Glow", "value": "#FCD34D", "display_order": 2 },
+            { "label": "Morning Sky Blue", "value": "#38BDF8", "display_order": 3 },
+            { "label": "Fresh Sprout Green", "value": "#4ADE80", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Pick the horizon that brings you peace:",
+            "illustrations": [
+              { "label": "Golden Dawn", "value": "horizon-goldendawn", "illustration_key": "horizon-goldendawn" },
+              { "label": "Mountain Mist", "value": "horizon-mountainmist", "illustration_key": "horizon-mountainmist" },
+              { "label": "Ocean Sunset", "value": "horizon-oceansunset", "illustration_key": "horizon-oceansunset" },
+              { "label": "Twilight Glow", "value": "horizon-twilight", "illustration_key": "horizon-twilight" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Golden Dawn", "value": "horizon-goldendawn", "display_order": 1, "illustration_key": "horizon-goldendawn" },
+            { "label": "Mountain Mist", "value": "horizon-mountainmist", "display_order": 2, "illustration_key": "horizon-mountainmist" },
+            { "label": "Ocean Sunset", "value": "horizon-oceansunset", "display_order": 3, "illustration_key": "horizon-oceansunset" },
+            { "label": "Twilight Glow", "value": "horizon-twilight", "display_order": 4, "illustration_key": "horizon-twilight" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Your blessing for the week ahead in 2 words:",
+            "chips": [
+              { "label": "Steady", "value": "steady" },
+              { "label": "Wild", "value": "wild" },
+              { "label": "Gentle", "value": "gentle" },
+              { "label": "Busy", "value": "busy" },
+              { "label": "Lucky", "value": "lucky" },
+              { "label": "New", "value": "new" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Steady", "value": "steady", "display_order": 1 },
+            { "label": "Wild", "value": "wild", "display_order": 2 },
+            { "label": "Gentle", "value": "gentle", "display_order": 3 },
+            { "label": "Busy", "value": "busy", "display_order": 4 },
+            { "label": "Lucky", "value": "lucky", "display_order": 5 },
+            { "label": "New", "value": "new", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-15",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Morning wake-up style:",
+            "options": [
+              { "label": "Up at the first ring of the alarm", "value": "first_ring" },
+              { "label": "Hit snooze at least 3 times", "value": "snooze" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Up at the first ring of the alarm", "value": "first_ring", "display_order": 1 },
+            { "label": "Hit snooze at least 3 times", "value": "snooze", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Ideal number of close lifelong friends:",
+            "min": 1,
+            "max": 12,
+            "step": 1
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of total focus:",
+            "swatches": [
+              { "label": "Laser Indigo", "value": "#4338CA", "hex": "#4338CA" },
+              { "label": "Graphite Black", "value": "#0F172A", "hex": "#0F172A" },
+              { "label": "Cyber Mint", "value": "#10B981", "hex": "#10B981" },
+              { "label": "Solar White", "value": "#F8FAFC", "hex": "#F8FAFC" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Laser Indigo", "value": "#4338CA", "display_order": 1 },
+            { "label": "Graphite Black", "value": "#0F172A", "display_order": 2 },
+            { "label": "Cyber Mint", "value": "#10B981", "display_order": 3 },
+            { "label": "Solar White", "value": "#F8FAFC", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which sky energises your thoughts most?",
+            "illustrations": [
+              { "label": "Sunrise Sky", "value": "sunrise", "illustration_key": "sky-sunrise" },
+              { "label": "Storm Sky", "value": "storm", "illustration_key": "sky-storm" },
+              { "label": "Starry Night", "value": "starry", "illustration_key": "sky-starry" },
+              { "label": "Overcast Sky", "value": "overcast", "illustration_key": "sky-overcast" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Sunrise Sky", "value": "sunrise", "display_order": 1, "illustration_key": "sky-sunrise" },
+            { "label": "Storm Sky", "value": "storm", "display_order": 2, "illustration_key": "sky-storm" },
+            { "label": "Starry Night", "value": "starry", "display_order": 3, "illustration_key": "sky-starry" },
+            { "label": "Overcast Sky", "value": "overcast", "display_order": 4, "illustration_key": "sky-overcast" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick your mood compass in two words:",
+            "chips": [
+              { "label": "Driven", "value": "driven" },
+              { "label": "Content", "value": "content" },
+              { "label": "Restless", "value": "restless" },
+              { "label": "Grateful", "value": "grateful" },
+              { "label": "Silly", "value": "silly" },
+              { "label": "Quiet", "value": "quiet" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Driven", "value": "driven", "display_order": 1 },
+            { "label": "Content", "value": "content", "display_order": 2 },
+            { "label": "Restless", "value": "restless", "display_order": 3 },
+            { "label": "Grateful", "value": "grateful", "display_order": 4 },
+            { "label": "Silly", "value": "silly", "display_order": 5 },
+            { "label": "Quiet", "value": "quiet", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-16",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "When discovering a brilliant new song:",
+            "options": [
+              { "label": "Play it on repeat 50 times until sick of it", "value": "repeat" },
+              { "label": "Savour it sparingly so it never gets old", "value": "savour" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Play it on repeat 50 times until sick of it", "value": "repeat", "display_order": 1 },
+            { "label": "Savour it sparingly so it never gets old", "value": "savour", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Ideal room temperature (°C):",
+            "min": 16,
+            "max": 28,
+            "step": 1,
+            "unit": "°C"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of a secret kept safe:",
+            "swatches": [
+              { "label": "Midnight Shadow", "value": "#09090B", "hex": "#09090B" },
+              { "label": "Muted Brass", "value": "#CA8A04", "hex": "#CA8A04" },
+              { "label": "Deep Wine", "value": "#881337", "hex": "#881337" },
+              { "label": "Smoky Quartz", "value": "#78716C", "hex": "#78716C" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Midnight Shadow", "value": "#09090B", "display_order": 1 },
+            { "label": "Muted Brass", "value": "#CA8A04", "display_order": 2 },
+            { "label": "Deep Wine", "value": "#881337", "display_order": 3 },
+            { "label": "Smoky Quartz", "value": "#78716C", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which mysterious door leads to where you need to be?",
+            "illustrations": [
+              { "label": "The Red Door", "value": "door-red", "illustration_key": "door-red" },
+              { "label": "The Weathered Wood Door", "value": "door-wood", "illustration_key": "door-wood" },
+              { "label": "The Smoked Glass Door", "value": "door-glass", "illustration_key": "door-glass" },
+              { "label": "The Mysterious Tiny Door", "value": "door-tiny", "illustration_key": "door-tiny" }
+            ]
+          },
+          "answer_options": [
+            { "label": "The Red Door", "value": "door-red", "display_order": 1, "illustration_key": "door-red" },
+            { "label": "The Weathered Wood Door", "value": "door-wood", "display_order": 2, "illustration_key": "door-wood" },
+            { "label": "The Smoked Glass Door", "value": "door-glass", "display_order": 3, "illustration_key": "door-glass" },
+            { "label": "The Mysterious Tiny Door", "value": "door-tiny", "display_order": 4, "illustration_key": "door-tiny" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick your pace right now in two words:",
+            "chips": [
+              { "label": "Sprint", "value": "sprint" },
+              { "label": "Drift", "value": "drift" },
+              { "label": "Climb", "value": "climb" },
+              { "label": "Glide", "value": "glide" },
+              { "label": "Anchor", "value": "anchor" },
+              { "label": "Float", "value": "float" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Sprint", "value": "sprint", "display_order": 1 },
+            { "label": "Drift", "value": "drift", "display_order": 2 },
+            { "label": "Climb", "value": "climb", "display_order": 3 },
+            { "label": "Glide", "value": "glide", "display_order": 4 },
+            { "label": "Anchor", "value": "anchor", "display_order": 5 },
+            { "label": "Float", "value": "float", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-17",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Social battery after a long night out:",
+            "options": [
+              { "label": "Leave before midnight without fanfare", "value": "ghost" },
+              { "label": "Stay until the very lights come on", "value": "last_one" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Leave before midnight without fanfare", "value": "ghost", "display_order": 1 },
+            { "label": "Stay until the very lights come on", "value": "last_one", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "How many open browser tabs is too many?",
+            "min": 5,
+            "max": 50,
+            "step": 5,
+            "unit": "tabs"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of a quiet sanctuary:",
+            "swatches": [
+              { "label": "Eucalyptus Jade", "value": "#059669", "hex": "#059669" },
+              { "label": "Warm Terracotta", "value": "#EA580C", "hex": "#EA580C" },
+              { "label": "Soft Cloud Blue", "value": "#60A5FA", "hex": "#60A5FA" },
+              { "label": "Oatmeal Neutral", "value": "#E2E8F0", "hex": "#E2E8F0" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Eucalyptus Jade", "value": "#059669", "display_order": 1 },
+            { "label": "Warm Terracotta", "value": "#EA580C", "display_order": 2 },
+            { "label": "Soft Cloud Blue", "value": "#60A5FA", "display_order": 3 },
+            { "label": "Oatmeal Neutral", "value": "#E2E8F0", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which stroll would clear your mind most?",
+            "illustrations": [
+              { "label": "Steaming Chai Lane", "value": "path-chai", "illustration_key": "path-chai" },
+              { "label": "Quiet Park Path", "value": "path-park", "illustration_key": "path-park" },
+              { "label": "Glowing Neon Market", "value": "path-neon", "illustration_key": "path-neon" },
+              { "label": "Empty Beach Promenade", "value": "path-beach", "illustration_key": "path-beach" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Steaming Chai Lane", "value": "path-chai", "display_order": 1, "illustration_key": "path-chai" },
+            { "label": "Quiet Park Path", "value": "path-park", "display_order": 2, "illustration_key": "path-park" },
+            { "label": "Glowing Neon Market", "value": "path-neon", "display_order": 3, "illustration_key": "path-neon" },
+            { "label": "Empty Beach Promenade", "value": "path-beach", "display_order": 4, "illustration_key": "path-beach" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick your secret ingredient for today:",
+            "chips": [
+              { "label": "Patience", "value": "patience" },
+              { "label": "Audacity", "value": "audacity" },
+              { "label": "Laughter", "value": "laughter" },
+              { "label": "Coffee", "value": "coffee" },
+              { "label": "Silence", "value": "silence" },
+              { "label": "Luck", "value": "luck" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Patience", "value": "patience", "display_order": 1 },
+            { "label": "Audacity", "value": "audacity", "display_order": 2 },
+            { "label": "Laughter", "value": "laughter", "display_order": 3 },
+            { "label": "Coffee", "value": "coffee", "display_order": 4 },
+            { "label": "Silence", "value": "silence", "display_order": 5 },
+            { "label": "Luck", "value": "luck", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-18",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Spontaneous decisions:",
+            "options": [
+              { "label": "Jump in and figure it out on the fly", "value": "jump" },
+              { "label": "Check reviews, map, and weather first", "value": "research" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Jump in and figure it out on the fly", "value": "jump", "display_order": 1 },
+            { "label": "Check reviews, map, and weather first", "value": "research", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Pick an even number that has always felt satisfying to you:",
+            "min": 2,
+            "max": 50,
+            "step": 2
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of anticipation:",
+            "swatches": [
+              { "label": "Vibrant Citron", "value": "#EAB308", "hex": "#EAB308" },
+              { "label": "Bright Tangerine", "value": "#F97316", "hex": "#F97316" },
+              { "label": "Neon Fuchsia", "value": "#D946EF", "hex": "#D946EF" },
+              { "label": "Deep Royal Purple", "value": "#581C87", "hex": "#581C87" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Vibrant Citron", "value": "#EAB308", "display_order": 1 },
+            { "label": "Bright Tangerine", "value": "#F97316", "display_order": 2 },
+            { "label": "Neon Fuchsia", "value": "#D946EF", "display_order": 3 },
+            { "label": "Deep Royal Purple", "value": "#581C87", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which tool would you guard with your life?",
+            "illustrations": [
+              { "label": "Thick Book", "value": "island-book", "illustration_key": "island-book" },
+              { "label": "Acoustic Guitar", "value": "island-guitar", "illustration_key": "island-guitar" },
+              { "label": "Reliable Torch", "value": "island-torch", "illustration_key": "island-torch" },
+              { "label": "Blank Notebook", "value": "island-notebook", "illustration_key": "island-notebook" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Thick Book", "value": "island-book", "display_order": 1, "illustration_key": "island-book" },
+            { "label": "Acoustic Guitar", "value": "island-guitar", "display_order": 2, "illustration_key": "island-guitar" },
+            { "label": "Reliable Torch", "value": "island-torch", "display_order": 3, "illustration_key": "island-torch" },
+            { "label": "Blank Notebook", "value": "island-notebook", "display_order": 4, "illustration_key": "island-notebook" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Your state of curiosity in two words:",
+            "chips": [
+              { "label": "Burning", "value": "burning" },
+              { "label": "Patient", "value": "patient" },
+              { "label": "Skeptical", "value": "skeptical" },
+              { "label": "Open", "value": "open" },
+              { "label": "Obsessive", "value": "obsessive" },
+              { "label": "Gentle", "value": "gentle" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Burning", "value": "burning", "display_order": 1 },
+            { "label": "Patient", "value": "patient", "display_order": 2 },
+            { "label": "Skeptical", "value": "skeptical", "display_order": 3 },
+            { "label": "Open", "value": "open", "display_order": 4 },
+            { "label": "Obsessive", "value": "obsessive", "display_order": 5 },
+            { "label": "Gentle", "value": "gentle", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-19",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "Your relationship with books:",
+            "options": [
+              { "label": "Always finish a book once started", "value": "finish" },
+              { "label": "Abandon guilt-free at page 30 if boring", "value": "abandon" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Always finish a book once started", "value": "finish", "display_order": 1 },
+            { "label": "Abandon guilt-free at page 30 if boring", "value": "abandon", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "How many minutes of pure silence do you need daily?",
+            "min": 0,
+            "max": 60,
+            "step": 5,
+            "unit": "min"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of nostalgic longing:",
+            "swatches": [
+              { "label": "Sepia Brown", "value": "#78350F", "hex": "#78350F" },
+              { "label": "Washed Denim", "value": "#60A5FA", "hex": "#60A5FA" },
+              { "label": "Faded Amber", "value": "#D97706", "hex": "#D97706" },
+              { "label": "Muted Moss", "value": "#4D7C0F", "hex": "#4D7C0F" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Sepia Brown", "value": "#78350F", "display_order": 1 },
+            { "label": "Washed Denim", "value": "#60A5FA", "display_order": 2 },
+            { "label": "Faded Amber", "value": "#D97706", "display_order": 3 },
+            { "label": "Muted Moss", "value": "#4D7C0F", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Pick your Saturday morning pleasure:",
+            "illustrations": [
+              { "label": "Fresh Fruit Pyramid", "value": "market-fruit", "illustration_key": "market-fruit" },
+              { "label": "Second-hand Books", "value": "market-books", "illustration_key": "market-books" },
+              { "label": "Gleaming Bangles", "value": "market-bangles", "illustration_key": "market-bangles" },
+              { "label": "Warm Syrupy Sweets", "value": "market-sweets", "illustration_key": "market-sweets" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Fresh Fruit Pyramid", "value": "market-fruit", "display_order": 1, "illustration_key": "market-fruit" },
+            { "label": "Second-hand Books", "value": "market-books", "display_order": 2, "illustration_key": "market-books" },
+            { "label": "Gleaming Bangles", "value": "market-bangles", "display_order": 3, "illustration_key": "market-bangles" },
+            { "label": "Warm Syrupy Sweets", "value": "market-sweets", "display_order": 4, "illustration_key": "market-sweets" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick 2 words that capture your personal gravity:",
+            "chips": [
+              { "label": "Deep", "value": "deep" },
+              { "label": "Light", "value": "light" },
+              { "label": "Direct", "value": "direct" },
+              { "label": "Mysterious", "value": "mysterious" },
+              { "label": "Warm", "value": "warm" },
+              { "label": "Electric", "value": "electric" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Deep", "value": "deep", "display_order": 1 },
+            { "label": "Light", "value": "light", "display_order": 2 },
+            { "label": "Direct", "value": "direct", "display_order": 3 },
+            { "label": "Mysterious", "value": "mysterious", "display_order": 4 },
+            { "label": "Warm", "value": "warm", "display_order": 5 },
+            { "label": "Electric", "value": "electric", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-20",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "City living preference:",
+            "options": [
+              { "label": "High-rise balcony overlooking neon skyline", "value": "highrise" },
+              { "label": "Old leafy courtyard tucked off a quiet lane", "value": "courtyard" }
+            ]
+          },
+          "answer_options": [
+            { "label": "High-rise balcony overlooking neon skyline", "value": "highrise", "display_order": 1 },
+            { "label": "Old leafy courtyard tucked off a quiet lane", "value": "courtyard", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "Pick an odd number that commands respect:",
+            "min": 1,
+            "max": 49,
+            "step": 2
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of quiet confidence:",
+            "swatches": [
+              { "label": "Deep Pine", "value": "#064E3B", "hex": "#064E3B" },
+              { "label": "Midnight Blue", "value": "#172554", "hex": "#172554" },
+              { "label": "Brushed Steel", "value": "#64748B", "hex": "#64748B" },
+              { "label": "Warm Charcoal", "value": "#262626", "hex": "#262626" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Deep Pine", "value": "#064E3B", "display_order": 1 },
+            { "label": "Midnight Blue", "value": "#172554", "display_order": 2 },
+            { "label": "Brushed Steel", "value": "#64748B", "display_order": 3 },
+            { "label": "Warm Charcoal", "value": "#262626", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which horizon draws you in closest?",
+            "illustrations": [
+              { "label": "Golden Dawn", "value": "horizon-goldendawn", "illustration_key": "horizon-goldendawn" },
+              { "label": "Mountain Mist", "value": "horizon-mountainmist", "illustration_key": "horizon-mountainmist" },
+              { "label": "Ocean Sunset", "value": "horizon-oceansunset", "illustration_key": "horizon-oceansunset" },
+              { "label": "Twilight Glow", "value": "horizon-twilight", "illustration_key": "horizon-twilight" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Golden Dawn", "value": "horizon-goldendawn", "display_order": 1, "illustration_key": "horizon-goldendawn" },
+            { "label": "Mountain Mist", "value": "horizon-mountainmist", "display_order": 2, "illustration_key": "horizon-mountainmist" },
+            { "label": "Ocean Sunset", "value": "horizon-oceansunset", "display_order": 3, "illustration_key": "horizon-oceansunset" },
+            { "label": "Twilight Glow", "value": "horizon-twilight", "display_order": 4, "illustration_key": "horizon-twilight" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Pick your truth in two words:",
+            "chips": [
+              { "label": "Real", "value": "real" },
+              { "label": "Raw", "value": "raw" },
+              { "label": "Kind", "value": "kind" },
+              { "label": "Unfinished", "value": "unfinished" },
+              { "label": "Brave", "value": "brave" },
+              { "label": "Free", "value": "free" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Real", "value": "real", "display_order": 1 },
+            { "label": "Raw", "value": "raw", "display_order": 2 },
+            { "label": "Kind", "value": "kind", "display_order": 3 },
+            { "label": "Unfinished", "value": "unfinished", "display_order": 4 },
+            { "label": "Brave", "value": "brave", "display_order": 5 },
+            { "label": "Free", "value": "free", "display_order": 6 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-11-21",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "payload": {
+            "type": "text",
+            "prompt": "When entering an unfamiliar room of strangers:",
+            "options": [
+              { "label": "Find the snack table or quiet corner", "value": "corner" },
+              { "label": "Strike up a conversation with the nearest person", "value": "mingle" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Find the snack table or quiet corner", "value": "corner", "display_order": 1 },
+            { "label": "Strike up a conversation with the nearest person", "value": "mingle", "display_order": 2 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "number",
+          "payload": {
+            "type": "number",
+            "prompt": "How many hours of sleep leaves you feeling unstoppable?",
+            "min": 5,
+            "max": 10,
+            "step": 0.5,
+            "unit": "hrs"
+          },
+          "answer_options": []
+        },
+        {
+          "position": 3,
+          "type": "colour",
+          "payload": {
+            "type": "colour",
+            "prompt": "The colour of serendipity:",
+            "swatches": [
+              { "label": "Electric Turquoise", "value": "#06B6D4", "hex": "#06B6D4" },
+              { "label": "Golden Poppy", "value": "#FBBF24", "hex": "#FBBF24" },
+              { "label": "Cosmic Lilac", "value": "#C084FC", "hex": "#C084FC" },
+              { "label": "Peach Melba", "value": "#FDA4AF", "hex": "#FDA4AF" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Electric Turquoise", "value": "#06B6D4", "display_order": 1 },
+            { "label": "Golden Poppy", "value": "#FBBF24", "display_order": 2 },
+            { "label": "Cosmic Lilac", "value": "#C084FC", "display_order": 3 },
+            { "label": "Peach Melba", "value": "#FDA4AF", "display_order": 4 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "payload": {
+            "type": "image",
+            "prompt": "Which sky captures what tomorrow might hold?",
+            "illustrations": [
+              { "label": "Sunrise Sky", "value": "sunrise", "illustration_key": "sky-sunrise" },
+              { "label": "Storm Sky", "value": "storm", "illustration_key": "sky-storm" },
+              { "label": "Starry Night", "value": "starry", "illustration_key": "sky-starry" },
+              { "label": "Overcast Sky", "value": "overcast", "illustration_key": "sky-overcast" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Sunrise Sky", "value": "sunrise", "display_order": 1, "illustration_key": "sky-sunrise" },
+            { "label": "Storm Sky", "value": "storm", "display_order": 2, "illustration_key": "sky-storm" },
+            { "label": "Starry Night", "value": "starry", "display_order": 3, "illustration_key": "sky-starry" },
+            { "label": "Overcast Sky", "value": "overcast", "display_order": 4, "illustration_key": "sky-overcast" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "word",
+          "payload": {
+            "type": "word",
+            "prompt": "Your final two words as this cycle ends:",
+            "chips": [
+              { "label": "Ready", "value": "ready" },
+              { "label": "Complete", "value": "complete" },
+              { "label": "Wonder", "value": "wonder" },
+              { "label": "Alive", "value": "alive" },
+              { "label": "Still", "value": "still" },
+              { "label": "Begun", "value": "begun" }
+            ],
+            "max_selections": 2
+          },
+          "answer_options": [
+            { "label": "Ready", "value": "ready", "display_order": 1 },
+            { "label": "Complete", "value": "complete", "display_order": 2 },
+            { "label": "Wonder", "value": "wonder", "display_order": 3 },
+            { "label": "Alive", "value": "alive", "display_order": 4 },
+            { "label": "Still", "value": "still", "display_order": 5 },
+            { "label": "Begun", "value": "begun", "display_order": 6 }
+          ]
+        }
+      ]
+    }
+  ]
+}
