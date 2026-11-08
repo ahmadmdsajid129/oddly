@@ -177,20 +177,20 @@ _Status: COMPLETE | Target: Animated reveal, count-up match score, oddness card,
 
 ### Phase 6: Share Cards, Share Pages, and Challenge Links (Stage 6)
 
-_Status: TODO | Target: Satori PNG card generator, `/c/:shortId` landing page, challenge loops._
+_Status: COMPLETE | Target: Satori PNG card generator, `/c/:shortId` landing page, challenge loops._
 
-| ID      | Task Description                                                                               | Priority | Status | Depends On   | Owner | Done Date | Notes                        |
-| ------- | ---------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------- |
-| `P6.01` | Build Satori card layout templates (Story 9:16, Square 1:1, Link 1.91:1) in 3 themes           | Critical | TODO   | P1.01, P1.02 | Agent | —         | Serverless card layouts      |
-| `P6.02` | Implement BullMQ card rendering job (`renderCard`) with `@resvg/resvg-js` PNG output           | Critical | TODO   | P6.01, P0.06 | Agent | —         | High-resolution image worker |
-| `P6.03` | Configure Cloudflare R2 / local filesystem storage client with content-hash keying             | High     | TODO   | P6.02        | Agent | —         | S3-compatible card storage   |
-| `P6.04` | Implement `GET /v1/results/:dropId/card` polling endpoint and skeleton placeholder in UI       | High     | TODO   | P6.03        | Agent | —         | Async card retrieval         |
-| `P6.05` | Implement S8 Share Sheet (Web Share API with file attachment, copy link, save image)           | High     | TODO   | P6.04        | Agent | —         | Native share integration     |
-| `P6.06` | Build `/c/:shortId` public share landing page with dynamic Open Graph meta tags                | Critical | TODO   | P6.03        | Agent | —         | Viral receiver landing page  |
-| `P6.07` | Implement Challenge Link parameter (`?challenge=1`) and "You vs Sharer" pick comparison        | High     | TODO   | P6.06        | Agent | —         | Compares public picks only   |
-| `P6.08` | Integrate in-memory QR code generator (`qrcode`) onto share card footer                        | Medium   | TODO   | P6.01        | Agent | —         | Scannable card QR code       |
-| `P6.09` | Write visual regression tests for generated share cards across all 3 aspect ratios             | High     | TODO   | P6.02        | Agent | —         | Ensures layout consistency   |
-| `P6.10` | Write privacy audit test asserting zero PII or user IDs appear on share cards or landing pages | Critical | TODO   | P6.06        | Agent | —         | Strict privacy verification  |
+| ID      | Task Description                                                                               | Priority | Status | Depends On   | Owner | Done Date   | Notes                        |
+| ------- | ---------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------- |
+| `[x] P6.01` | Build Satori card layout templates (Story 9:16, Square 1:1, Link 1.91:1) in 3 themes           | Critical | DONE   | P1.01, P1.02 | Agent | 2026-11-08  | Serverless card layouts      |
+| `[x] P6.02` | Implement BullMQ card rendering job (`renderCard`) with `@resvg/resvg-js` PNG output           | Critical | DONE   | P6.01, P0.06 | Agent | 2026-11-08  | High-resolution image worker |
+| `[x] P6.03` | Configure Cloudflare R2 / local filesystem storage client with content-hash keying             | High     | DONE   | P6.02        | Agent | 2026-11-08  | S3-compatible card storage   |
+| `[x] P6.04` | Implement `GET /v1/results/:dropId/card` polling endpoint and skeleton placeholder in UI       | High     | DONE   | P6.03        | Agent | 2026-11-08  | Async card retrieval         |
+| `[x] P6.05` | Implement S8 Share Sheet (Web Share API with file attachment, copy link, save image)           | High     | DONE   | P6.04        | Agent | 2026-11-08  | Native share integration     |
+| `[x] P6.06` | Build `/c/:shortId` public share landing page with dynamic Open Graph meta tags                | Critical | DONE   | P6.03        | Agent | 2026-11-08  | Viral receiver landing page  |
+| `[x] P6.07` | Implement Challenge Link parameter (`?challenge=1`) and "You vs Sharer" pick comparison        | High     | DONE   | P6.06        | Agent | 2026-11-08  | Compares public picks only   |
+| `[x] P6.08` | Integrate in-memory QR code generator (`qrcode`) onto share card footer                        | Medium   | DONE   | P6.01        | Agent | 2026-11-08  | Scannable card QR code       |
+| `[x] P6.09` | Write visual regression tests for generated share cards across all 3 aspect ratios             | High     | DONE   | P6.02        | Agent | 2026-11-08  | Ensures layout consistency   |
+| `[x] P6.10` | Write privacy audit test asserting zero PII or user IDs appear on share cards or landing pages | Critical | DONE   | P6.06        | Agent | 2026-11-08  | Strict privacy verification  |
 
 ---
 
@@ -382,8 +382,8 @@ _Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
   - [ ] Inspect reveal sequence: 1.5s search journey, twin card slide-up, pick dot illumination, confetti burst.
   - [ ] Inspect Oddness card, percentile count-up, and verify honest copy displays for low player counts.
 - **Stage 6 Checklist:**
-  - [ ] Generate share cards across Story, Square, and Link formats; verify crisp rendering and QR code.
-  - [ ] Open `/c/:shortId` in an incognito window; verify dynamic Open Graph tags and "Play" CTA.
+  - [x] Generate share cards across Story, Square, and Link formats; verify crisp rendering and QR code.
+  - [x] Open `/c/:shortId` in an incognito window; verify dynamic Open Graph tags and "Play" CTA.
 - **Stage 7 Checklist:**
   - [ ] Sign in with Google from the result sheet; verify guest picks and streaks merge without data loss.
 - **Stage 8 Checklist:**
@@ -413,3 +413,8 @@ _Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
 | `2026-11-07` | Phase 0 to 15             | Established initial 16-phase roadmap containing 165 granular, tracked engineering tasks.                       | Comprehensive project initialisation.         |
 | `2026-11-07` | Stage 0 Complete          | Verified monorepo skeleton, 6 core markdown documents, and base scripts (typecheck, lint, test, build, dev).    | Stage 0 Definition of Done achieved.          |
 | `2026-11-07` | Stage 1 Complete          | Built complete design system, UI kit, 28 SVGs, interactive controls, and `/design` showcase route. Verified.   | Stage 1 Definition of Done achieved.          |
+| `2026-11-08` | Stage 2 Complete          | Completed PostgreSQL schema, 18 tables, Prisma seed, pure scoring math, and k-anonymity helpers.              | Stage 2 Definition of Done achieved.          |
+| `2026-11-08` | Stage 3 Complete          | Built Fastify REST API core, Swagger docs, guest identity sessions, and typed API client.                     | Stage 3 Definition of Done achieved.          |
+| `2026-11-08` | Stage 4 Complete          | Built play flow frontend (S1 Landing, S2 Countdown, Age Gate, S3 Questions, S4 Review).                       | Stage 4 Definition of Done achieved.          |
+| `2026-11-08` | Stage 5 Complete          | Built reveal radar (2.0s), count-up TwinReveal, confetti, and Oddness tiers. Passing 92 tests.              | Stage 5 Definition of Done achieved.          |
+| `2026-11-08` | Stage 6 Complete          | Built Satori share card generator (3 themes, 3 ratios), QR code, S8 Share Sheet, and `/c/:shortId` challenge. | Stage 6 Definition of Done achieved.          |
