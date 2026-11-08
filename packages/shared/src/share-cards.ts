@@ -3,15 +3,14 @@ import path from "node:path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import { generateQrCodeDataUrl } from "./qrcode.js";
-import type { TierName } from "./scoring.js";
+import type { ShareFormat, Tier } from "./types.js";
 
-export type ShareFormat = "story" | "square" | "link";
 export type ShareTheme = "dark" | "light" | "mythic";
 
 export interface ShareCardData {
   score: number; // e.g. 4
   total?: number; // default 5
-  tier: TierName; // "Common" | "Uncommon" | "Rare" | "Mythic"
+  tier: Tier; // "Common" | "Uncommon" | "Rare" | "Mythic"
   percentile: number; // e.g. 84
   twinCity?: string; // e.g. "Berlin, Germany"
   rarestPickTitle?: string; // e.g. "Violet for Monday Morning"
@@ -73,7 +72,7 @@ interface ThemePalette {
   pillText: string;
 }
 
-function getThemePalette(theme: ShareTheme, tier: TierName): ThemePalette {
+function getThemePalette(theme: ShareTheme, tier: Tier): ThemePalette {
   if (theme === "light") {
     return {
       bg: "#FFF8F0",
