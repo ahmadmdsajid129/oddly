@@ -7,14 +7,20 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "vitest run"
+    "test": "vitest run",
+    "generate": "prisma generate --schema=./prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
+    "db:seed": "tsx prisma/seed.ts",
+    "sim": "tsx src/simulation.ts"
   },
   "dependencies": {
+    "@prisma/client": "5.22.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "prisma": "5.22.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^2.1.4"
   }
 }
-
