@@ -6,7 +6,7 @@
  * Zod validation, OpenAPI docs, cookies, and rate limits.
  */
 
-import Fastify, { FastifyInstance } from "fastify";
+import Fastify from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import cookie from "@fastify/cookie";
@@ -14,6 +14,7 @@ import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import {
+  hasZodFastifySchemaValidationErrors,
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
@@ -36,7 +37,7 @@ export interface ServerOptions {
 
 export async function buildServer(
   opts: ServerOptions = {}
-): Promise<FastifyInstance> {
+) {
   const app = Fastify({
     logger: opts.logger ?? {
       level: process.env.LOG_LEVEL || "info",
@@ -151,14 +152,33 @@ export async function buildServer(
   await app.register(resultsRoutes);
   await app.register(worldRoutes);
 
-  // 8. Global error handler mapping Zod errors cleanly
+  // 8. Propagate correlation requestId header on all responses
+  app.addHook("onSend", async (request, reply) => {
+    reply.header("x-request-id", request.id);
+  });
+
+  // 9. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {
-    if (error.validation) {
+    const err = error as {
+      code?: string;
+      validation?: unknown;
+      issues?: unknown;
+      name?: string;
+      message?: string;
+      statusCode?: number;
+    };
+
+    if (
+      hasZodFastifySchemaValidationErrors(error) ||
+      error.validation ||
+      error.name === "ZodError" ||
+      err.code === "FST_ERR_VALIDATION"
+    ) {
       reply.status(400).send({
         ok: false,
         error: "VALIDATION_ERROR",
-        message: error.message,
-        details: error.validation,
+        message: error.message || "Request validation failed",
+        details: err.validation || err.issues,
       });
       return;
     }
