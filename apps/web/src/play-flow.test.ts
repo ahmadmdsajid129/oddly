@@ -17,7 +17,7 @@ import {
 import { AnswerPayloadSchema } from "@oddly/shared";
 import type { AnswerPayload } from "@oddly/shared";
 
-// Mock localStorage for node environment
+// Mock localStorage and window for node environment
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
@@ -33,6 +33,13 @@ const localStorageMock = (() => {
     },
   };
 })();
+
+Object.defineProperty(global, "window", {
+  value: {
+    localStorage: localStorageMock,
+  },
+  writable: true,
+});
 
 Object.defineProperty(global, "localStorage", {
   value: localStorageMock,
