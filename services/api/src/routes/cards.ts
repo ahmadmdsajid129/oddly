@@ -9,7 +9,13 @@ import {
   type ShareTheme,
   type Tier,
 } from "@oddly/shared";
-import { submissionsRepo, dropsRepo, matchesRepo, sharesRepo } from "../db/index.js";
+import {
+  prisma,
+  SubmissionsRepository,
+  DropsRepository,
+  MatchesRepository,
+  SharesRepository,
+} from "../db/index.js";
 
 const CardQuerySchema = z.object({
   format: z.enum(["story", "square", "link"]).default("story"),
@@ -68,7 +74,7 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
       const theme = (req.query.theme as ShareTheme) || "dark";
 
       // 1. Fetch submission
-      const submission = await submissionsRepo.findByPlayerAndDrop(playerId, dropId);
+      const submission = await SubmissionsRepository.findByPlayerAndDrop(playerId, dropId);
       if (!submission) {
         return reply.status(404).send({
           error: "SUBMISSION_NOT_FOUND",
@@ -76,23 +82,29 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      // 2. Fetch drop & match context
-      const drop = await dropsRepo.findById(dropId);
-      const match = await matchesRepo.findBySubmission(submission.id);
-      const { short_id: shortId } = await sharesRepo.createShortLink(submission.id);
+      // 2. Fetch drop & match & oddness context
+      const drop = await DropsRepository.getDropById(dropId);
+      const match = await MatchesRepository.getMatchForPlayer(dropId, playerId);
+      const oddness = await prisma.oddnessScore.findUnique({
+        where: { submission_id: submission.id },
+      });
+      const { short_id: shortId } = await SharesRepository.createShortLink(submission.id);
 
-      const score = match?.score ?? 3;
-      const tier = (match?.tier || "Common") as Tier;
-      const percentile = match?.percentile ?? 50;
+      const score = match ? Math.round(match.similarity_score * 5) : 3;
+      const tier = (oddness?.tier || "Common") as Tier;
+      const percentile = oddness?.percentile ?? 50;
 
-      // Extract twin persona if present
+      const twinPlayer = match
+        ? match.player_a_id === playerId
+          ? match.player_b
+          : match.player_a
+        : null;
+
       let twinCity = "Berlin, Germany";
-      if (match?.twin_persona && typeof match.twin_persona === "object") {
-        const persona = match.twin_persona as Record<string, unknown>;
-        if (typeof persona.city === "string" && typeof persona.country === "string") {
-          twinCity = `${persona.city}, ${persona.country}`;
-        }
-      }
+      if (twinPlayer?.region === "IN") twinCity = "Mumbai, India";
+      else if (twinPlayer?.region === "US") twinCity = "New York, USA";
+      else if (twinPlayer?.region === "GB") twinCity = "London, UK";
+      else if (twinPlayer?.region === "DE") twinCity = "Berlin, Germany";
 
       // 3. Compute storage key
       const contentHash = computeCardContentHash({
@@ -141,7 +153,7 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
         });
 
         publicUrl = await storage.putCard(storageKey, pngBuffer);
-        await sharesRepo.saveShareCard(submission.id, format, storageKey);
+        await SharesRepository.saveShareCard(submission.id, format, storageKey);
       }
 
       // Set CDN immutable caching

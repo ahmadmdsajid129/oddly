@@ -1,6 +1,12 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { submissionsRepo, dropsRepo, matchesRepo, sharesRepo } from "../db/index.js";
+import {
+  prisma,
+  SubmissionsRepository,
+  DropsRepository,
+  MatchesRepository,
+  SharesRepository,
+} from "../db/index.js";
 
 export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
   /**
@@ -43,7 +49,7 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       const { dropId } = req.body;
-      const submission = await submissionsRepo.findByPlayerAndDrop(playerId, dropId);
+      const submission = await SubmissionsRepository.findByPlayerAndDrop(playerId, dropId);
       if (!submission) {
         return reply.status(404).send({
           error: "SUBMISSION_NOT_FOUND",
@@ -51,7 +57,7 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      const { short_id: shortId } = await sharesRepo.createShortLink(submission.id);
+      const { short_id: shortId } = await SharesRepository.createShortLink(submission.id);
 
       return reply.send({
         success: true,
@@ -109,7 +115,7 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
     },
     async (req, reply) => {
       const { shortId } = req.params;
-      const shortLink = await sharesRepo.findByShortId(shortId);
+      const shortLink = await SharesRepository.findByShortId(shortId);
 
       if (!shortLink) {
         return reply.status(404).send({
@@ -119,10 +125,10 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       // Increment view count asynchronously
-      void sharesRepo.incrementViews(shortId);
+      void SharesRepository.incrementViews(shortId);
 
       // Fetch submission
-      const submission = await submissionsRepo.findById(shortLink.submission_id);
+      const submission = await SubmissionsRepository.getById(shortLink.submission_id);
       if (!submission) {
         return reply.status(404).send({
           error: "SUBMISSION_NOT_FOUND",
@@ -130,17 +136,24 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      // Fetch drop and match details
-      const drop = await dropsRepo.findById(submission.drop_id);
-      const match = await matchesRepo.findBySubmission(submission.id);
+      // Fetch drop, oddness, and match details
+      const drop = await DropsRepository.getDropById(submission.drop_id);
+      const match = await MatchesRepository.getMatchForPlayer(submission.drop_id, submission.player_id);
+      const oddness = await prisma.oddnessScore.findUnique({
+        where: { submission_id: submission.id },
+      });
+
+      const twinPlayer = match
+        ? match.player_a_id === submission.player_id
+          ? match.player_b
+          : match.player_a
+        : null;
 
       let twinCity = "Berlin, Germany";
-      if (match?.twin_persona && typeof match.twin_persona === "object") {
-        const persona = match.twin_persona as Record<string, unknown>;
-        if (typeof persona.city === "string" && typeof persona.country === "string") {
-          twinCity = `${persona.city}, ${persona.country}`;
-        }
-      }
+      if (twinPlayer?.region === "IN") twinCity = "Mumbai, India";
+      else if (twinPlayer?.region === "US") twinCity = "New York, USA";
+      else if (twinPlayer?.region === "GB") twinCity = "London, UK";
+      else if (twinPlayer?.region === "DE") twinCity = "Berlin, Germany";
 
       // Map questions and answers cleanly without any player/user references
       const rawAnswers = (submission.answers as any[]) || [];
@@ -163,9 +176,9 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
         shortId,
         dropId: submission.drop_id,
         dropDate: drop?.drop_date ? new Date(drop.drop_date).toISOString() : new Date().toISOString(),
-        sharerScore: match?.score ?? 3,
-        sharerTier: match?.tier ?? "Common",
-        sharerPercentile: match?.percentile ?? 50,
+        sharerScore: match ? Math.round(match.similarity_score * 5) : 3,
+        sharerTier: oddness?.tier ?? "Common",
+        sharerPercentile: oddness?.percentile ?? 50,
         twinCity,
         answers: sanitizedAnswers,
         questions: sanitizedQuestions,
