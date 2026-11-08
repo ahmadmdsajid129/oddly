@@ -430,7 +430,7 @@ export default function HomePage() {
         <ShareSheet
           isOpen={isShareSheetOpen}
           onClose={() => setIsShareSheetOpen(false)}
-          dropId={todayDrop.id}
+          dropId={activeDropId}
           defaultFormat={shareFormat}
         />
       </>
@@ -457,7 +457,7 @@ export default function HomePage() {
         <ShareSheet
           isOpen={isShareSheetOpen}
           onClose={() => setIsShareSheetOpen(false)}
-          dropId={todayDrop.id}
+          dropId={activeDropId}
           defaultFormat={shareFormat}
         />
       </>
