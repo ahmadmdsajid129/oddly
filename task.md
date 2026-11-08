@@ -1,6 +1,6 @@
 # Phase and Task Breakdown — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-07 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-08 | Owner: Founder + AI agent
 Purpose of this file: Authoritative project roadmap, task tracking, progress bars, phase dependencies, and verification criteria across all 16 stages (Stage 0 to Stage 15).
 
 ---
@@ -9,13 +9,13 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 
 | Metric                          | Current Value                                             |
 | ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[█████░░░░░░░░░░░░░░░] 27%`                              |
-| **Current Active Stage**        | **Stage 2 Complete (Awaiting Founder review for Stage 3)**|
+| **Overall Project Progress**    | `[██████░░░░░░░░░░░░░░] 35%`                              |
+| **Current Active Stage**        | **Stage 3 Complete (Awaiting Founder review for Stage 4)**|
 | **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 45 tasks                                                  |
+| **Completed Tasks (`DONE`)**    | 57 tasks                                                  |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 120 tasks                                                 |
+| **Pending (`TODO`)**            | 108 tasks                                                 |
 
 ---
 
@@ -26,8 +26,8 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | **Phase 0**  | Documentation & Skeleton Initialisation | Critical | COMPLETE  | `[##########] 100%`| 14 / 14            | Stage 0              |
 | **Phase 1**  | Design System & UI Kit                  | High     | COMPLETE  | `[##########] 100%`| 19 / 19            | Stage 1              |
 | **Phase 2**  | Database & Shared Core Scoring          | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 2              |
-| **Phase 3**  | Fastify REST API Core                   | Critical | TODO        | `[----------] 0%` | 0 / 12             | Stage 3              |
-| **Phase 4**  | Play Flow Frontend (PWA)                | Critical | TODO        | `[----------] 0%` | 0 / 11             | Stage 4              |
+| **Phase 3**  | Fastify REST API Core                   | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 3              |
+| **Phase 4**  | Play Flow Frontend (PWA)                | Critical | TODO      | `[----------] 0%` | 0 / 11             | Stage 4              |
 | **Phase 5**  | Reveal, Matching UX & Oddness           | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 5              |
 | **Phase 6**  | Server-Rendered Share Cards & Links     | High     | TODO        | `[----------] 0%` | 0 / 10             | Stage 6              |
 | **Phase 7**  | Authentication & Guest Merge            | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 7              |
@@ -118,22 +118,22 @@ _Status: COMPLETE | Target: Prisma schema, dynamic seed files, mathematical scor
 
 ### Phase 3: Fastify REST API Core (Stage 3)
 
-_Status: TODO | Target: Working API endpoints with rate limits and Zod validation._
+_Status: COMPLETE | Target: Working API endpoints with rate limits and Zod validation._
 
-| ID      | Task Description                                                                                          | Priority | Status | Depends On   | Owner | Done Date | Notes                              |
-| ------- | --------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------- |
-| `P3.01` | Build Fastify server factory with CORS, Helmet, Cookie, Rate-Limit, and Zod type provider                 | Critical | TODO   | P0.05, P2.03 | Agent | —         | Secure HTTP foundation             |
-| `P3.02` | Configure structured Pino logging with correlation `requestId` propagation                                | High     | TODO   | P3.01        | Agent | —         | Traceable server logs              |
-| `P3.03` | Implement `GET /v1/drop/today`, `GET /v1/content/:locale`, `GET /v1/pages/:slug`, `GET /v1/config/public` | Critical | TODO   | P3.01, P2.11 | Agent | —         | Edge-cached public documents       |
-| `P3.04` | Implement guest identity creation and cookie issuance (`oddly_did`, `oddly_at`)                           | High     | TODO   | P3.01        | Agent | —         | Zero-login guest session           |
-| `P3.05` | Implement `POST /v1/submissions` with Zod validation, idempotency, transaction, and Redis counters        | Critical | TODO   | P3.01, P2.11 | Agent | —         | Core submission engine             |
-| `P3.06` | Integrate instant Stage A matching and oddness scoring inside submission pipeline                         | Critical | TODO   | P3.05, P2.06 | Agent | —         | Returns provisional twin in < 50ms |
-| `P3.07` | Implement `GET /v1/results/:dropId` for viewing current provisional or final match                        | High     | TODO   | P3.05        | Agent | —         | Personal result endpoint           |
-| `P3.08` | Implement `GET /v1/world/:dropId` returning aggregate global stats post-close                             | Medium   | TODO   | P3.03        | Agent | —         | Recap statistics                   |
-| `P3.09` | Implement rate limiting and anti-bot timing anomaly detection (< 3s total duration flagged)               | High     | TODO   | P3.05        | Agent | —         | Bot defenses                       |
-| `P3.10` | Write API integration tests covering happy path, duplicate submit, closed window, and retries             | Critical | TODO   | P3.05-P3.09  | Agent | —         | Comprehensive test suite           |
-| `P3.11` | Generate typed OpenAPI documentation directly from Zod route schemas                                      | Low      | TODO   | P3.01        | Agent | —         | Self-documenting API               |
-| `P3.12` | Generate and export typed `@oddly/api-client` package                                                     | High     | TODO   | P3.10        | Agent | —         | Universal API client library       |
+| ID          | Task Description                                                                                          | Priority | Status | Depends On   | Owner | Done Date   | Notes                              |
+| ----------- | --------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------- |
+| `[x] P3.01` | Build Fastify server factory with CORS, Helmet, Cookie, Rate-Limit, and Zod type provider                 | Critical | DONE   | P0.05, P2.03 | Agent | 2026-11-08  | Secure HTTP foundation             |
+| `[x] P3.02` | Configure structured Pino logging with correlation `requestId` propagation                                | High     | DONE   | P3.01        | Agent | 2026-11-08  | Traceable server logs              |
+| `[x] P3.03` | Implement `GET /v1/drop/today`, `GET /v1/content/:locale`, `GET /v1/pages/:slug`, `GET /v1/config/public` | Critical | DONE   | P3.01, P2.11 | Agent | 2026-11-08  | Edge-cached public documents       |
+| `[x] P3.04` | Implement guest identity creation and cookie issuance (`oddly_did`, `oddly_at`)                           | High     | DONE   | P3.01        | Agent | 2026-11-08  | Zero-login guest session           |
+| `[x] P3.05` | Implement `POST /v1/submissions` with Zod validation, idempotency, transaction, and Redis counters        | Critical | DONE   | P3.01, P2.11 | Agent | 2026-11-08  | Core submission engine             |
+| `[x] P3.06` | Integrate instant Stage A matching and oddness scoring inside submission pipeline                         | Critical | DONE   | P3.05, P2.06 | Agent | 2026-11-08  | Returns provisional twin in < 50ms |
+| `[x] P3.07` | Implement `GET /v1/results/:dropId` for viewing current provisional or final match                        | High     | DONE   | P3.05        | Agent | 2026-11-08  | Personal result endpoint           |
+| `[x] P3.08` | Implement `GET /v1/world/:dropId` returning aggregate global stats post-close                             | Medium   | DONE   | P3.03        | Agent | 2026-11-08  | Recap statistics                   |
+| `[x] P3.09` | Implement rate limiting and anti-bot timing anomaly detection (< 3s total duration flagged)               | High     | DONE   | P3.05        | Agent | 2026-11-08  | Bot defenses                       |
+| `[x] P3.10` | Write API integration tests covering happy path, duplicate submit, closed window, and retries             | Critical | DONE   | P3.05-P3.09  | Agent | 2026-11-08  | Comprehensive test suite           |
+| `[x] P3.11` | Generate typed OpenAPI documentation directly from Zod route schemas                                      | Low      | DONE   | P3.01        | Agent | 2026-11-08  | Self-documenting API               |
+| `[x] P3.12` | Generate and export typed `@oddly/api-client` package                                                     | High     | DONE   | P3.10        | Agent | 2026-11-08  | Universal API client library       |
 
 ---
 
