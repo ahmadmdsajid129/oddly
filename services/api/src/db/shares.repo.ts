@@ -13,7 +13,7 @@ export class SharesRepository {
   /**
    * Creates or retrieves an existing short link for a submission.
    */
-  async createShortLink(submissionId: string): Promise<{ short_id: string; isNew: boolean }> {
+  static async createShortLink(submissionId: string): Promise<{ short_id: string; isNew: boolean }> {
     // Check if an existing short link was already issued for this submission
     const existing = await prisma.shortLink.findFirst({
       where: { submission_id: submissionId },
@@ -34,7 +34,7 @@ export class SharesRepository {
           },
         });
         return { short_id: created.short_id, isNew: true };
-      } catch (err) {
+      } catch {
         shortId = SharesRepository.generateShortId();
       }
     }
@@ -45,7 +45,7 @@ export class SharesRepository {
   /**
    * Finds a short link by its public 7-character token.
    */
-  async findByShortId(shortId: string) {
+  static async findByShortId(shortId: string) {
     return await prisma.shortLink.findUnique({
       where: { short_id: shortId },
     });
@@ -54,7 +54,7 @@ export class SharesRepository {
   /**
    * Atomically increments the view counter for a short link.
    */
-  async incrementViews(shortId: string): Promise<void> {
+  static async incrementViews(shortId: string): Promise<void> {
     try {
       await prisma.shortLink.update({
         where: { short_id: shortId },
@@ -68,7 +68,7 @@ export class SharesRepository {
   /**
    * Upserts a share card record for a submission and format.
    */
-  async saveShareCard(
+  static async saveShareCard(
     submissionId: string,
     format: ShareFormat,
     storageKey: string
@@ -77,12 +77,12 @@ export class SharesRepository {
       where: {
         submission_id_format: {
           submission_id: submissionId,
-          format: format as any,
+          format,
         },
       },
       create: {
         submission_id: submissionId,
-        format: format as any,
+        format,
         storage_key: storageKey,
       },
       update: {
@@ -95,16 +95,14 @@ export class SharesRepository {
   /**
    * Finds an existing generated share card.
    */
-  async findShareCard(submissionId: string, format: ShareFormat) {
+  static async findShareCard(submissionId: string, format: ShareFormat) {
     return await prisma.shareCard.findUnique({
       where: {
         submission_id_format: {
           submission_id: submissionId,
-          format: format as any,
+          format,
         },
       },
     });
   }
 }
-
-export const sharesRepo = new SharesRepository();
