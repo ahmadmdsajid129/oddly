@@ -116,7 +116,7 @@ export default function ChallengeClientView({
   if (loading) {
     return (
       <main className="min-h-screen bg-bg text-text flex flex-col items-center justify-center p-4">
-        <Atmosphere mode="searching" />
+        <Atmosphere mode="hero" />
         <div className="w-12 h-12 border-4 border-violet border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-sm text-textMuted font-medium">Loading challenge...</p>
       </main>
@@ -126,7 +126,7 @@ export default function ChallengeClientView({
   if (error || !shareData) {
     return (
       <main className="min-h-screen bg-bg text-text flex flex-col items-center justify-center p-6 text-center">
-        <Atmosphere mode="common" />
+        <Atmosphere mode="hero" />
         <BrandMark size={40} className="mb-4" />
         <h1 className="text-2xl font-bold mb-2">Challenge Link Expired</h1>
         <p className="text-sm text-textMuted max-w-sm mb-6">
@@ -185,14 +185,26 @@ export default function ChallengeClientView({
     return (
       <QuestionScreen
         question={currentQ}
+        currentIndex={currentIndex}
         totalQuestions={formattedQuestions.length}
         currentAnswer={existingAnswer}
+        answers={userAnswers}
         onAnswer={handleAnswer}
+        onNext={() => {
+          if (currentIndex < formattedQuestions.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+          } else {
+            setIsCompleted(true);
+            setInGame(false);
+            fireConfetti();
+          }
+        }}
         onBack={() => {
           if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
           else setInGame(false);
         }}
         onExit={() => setInGame(false)}
+        onJumpToIndex={(idx) => setCurrentIndex(idx)}
       />
     );
   }
@@ -221,7 +233,7 @@ export default function ChallengeClientView({
 
     return (
       <main className="min-h-screen bg-bg text-text flex flex-col items-center justify-between p-4 sm:p-6 pb-12">
-        <Atmosphere mode={syncPercentage >= 60 ? "mythic" : "rare"} />
+        <Atmosphere mode="hero" />
 
         {/* Header */}
         <header className="w-full max-w-md flex items-center justify-between pt-4 pb-6">
@@ -333,7 +345,7 @@ export default function ChallengeClientView({
   // 3. Welcome Screen: Teaser of friend's match + Accept Challenge CTA
   return (
     <main className="min-h-screen bg-bg text-text flex flex-col items-center justify-between p-4 sm:p-6 pb-12">
-      <Atmosphere mode="rare" />
+      <Atmosphere mode="hero" />
 
       {/* Header */}
       <header className="w-full max-w-md flex items-center justify-between pt-4 pb-6">
