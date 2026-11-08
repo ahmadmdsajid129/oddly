@@ -5,19 +5,17 @@
  * Results endpoint for viewing matches and Oddness scores (P3.07).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { hashTwinId } from "@oddly/shared";
 import { prisma } from "../db/client.js";
 import { SubmissionsRepository } from "../db/submissions.repo.js";
 import { MatchesRepository } from "../db/matches.repo.js";
 
-export const resultsRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const resultsRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // GET /v1/results/:dropId — view result for drop
-  app.get(
+  app.get<{ Params: { dropId: string }; Querystring: { player_id?: string } }>(
     "/v1/results/:dropId",
     {
       schema: {
@@ -32,11 +30,10 @@ export const resultsRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (req, reply) => {
-      // Resolve player_id from query or cookie
-      let playerId = req.query.player_id;
+      let playerId: string | undefined = req.query.player_id;
       if (!playerId && req.cookies.oddly_at) {
         const unsigned = req.unsignCookie(req.cookies.oddly_at);
-        playerId = unsigned.valid ? unsigned.value : req.cookies.oddly_at;
+        playerId = (unsigned.valid ? unsigned.value : req.cookies.oddly_at) || undefined;
       }
 
       if (!playerId) {
@@ -99,7 +96,7 @@ export const resultsRoutes: FastifyPluginAsync = async (fastify) => {
   );
 
   // GET /v1/results/submission/:submissionId
-  app.get(
+  app.get<{ Params: { submissionId: string } }>(
     "/v1/results/submission/:submissionId",
     {
       schema: {
@@ -155,3 +152,4 @@ export const resultsRoutes: FastifyPluginAsync = async (fastify) => {
     }
   );
 };
+
