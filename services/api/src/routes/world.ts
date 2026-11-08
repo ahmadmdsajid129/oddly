@@ -6,15 +6,13 @@
  * Provides the global community recap data after drops close.
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
 
-export const worldRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const worldRoutes: FastifyPluginAsyncZod = async (app) => {
 
-  app.get(
+  app.get<{ Params: { dropId: string } }>(
     "/v1/world/:dropId",
     {
       schema: {
@@ -93,3 +91,4 @@ export const worldRoutes: FastifyPluginAsync = async (fastify) => {
     }
   );
 };
+
