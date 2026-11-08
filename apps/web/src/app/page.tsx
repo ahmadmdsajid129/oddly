@@ -226,11 +226,7 @@ export default function HomePage() {
 
   const handleSubmit = async () => {
     if (!isOnline) {
-      toast({
-        title: "You are offline",
-        description: "Please connect to the internet to submit your choices.",
-        variant: "error",
-      });
+      toast("Please connect to the internet to submit your choices.", "error");
       return;
     }
 
@@ -467,7 +463,7 @@ export default function HomePage() {
             <p className="text-sm font-heading font-semibold text-text-muted">
               Today&apos;s five drop at 7:00 AM IST
             </p>
-            <Countdown targetHourIST={7} />
+            <Countdown />
           </div>
         ) : (
           <div className="space-y-3">
