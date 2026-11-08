@@ -20,6 +20,15 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { randomUUID } from "node:crypto";
+import { healthRoutes } from "./routes/health.js";
+import { dropsRoutes } from "./routes/drops.js";
+import { contentRoutes } from "./routes/content.js";
+import { pagesRoutes } from "./routes/pages.js";
+import { configRoutes } from "./routes/config.js";
+import { identityRoutes } from "./routes/identity.js";
+import { submissionsRoutes } from "./routes/submissions.js";
+import { resultsRoutes } from "./routes/results.js";
+import { worldRoutes } from "./routes/world.js";
 
 export interface ServerOptions {
   logger?: boolean;
@@ -131,7 +140,18 @@ export async function buildServer(
     },
   });
 
-  // 7. Global error handler mapping Zod errors cleanly
+  // 7. Register domain routes
+  await app.register(healthRoutes);
+  await app.register(dropsRoutes);
+  await app.register(contentRoutes);
+  await app.register(pagesRoutes);
+  await app.register(configRoutes);
+  await app.register(identityRoutes);
+  await app.register(submissionsRoutes);
+  await app.register(resultsRoutes);
+  await app.register(worldRoutes);
+
+  // 8. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {
     if (error.validation) {
       reply.status(400).send({
