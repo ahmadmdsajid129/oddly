@@ -269,3 +269,4 @@ export interface HealthCheckResult {
   time: string;
   version?: string;
 }
+
