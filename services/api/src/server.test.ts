@@ -12,11 +12,10 @@
  */
 
 import { beforeAll, describe, expect, it } from "vitest";
-import { FastifyInstance } from "fastify";
 import { buildServer } from "./server.js";
 
 describe("Oddly API Server Integration Tests", () => {
-  let app: FastifyInstance;
+  let app: Awaited<ReturnType<typeof buildServer>>;
 
   beforeAll(async () => {
     app = await buildServer({ logger: false });
@@ -100,8 +99,9 @@ describe("Oddly API Server Integration Tests", () => {
 
       expect(res.statusCode).toBe(400);
       const body = JSON.parse(res.body);
-      expect(body.ok).toBe(false);
-      expect(body.error).toBe("VALIDATION_ERROR");
+      expect(body.statusCode).toBe(400);
+      expect(body.error).toBe("Bad Request");
+      expect(body.message).toContain("16");
     });
 
     it("enforces exactly 5 answers on POST /v1/submissions", async () => {
@@ -125,8 +125,8 @@ describe("Oddly API Server Integration Tests", () => {
 
       expect(res.statusCode).toBe(400);
       const body = JSON.parse(res.body);
-      expect(body.ok).toBe(false);
-      expect(body.error).toBe("VALIDATION_ERROR");
+      expect(body.statusCode).toBe(400);
+      expect(body.message).toContain("Must submit exactly 5 answers");
     });
   });
 
