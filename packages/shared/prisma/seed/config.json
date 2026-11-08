@@ -1,0 +1,42 @@
+[
+  {
+    "key": "features.audio_effects",
+    "value": { "enabled": true, "default": true }
+  },
+  {
+    "key": "features.haptic_feedback",
+    "value": { "enabled": true, "default": true }
+  },
+  {
+    "key": "features.push_notifications",
+    "value": { "enabled": true, "vapid_public_key": "" }
+  },
+  {
+    "key": "features.google_auth",
+    "value": { "enabled": true }
+  },
+  {
+    "key": "limits.submissions_per_ip_hour",
+    "value": 10
+  },
+  {
+    "key": "privacy.k_anonymity_min_size",
+    "value": 5
+  },
+  {
+    "key": "matching.algorithm",
+    "value": "brute_force_stage_a"
+  },
+  {
+    "key": "matching.min_pool_size",
+    "value": 2
+  },
+  {
+    "key": "timing.drop_open_time_ist",
+    "value": "07:00:00"
+  },
+  {
+    "key": "timing.drop_close_time_ist",
+    "value": "23:59:59"
+  }
+]
