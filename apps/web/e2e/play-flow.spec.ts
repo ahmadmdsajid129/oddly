@@ -83,11 +83,30 @@ test.describe("Oddly v1: Guest Play Flow (S1 to S4)", () => {
     await expect(findTwinButton).toBeVisible();
     await expect(findTwinButton).toBeEnabled();
 
-    // 10. Submit choices and verify sealed results screen
+    // 10. Submit choices -> S5 Searching -> S6 Twin Reveal -> S7 Oddness
     await findTwinButton.click();
-    await expect(page.getByText("Stranger Twin Found")).toBeVisible({
+
+    // S5 Searching radar (tap to skip or auto-complete within 2.0s)
+    const skipBtn = page.getByText(/Tap to skip/i);
+    if (await skipBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await skipBtn.click().catch(() => {});
+    }
+
+    // S6 Twin Reveal Screen
+    await expect(page.getByText(/Picks Matched/i)).toBeVisible({
       timeout: 5000,
     });
+    await expect(page.getByText(/Someone in Berlin, Germany/i)).toBeVisible();
+
+    // S7 Oddness Screen
+    const seeOddnessBtn = page.getByRole("button", {
+      name: /See how odd you are/i,
+    });
+    await expect(seeOddnessBtn).toBeVisible();
+    await seeOddnessBtn.click();
+
+    await expect(page.getByText(/Oddness Score/i)).toBeVisible();
+    await expect(page.getByText(/Rarer than/i)).toBeVisible();
   });
 
   test("courteously excludes users under 18 with zero data collected", async ({
