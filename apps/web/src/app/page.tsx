@@ -32,7 +32,8 @@ import { ReviewScreen } from "@/components/play/ReviewScreen";
 import { SearchMapAnimation } from "@/components/play/SearchMapAnimation";
 import { TwinRevealScreen, TwinMatchData } from "@/components/play/TwinRevealScreen";
 import { OddnessScreen, OddnessData } from "@/components/play/OddnessScreen";
-import type { AnswerPayload } from "@oddly/shared";
+import { ShareSheet } from "@/components/share/ShareSheet";
+import type { AnswerPayload, ShareFormat } from "@oddly/shared";
 import { Sun, Moon, Sparkles, Trophy, ArrowRight } from "lucide-react";
 
 // Fallback launch questions for offline or initial zero-db states
@@ -135,6 +136,8 @@ export default function HomePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<StoredPlayResult | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
+  const [shareFormat, setShareFormat] = useState<ShareFormat>("story");
 
   // Fetch today's drop
   const { data: dropData, isLoading } = useQuery({
@@ -414,55 +417,50 @@ export default function HomePage() {
   // 5. Twin Reveal Screen (S6)
   if (step === "reveal" && submissionResult) {
     return (
-      <TwinRevealScreen
-        match={submissionResult.match}
-        onSeeOddness={() => setStep("oddness")}
-        onShare={() => {
-          if (navigator.share) {
-            navigator.share({
-              title: "Oddly — My Stranger Twin",
-              text: `I matched ${submissionResult.match.matched_picks}/5 picks with a stranger in ${submissionResult.match.twin_location}!`,
-              url: window.location.href,
-            }).catch(() => {});
-          } else {
-            toast("Link copied to clipboard!", "success");
-          }
-        }}
-        onClose={() => setStep("landing")}
-      />
+      <>
+        <TwinRevealScreen
+          match={submissionResult.match}
+          onSeeOddness={() => setStep("oddness")}
+          onShare={() => {
+            setShareFormat("story");
+            setIsShareSheetOpen(true);
+          }}
+          onClose={() => setStep("landing")}
+        />
+        <ShareSheet
+          isOpen={isShareSheetOpen}
+          onClose={() => setIsShareSheetOpen(false)}
+          dropId={todayDrop.id}
+          defaultFormat={shareFormat}
+        />
+      </>
     );
   }
 
   // 6. Oddness Screen (S7)
   if (step === "oddness" && submissionResult) {
     return (
-      <OddnessScreen
-        oddness={submissionResult.oddness}
-        onBackToTwin={() => setStep("reveal")}
-        onShare={() => {
-          if (navigator.share) {
-            navigator.share({
-              title: "Oddly — Rarity Score",
-              text: `I am rarer than ${Math.round(submissionResult.oddness.percentile)}% of today's players worldwide on Oddly!`,
-              url: window.location.href,
-            }).catch(() => {});
-          } else {
-            toast("Card copied to clipboard!", "success");
-          }
-        }}
-        onChallenge={() => {
-          if (navigator.share) {
-            navigator.share({
-              title: "Challenge me on Oddly",
-              text: "Can you pick the exact same 5 choices as me today?",
-              url: window.location.href,
-            }).catch(() => {});
-          } else {
-            toast("Challenge link copied!", "success");
-          }
-        }}
-        onHome={() => setStep("landing")}
-      />
+      <>
+        <OddnessScreen
+          oddness={submissionResult.oddness}
+          onBackToTwin={() => setStep("reveal")}
+          onShare={() => {
+            setShareFormat("square");
+            setIsShareSheetOpen(true);
+          }}
+          onChallenge={() => {
+            setShareFormat("link");
+            setIsShareSheetOpen(true);
+          }}
+          onHome={() => setStep("landing")}
+        />
+        <ShareSheet
+          isOpen={isShareSheetOpen}
+          onClose={() => setIsShareSheetOpen(false)}
+          dropId={todayDrop.id}
+          defaultFormat={shareFormat}
+        />
+      </>
     );
   }
 
