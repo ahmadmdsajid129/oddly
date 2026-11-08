@@ -4,19 +4,19 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { classifyRarityTier } from "@oddly/shared";
+import { classifyTier } from "@oddly/shared";
 
 describe("Stage 5: Reveal, Matching UX & Oddness Logic", () => {
   describe("Rarity Tier Thresholds (D-016 descending rule)", () => {
     it("classifies scores into correct rarity tiers", () => {
-      expect(classifyRarityTier(20)).toBe("Common");
-      expect(classifyRarityTier(59.9)).toBe("Common");
-      expect(classifyRarityTier(60)).toBe("Uncommon");
-      expect(classifyRarityTier(84.9)).toBe("Uncommon");
-      expect(classifyRarityTier(85)).toBe("Rare");
-      expect(classifyRarityTier(94.9)).toBe("Rare");
-      expect(classifyRarityTier(95)).toBe("Legendary");
-      expect(classifyRarityTier(99.5)).toBe("Legendary");
+      expect(classifyTier(20)).toBe("Common");
+      expect(classifyTier(59.9)).toBe("Common");
+      expect(classifyTier(60)).toBe("Uncommon");
+      expect(classifyTier(84.9)).toBe("Uncommon");
+      expect(classifyTier(85)).toBe("Rare");
+      expect(classifyTier(96.9)).toBe("Rare");
+      expect(classifyTier(97)).toBe("Mythic");
+      expect(classifyTier(99.5)).toBe("Mythic");
     });
   });
 
