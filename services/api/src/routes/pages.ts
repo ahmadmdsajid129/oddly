@@ -5,15 +5,13 @@
  * CMS static pages endpoint (GET /v1/pages/:slug).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
 
-export const pagesRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const pagesRoutes: FastifyPluginAsyncZod = async (app) => {
 
-  app.get(
+  app.get<{ Params: { slug: string } }>(
     "/v1/pages/:slug",
     {
       schema: {
@@ -28,11 +26,6 @@ export const pagesRoutes: FastifyPluginAsync = async (fastify) => {
             title: z.string(),
             body_md: z.string(),
             updated_at: z.string(),
-          }),
-          404: z.object({
-            ok: z.literal(false),
-            error: z.string(),
-            message: z.string(),
           }),
         },
       },
