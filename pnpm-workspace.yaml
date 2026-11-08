@@ -9,3 +9,6 @@ allowBuilds:
   esbuild: true
   msgpackr-extract: true
   prisma: true
+
+overrides:
+  zod-to-json-schema: 3.24.1
