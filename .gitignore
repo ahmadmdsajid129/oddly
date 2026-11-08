@@ -38,6 +38,9 @@ coverage
 test-results
 playwright-report
 
+# Generated Prisma Client
+packages/shared/generated/
+
 # Turborepo
 .turbo
 
