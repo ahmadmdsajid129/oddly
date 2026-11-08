@@ -156,14 +156,27 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
       else if (twinPlayer?.region === "DE") twinCity = "Berlin, Germany";
 
       // Map questions and answers cleanly without any player/user references
-      const rawAnswers = (submission.answers as any[]) || [];
-      const sanitizedAnswers = rawAnswers.map((a: any) => ({
-        questionId: a.question_id || a.questionId,
+      interface StoredItemAnswer {
+        question_id?: string;
+        questionId?: string;
+        value: unknown;
+      }
+      interface StoredQuestionItem {
+        id: string;
+        type: string;
+        prompt: string;
+        options?: unknown;
+        media_url?: string | null;
+      }
+
+      const rawAnswers = (submission.answers as unknown as StoredItemAnswer[]) || [];
+      const sanitizedAnswers = rawAnswers.map((a) => ({
+        questionId: a.question_id || a.questionId || "",
         value: a.value,
       }));
 
-      const rawQuestions = drop?.questions || [];
-      const sanitizedQuestions = rawQuestions.map((q: any) => ({
+      const rawQuestions = (drop?.questions as unknown as StoredQuestionItem[]) || [];
+      const sanitizedQuestions = rawQuestions.map((q) => ({
         id: q.id,
         type: q.type,
         prompt: q.prompt,
