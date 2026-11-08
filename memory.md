@@ -73,6 +73,9 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-07` | `D-013` | Bundler moduleResolution for Shared Monorepo Packages  | Enables Next.js webpack transpiler to resolve extensionless imports across internal workspace packages  | Emitting pre-compiled `.js` with declaration | `@oddly/ui-tokens`, `@oddly/shared` |
 | `2026-11-07` | `D-014` | Web Audio API Oscillator Sound Synthesizer             | Zero asset network requests, 0 latency feedback, guaranteed availability offline                       | Static MP3/WAV audio assets                 | `apps/web/src/lib/feedback.ts`  |
 | `2026-11-07` | `D-015` | Dynamic Vector Illustration Registry (Keyed SVGs)      | Zero-deploy question additions for Type 4 questions, crisp vector scaling on high-DPI displays          | Static raster PNGs, external CDN images     | `apps/web/src/components/illustrations` |
+| `2026-11-08` | `D-016` | Descending Evaluation on Percentile Tier Boundaries    | Guarantees threshold percentiles (60, 85, 97) match the higher tier unambiguously                      | Ascending interval evaluation               | `packages/shared/src/scoring.ts`|
+| `2026-11-08` | `D-017` | Seed Question Alignment with Vector Illustration Keys  | Type 4 questions in batch 001 directly reference the 28 registered illustration keys                   | Generic arbitrary icon names                | `seed/oddly_batch_001_first_14_days.json` |
+| `2026-11-08` | `D-018` | Generate Prisma Client on Demand in CI and Local Setup | Avoids committing OS-specific engine binaries to git, ensuring cross-platform runner stability        | Committing binary engines                   | `.gitignore`, `.github/workflows/ci.yml` |
 
 ---
 
@@ -107,6 +110,18 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-07` | Stage 1 | Wired ThemeProvider and ToastProvider into root layout                        | `apps/web/src/app/layout.tsx` | Phase 1: Root provider wrapping |
 | `2026-11-07` | Stage 1 | Updated Section 2 with verification notes and contrast audit                  | `design.md` | Phase 1: Documentation audit |
 | `2026-11-07` | Stage 1 | Marked Phase 1 tasks COMPLETE (33/165 total done, 20% overall)                | `task.md` | Phase 1: Roadmap status update |
+| `2026-11-08` | Stage 2 | Created Prisma schema with all 18 tables and dynamic enums                    | `packages/shared/prisma/schema.prisma` | Phase 2: Authoritative DB schema |
+| `2026-11-08` | Stage 2 | Built complete TypeScript types and Zod contract validators                   | `packages/shared/src/types.ts`, `schemas.ts` | Phase 2: Polymorphic question & API types |
+| `2026-11-08` | Stage 2 | Implemented pure math scoring engine (Dice, Shannon, Oddness, Percentile, Tier) | `packages/shared/src/scoring.ts` | Phase 2: Core scoring math |
+| `2026-11-08` | Stage 2 | Implemented 70 unit tests covering scoring, dates, and privacy               | `packages/shared/src/*.test.ts` | Phase 2: Comprehensive unit test suite |
+| `2026-11-08` | Stage 2 | Implemented MatchingStrategy interface and BruteForceMatchingStrategy         | `packages/shared/src/matching.ts` | Phase 2: In-memory Stage A matcher |
+| `2026-11-08` | Stage 2 | Built match simulation benchmark script (`pnpm sim`)                          | `packages/shared/src/simulation.ts` | Phase 2: Distribution verification |
+| `2026-11-08` | Stage 2 | Built k-anonymity helpers and AES-256-GCM PII encryption/decryption           | `packages/shared/src/privacy.ts` | Phase 2: Privacy and token security |
+| `2026-11-08` | Stage 2 | Built IST/UTC date calculations, drop window validators, and streak calculator| `packages/shared/src/dates.ts` | Phase 2: Timezone & streak logic |
+| `2026-11-08` | Stage 2 | Authored dynamic seed files for content, config, tiers, and 14-day batch 001  | `packages/shared/prisma/seed/*.json` | Phase 2: Complete dynamic DB seed files |
+| `2026-11-08` | Stage 2 | Built dynamic seed script importing batch 001 into Prisma                      | `packages/shared/prisma/seed.ts` | Phase 2: Idempotent database seeder |
+| `2026-11-08` | Stage 2 | Built API database repository access layer for drops, submissions, players, matches | `services/api/src/db/*.ts` | Phase 2: Clean DB repository abstractions |
+| `2026-11-08` | Stage 2 | Marked Phase 2 tasks COMPLETE (45/165 total done, 27% overall)                | `task.md` | Phase 2: Roadmap status update |
 
 ---
 
@@ -119,6 +134,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-07` | `B-003` | `Cannot find module 'tailwindcss'` during build | `packages/ui-tokens` imported `Config` from tailwindcss without explicit devDependency  | Added `tailwindcss: ^3.4.17` to `packages/ui-tokens/package.json` devDependencies                        | `packages/ui-tokens/package.json` | Always pin peer/dev types in packages | `pnpm typecheck` |
 | `2026-11-07` | `B-004` | `Module not found: Can't resolve './tokens.js'` | Next.js webpack bundler could not map `.js` import specifiers to uncompiled `.ts` files  | Converted imports to extensionless and set `"moduleResolution": "Bundler"`                                | `packages/ui-tokens/tsconfig.json`, `packages/shared/tsconfig.json` | Use bundler resolution for monorepos | `pnpm build` |
 | `2026-11-08` | `B-005` | GitHub Actions CI failed with red X on commit   | `cache: "pnpm"` in `setup-node` ran before pnpm installation, and `action-setup` conflicted with `packageManager` | Set up Node 20 first, installed pinned pnpm via npm, and configured `actions/cache` on pnpm store path | `.github/workflows/ci.yml`, `.npmrc` | Pin package manager and use reliable actions/cache | GitHub Actions Run 42406355228 |
+| `2026-11-08` | `B-006` | TS2308: Ambiguous re-exports in `@oddly/shared` | `types.ts` and `db.ts` both exported `DropStatus`, `QuestionType`, etc. with `export *` | Explicitly exported pure domain types from `types.ts` and `PrismaClient`/`Prisma` from `db.ts` in `index.ts` | `packages/shared/src/index.ts` | Disallow conflicting wildcard re-exports | `pnpm typecheck` |
+| `2026-11-08` | `B-007` | `StoredAnswer[]` not assignable to `InputJsonValue` | Prisma JSON column types require `InputJsonValue`                                     | Cast stored answers via `as unknown as Prisma.InputJsonValue` in `submissions.repo.ts`                   | `services/api/src/db/submissions.repo.ts` | Use Prisma JSON type casting | `pnpm build` |
 
 ---
 
