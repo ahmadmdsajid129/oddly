@@ -9,13 +9,13 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 
 | Metric                          | Current Value                                             |
 | ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[████░░░░░░░░░░░░░░░░] 20%`                              |
-| **Current Active Stage**        | **Stage 1 Complete (Awaiting Founder review for Stage 2)**|
+| **Overall Project Progress**    | `[█████░░░░░░░░░░░░░░░] 27%`                              |
+| **Current Active Stage**        | **Stage 2 Complete (Awaiting Founder review for Stage 3)**|
 | **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 33 tasks                                                  |
+| **Completed Tasks (`DONE`)**    | 45 tasks                                                  |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 132 tasks                                                 |
+| **Pending (`TODO`)**            | 120 tasks                                                 |
 
 ---
 
@@ -25,7 +25,7 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | ------------ | --------------------------------------- | -------- | --------- | ----------------- | ------------------ | -------------------- |
 | **Phase 0**  | Documentation & Skeleton Initialisation | Critical | COMPLETE  | `[##########] 100%`| 14 / 14            | Stage 0              |
 | **Phase 1**  | Design System & UI Kit                  | High     | COMPLETE  | `[##########] 100%`| 19 / 19            | Stage 1              |
-| **Phase 2**  | Database & Shared Core Scoring          | Critical | TODO        | `[----------] 0%` | 0 / 12             | Stage 2              |
+| **Phase 2**  | Database & Shared Core Scoring          | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 2              |
 | **Phase 3**  | Fastify REST API Core                   | Critical | TODO        | `[----------] 0%` | 0 / 12             | Stage 3              |
 | **Phase 4**  | Play Flow Frontend (PWA)                | Critical | TODO        | `[----------] 0%` | 0 / 11             | Stage 4              |
 | **Phase 5**  | Reveal, Matching UX & Oddness           | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 5              |
@@ -97,22 +97,22 @@ _Status: COMPLETE | Target: Visual kit verified on `/design` route in light and 
 
 ### Phase 2: Database and Shared Core Scoring (Stage 2)
 
-_Status: TODO | Target: Prisma schema, migration, mathematical formulas, and tests._
+_Status: COMPLETE | Target: Prisma schema, dynamic seed files, mathematical scoring formulas, and 70 unit tests._
 
-| ID      | Task Description                                                                                     | Priority | Status | Depends On | Owner | Done Date | Notes                               |
-| ------- | ---------------------------------------------------------------------------------------------------- | -------- | ------ | ---------- | ----- | --------- | ----------------------------------- |
-| `P2.01` | Write authoritative `schema.prisma` covering all 18 tables defined in `architecture.md`              | Critical | TODO   | P0.08      | Agent | —         | Fully typed PostgreSQL schema       |
-| `P2.02` | Build dynamic seed script importing `seed/oddly_batch_001_first_14_days.json`, palettes, and content | Critical | TODO   | P2.01      | Agent | —         | Seeds via the actual batch importer |
-| `P2.03` | Define Zod schemas and TypeScript types for all API payloads in `packages/shared`                    | Critical | TODO   | P0.07      | Agent | —         | Shared contract validation          |
-| `P2.04` | Implement pure mathematical functions: `similarity`, `information`, `oddness`, `percentile`, `tier`  | Critical | TODO   | P0.07      | Agent | —         | Pure scoring math                   |
-| `P2.05` | Unit test scoring functions with Master Prompt worked-example fixtures and property tests            | Critical | TODO   | P2.04      | Agent | —         | Strict symmetry, bounds [0, 1]      |
-| `P2.06` | Implement `MatchingStrategy` interface and Stage A brute-force pairwise matcher                      | Critical | TODO   | P2.04      | Agent | —         | In-memory matcher with tie-breakers |
-| `P2.07` | Build match simulation script (`pnpm sim`) reproducing entropy and pair distributions                | High     | TODO   | P2.06      | Agent | —         | Validates theoretical match odds    |
-| `P2.08` | Implement k-anonymity privacy helpers for region and age-band merging with unit tests                | High     | TODO   | P2.03      | Agent | —         | Prevents deanonymisation            |
-| `P2.09` | Implement Twin Day UTC/IST boundary helpers and streak calculation logic with tests                  | High     | TODO   | P2.03      | Agent | —         | Handles cross-timezone players      |
-| `P2.10` | Build dynamic content registry and seed JSON files (`app_content`, `app_config`, `tier_definitions`) | High     | TODO   | P2.01      | Agent | —         | Section 12 dynamic architecture     |
-| `P2.11` | Build repository data access layer in `services/api/src/db`                                          | High     | TODO   | P2.01      | Agent | —         | Clean Prisma query abstraction      |
-| `P2.12` | Build AES-256-GCM encryption/decryption helpers for PII fields with unit tests                       | High     | TODO   | P2.03      | Agent | —         | Encrypts push tokens & IDs          |
+| ID      | Task Description                                                                                     | Priority | Status | Depends On | Owner | Done Date   | Notes                               |
+| ------- | ---------------------------------------------------------------------------------------------------- | -------- | ------ | ---------- | ----- | ----------- | ----------------------------------- |
+| `[x] P2.01` | Write authoritative `schema.prisma` covering all 18 tables defined in `architecture.md`              | Critical | DONE   | P0.08      | Agent | 2026-11-08  | Fully typed PostgreSQL schema       |
+| `[x] P2.02` | Build dynamic seed script importing `seed/oddly_batch_001_first_14_days.json`, palettes, and content | Critical | DONE   | P2.01      | Agent | 2026-11-08  | Seeds via the actual batch importer |
+| `[x] P2.03` | Define Zod schemas and TypeScript types for all API payloads in `packages/shared`                    | Critical | DONE   | P0.07      | Agent | 2026-11-08  | Shared contract validation          |
+| `[x] P2.04` | Implement pure mathematical functions: `similarity`, `information`, `oddness`, `percentile`, `tier`  | Critical | DONE   | P0.07      | Agent | 2026-11-08  | Pure scoring math                   |
+| `[x] P2.05` | Unit test scoring functions with Master Prompt worked-example fixtures and property tests            | Critical | DONE   | P2.04      | Agent | 2026-11-08  | Strict symmetry, bounds [0, 1]      |
+| `[x] P2.06` | Implement `MatchingStrategy` interface and Stage A brute-force pairwise matcher                      | Critical | DONE   | P2.04      | Agent | 2026-11-08  | In-memory matcher with tie-breakers |
+| `[x] P2.07` | Build match simulation script (`pnpm sim`) reproducing entropy and pair distributions                | High     | DONE   | P2.06      | Agent | 2026-11-08  | Validates theoretical match odds    |
+| `[x] P2.08` | Implement k-anonymity privacy helpers for region and age-band merging with unit tests                | High     | DONE   | P2.03      | Agent | 2026-11-08  | Prevents deanonymisation            |
+| `[x] P2.09` | Implement Twin Day UTC/IST boundary helpers and streak calculation logic with tests                  | High     | DONE   | P2.03      | Agent | 2026-11-08  | Handles cross-timezone players      |
+| `[x] P2.10` | Build dynamic content registry and seed JSON files (`app_content`, `app_config`, `tier_definitions`) | High     | DONE   | P2.01      | Agent | 2026-11-08  | Section 12 dynamic architecture     |
+| `[x] P2.11` | Build repository data access layer in `services/api/src/db`                                          | High     | DONE   | P2.01      | Agent | 2026-11-08  | Clean Prisma query abstraction      |
+| `[x] P2.12` | Build AES-256-GCM encryption/decryption helpers for PII fields with unit tests                       | High     | DONE   | P2.03      | Agent | 2026-11-08  | Encrypts push tokens & IDs          |
 
 ---
 
