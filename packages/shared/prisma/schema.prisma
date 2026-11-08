@@ -1,0 +1,379 @@
+// Oddly v1 — Prisma Schema
+// packages/shared/prisma/schema.prisma
+// All 18 tables. Everything dynamic comes from the DB.
+// D-005: No hardcoded questions/copy/config in code.
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum DropStatus {
+  pending
+  live
+  closed
+}
+
+enum QuestionType {
+  text
+  number
+  colour
+  image
+  word
+}
+
+enum ShareFormat {
+  story
+  square
+  link
+}
+
+enum TierEnum {
+  Common
+  Uncommon
+  Rare
+  Mythic
+}
+
+enum ReportReason {
+  offensive
+  spam
+  incorrect
+  other
+}
+
+// ---------------------------------------------------------------------------
+// 1. accounts — optional Google-linked account (may be null for guest players)
+// ---------------------------------------------------------------------------
+model Account {
+  id           String    @id @default(uuid())
+  google_sub   String    @unique
+  email_hash   String    // SHA-256 of email, never store plaintext
+  display_name String    @db.VarChar(50)
+  created_at   DateTime  @default(now())
+  deleted_at   DateTime?
+
+  players Player[]
+
+  @@map("accounts")
+}
+
+// ---------------------------------------------------------------------------
+// 2. players — a device (guest). May be linked to an Account.
+// ---------------------------------------------------------------------------
+model Player {
+  id              String    @id @default(uuid())
+  did             String    @unique @db.VarChar(128) // device fingerprint
+  account_id      String?
+  account         Account?  @relation(fields: [account_id], references: [id])
+  region          String    @db.VarChar(10)   // ISO 3166-1 alpha-2 (e.g. "IN")
+  age_band        String    @db.VarChar(10)   // "18-24", "25-34", etc.
+  push_token_enc  String?   @db.Text          // AES-256-GCM encrypted push token
+  created_at      DateTime  @default(now())
+
+  submissions      Submission[]
+  streakLogs       StreakLog[]
+  pushSubscriptions PushSubscription[]
+  matchesAsA       Match[]  @relation("PlayerA")
+  matchesAsB       Match[]  @relation("PlayerB")
+  reports          Report[]
+
+  @@index([account_id])
+  @@index([did])
+  @@map("players")
+}
+
+// ---------------------------------------------------------------------------
+// 3. drops — one per day (07:00 IST open, 23:59 IST close)
+// ---------------------------------------------------------------------------
+model Drop {
+  id         String     @id @default(uuid())
+  drop_date  DateTime   @db.Date @unique // YYYY-MM-DD in IST
+  opens_at   DateTime                    // UTC timestamp for 07:00 IST
+  closes_at  DateTime                    // UTC timestamp for 23:59 IST
+  status     DropStatus @default(pending)
+  created_at DateTime   @default(now())
+
+  questions    Question[]
+  submissions  Submission[]
+  matches      Match[]
+  streakLogs   StreakLog[]
+  reports      Report[]
+
+  @@index([drop_date])
+  @@index([status])
+  @@map("drops")
+}
+
+// ---------------------------------------------------------------------------
+// 4. questions — 5 per drop, polymorphic via JSONB payload
+// ---------------------------------------------------------------------------
+model Question {
+  id         String       @id @default(uuid())
+  drop_id    String
+  drop       Drop         @relation(fields: [drop_id], references: [id])
+  position   Int          @db.SmallInt // 1-5
+  type       QuestionType
+  payload    Json         // discriminated by type (see D-006)
+  created_at DateTime     @default(now())
+
+  answerOptions    AnswerOption[]
+  answerFrequencies AnswerFrequency[]
+
+  @@unique([drop_id, position])
+  @@index([drop_id])
+  @@map("questions")
+}
+
+// ---------------------------------------------------------------------------
+// 5. answer_options — static choices for a question
+// ---------------------------------------------------------------------------
+model AnswerOption {
+  id               String   @id @default(uuid())
+  question_id      String
+  question         Question @relation(fields: [question_id], references: [id])
+  label            String   @db.VarChar(200)
+  value            String   @db.VarChar(200) // canonical value used in matching
+  display_order    Int      @db.SmallInt
+  illustration_key String?  @db.VarChar(100) // links to SVG registry (Q-Type 4)
+
+  @@index([question_id])
+  @@map("answer_options")
+}
+
+// ---------------------------------------------------------------------------
+// 6. submissions — one per player per drop (idempotent via request_id)
+// ---------------------------------------------------------------------------
+model Submission {
+  id           String   @id @default(uuid())
+  drop_id      String
+  drop         Drop     @relation(fields: [drop_id], references: [id])
+  player_id    String
+  player       Player   @relation(fields: [player_id], references: [id])
+  request_id   String   @unique @db.VarChar(64) // client-generated idempotency key
+  answers      Json     // array of {question_id, value} — matches AnswerPayload[]
+  submitted_at DateTime @default(now())
+  is_bot_flagged Boolean @default(false)
+
+  oddnessScore OddnessScore?
+  shareCards   ShareCard[]
+  matchAsA     Match[]       @relation("SubmissionA")
+  matchAsB     Match[]       @relation("SubmissionB")
+  reports      Report[]      @relation("ReportedSubmission")
+
+  @@unique([drop_id, player_id])
+  @@index([drop_id])
+  @@index([player_id])
+  @@index([submitted_at])
+  @@map("submissions")
+}
+
+// ---------------------------------------------------------------------------
+// 7. answer_frequencies — running probability per question value (updated live)
+// ---------------------------------------------------------------------------
+model AnswerFrequency {
+  id          String   @id @default(uuid())
+  question_id String
+  question    Question @relation(fields: [question_id], references: [id])
+  value       String   @db.VarChar(200)
+  count       Int      @default(0)
+  probability Float    @default(0) // count / total_submissions_for_drop
+
+  @@unique([question_id, value])
+  @@index([question_id])
+  @@map("answer_frequencies")
+}
+
+// ---------------------------------------------------------------------------
+// 8. matches — pairwise match for a drop
+// ---------------------------------------------------------------------------
+model Match {
+  id               String    @id @default(uuid())
+  drop_id          String
+  drop             Drop      @relation(fields: [drop_id], references: [id])
+  player_a_id      String
+  player_a         Player    @relation("PlayerA", fields: [player_a_id], references: [id])
+  player_b_id      String
+  player_b         Player    @relation("PlayerB", fields: [player_b_id], references: [id])
+  submission_a_id  String?
+  submission_a     Submission? @relation("SubmissionA", fields: [submission_a_id], references: [id])
+  submission_b_id  String?
+  submission_b     Submission? @relation("SubmissionB", fields: [submission_b_id], references: [id])
+  similarity_score Float     // dice coefficient [0, 1]
+  is_provisional   Boolean   @default(true)  // true until drop closes
+  matched_at       DateTime  @default(now())
+  finalized_at     DateTime?
+
+  @@unique([drop_id, player_a_id])
+  @@unique([drop_id, player_b_id])
+  @@index([drop_id])
+  @@index([player_a_id])
+  @@index([player_b_id])
+  @@map("matches")
+}
+
+// ---------------------------------------------------------------------------
+// 9. oddness_scores — computed after drop closes
+// ---------------------------------------------------------------------------
+model OddnessScore {
+  id            String     @id @default(uuid())
+  submission_id String     @unique
+  submission    Submission @relation(fields: [submission_id], references: [id])
+  raw_score     Float      // weighted entropy [0, 1]
+  percentile    Float      // 0-100 within day's cohort
+  tier          TierEnum
+
+  @@index([submission_id])
+  @@index([tier])
+  @@map("oddness_scores")
+}
+
+// ---------------------------------------------------------------------------
+// 10. streak_logs — one row per player per drop they participated in
+// ---------------------------------------------------------------------------
+model StreakLog {
+  id             String   @id @default(uuid())
+  player_id      String
+  player         Player   @relation(fields: [player_id], references: [id])
+  drop_id        String
+  drop           Drop     @relation(fields: [drop_id], references: [id])
+  streak_count   Int      @default(1)
+  calculated_at  DateTime @default(now())
+
+  @@unique([player_id, drop_id])
+  @@index([player_id])
+  @@map("streak_logs")
+}
+
+// ---------------------------------------------------------------------------
+// 11. share_cards — generated PNG/story/square card per submission
+// ---------------------------------------------------------------------------
+model ShareCard {
+  id            String      @id @default(uuid())
+  submission_id String
+  submission    Submission  @relation(fields: [submission_id], references: [id])
+  format        ShareFormat
+  storage_key   String      @db.Text // S3/R2 object key
+  generated_at  DateTime    @default(now())
+
+  @@unique([submission_id, format])
+  @@index([submission_id])
+  @@map("share_cards")
+}
+
+// ---------------------------------------------------------------------------
+// 12. short_links — 6-char slug for share URLs
+// ---------------------------------------------------------------------------
+model ShortLink {
+  id            String     @id @default(uuid())
+  short_id      String     @unique @db.VarChar(8) // e.g. "xK9mP2"
+  submission_id String
+  created_at    DateTime   @default(now())
+  views         Int        @default(0)
+
+  @@index([short_id])
+  @@map("short_links")
+}
+
+// ---------------------------------------------------------------------------
+// 13. push_subscriptions — Web Push subscription endpoint + keys
+// ---------------------------------------------------------------------------
+model PushSubscription {
+  id         String   @id @default(uuid())
+  player_id  String
+  player     Player   @relation(fields: [player_id], references: [id])
+  endpoint   String   @db.Text
+  keys       Json     // { p256dh: string, auth: string }
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  @@unique([player_id, endpoint])
+  @@index([player_id])
+  @@index([is_active])
+  @@map("push_subscriptions")
+}
+
+// ---------------------------------------------------------------------------
+// 14. app_content — all UI strings, by locale key (D-005)
+// ---------------------------------------------------------------------------
+model AppContent {
+  id         String   @id @default(uuid())
+  key        String   @db.VarChar(200)
+  locale     String   @db.VarChar(10) @default("en")
+  value      String   @db.Text
+  updated_at DateTime @updatedAt
+
+  @@unique([key, locale])
+  @@index([key])
+  @@map("app_content")
+}
+
+// ---------------------------------------------------------------------------
+// 15. app_config — feature flags and runtime settings (D-005)
+// ---------------------------------------------------------------------------
+model AppConfig {
+  id         String   @id @default(uuid())
+  key        String   @unique @db.VarChar(200)
+  value      Json     // any JSON value
+  updated_at DateTime @updatedAt
+
+  @@map("app_config")
+}
+
+// ---------------------------------------------------------------------------
+// 16. tier_definitions — dynamic tier thresholds (D-005)
+// ---------------------------------------------------------------------------
+model TierDefinition {
+  id              String   @id @default(uuid())
+  tier            TierEnum @unique
+  min_percentile  Float
+  max_percentile  Float
+  label           String   @db.VarChar(50)
+  description     String   @db.Text
+  badge_color     String   @db.VarChar(20) // hex or CSS colour token
+
+  @@map("tier_definitions")
+}
+
+// ---------------------------------------------------------------------------
+// 17. pages — CMS-managed static pages (About, Privacy, FAQ)
+// ---------------------------------------------------------------------------
+model Page {
+  id         String   @id @default(uuid())
+  slug       String   @unique @db.VarChar(100)
+  title      String   @db.VarChar(200)
+  body_md    String   @db.Text
+  updated_at DateTime @updatedAt
+
+  @@map("pages")
+}
+
+// ---------------------------------------------------------------------------
+// 18. reports — player reporting another submission
+// ---------------------------------------------------------------------------
+model Report {
+  id          String       @id @default(uuid())
+  reporter_id String
+  reporter    Player       @relation(fields: [reporter_id], references: [id])
+  drop_id     String
+  drop        Drop         @relation(fields: [drop_id], references: [id])
+  submission_id String
+  submission  Submission   @relation("ReportedSubmission", fields: [submission_id], references: [id])
+  reason      ReportReason
+  note        String?      @db.Text
+  created_at  DateTime     @default(now())
+
+  @@index([drop_id])
+  @@index([reporter_id])
+  @@map("reports")
+}
