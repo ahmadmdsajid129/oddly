@@ -5,8 +5,7 @@
  * Daily Drop retrieval endpoints (GET /v1/drop/today, GET /v1/drop/:date).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import {
   getTwinDay,
@@ -15,8 +14,7 @@ import {
 } from "@oddly/shared";
 import { DropsRepository } from "../db/drops.repo.js";
 
-export const dropsRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const dropsRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // GET /v1/drop/today
   app.get(
@@ -50,11 +48,6 @@ export const dropsRoutes: FastifyPluginAsync = async (fastify) => {
                 ),
               })
             ),
-          }),
-          404: z.object({
-            ok: z.literal(false),
-            error: z.string(),
-            message: z.string(),
           }),
         },
       },
@@ -106,7 +99,7 @@ export const dropsRoutes: FastifyPluginAsync = async (fastify) => {
   );
 
   // GET /v1/drop/:date
-  app.get(
+  app.get<{ Params: { date: string } }>(
     "/v1/drop/:date",
     {
       schema: {
