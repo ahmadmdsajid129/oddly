@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "../ui/Button";
-import { toast } from "../ui/Toast";
+import { useToast } from "../ui/Toast";
 import { BrandMark } from "../icons";
 import { oddlyApi } from "@/lib/api";
 import type { ShareFormat, ShareTheme } from "@oddly/shared";
@@ -20,6 +20,7 @@ export function ShareSheet({
   dropId,
   defaultFormat = "story",
 }: ShareSheetProps) {
+  const { toast } = useToast();
   const [format, setFormat] = useState<ShareFormat>(defaultFormat);
   const [theme, setTheme] = useState<ShareTheme>("dark");
   const [loading, setLoading] = useState(true);
@@ -43,7 +44,7 @@ export function ShareSheet({
       } catch (err) {
         if (!isCancelled) {
           console.error("Failed to load share card:", err);
-          toast.error("Could not load share card. Please retry.");
+          toast("Could not load share card. Please retry.", "error");
         }
       } finally {
         if (!isCancelled) {
@@ -57,7 +58,7 @@ export function ShareSheet({
     return () => {
       isCancelled = true;
     };
-  }, [isOpen, dropId, format, theme]);
+  }, [isOpen, dropId, format, theme, toast]);
 
   if (!isOpen) return null;
 
@@ -69,12 +70,12 @@ export function ShareSheet({
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(challengeUrl);
-        toast.success("Challenge link copied to clipboard!");
+        toast("Challenge link copied to clipboard!", "success");
       } else {
-        toast.info(challengeUrl);
+        toast(challengeUrl, "info");
       }
     } catch {
-      toast.error("Failed to copy link. Please copy manually.");
+      toast("Failed to copy link. Please copy manually.", "error");
     }
   };
 
@@ -130,11 +131,11 @@ export function ShareSheet({
         document.body.removeChild(link);
 
         await handleCopyChallengeLink();
-        toast.success("Card downloaded! Link copied to clipboard.");
+        toast("Card downloaded! Link copied to clipboard.", "success");
       }
     } catch (err) {
       console.error("Share error:", err);
-      toast.error("Sharing failed. You can copy the challenge link below.");
+      toast("Sharing failed. You can copy the challenge link below.", "error");
     } finally {
       setIsSharing(false);
     }
@@ -245,7 +246,7 @@ export function ShareSheet({
             </Button>
 
             <Button
-              variant="outline"
+              variant="secondary"
               size="lg"
               className="w-full flex items-center justify-center gap-2"
               onClick={handleCopyChallengeLink}
