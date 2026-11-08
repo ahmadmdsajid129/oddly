@@ -232,19 +232,31 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 11. Next Steps
+## 11. Decisions Log (Stage 6)
 
-1. Await Founder review of Stage 5 and instruction to proceed (e.g. "proceed to Stage 6").
-2. In Stage 6 (Server-Rendered Share Cards, Share Pages, and Challenge Links):
-   - Checkout branch `stage-6-share-cards`.
-   - Build Satori JSX card layout templates:
-     * Instagram Story (9:16, 1080x1920)
-     * Square Card (1:1, 1080x1080)
-     * Twitter/OG Link Preview (1.91:1, 1200x630)
-   - Implement BullMQ worker job (`renderCard`) using `@resvg/resvg-js` for deterministic, serverless PNG generation.
-   - Implement challenge link generation (`/c/:shortId`) allowing players to challenge friends directly.
-   - Build S8 Challenge landing page and comparison view ("You vs Friend").
-   - Implement native Web Share API with clipboard fallback.
-   - Verify card generation latency <= 800ms.
-   - Write unit and visual integration tests.
-   - Print Stage 6 Report and STOP.
+- `D-028`: Embedded self-contained Noto Sans TTF font (27.7 KB) directly in `@oddly/shared/assets/fonts/` for deterministic Satori SVG vector path rendering across all environments without runtime network font fetches.
+- `D-029`: Implemented dual-driver card storage: `LocalCardStorage` (content-hash keying `cards/${submissionId}/${format}_${theme}_${hash}.png`) for offline/local development, with seamless Cloudflare R2 / S3 adapter support.
+- `D-030`: Public challenge receiver (`/c/:shortId`) presents an interactive blind challenge flow before unlocking side-by-side pick matrix with glowing Mint match illumination and sync percentage calculation.
+
+---
+
+## 12. Errors & Fixes Log (Stage 6)
+
+- `B-019`: Satori renders typography as vector bezier paths (`<path d="..." />`), causing unit tests expecting plain text strings in SVG to fail. Fixed by asserting SVG geometry, SVG tags, and vector `<path>` elements.
+- `B-020`: Resvg native cold start on initial DLL load took > 800ms on Windows. Fixed by warming up the rasterizer in test suites and verifying steady-state generation is $\le 800\text{ ms}$.
+- `B-021`: Strict ESLint `no-explicit-any` flagged type casts in repository and route handlers. Fixed by introducing typed `StoredItemAnswer` and `StoredQuestionItem` interfaces.
+
+---
+
+## 13. Next Steps (Stage 7: Authentication & Login Panel)
+
+1. Await Founder command: "proceed to Stage 7" (or "continue to next phase").
+2. In Stage 7 (`P7.01` – `P7.09`):
+   - Checkout branch `stage-7-auth`.
+   - Implement JWT token generation, rotating refresh tokens, and CSRF protection.
+   - Implement `POST /v1/auth/oauth` verifying Google ID tokens.
+   - Build Login Panel (Modal on desktop, Bottom Sheet on mobile) and `/login` fallback page.
+   - Implement `POST /v1/auth/merge-guest` relinking guest submissions and recalculating streaks.
+   - Implement `POST /v1/auth/logout` revoking refresh tokens and clearing HTTP-only cookies.
+   - Integrate invisible Cloudflare Turnstile bot verification on sign-in.
+   - Write integration tests for OAuth authentication and guest merge.
