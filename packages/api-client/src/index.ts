@@ -34,8 +34,8 @@ export interface PlayerMeResponse {
 }
 
 export interface PublicConfigResponse {
-  features: Record<string, any>;
-  timing: Record<string, any>;
+  features: Record<string, unknown>;
+  timing: Record<string, unknown>;
   tiers: Array<{
     tier: string;
     min_percentile: number;
@@ -112,14 +112,17 @@ export class OddlyApiClient {
     });
 
     if (!res.ok) {
-      let errorBody: any;
+      let errorMessage = res.statusText;
       try {
-        errorBody = await res.json();
+        const errorBody = (await res.json()) as { message?: string };
+        if (errorBody?.message) {
+          errorMessage = errorBody.message;
+        }
       } catch {
-        errorBody = { message: res.statusText };
+        // Fallback to res.statusText
       }
       throw new Error(
-        errorBody.message || `Request to ${path} failed with HTTP ${res.status}`
+        errorMessage || `Request to ${path} failed with HTTP ${res.status}`
       );
     }
 
