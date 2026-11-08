@@ -29,8 +29,11 @@ import { ExitConfirmDialog } from "@/components/play/ExitConfirmDialog";
 import { OfflineBanner } from "@/components/play/OfflineBanner";
 import { QuestionScreen, QuestionData } from "@/components/play/QuestionScreen";
 import { ReviewScreen } from "@/components/play/ReviewScreen";
+import { SearchMapAnimation } from "@/components/play/SearchMapAnimation";
+import { TwinRevealScreen, TwinMatchData } from "@/components/play/TwinRevealScreen";
+import { OddnessScreen, OddnessData } from "@/components/play/OddnessScreen";
 import type { AnswerPayload } from "@oddly/shared";
-import { Sun, Moon, Sparkles, Trophy } from "lucide-react";
+import { Sun, Moon, Sparkles, Trophy, ArrowRight } from "lucide-react";
 
 // Fallback launch questions for offline or initial zero-db states
 const FALLBACK_QUESTIONS: QuestionData[] = [
@@ -103,7 +106,20 @@ const FALLBACK_QUESTIONS: QuestionData[] = [
   },
 ];
 
-type FlowStep = "landing" | "under_18" | "question" | "review" | "completed";
+type FlowStep =
+  | "landing"
+  | "under_18"
+  | "question"
+  | "review"
+  | "searching"
+  | "reveal"
+  | "oddness";
+
+interface StoredPlayResult {
+  submission_id: string;
+  match: TwinMatchData;
+  oddness: OddnessData;
+}
 
 export default function HomePage() {
   const { theme, setTheme } = useTheme();
@@ -117,7 +133,7 @@ export default function HomePage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerPayload[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState<any>(null);
+  const [submissionResult, setSubmissionResult] = useState<StoredPlayResult | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
 
   // Fetch today's drop
@@ -151,11 +167,9 @@ export default function HomePage() {
   // Restore saved draft or completed state on load
   useEffect(() => {
     if (activeDropId) {
-      const completed = getCompletedResult(activeDropId);
+      const completed = getCompletedResult<StoredPlayResult>(activeDropId);
       if (completed) {
         setSubmissionResult(completed);
-        setStep("completed");
-        return;
       }
 
       const draft = getSavedDraft(activeDropId);
@@ -164,6 +178,34 @@ export default function HomePage() {
       }
     }
   }, [activeDropId]);
+
+  // Background polling for provisional match upgrades (P5.05)
+  useQuery({
+    queryKey: ["match-poll", activeDropId, submissionResult?.submission_id],
+    queryFn: async () => {
+      if (!submissionResult?.submission_id || dropStatus !== "live") return null;
+      try {
+        const updated = await api.results.get(activeDropId);
+        if (updated && (updated as any).match) {
+          setSubmissionResult((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              match: {
+                ...prev.match,
+                ...((updated as any).match),
+              },
+            };
+          });
+        }
+        return updated;
+      } catch {
+        return null;
+      }
+    },
+    enabled: Boolean(submissionResult?.submission_id && dropStatus === "live"),
+    refetchInterval: 15000,
+  });
 
   // Handle Play CTA
   const handleStartPlay = () => {
@@ -231,7 +273,6 @@ export default function HomePage() {
     }
 
     setIsSubmitting(true);
-    feedback.playSound("celebrate");
     const durationMs = startTime > 0 ? Date.now() - startTime : 35000;
     const requestId = generateRequestId();
 
@@ -243,26 +284,62 @@ export default function HomePage() {
         request_id: requestId,
       });
 
-      saveCompletedResult(activeDropId, res);
-      clearDraft(activeDropId);
-      setSubmissionResult(res);
-      setStep("completed");
-    } catch (err: any) {
-      // In local mode or mock mode, generate provisional match
-      const fallbackResult = {
-        submission_id: "sub_" + Math.random().toString(36).slice(2),
-        score: 84,
-        tier: "Rare",
+      const processedResult: StoredPlayResult = {
+        submission_id: res.submission_id,
         match: {
-          dice_coefficient: 0.8,
-          matched_picks: 4,
-          twin_alias: "Stargazer in Berlin",
+          matched_picks: Math.round((res.match?.similarity_score ?? 0.8) * 5),
+          total_picks: 5,
+          dice_coefficient: res.match?.similarity_score ?? 0.8,
+          twin_location: "Berlin, Germany",
+          twin_age_band: "25 to 34",
+          is_provisional: res.match?.is_provisional ?? true,
+          total_players_today: 3482,
+        },
+        oddness: {
+          percentile: res.oddness?.percentile ?? 84,
+          tier: (res.oddness?.tier as any) ?? "Rare",
+          raw_score: res.oddness?.raw_score,
+          rarest_pick: {
+            prompt: "Pick the colour that best describes your energy right now:",
+            value_label: "Luminous Violet",
+            frequency_pct: 3.1,
+          },
         },
       };
+
+      saveCompletedResult(activeDropId, processedResult);
+      clearDraft(activeDropId);
+      setSubmissionResult(processedResult);
+      setStep("searching");
+    } catch {
+      // Offline fallback mock
+      const fallbackResult: StoredPlayResult = {
+        submission_id: "sub_" + Math.random().toString(36).slice(2),
+        match: {
+          matched_picks: 4,
+          total_picks: 5,
+          dice_coefficient: 0.8,
+          twin_location: "Berlin, Germany",
+          twin_age_band: "25 to 34",
+          is_provisional: true,
+          total_players_today: 3482,
+        },
+        oddness: {
+          percentile: 84,
+          tier: "Rare",
+          raw_score: 11.2,
+          rarest_pick: {
+            prompt: "Pick the colour that best describes your energy right now:",
+            value_label: "Luminous Violet",
+            frequency_pct: 3.1,
+          },
+        },
+      };
+
       saveCompletedResult(activeDropId, fallbackResult);
       clearDraft(activeDropId);
       setSubmissionResult(fallbackResult);
-      setStep("completed");
+      setStep("searching");
     } finally {
       setIsSubmitting(false);
     }
@@ -329,76 +406,67 @@ export default function HomePage() {
     );
   }
 
-  // 4. Completed Result Screen (Stage 4 baseline)
-  if (step === "completed" && submissionResult) {
+  // 4. Searching Radar Screen (S5: 2.0s duration)
+  if (step === "searching") {
+    return <SearchMapAnimation onComplete={() => setStep("reveal")} />;
+  }
+
+  // 5. Twin Reveal Screen (S6)
+  if (step === "reveal" && submissionResult) {
     return (
-      <main className="min-h-screen flex flex-col justify-between p-6 relative select-none">
-        <Atmosphere />
-        <OfflineBanner isOnline={isOnline} />
-
-        <header className="relative z-20 flex items-center justify-between w-full max-w-xl mx-auto pt-2">
-          <BrandMark size={32} />
-          <button
-            type="button"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-        </header>
-
-        <div className="relative z-20 w-full max-w-md mx-auto my-auto text-center space-y-6">
-          <Card variant="elevated" className="p-8 space-y-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-mint/15 text-mint flex items-center justify-center mx-auto shadow-md">
-              <Trophy className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-2">
-              <span className="text-xs font-heading uppercase tracking-widest font-bold text-mint">
-                Today&apos;s Picks Sealed
-              </span>
-              <h1 className="font-heading text-3xl font-bold text-text">
-                Stranger Twin Found
-              </h1>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                You matched 4 of 5 picks with a stranger in Berlin! Full reveal animations & share cards unlock in Stage 5.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-2 border border-border flex justify-around items-center">
-              <div>
-                <span className="text-xs text-text-muted block">Match Score</span>
-                <span className="font-heading text-2xl font-bold text-mint">84%</span>
-              </div>
-              <div className="h-8 w-px bg-border" />
-              <div>
-                <span className="text-xs text-text-muted block">Rarity Tier</span>
-                <span className="font-heading text-2xl font-bold text-violet">Rare</span>
-              </div>
-            </div>
-
-            <Button
-              variant="secondary"
-              size="lg"
-              className="w-full"
-              onClick={() => {
-                setStep("landing");
-              }}
-            >
-              Back to Home
-            </Button>
-          </Card>
-        </div>
-
-        <footer className="relative z-20 text-center pb-4 text-xs text-text-muted">
-          Oddly • Tomorrow&apos;s five drop at 7:00 AM IST
-        </footer>
-      </main>
+      <TwinRevealScreen
+        match={submissionResult.match}
+        onSeeOddness={() => setStep("oddness")}
+        onShare={() => {
+          if (navigator.share) {
+            navigator.share({
+              title: "Oddly — My Stranger Twin",
+              text: `I matched ${submissionResult.match.matched_picks}/5 picks with a stranger in ${submissionResult.match.twin_location}!`,
+              url: window.location.href,
+            }).catch(() => {});
+          } else {
+            toast("Link copied to clipboard!", "success");
+          }
+        }}
+        onClose={() => setStep("landing")}
+      />
     );
   }
 
-  // 5. Default S1 Landing Screen
+  // 6. Oddness Screen (S7)
+  if (step === "oddness" && submissionResult) {
+    return (
+      <OddnessScreen
+        oddness={submissionResult.oddness}
+        onBackToTwin={() => setStep("reveal")}
+        onShare={() => {
+          if (navigator.share) {
+            navigator.share({
+              title: "Oddly — Rarity Score",
+              text: `I am rarer than ${Math.round(submissionResult.oddness.percentile)}% of today's players worldwide on Oddly!`,
+              url: window.location.href,
+            }).catch(() => {});
+          } else {
+            toast("Card copied to clipboard!", "success");
+          }
+        }}
+        onChallenge={() => {
+          if (navigator.share) {
+            navigator.share({
+              title: "Challenge me on Oddly",
+              text: "Can you pick the exact same 5 choices as me today?",
+              url: window.location.href,
+            }).catch(() => {});
+          } else {
+            toast("Challenge link copied!", "success");
+          }
+        }}
+        onHome={() => setStep("landing")}
+      />
+    );
+  }
+
+  // 7. S1 Landing Screen
   return (
     <main className="min-h-screen flex flex-col justify-between p-6 relative select-none">
       <Atmosphere />
@@ -429,7 +497,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Body */}
-      <div className="relative z-20 w-full max-w-md mx-auto my-auto text-center space-y-8 py-6">
+      <div className="relative z-20 w-full max-w-md mx-auto my-auto text-center space-y-6 py-4">
         {/* Brand visual motif */}
         <div className="relative w-28 h-20 mx-auto flex items-center justify-center">
           <div className="absolute left-2 w-14 h-14 rounded-full bg-violet/80 blur-xs border border-violet/40" />
@@ -438,23 +506,53 @@ export default function HomePage() {
         </div>
 
         {/* Hero headline & tagline */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-text">
             Someone out there is oddly like you
           </h1>
-          <p className="font-body text-text-secondary text-base leading-relaxed max-w-xs mx-auto">
+          <p className="font-body text-text-secondary text-sm sm:text-base leading-relaxed max-w-xs mx-auto">
             Five picks. About 30 seconds. One stranger twin anywhere in the world.
           </p>
         </div>
 
         {/* Live Player Counter */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-2 border border-border text-xs font-medium text-text">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-2 border border-border text-xs font-medium text-text">
           <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
           <span>3,482 players today</span>
         </div>
 
-        {/* Main CTA or Countdown */}
-        {isLoading ? (
+        {/* Completed Drop Summary or Play CTA */}
+        {submissionResult ? (
+          <Card variant="elevated" className="p-6 space-y-4 text-center">
+            <div className="flex items-center justify-center gap-2 text-mint font-heading font-bold text-xs uppercase tracking-wider">
+              <Trophy className="w-4 h-4" />
+              <span>Today&apos;s Picks Sealed</span>
+            </div>
+
+            <p className="font-heading text-xl font-bold text-text">
+              Matched {submissionResult.match.matched_picks}/5 with a stranger in {submissionResult.match.twin_location}
+            </p>
+
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant="primary"
+                size="md"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => setStep("reveal")}
+              >
+                <span>View Twin & Oddness</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="pt-2 border-t border-border">
+              <p className="text-xs text-text-muted mb-2 font-heading">
+                Next five drop at 7:00 AM IST
+              </p>
+              <Countdown />
+            </div>
+          </Card>
+        ) : isLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-14 w-full rounded-2xl" />
           </div>
