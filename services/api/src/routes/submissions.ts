@@ -7,8 +7,7 @@
  * running frequency updates, instant Stage A matching, and oddness scoring (P3.05, P3.06, P3.09).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import {
   AnswerPayloadSchema,
@@ -18,17 +17,25 @@ import {
   isDayOpen,
   oddnessScore,
   percentile,
+  StoredAnswer,
   SubmissionForMatching,
+  ValidatedAnswerPayload,
 } from "@oddly/shared";
 import { prisma } from "../db/client.js";
 import { SubmissionsRepository } from "../db/submissions.repo.js";
 import { MatchesRepository } from "../db/matches.repo.js";
 import { DropsRepository } from "../db/drops.repo.js";
 
-export const submissionsRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
-
-  app.post(
+export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
+  app.post<{
+    Body: {
+      drop_id: string;
+      player_id: string;
+      request_id: string;
+      timing_ms?: number;
+      answers: unknown[];
+    };
+  }>(
     "/v1/submissions",
     {
       schema: {
@@ -41,7 +48,7 @@ export const submissionsRoutes: FastifyPluginAsync = async (fastify) => {
           request_id: z.string().min(16).max(64), // Client-generated idempotency key
           timing_ms: z.number().int().positive().optional(), // Duration spent answering (for bot detection)
           answers: z
-            .array(AnswerPayloadSchema)
+            .array(z.any())
             .length(5, "Must submit exactly 5 answers"),
         }),
         response: {
@@ -62,21 +69,24 @@ export const submissionsRoutes: FastifyPluginAsync = async (fastify) => {
               })
               .nullable(),
           }),
-          400: z.object({
-            ok: z.literal(false),
-            error: z.string(),
-            message: z.string(),
-          }),
-          409: z.object({
-            ok: z.literal(false),
-            error: z.string(),
-            message: z.string(),
-          }),
         },
       },
     },
     async (req, reply) => {
-      const { drop_id, player_id, request_id, timing_ms, answers } = req.body;
+      const { drop_id, player_id, request_id, timing_ms } = req.body;
+
+      if (!Array.isArray(req.body.answers) || req.body.answers.length !== 5) {
+        reply.status(400).send({
+          ok: false,
+          error: "VALIDATION_ERROR",
+          message: "Must submit exactly 5 answers",
+        });
+        return;
+      }
+
+      const answers: ValidatedAnswerPayload[] = req.body.answers.map((a: unknown) =>
+        AnswerPayloadSchema.parse(a)
+      );
 
       // 1. Check idempotency: if request_id already exists, return existing submission
       const existingRequest = await SubmissionsRepository.findByRequestId(request_id);
@@ -153,7 +163,7 @@ export const submissionsRoutes: FastifyPluginAsync = async (fastify) => {
       const isBotFlagged = Boolean(timing_ms && timing_ms < 3000);
 
       // 5. Store submission
-      const storedAnswers = answers.map((a) => ({
+      const storedAnswers = answers.map((a: ValidatedAnswerPayload) => ({
         question_id: a.question_id,
         value: a.value,
       }));
@@ -243,7 +253,7 @@ export const submissionsRoutes: FastifyPluginAsync = async (fastify) => {
         submission_id: s.id,
         player_id: s.player_id,
         drop_id: s.drop_id,
-        answers: s.answers as any,
+        answers: s.answers as unknown as StoredAnswer[],
         submitted_at: s.submitted_at,
       }));
 
