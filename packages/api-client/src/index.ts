@@ -201,3 +201,8 @@ export class OddlyApiClient {
     return this.request<WorldStatsResponse>(`/v1/world/${dropId}`);
   }
 }
+
+export function createOddlyClient(config: OddlyClientConfig): OddlyApiClient {
+  return new OddlyApiClient(config);
+}
+
