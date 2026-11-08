@@ -341,3 +341,4 @@ describe("submissionSimilarity", () => {
     expect(submissionSimilarity([], [], optionMap)).toBe(0);
   });
 });
+
