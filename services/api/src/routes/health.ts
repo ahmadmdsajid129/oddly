@@ -5,13 +5,11 @@
  * System health and readiness endpoint.
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { ODDLY_VERSION } from "@oddly/shared";
 
-export const healthRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const healthRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get(
     "/health",
@@ -39,3 +37,4 @@ export const healthRoutes: FastifyPluginAsync = async (fastify) => {
     }
   );
 };
+
