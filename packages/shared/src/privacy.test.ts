@@ -104,3 +104,4 @@ describe("hashTwinId", () => {
     expect(tokenDay1).not.toBe(tokenDay2);
   });
 });
+
