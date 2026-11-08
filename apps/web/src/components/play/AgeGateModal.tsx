@@ -33,9 +33,8 @@ export function AgeGateModal({ open, onOpenChange, onConfirm, onUnder18 }: AgeGa
 
         <div className="flex items-center space-x-3 p-2">
           <Checkbox
-            id="age-gate-checkbox"
             checked={agreed}
-            onCheckedChange={(checked) => setAgreed(Boolean(checked))}
+            onChange={(checked: boolean) => setAgreed(checked)}
             label="I confirm that I am 18 years of age or older"
           />
         </div>
