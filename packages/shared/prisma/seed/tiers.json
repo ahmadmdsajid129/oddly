@@ -1,0 +1,34 @@
+[
+  {
+    "tier": "Common",
+    "min_percentile": 0.0,
+    "max_percentile": 60.0,
+    "label": "Common",
+    "description": "Your instincts align with the everyday heartbeat of humanity.",
+    "badge_color": "#94A3B8"
+  },
+  {
+    "tier": "Uncommon",
+    "min_percentile": 60.0,
+    "max_percentile": 85.0,
+    "label": "Uncommon",
+    "description": "You walk the beaten path, but your eyes wander towards the edge.",
+    "badge_color": "#38BDF8"
+  },
+  {
+    "tier": "Rare",
+    "min_percentile": 85.0,
+    "max_percentile": 97.0,
+    "label": "Rare",
+    "description": "A peculiar frequency. Very few think quite like you.",
+    "badge_color": "#A855F7"
+  },
+  {
+    "tier": "Mythic",
+    "min_percentile": 97.0,
+    "max_percentile": 100.0,
+    "label": "Mythic",
+    "description": "An anomaly in the human dataset. A solitary signal in the void.",
+    "badge_color": "#F59E0B"
+  }
+]
