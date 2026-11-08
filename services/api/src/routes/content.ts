@@ -6,15 +6,13 @@
  * All user-facing text is sourced dynamically from the app_content table (D-005).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
 
-export const contentRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const contentRoutes: FastifyPluginAsyncZod = async (app) => {
 
-  app.get(
+  app.get<{ Params: { locale: string } }>(
     "/v1/content/:locale",
     {
       schema: {
@@ -69,8 +67,9 @@ export const contentRoutes: FastifyPluginAsync = async (fastify) => {
   );
 
   // Fallback GET /v1/content defaults to en
-  app.get("/v1/content", async (req, reply) => {
-    const locale = (req.query as { locale?: string })?.locale || "en";
+  app.get<{ Querystring: { locale?: string } }>("/v1/content", async (req, reply) => {
+    const locale = req.query?.locale || "en";
     reply.redirect(`/v1/content/${locale}`);
   });
 };
+
