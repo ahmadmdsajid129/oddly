@@ -158,3 +158,4 @@ export function hashTwinId(playerId: string, salt: string): string {
     .digest("hex");
   return hash.slice(0, 16);
 }
+
