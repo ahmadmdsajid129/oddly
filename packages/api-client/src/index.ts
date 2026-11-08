@@ -81,6 +81,43 @@ export interface WorldStatsResponse {
   } | null;
 }
 
+export interface CardResponse {
+  success: boolean;
+  format: string;
+  theme: string;
+  cardUrl: string;
+  storageKey: string;
+  shortId: string;
+}
+
+export interface CreateShareResponse {
+  success: boolean;
+  shortId: string;
+  shareUrl: string;
+}
+
+export interface PublicShareResponse {
+  success: boolean;
+  shortId: string;
+  dropId: string;
+  dropDate: string;
+  sharerScore: number;
+  sharerTier: string;
+  sharerPercentile: number;
+  twinCity?: string;
+  answers: Array<{
+    questionId: string;
+    value: unknown;
+  }>;
+  questions: Array<{
+    id: string;
+    type: string;
+    prompt: string;
+    options?: unknown;
+    media_url?: string | null;
+  }>;
+}
+
 export class OddlyApiClient {
   private baseUrl: string;
   private fetchFn: typeof fetch;
@@ -199,6 +236,30 @@ export class OddlyApiClient {
   /** Global community statistics for a drop */
   async getWorldStats(dropId: string): Promise<WorldStatsResponse> {
     return this.request<WorldStatsResponse>(`/v1/world/${dropId}`);
+  }
+
+  /** Share card for a drop */
+  async getCard(
+    dropId: string,
+    format: "story" | "square" | "link" = "story",
+    theme: "dark" | "light" | "mythic" = "dark"
+  ): Promise<CardResponse> {
+    return this.request<CardResponse>(
+      `/v1/results/${dropId}/card?format=${format}&theme=${theme}`
+    );
+  }
+
+  /** Generate or retrieve viral short link */
+  async createShare(dropId: string): Promise<CreateShareResponse> {
+    return this.request<CreateShareResponse>("/v1/shares", {
+      method: "POST",
+      body: JSON.stringify({ dropId }),
+    });
+  }
+
+  /** Resolve public challenge link and receiver payload */
+  async getShare(shortId: string): Promise<PublicShareResponse> {
+    return this.request<PublicShareResponse>(`/v1/shares/${shortId}`);
   }
 }
 
