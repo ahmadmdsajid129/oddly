@@ -117,12 +117,11 @@ export function QuestionScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [question, onExit]);
 
-  const atmosphereType =
-    question.type === "word" ? "words" : question.type;
+  const atmosphereType = question.type;
 
   return (
     <div className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none">
-      <Atmosphere questionType={atmosphereType as any} />
+      <Atmosphere mode={atmosphereType} />
 
       {/* Screen reader announcement */}
       <div aria-live="polite" className="sr-only">
