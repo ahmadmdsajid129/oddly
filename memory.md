@@ -17,40 +17,20 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 ## 2. Current State
 
 - **What works now:**
-  - Stage 0 and Stage 1 are 100% COMPLETE.
-  - Complete, exhaustive system documentation created in root: `product.md`, `rules.md`, `design.md`, `architecture.md`, `task.md`, and `memory.md`.
-  - Node.js LTS environment configured at `v20.19.5` with `pnpm 12.18.0`.
-  - System junction established for Windows `nvm4w` pointing to Node 20.
-  - Monorepo skeleton fully initialized (`apps/web`, `apps/admin`, `services/api`, `services/worker`, `packages/shared`, `packages/ui-tokens`, `packages/api-client`, `infra/`).
-  - Full design system implemented in `apps/web`:
-    - `apps/web/src/styles/globals.css`: Full color tokens, light/dark themes, `--grad-hero`, `--grad-match`, `--grad-mythic`, `--glow-mint`, `--glow-violet`, glass panels, shimmers, reduced motion overrides.
-    - `apps/web/src/components/ui/ThemeProvider.tsx`: Supports `system`, `light`, `dark`, auto-detects `prefers-color-scheme`, persisted in `localStorage`.
-    - `apps/web/src/lib/motion.ts`: Framer Motion spring presets (`springDefault`, `springBouncy`, `springGentle`), transition variants, sheet/modal variants.
-    - `apps/web/src/lib/feedback.ts`: Tactile vibration (`navigator.vibrate`) and Web Audio API tone synthesizer (chimes, ticks, celebrate).
-    - `apps/web/src/components/icons/index.tsx`: `BrandMark`, `StreakFlame`, 4 Tier Badges (`CommonBadge`, `UncommonBadge`, `RareBadge`, `MythicBadge`), canvas confetti emitter.
-    - `apps/web/src/components/illustrations/index.tsx`: Complete 28 custom vector SVG illustrations for Question Type 4 across 7 categories + `DynamicIllustration` registry.
-    - `apps/web/src/components/ui/Atmosphere.tsx`: Drifting hero circles with glowing mint overlap and per-question shifting hue (Text: Violet, Number: Coral, Colour: Mint, Image: Sky, Word: Amber).
-    - `apps/web/src/components/ui/Button.tsx`: All 6 variants (primary, secondary, ghost, destructive, icon, close X) across 3 sizes and 8 states with loading indicator.
-    - `apps/web/src/components/ui/Card.tsx`: Default, elevated, and glass cards; `Badge` and `Chip` components.
-    - `apps/web/src/components/ui/FormControls.tsx`: Radix Switch `Toggle`, Age Gate 28px rounded `Checkbox`, `Input`, and `Textarea` with 140-char counter.
-    - `apps/web/src/components/ui/Dialogs.tsx`: `ResponsiveDialog` rendering mobile Bottom Sheet (with swipe-down-to-dismiss drag gesture) and desktop centered modal.
-    - `apps/web/src/components/ui/Toast.tsx`: `ToastProvider` and `useToast()` hook with success, error, info variants.
-    - `apps/web/src/components/ui/Navigation.tsx`: `Tooltip`, `Tabs`, `BottomTabBar` (Today, History, Me), and `TopNav`.
-    - `apps/web/src/components/ui/FeedbackPrimitives.tsx`: `ProgressDots` (5 dots, jumpable), `Skeleton` shimmer, and `EmptyState`.
-    - `apps/web/src/components/ui/Countdown.tsx`: Tabular flip-digit countdown timer for 07:00 IST drop release.
-    - `apps/web/src/components/play/AnswerComponents.tsx`: Interactive components for all 5 question types (`AnswerTile`, `NumberPicker`, `ColourSwatchGrid`, `ImageTileGrid`, `WordChipsGrid`).
-    - `apps/web/src/components/play/SearchMapAnimation.tsx`: S5 animated dot convergence journey with tap-to-skip.
-    - `apps/web/src/app/design/page.tsx`: Interactive `/design` showcase route demonstrating every component in light/dark mode.
-    - `apps/web/src/app/layout.tsx`: Root layout wired with `ThemeProvider` and `ToastProvider`.
-  - `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm build` verified and passing with zero errors (all 6 workspace packages pass clean).
-  - Web showcase verified on `http://localhost:3000/design`.
-  - `services/api` responds to `GET /health` with `{ ok: true, service: "api", time: "..." }` on `http://localhost:4000`.
-  - `services/worker` boots and connects to Redis (or logs idle readiness) and emits "worker ready".
+  - Stage 0, Stage 1, Stage 2, and Stage 3 are 100% COMPLETE.
+  - Stage 3 Fastify REST API Core fully built and verified:
+    - Scaffolded and configured Fastify 4.29 server factory with strict `fastify-type-provider-zod` v4, Helmet, CORS, signed Cookies, Rate-limiting, and correlation `x-request-id` hook (`P3.01`, `P3.02`).
+    - Added Swagger / OpenAPI documentation endpoint at `/docs` (`P3.11`).
+    - Implemented resilient Redis client wrapper with exponential reconnect and offline fallback (`services/api/src/lib/redis.ts`).
+    - Implemented all 9 domain API route modules (`health`, `drops`, `content`, `pages`, `config`, `identity`, `submissions`, `results`, `world`) covering tasks `P3.03` through `P3.09`.
+    - Implemented universal typed API client package `@oddly/api-client` (`P3.12`).
+    - Implemented integration test suite in `services/api/src/server.test.ts` verifying health, swagger docs, correlation headers, security headers, validation formatting, and session cookies (`P3.10`).
+    - Passed all 78 tests across monorepo (`@oddly/shared` + `services/api`), typechecks (6/6), lints (6/6), and builds (3/3).
 - **What is half-done:**
-  - Nothing in Stage 1. Stage 1 is 100% complete.
+  - Nothing. Stage 3 is 100% complete.
 - **What is next:**
-  - Await Founder instruction to proceed to **Stage 2 (Database and Shared Core Scoring)**.
-  - In Stage 2: Create Prisma schema for all 18 tables, write DB migration, implement mathematical scoring functions (Oddness entropy, Dice twin distance, tier classifier) with 100% unit test coverage in `@oddly/shared`, and author DB seed scripts.
+  - Await Founder instruction to proceed to **Stage 4 (Play Flow Frontend)**.
+  - In Stage 4: Connect Next.js 14 frontend with TanStack Query and `@oddly/api-client`, build the complete interactive 5-question play flow (S1 Landing, S2 Countdown, S3 Questions, S4 Review, Submission with offline recovery), test under-18 age gate, and write Playwright E2E tests.
 
 ---
 
@@ -76,6 +56,9 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | `D-016` | Descending Evaluation on Percentile Tier Boundaries    | Guarantees threshold percentiles (60, 85, 97) match the higher tier unambiguously                      | Ascending interval evaluation               | `packages/shared/src/scoring.ts`|
 | `2026-11-08` | `D-017` | Seed Question Alignment with Vector Illustration Keys  | Type 4 questions in batch 001 directly reference the 28 registered illustration keys                   | Generic arbitrary icon names                | `seed/oddly_batch_001_first_14_days.json` |
 | `2026-11-08` | `D-018` | Generate Prisma Client on Demand in CI and Local Setup | Avoids committing OS-specific engine binaries to git, ensuring cross-platform runner stability        | Committing binary engines                   | `.gitignore`, `.github/workflows/ci.yml` |
+| `2026-11-08` | `D-019` | Pin Fastify Security Plugins for Fastify 4.29          | Pins `@fastify/helmet@11.1.1`, `@fastify/cors@9.0.1`, `@fastify/rate-limit@9.1.0`, `@fastify/cookie@9.3.1`, `@fastify/swagger@8.14.0`, `@fastify/swagger-ui@3.0.0` | Installing Fastify 5 plugin versions        | `services/api/package.json` |
+| `2026-11-08` | `D-020` | Override `zod-to-json-schema` to `3.24.1`              | Resolves upstream subpath resolution bug (`zod/v3` or `zod/v4`) in `3.25.2` that breaks Zod 3.23/3.24 | Upgrading Zod to non-standard experimental v4 | `pnpm-workspace.yaml` |
+| `2026-11-08` | `D-021` | Fastify Route Generic Typing for Route Parameters      | Utilizes `app.get<{ Params: { ... } }>` to enforce strict compile-time types on `req.params` and `req.body` | Relying on untyped `any` or runtime casts   | `services/api/src/routes/*.ts` |
 
 ---
 
@@ -122,6 +105,13 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | Stage 2 | Built dynamic seed script importing batch 001 into Prisma                      | `packages/shared/prisma/seed.ts` | Phase 2: Idempotent database seeder |
 | `2026-11-08` | Stage 2 | Built API database repository access layer for drops, submissions, players, matches | `services/api/src/db/*.ts` | Phase 2: Clean DB repository abstractions |
 | `2026-11-08` | Stage 2 | Marked Phase 2 tasks COMPLETE (45/165 total done, 27% overall)                | `task.md` | Phase 2: Roadmap status update |
+| `2026-11-08` | Stage 3 | Implemented Fastify server factory with Helmet, CORS, signed cookies, rate limiting, and Zod provider | `services/api/src/server.ts` | Phase 3: Fastify HTTP factory (`P3.01`, `P3.02`) |
+| `2026-11-08` | Stage 3 | Implemented resilient Redis client wrapper with reconnect and offline fallback | `services/api/src/lib/redis.ts` | Phase 3: Redis cache & counter layer |
+| `2026-11-08` | Stage 3 | Implemented all 9 domain API routes (`health`, `drops`, `content`, `pages`, `config`, `identity`, `submissions`, `results`, `world`) | `services/api/src/routes/*.ts` | Phase 3: Public & submission endpoints (`P3.03`–`P3.09`) |
+| `2026-11-08` | Stage 3 | Built server entrypoint booting on port 4000                                  | `services/api/src/index.ts` | Phase 3: API service runtime (`P3.01`) |
+| `2026-11-08` | Stage 3 | Built universal typed `@oddly/api-client` package                             | `packages/api-client/src/index.ts` | Phase 3: Client SDK (`P3.12`) |
+| `2026-11-08` | Stage 3 | Implemented 8 integration tests using `fastify.inject()`                      | `services/api/src/server.test.ts` | Phase 3: Server integration test suite (`P3.10`) |
+| `2026-11-08` | Stage 3 | Marked Phase 3 tasks COMPLETE (57/165 total done, 35% overall)                | `task.md` | Phase 3: Roadmap status update |
 
 ---
 
@@ -136,6 +126,14 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | `B-005` | GitHub Actions CI failed with red X on commit   | `cache: "pnpm"` in `setup-node` ran before pnpm installation, and `action-setup` conflicted with `packageManager` | Set up Node 20 first, installed pinned pnpm via npm, and configured `actions/cache` on pnpm store path | `.github/workflows/ci.yml`, `.npmrc` | Pin package manager and use reliable actions/cache | GitHub Actions Run 42406355228 |
 | `2026-11-08` | `B-006` | TS2308: Ambiguous re-exports in `@oddly/shared` | `types.ts` and `db.ts` both exported `DropStatus`, `QuestionType`, etc. with `export *` | Explicitly exported pure domain types from `types.ts` and `PrismaClient`/`Prisma` from `db.ts` in `index.ts` | `packages/shared/src/index.ts` | Disallow conflicting wildcard re-exports | `pnpm typecheck` |
 | `2026-11-08` | `B-007` | `StoredAnswer[]` not assignable to `InputJsonValue` | Prisma JSON column types require `InputJsonValue`                                     | Cast stored answers via `as unknown as Prisma.InputJsonValue` in `submissions.repo.ts`                   | `services/api/src/db/submissions.repo.ts` | Use Prisma JSON type casting | `pnpm build` |
+| `2026-11-08` | `B-008` | `Failed to load url zod` in `services/api`      | `zod` not declared directly in `services/api/package.json`                              | Installed `zod` directly in `services/api` dependencies                                                   | `services/api/package.json`  | Declare runtime dependencies explicitly| `pnpm typecheck` |
+| `2026-11-08` | `B-009` | `zod/v3` subpath not defined error              | Upstream `zod-to-json-schema@3.25.2` incompatible with Zod 3.23/3.24                    | Pinned `zod-to-json-schema: 3.24.1` via `overrides` in `pnpm-workspace.yaml`                              | `pnpm-workspace.yaml`        | Pin transitive schema generator tools  | `pnpm typecheck` |
+| `2026-11-08` | `B-010` | Fastify 5 plugin version mismatch               | `@fastify/helmet@13` & `@fastify/cors@11` expected Fastify 5                            | Pinned Fastify 4 plugins (`helmet@11.1.1`, `cors@9.0.1`, `rate-limit@9.1.0`, etc.)                       | `services/api/package.json`  | Match major plugin versions to Fastify | `pnpm typecheck` |
+| `2026-11-08` | `B-011` | `x-request-id` undefined on response            | Fastify logger generates request ID internally but does not echo to response header     | Added `app.addHook("onSend", ...)` to echo `x-request-id` header                                          | `services/api/src/server.ts` | Test correlation header echo in CI     | `server.test.ts` |
+| `2026-11-08` | `B-012` | `FST_ERR_FAILED_ERROR_SERIALIZATION` on 400     | Route schema declared `response: { 400: ... }` which bypassed default error serializer  | Removed custom 400 response schema and let standard Fastify validation JSON serialize cleanly             | `services/api/src/routes/drops.ts` | Keep default error serialization | `server.test.ts` |
+| `2026-11-08` | `B-013` | `TS2589: Type instantiation excessively deep`   | Fixed-length array of 5 discriminated unions inside Zod Fastify type provider schema    | Typed Fastify route body schema as array and parsed items via `AnswerPayloadSchema.parse(a)` in handler   | `services/api/src/routes/submissions.ts` | Avoid deep Zod tuples in Fastify schema | `pnpm typecheck` |
+| `2026-11-08` | `B-014` | `req.params is of type 'unknown'`               | Parametrized route handlers lacked Fastify route generics                               | Added `app.get<{ Params: { ... } }>` to `drops`, `content`, `pages`, `results`, `world` routes            | `services/api/src/routes/*.ts` | Always supply route generics for params | `pnpm typecheck` |
+| `2026-11-08` | `B-015` | Missing `@types/node` in `@oddly/api-client`    | TypeScript traversed `@oddly/shared` `Buffer` and `node:crypto` types                   | Added `@types/node` to `packages/api-client/package.json` devDependencies                                 | `packages/api-client/package.json` | Include node types when traversing shared | `pnpm typecheck` |
 
 ---
 
@@ -203,13 +201,16 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ## 11. Next Steps
 
-1. Await Founder review of Stage 1 and instruction to proceed (e.g. "proceed to Stage 2").
-2. In Stage 2 (Database & Shared Core Scoring):
-   - Checkout branch `stage-2-database-scoring`.
-   - Author complete `packages/shared/prisma/schema.prisma` with all 18 tables, indexes, and constraints.
-   - Run Prisma migration and generate client types.
-   - Implement mathematical scoring functions in `packages/shared/src/scoring.ts` (Dice twin distance, Shannon self-information Oddness entropy, rarity tier classifier).
-   - Write comprehensive unit tests in `packages/shared/tests/scoring.test.ts` (100% mathematical edge case coverage).
-   - Write idempotent database seed script (`packages/shared/prisma/seed.ts`) with dynamic Drop 1 questions and initial system configuration.
-   - Verify `pnpm test`, `pnpm typecheck`, `pnpm lint`, and DB migrations.
-   - Print Stage 2 Report and STOP.
+1. Await Founder review of Stage 3 and instruction to proceed (e.g. "proceed to Stage 4").
+2. In Stage 4 (Play Flow Frontend):
+   - Checkout branch `stage-4-play-flow`.
+   - Wire TanStack Query provider and `@oddly/api-client` in `apps/web`.
+   - Implement S1 Landing / Today screen (`/`) with live player count, active countdown, and dynamic copy.
+   - Implement S2 Countdown screen with tabular flip digits.
+   - Implement DPDP Act age gate bottom sheet and under-18 exclusion view.
+   - Implement S3 Question screens (Pick One Text, Number, 12-Colour, Image Grid, Word Chips) with auto-advance (350ms), back navigation, and persistent local draft.
+   - Implement S4 Review screen with summary chips and editable jumps.
+   - Implement submission pipeline with idempotency `request_id`, retry queue, and offline recovery banner.
+   - Verify bundle size $\le 150\text{ KB}$ gzipped.
+   - Run unit & Playwright E2E test suite.
+   - Print Stage 4 Report and STOP.
