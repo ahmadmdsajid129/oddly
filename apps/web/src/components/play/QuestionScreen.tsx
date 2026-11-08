@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, X } from "lucide-react";
 import { ProgressDots } from "@/components/ui/FeedbackPrimitives";
 import { Atmosphere } from "@/components/ui/Atmosphere";
@@ -70,19 +70,22 @@ export function QuestionScreen({
     };
   }, [question.id]);
 
-  const scheduleAutoAdvance = (ans: AnswerPayload) => {
-    onAnswer(ans);
-    feedback.playSound("tick");
-    feedback.triggerHaptic("select");
+  const scheduleAutoAdvance = useCallback(
+    (ans: AnswerPayload) => {
+      onAnswer(ans);
+      feedback.playSound("tick");
+      feedback.triggerHaptic("select");
 
-    if (autoAdvanceTimerRef.current) {
-      clearTimeout(autoAdvanceTimerRef.current);
-    }
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+      }
 
-    autoAdvanceTimerRef.current = setTimeout(() => {
-      onNext();
-    }, 350);
-  };
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        onNext();
+      }, 350);
+    },
+    [onAnswer, onNext]
+  );
 
   // Keyboard navigation
   useEffect(() => {
@@ -115,7 +118,7 @@ export function QuestionScreen({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [question, onExit]);
+  }, [question, onExit, scheduleAutoAdvance]);
 
   const atmosphereType = question.type;
 
