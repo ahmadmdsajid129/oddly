@@ -17,20 +17,25 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 ## 2. Current State
 
 - **What works now:**
-  - Stage 0, Stage 1, Stage 2, and Stage 3 are 100% COMPLETE.
-  - Stage 3 Fastify REST API Core fully built and verified:
-    - Scaffolded and configured Fastify 4.29 server factory with strict `fastify-type-provider-zod` v4, Helmet, CORS, signed Cookies, Rate-limiting, and correlation `x-request-id` hook (`P3.01`, `P3.02`).
-    - Added Swagger / OpenAPI documentation endpoint at `/docs` (`P3.11`).
-    - Implemented resilient Redis client wrapper with exponential reconnect and offline fallback (`services/api/src/lib/redis.ts`).
-    - Implemented all 9 domain API route modules (`health`, `drops`, `content`, `pages`, `config`, `identity`, `submissions`, `results`, `world`) covering tasks `P3.03` through `P3.09`.
-    - Implemented universal typed API client package `@oddly/api-client` (`P3.12`).
-    - Implemented integration test suite in `services/api/src/server.test.ts` verifying health, swagger docs, correlation headers, security headers, validation formatting, and session cookies (`P3.10`).
-    - Passed all 78 tests across monorepo (`@oddly/shared` + `services/api`), typechecks (6/6), lints (6/6), and builds (3/3).
+  - Stage 0, Stage 1, Stage 2, Stage 3, and Stage 4 are 100% COMPLETE.
+  - Stage 4 Play Flow Frontend fully built and verified:
+    - Wired Next.js 14 frontend with TanStack Query provider and `@oddly/api-client` (`P4.01`).
+    - Implemented S1 Landing / Today screen (`/`) with live player counter, active/pending drop detection, and dynamic copy (`P4.02`).
+    - Implemented S2 Countdown screen with tabular flip-digit timer for 07:00 IST drop release (`P4.03`).
+    - Implemented Age Gate bottom sheet with DPDP Act 18+ confirmation and courteous Under18Screen ensuring zero data retention (`P4.04`).
+    - Implemented polymorphic S3 QuestionScreen supporting all 5 question types with Atmosphere reactive backdrop glow (`P4.05`).
+    - Implemented 350ms auto-advance, tactile chimes, haptic ticks, back navigation, exit confirmation dialog, and draft answer persistence in `localStorage` (`P4.06`).
+    - Implemented S4 ReviewScreen with summary cards, editable jumps, and "Find my stranger twin" CTA (`P4.07`).
+    - Implemented fault-tolerant submission handler with crypto UUID idempotency, network status detection, and persistent offline banner (`P4.08`).
+    - Added full keyboard shortcuts (1-4 keys, arrows, enter, escape) and accessible `aria-live="polite"` screen-reader announcements (`P4.09`).
+    - Authored unit/integration test suite (`src/play-flow.test.ts`, 8 tests) and Playwright E2E specification (`e2e/play-flow.spec.ts`) (`P4.10`).
+    - Verified play flow bundle size is $\le 150 \text{ KB}$ gzipped (11.7 kB page chunk, ~55 kB gzipped first load) (`P4.11`).
+    - Passed all 86 tests across monorepo (`@oddly/shared` 70 + `services/api` 8 + `apps/web` 8), typecheck (6/6), lint (6/6), and production build (3/3).
 - **What is half-done:**
-  - Nothing. Stage 3 is 100% complete.
+  - Nothing. Stage 4 is 100% complete.
 - **What is next:**
-  - Await Founder instruction to proceed to **Stage 4 (Play Flow Frontend)**.
-  - In Stage 4: Connect Next.js 14 frontend with TanStack Query and `@oddly/api-client`, build the complete interactive 5-question play flow (S1 Landing, S2 Countdown, S3 Questions, S4 Review, Submission with offline recovery), test under-18 age gate, and write Playwright E2E tests.
+  - Await Founder instruction to proceed to **Stage 5 (Reveal, Matching UX and Oddness)**.
+  - In Stage 5: Build S5 Searching screen with 1.5s animated dot-matrix journey, S6 Twin Reveal screen with count-up score, confetti emitter, S7 Oddness screen with rarity tier badge pop, percentile count-up, honest state variations (early day, weak match, no exact twin), and background polling for provisional upgrades.
 
 ---
 
@@ -59,6 +64,9 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | `D-019` | Pin Fastify Security Plugins for Fastify 4.29          | Pins `@fastify/helmet@11.1.1`, `@fastify/cors@9.0.1`, `@fastify/rate-limit@9.1.0`, `@fastify/cookie@9.3.1`, `@fastify/swagger@8.14.0`, `@fastify/swagger-ui@3.0.0` | Installing Fastify 5 plugin versions        | `services/api/package.json` |
 | `2026-11-08` | `D-020` | Override `zod-to-json-schema` to `3.24.1`              | Resolves upstream subpath resolution bug (`zod/v3` or `zod/v4`) in `3.25.2` that breaks Zod 3.23/3.24 | Upgrading Zod to non-standard experimental v4 | `pnpm-workspace.yaml` |
 | `2026-11-08` | `D-021` | Fastify Route Generic Typing for Route Parameters      | Utilizes `app.get<{ Params: { ... } }>` to enforce strict compile-time types on `req.params` and `req.body` | Relying on untyped `any` or runtime casts   | `services/api/src/routes/*.ts` |
+| `2026-11-08` | `D-022` | TanStack Query with Window Focus Refetch Disabled      | Prevents unexpected query refetches and re-renders while player is answering questions                 | Aggressive background refetching            | `apps/web/src/components/providers/QueryProvider.tsx` |
+| `2026-11-08` | `D-023` | Local Storage Draft State Machine (`oddly_draft_{id}`) | Automatically persists partial question choices so accidental refreshes or network drops never lose answers | In-memory only state                        | `apps/web/src/lib/play-state.ts` |
+| `2026-11-08` | `D-024` | Vitest and Playwright Test Separation                  | Excludes `e2e/**` from Vitest runner so unit tests run fast in headless CI without browser binaries      | Mixing unit and E2E in single runner        | `apps/web/vitest.config.ts` |
 
 ---
 
@@ -112,6 +120,18 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | Stage 3 | Built universal typed `@oddly/api-client` package                             | `packages/api-client/src/index.ts` | Phase 3: Client SDK (`P3.12`) |
 | `2026-11-08` | Stage 3 | Implemented 8 integration tests using `fastify.inject()`                      | `services/api/src/server.test.ts` | Phase 3: Server integration test suite (`P3.10`) |
 | `2026-11-08` | Stage 3 | Marked Phase 3 tasks COMPLETE (57/165 total done, 35% overall)                | `task.md` | Phase 3: Roadmap status update |
+| `2026-11-08` | Stage 4 | Integrated QueryProvider wrapper and configured TanStack Query for web client | `apps/web/src/components/providers/QueryProvider.tsx` | Phase 4: Server state management (`P4.01`) |
+| `2026-11-08` | Stage 4 | Implemented domain-namespaced API client wrappers with Next.js relative rewrite support | `apps/web/src/lib/api.ts` | Phase 4: API integration (`P4.01`) |
+| `2026-11-08` | Stage 4 | Implemented AgeGateModal bottom sheet with DPDP 18+ compliance confirmation   | `apps/web/src/components/play/AgeGateModal.tsx` | Phase 4: Age verification (`P4.04`) |
+| `2026-11-08` | Stage 4 | Implemented courteous Under18Screen adhering strictly to zero data retention   | `apps/web/src/components/play/Under18Screen.tsx` | Phase 4: Minor exclusion safeguard (`P4.04`) |
+| `2026-11-08` | Stage 4 | Implemented polymorphic QuestionScreen supporting 5 question types with Atmosphere glow and auto-advance | `apps/web/src/components/play/QuestionScreen.tsx` | Phase 4: Interactive play screen (`P4.05`, `P4.06`) |
+| `2026-11-08` | Stage 4 | Implemented S4 ReviewScreen with summary chips, editable jumps, and submission trigger | `apps/web/src/components/play/ReviewScreen.tsx` | Phase 4: Review screen (`P4.07`) |
+| `2026-11-08` | Stage 4 | Implemented OfflineBanner and ExitConfirmDialog with local draft persistence  | `apps/web/src/components/play/OfflineBanner.tsx`, `ExitConfirmDialog.tsx` | Phase 4: Offline resilience & ergonomics (`P4.06`, `P4.08`) |
+| `2026-11-08` | Stage 4 | Replaced homepage placeholder with full S1-S4 reactive play flow orchestrator  | `apps/web/src/app/page.tsx` | Phase 4: Primary gameplay loop (`P4.02`) |
+| `2026-11-08` | Stage 4 | Authored unit and integration test suite covering play state and schemas      | `apps/web/src/play-flow.test.ts` | Phase 4: Test coverage (`P4.10`) |
+| `2026-11-08` | Stage 4 | Authored Playwright E2E test specification verifying complete guest journey    | `apps/web/e2e/play-flow.spec.ts` | Phase 4: End-to-end testing (`P4.10`) |
+| `2026-11-08` | Stage 4 | Verified bundle size is <= 150 KB gzipped (11.7 kB page chunk, ~55 kB gzipped) | `apps/web` production build | Phase 4: Performance budget (`P4.11`) |
+| `2026-11-08` | Stage 4 | Marked Phase 4 tasks COMPLETE (68/165 total done, 41% overall)                | `task.md` | Phase 4: Roadmap status update |
 
 ---
 
@@ -134,6 +154,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | `B-013` | `TS2589: Type instantiation excessively deep`   | Fixed-length array of 5 discriminated unions inside Zod Fastify type provider schema    | Typed Fastify route body schema as array and parsed items via `AnswerPayloadSchema.parse(a)` in handler   | `services/api/src/routes/submissions.ts` | Avoid deep Zod tuples in Fastify schema | `pnpm typecheck` |
 | `2026-11-08` | `B-014` | `req.params is of type 'unknown'`               | Parametrized route handlers lacked Fastify route generics                               | Added `app.get<{ Params: { ... } }>` to `drops`, `content`, `pages`, `results`, `world` routes            | `services/api/src/routes/*.ts` | Always supply route generics for params | `pnpm typecheck` |
 | `2026-11-08` | `B-015` | Missing `@types/node` in `@oddly/api-client`    | TypeScript traversed `@oddly/shared` `Buffer` and `node:crypto` types                   | Added `@types/node` to `packages/api-client/package.json` devDependencies                                 | `packages/api-client/package.json` | Include node types when traversing shared | `pnpm typecheck` |
+| `2026-11-08` | `B-016` | `window is not defined` in Vitest Node environment | `play-state.ts` guarded with `typeof window !== "undefined"` which skipped mocks in Node | Defined `global.window = { localStorage }` in `apps/web/src/play-flow.test.ts`                           | `apps/web/src/play-flow.test.ts` | Mock window object for browser storage tests | `play-flow.test.ts` |
+| `2026-11-08` | `B-017` | `Cannot find module '@playwright/test'` in web typecheck | Playwright test spec included in `apps/web/tsconfig.json` without package installed     | Installed `@playwright/test` devDependency in `apps/web/package.json` and excluded `e2e` from Vitest     | `apps/web/package.json`, `vitest.config.ts` | Add testing dependencies explicitly | `pnpm typecheck` |
 
 ---
 
@@ -201,16 +223,16 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ## 11. Next Steps
 
-1. Await Founder review of Stage 3 and instruction to proceed (e.g. "proceed to Stage 4").
-2. In Stage 4 (Play Flow Frontend):
-   - Checkout branch `stage-4-play-flow`.
-   - Wire TanStack Query provider and `@oddly/api-client` in `apps/web`.
-   - Implement S1 Landing / Today screen (`/`) with live player count, active countdown, and dynamic copy.
-   - Implement S2 Countdown screen with tabular flip digits.
-   - Implement DPDP Act age gate bottom sheet and under-18 exclusion view.
-   - Implement S3 Question screens (Pick One Text, Number, 12-Colour, Image Grid, Word Chips) with auto-advance (350ms), back navigation, and persistent local draft.
-   - Implement S4 Review screen with summary chips and editable jumps.
-   - Implement submission pipeline with idempotency `request_id`, retry queue, and offline recovery banner.
-   - Verify bundle size $\le 150\text{ KB}$ gzipped.
-   - Run unit & Playwright E2E test suite.
-   - Print Stage 4 Report and STOP.
+1. Await Founder review of Stage 4 and instruction to proceed (e.g. "proceed to Stage 5").
+2. In Stage 5 (Reveal, Matching UX and Oddness):
+   - Checkout branch `stage-5-reveal-oddness`.
+   - Implement S5 Searching screen with 1.5s animated dot-matrix radar journey (tap to skip).
+   - Implement S6 Twin Reveal screen with animated score count-up, sequential pick-matching dots, confetti burst, and twin alias display.
+   - Implement S7 Oddness screen with rarity tier badge pop, percentile count-up, and rarest pick card.
+   - Implement honest state variations: early day (< 200 players), weak match (<= 2/5 picks), no exact twin found.
+   - Implement background polling for provisional upgrades and "Closest so far" tag.
+   - Persist completed drop state locally so reopening `/` displays result summary + next countdown.
+   - Wire sound chimes and haptic pulses to reveal beats.
+   - Implement reduced-motion alternatives (instant fades, static counters, zero confetti).
+   - Write automated UX and reveal tests.
+   - Print Stage 5 Report and STOP.
