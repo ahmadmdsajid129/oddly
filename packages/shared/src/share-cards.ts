@@ -1107,7 +1107,7 @@ export async function generateShareCardSvg(data: ShareCardData): Promise<string>
     vdom = buildStoryTree(data, palette, qrDataUrl);
   }
 
-  const svg = await satori(vdom as any, {
+  const svg = await satori(vdom as unknown as Parameters<typeof satori>[0], {
     width: dimensions.width,
     height: dimensions.height,
     fonts: [
