@@ -6,7 +6,7 @@
  */
 
 import { prisma } from "./client.js";
-import type { StoredAnswer } from "@oddly/shared";
+import type { StoredAnswer, Prisma } from "@oddly/shared";
 
 export class SubmissionsRepository {
   /**
@@ -49,7 +49,7 @@ export class SubmissionsRepository {
         drop_id: data.drop_id,
         player_id: data.player_id,
         request_id: data.request_id,
-        answers: data.answers,
+        answers: data.answers as unknown as Prisma.InputJsonValue,
       },
       include: {
         drop: true,
