@@ -6,13 +6,11 @@
  * All runtime flags & limits are sourced from the app_config table (D-005).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
 
-export const configRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const configRoutes: FastifyPluginAsyncZod = async (app) => {
 
   app.get(
     "/v1/config/public",
@@ -22,8 +20,8 @@ export const configRoutes: FastifyPluginAsync = async (fastify) => {
         tags: ["Config"],
         response: {
           200: z.object({
-            features: z.record(z.any()),
-            timing: z.record(z.any()),
+            features: z.record(z.unknown()),
+            timing: z.record(z.unknown()),
             tiers: z.array(
               z.object({
                 tier: z.string(),
@@ -46,8 +44,8 @@ export const configRoutes: FastifyPluginAsync = async (fastify) => {
         }),
       ]);
 
-      const features: Record<string, any> = {};
-      const timing: Record<string, any> = {};
+      const features: Record<string, unknown> = {};
+      const timing: Record<string, unknown> = {};
 
       for (const cfg of configs) {
         if (cfg.key.startsWith("features.")) {
@@ -77,3 +75,4 @@ export const configRoutes: FastifyPluginAsync = async (fastify) => {
     }
   );
 };
+
