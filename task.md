@@ -9,13 +9,13 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 
 | Metric                          | Current Value                                             |
 | ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[███████░░░░░░░░░░░] 41%`                              |
-| **Current Active Stage**        | **Stage 4 Complete (Awaiting Founder review for Stage 5)**|
+| **Overall Project Progress**    | `[████████░░░░░░░░░░] 47%`                              |
+| **Current Active Stage**        | **Stage 5 Complete (Awaiting Founder review for Stage 6)**|
 | **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 68 tasks                                                  |
+| **Completed Tasks (`DONE`)**    | 77 tasks                                                  |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 97 tasks                                                  |
+| **Pending (`TODO`)**            | 88 tasks                                                  |
 
 ---
 
@@ -28,8 +28,8 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | **Phase 2**  | Database & Shared Core Scoring          | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 2              |
 | **Phase 3**  | Fastify REST API Core                   | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 3              |
 | **Phase 4**  | Play Flow Frontend (PWA)                | Critical | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 4              |
-| **Phase 5**  | Reveal, Matching UX & Oddness           | High     | TODO      | `[----------] 0%` | 0 / 9              | Stage 5              |
-| **Phase 6**  | Server-Rendered Share Cards & Links     | High     | TODO        | `[----------] 0%` | 0 / 10             | Stage 6              |
+| **Phase 5**  | Reveal, Matching UX & Oddness           | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 5              |
+| **Phase 6**  | Server-Rendered Share Cards & Links     | High     | TODO      | `[----------] 0%` | 0 / 10             | Stage 6              |
 | **Phase 7**  | Authentication & Guest Merge            | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 7              |
 | **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | TODO        | `[----------] 0%` | 0 / 10             | Stage 8              |
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler       | Critical | TODO        | `[----------] 0%` | 0 / 11             | Stage 9              |
@@ -159,19 +159,19 @@ _Status: COMPLETE | Target: Complete play flow playable in browser from landing 
 
 ### Phase 5: Reveal, Matching UX and Oddness (Stage 5)
 
-_Status: TODO | Target: Animated reveal, count-up match score, oddness card, honesty states._
+_Status: COMPLETE | Target: Animated reveal, count-up match score, oddness card, honesty states._
 
-| ID      | Task Description                                                                                    | Priority | Status | Depends On   | Owner | Done Date | Notes                    |
-| ------- | --------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------ |
-| `P5.01` | Implement S5 Searching screen with 1.5s animated world dot-matrix journey (tap to skip)             | High     | TODO   | P1.13, P4.08 | Agent | —         | Ambient search animation |
-| `P5.02` | Implement S6 Twin Reveal screen with count-up score, sequential pick dots, and confetti             | Critical | TODO   | P1.13, P5.01 | Agent | —         | Core emotional climax    |
-| `P5.03` | Implement S7 Oddness screen with tier badge pop, percentile count-up, and rarest pick card          | Critical | TODO   | P1.13, P5.02 | Agent | —         | Rarity validation screen |
-| `P5.04` | Implement honest state variations: early day (< 200 players), weak match ($\le 2/5$), no exact twin | Critical | TODO   | P5.02, P5.03 | Agent | —         | Transparent messaging    |
-| `P5.05` | Implement background polling for provisional upgrades and "Closest so far" tag                      | High     | TODO   | P5.02        | Agent | —         | Live match refinement    |
-| `P5.06` | Persist completed drop state locally so reopening `/` displays result summary + next countdown      | High     | TODO   | P5.02        | Agent | —         | Returning session UX     |
-| `P5.07` | Wire sound chimes and haptic pulses (`navigator.vibrate`) to reveal beats                           | Medium   | TODO   | P1.16, P5.02 | Agent | —         | Multi-sensory delight    |
-| `P5.08` | Implement reduced-motion alternatives (instant fades, static counters, zero confetti)               | High     | TODO   | P5.02, P5.03 | Agent | —         | Accessibility compliance |
-| `P5.09` | Write Playwright test verifying all reveal variants and honest states                               | High     | TODO   | P5.04        | Agent | —         | Automated UX testing     |
+| ID          | Task Description                                                                                    | Priority | Status | Depends On   | Owner | Done Date   | Notes                    |
+| ----------- | --------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ------------------------ |
+| `[x] P5.01` | Implement S5 Searching screen with 2.0s animated world dot-matrix journey (tap to skip)             | High     | DONE   | P1.13, P4.08 | Agent | 2026-11-08  | Ambient search animation |
+| `[x] P5.02` | Implement S6 Twin Reveal screen with count-up score, sequential pick dots, and confetti             | Critical | DONE   | P1.13, P5.01 | Agent | 2026-11-08  | Core emotional climax    |
+| `[x] P5.03` | Implement S7 Oddness screen with tier badge pop, percentile count-up, and rarest pick card          | Critical | DONE   | P1.13, P5.02 | Agent | 2026-11-08  | Rarity validation screen |
+| `[x] P5.04` | Implement honest state variations: early day (< 200 players), weak match ($\le 2/5$), no exact twin | Critical | DONE   | P5.02, P5.03 | Agent | 2026-11-08  | Transparent messaging    |
+| `[x] P5.05` | Implement background polling for provisional upgrades and "Closest so far" tag                      | High     | DONE   | P5.02        | Agent | 2026-11-08  | Live match refinement    |
+| `[x] P5.06` | Persist completed drop state locally so reopening `/` displays result summary + next countdown      | High     | DONE   | P5.02        | Agent | 2026-11-08  | Returning session UX     |
+| `[x] P5.07` | Wire sound chimes and haptic pulses (`navigator.vibrate`) to reveal beats                           | Medium   | DONE   | P1.16, P5.02 | Agent | 2026-11-08  | Multi-sensory delight    |
+| `[x] P5.08` | Implement reduced-motion alternatives (instant fades, static counters, zero confetti)               | High     | DONE   | P5.02, P5.03 | Agent | 2026-11-08  | Accessibility compliance |
+| `[x] P5.09` | Write Playwright test verifying all reveal variants and honest states                               | High     | DONE   | P5.04        | Agent | 2026-11-08  | Automated UX testing     |
 
 ---
 
