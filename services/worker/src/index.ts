@@ -1,4 +1,6 @@
 import { Redis } from "ioredis";
+import { Worker } from "bullmq";
+import { processRenderCardJob } from "./jobs/render-card.js";
 
 const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
 
@@ -26,6 +28,20 @@ async function bootstrap() {
   try {
     await redis.connect();
     console.log("[Oddly Worker] Connected to Redis successfully.");
+
+    // Start Cards rendering worker
+    const cardWorker = new Worker("cards", processRenderCardJob, {
+      connection: redis,
+      concurrency: 4,
+    });
+
+    cardWorker.on("completed", (job) => {
+      console.log(`[Oddly Worker] Card rendered for job ${job.id}`);
+    });
+
+    cardWorker.on("failed", (job, err) => {
+      console.error(`[Oddly Worker] Card rendering failed for job ${job?.id}:`, err);
+    });
   } catch (error) {
     console.warn(
       "[Oddly Worker] Redis connection deferred or offline. Starting idle worker:",
