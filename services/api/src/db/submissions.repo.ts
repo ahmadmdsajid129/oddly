@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "./client.js";
+import type { StoredAnswer } from "@oddly/shared";
 
 export class SubmissionsRepository {
   /**
@@ -41,7 +42,7 @@ export class SubmissionsRepository {
     drop_id: string;
     player_id: string;
     request_id: string;
-    answers: any;
+    answers: StoredAnswer[];
   }) {
     return prisma.submission.create({
       data: {
@@ -88,3 +89,4 @@ export class SubmissionsRepository {
     });
   }
 }
+
