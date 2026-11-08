@@ -6,17 +6,15 @@
  * Zero-friction onboarding: players can play immediately as guests (F1).
  */
 
-import { FastifyPluginAsync } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { calculateStreak, getTwinDay } from "@oddly/shared";
 import { PlayersRepository } from "../db/players.repo.js";
 
-export const identityRoutes: FastifyPluginAsync = async (fastify) => {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
+export const identityRoutes: FastifyPluginAsyncZod = async (app) => {
 
   // POST /v1/identity/guest — initialize or refresh guest identity
-  app.post(
+  app.post<{ Body: { did: string; region: string; age_band: string } }>(
     "/v1/identity/guest",
     {
       schema: {
@@ -101,7 +99,15 @@ export const identityRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       const unsigned = req.unsignCookie(rawCookie);
-      const playerId = unsigned.valid ? unsigned.value : rawCookie;
+      const playerId = (unsigned.valid ? unsigned.value : rawCookie) ?? "";
+
+      if (!playerId) {
+        return {
+          authenticated: false,
+          player_id: null,
+          streak: 0,
+        };
+      }
 
       const player = await PlayersRepository.getById(playerId);
       if (!player) {
@@ -123,3 +129,4 @@ export const identityRoutes: FastifyPluginAsync = async (fastify) => {
     }
   );
 };
+
