@@ -9,13 +9,13 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 
 | Metric                          | Current Value                                             |
 | ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[██████░░░░░░░░░░░░░░] 35%`                              |
-| **Current Active Stage**        | **Stage 3 Complete (Awaiting Founder review for Stage 4)**|
+| **Overall Project Progress**    | `[███████░░░░░░░░░░░] 41%`                              |
+| **Current Active Stage**        | **Stage 4 Complete (Awaiting Founder review for Stage 5)**|
 | **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 57 tasks                                                  |
+| **Completed Tasks (`DONE`)**    | 68 tasks                                                  |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 108 tasks                                                 |
+| **Pending (`TODO`)**            | 97 tasks                                                  |
 
 ---
 
@@ -27,8 +27,8 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | **Phase 1**  | Design System & UI Kit                  | High     | COMPLETE  | `[##########] 100%`| 19 / 19            | Stage 1              |
 | **Phase 2**  | Database & Shared Core Scoring          | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 2              |
 | **Phase 3**  | Fastify REST API Core                   | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 3              |
-| **Phase 4**  | Play Flow Frontend (PWA)                | Critical | TODO      | `[----------] 0%` | 0 / 11             | Stage 4              |
-| **Phase 5**  | Reveal, Matching UX & Oddness           | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 5              |
+| **Phase 4**  | Play Flow Frontend (PWA)                | Critical | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 4              |
+| **Phase 5**  | Reveal, Matching UX & Oddness           | High     | TODO      | `[----------] 0%` | 0 / 9              | Stage 5              |
 | **Phase 6**  | Server-Rendered Share Cards & Links     | High     | TODO        | `[----------] 0%` | 0 / 10             | Stage 6              |
 | **Phase 7**  | Authentication & Guest Merge            | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 7              |
 | **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | TODO        | `[----------] 0%` | 0 / 10             | Stage 8              |
@@ -139,21 +139,21 @@ _Status: COMPLETE | Target: Working API endpoints with rate limits and Zod valid
 
 ### Phase 4: Play Flow Frontend (Stage 4)
 
-_Status: TODO | Target: Complete play flow playable in browser from landing to submit._
+_Status: COMPLETE | Target: Complete play flow playable in browser from landing to submit._
 
-| ID      | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                         |
-| ------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ----------------------------- |
-| `P4.01` | Configure Next.js API rewrites (`/v1/*` -> Fastify) and TanStack Query provider             | Critical | TODO   | P0.04, P3.12 | Agent | —         | Seamless same-origin requests |
-| `P4.02` | Implement S1 Landing / Today screen with live player counter and dynamic copy               | High     | TODO   | P1.05, P4.01 | Agent | —         | Entry landing screen          |
-| `P4.03` | Implement S2 Countdown screen with tabular flip digits and yesterday's recap link           | High     | TODO   | P1.12, P4.01 | Agent | —         | Drop pending view             |
-| `P4.04` | Implement Age Gate bottom sheet and courteous under-18 exclusion screen                     | Critical | TODO   | P1.08, P4.01 | Agent | —         | DPDP Act compliance           |
-| `P4.05` | Implement S3 Question screens (Pick One Text, Number, 12-Colour, Image Grid, Word Chips)    | Critical | TODO   | P1.15, P4.01 | Agent | —         | Polymorphic question engine   |
-| `P4.06` | Implement auto-advance (350ms), back navigation, exit confirmation, and persisted draft     | High     | TODO   | P4.05        | Agent | —         | Smooth mobile ergonomics      |
-| `P4.07` | Implement S4 Review screen with summary chips, editable jumps, and "Find my twin" CTA       | High     | TODO   | P4.05        | Agent | —         | Final review step             |
-| `P4.08` | Implement submission handler with idempotency `request_id`, retry queue, and offline banner | Critical | TODO   | P4.07, P3.05 | Agent | —         | Fault-tolerant submission     |
-| `P4.09` | Add screen-reader announcements (`aria-live`) and full keyboard navigation across play flow | High     | TODO   | P4.05        | Agent | —         | Accessibility compliance      |
-| `P4.10` | Write Playwright E2E test verifying complete guest play flow from S1 to S4                  | Critical | TODO   | P4.08        | Agent | —         | Automated flow verification   |
-| `P4.11` | Verify play flow bundle size is $\le 150 \text{ KB}$ gzipped                                | High     | TODO   | P4.08        | Agent | —         | Performance budget check      |
+| ID          | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                         |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ----------------------------- |
+| `[x] P4.01` | Configure Next.js API rewrites (`/v1/*` -> Fastify) and TanStack Query provider             | Critical | DONE   | P0.04, P3.12 | Agent | 2026-11-08  | Seamless same-origin requests |
+| `[x] P4.02` | Implement S1 Landing / Today screen with live player counter and dynamic copy               | High     | DONE   | P1.05, P4.01 | Agent | 2026-11-08  | Entry landing screen          |
+| `[x] P4.03` | Implement S2 Countdown screen with tabular flip digits and yesterday's recap link           | High     | DONE   | P1.12, P4.01 | Agent | 2026-11-08  | Drop pending view             |
+| `[x] P4.04` | Implement Age Gate bottom sheet and courteous under-18 exclusion screen                     | Critical | DONE   | P1.08, P4.01 | Agent | 2026-11-08  | DPDP Act compliance           |
+| `[x] P4.05` | Implement S3 Question screens (Pick One Text, Number, 12-Colour, Image Grid, Word Chips)    | Critical | DONE   | P1.15, P4.01 | Agent | 2026-11-08  | Polymorphic question engine   |
+| `[x] P4.06` | Implement auto-advance (350ms), back navigation, exit confirmation, and persisted draft     | High     | DONE   | P4.05        | Agent | 2026-11-08  | Smooth mobile ergonomics      |
+| `[x] P4.07` | Implement S4 Review screen with summary chips, editable jumps, and "Find my twin" CTA       | High     | DONE   | P4.05        | Agent | 2026-11-08  | Final review step             |
+| `[x] P4.08` | Implement submission handler with idempotency `request_id`, retry queue, and offline banner | Critical | DONE   | P4.07, P3.05 | Agent | 2026-11-08  | Fault-tolerant submission     |
+| `[x] P4.09` | Add screen-reader announcements (`aria-live`) and full keyboard navigation across play flow | High     | DONE   | P4.05        | Agent | 2026-11-08  | Accessibility compliance      |
+| `[x] P4.10` | Write Playwright E2E test verifying complete guest play flow from S1 to S4                  | Critical | DONE   | P4.08        | Agent | 2026-11-08  | Automated flow verification   |
+| `[x] P4.11` | Verify play flow bundle size is $\le 150 \text{ KB}$ gzipped                                | High     | DONE   | P4.08        | Agent | 2026-11-08  | Performance budget check      |
 
 ---
 
