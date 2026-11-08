@@ -144,7 +144,10 @@ flowchart TD
 | **Date Arithmetic**  | date-fns & tz                     | `3.6.x`         | Lightweight, modular UTC timezone formatting               | Twin Day scheduling       | Day.js, Moment         |
 | **Identifiers**      | uuid & nanoid                     | `9.x` / `5.x`   | UUIDv4 for database IDs; nanoid for share URLs             | Database & short links    | CUID, shortid          |
 | **API Framework**    | Fastify                           | `4.28.x`        | Ultra-low overhead, native schema validation               | `services/api`            | Express, NestJS        |
+| **API Type Provider** | fastify-type-provider-zod         | `^2.0.0`        | Native end-to-end typed request/response with Zod schemas  | `services/api`            | TypeBox, Joi           |
 | **API Security**     | @fastify/helmet, cors, rate-limit | Latest          | Out-of-the-box secure HTTP headers and rate limiting       | `services/api`            | Custom middlewares     |
+| **API Cookies**      | @fastify/cookie                   | `^9.3.1`        | Secure HTTP-only signed cookies for guest identity         | Guest identity (F1)       | Custom cookie parsing  |
+| **API Documentation**| @fastify/swagger, swagger-ui      | `8.x` / `3.x`   | Automated OpenAPI / Swagger documentation from Zod routes  | Developer docs            | Manual OpenAPI spec    |
 | **Authentication**   | jose & google-auth-library        | `5.x` / `9.x`   | Secure JWT sign/verify, Google ID token verification       | Auth (F1, F2)             | NextAuth, Passport     |
 | **Database ORM**     | Prisma                            | `5.19.x`        | Type-safe query builder, automated migration management    | Data access               | Drizzle, Kysely        |
 | **Primary Database** | PostgreSQL                        | `16`            | ACID compliance, JSONB capabilities, future pgvector       | All core storage          | MySQL, MongoDB         |
