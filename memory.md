@@ -17,25 +17,23 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 ## 2. Current State
 
 - **What works now:**
-  - Stage 0, Stage 1, Stage 2, Stage 3, and Stage 4 are 100% COMPLETE.
-  - Stage 4 Play Flow Frontend fully built and verified:
-    - Wired Next.js 14 frontend with TanStack Query provider and `@oddly/api-client` (`P4.01`).
-    - Implemented S1 Landing / Today screen (`/`) with live player counter, active/pending drop detection, and dynamic copy (`P4.02`).
-    - Implemented S2 Countdown screen with tabular flip-digit timer for 07:00 IST drop release (`P4.03`).
-    - Implemented Age Gate bottom sheet with DPDP Act 18+ confirmation and courteous Under18Screen ensuring zero data retention (`P4.04`).
-    - Implemented polymorphic S3 QuestionScreen supporting all 5 question types with Atmosphere reactive backdrop glow (`P4.05`).
-    - Implemented 350ms auto-advance, tactile chimes, haptic ticks, back navigation, exit confirmation dialog, and draft answer persistence in `localStorage` (`P4.06`).
-    - Implemented S4 ReviewScreen with summary cards, editable jumps, and "Find my stranger twin" CTA (`P4.07`).
-    - Implemented fault-tolerant submission handler with crypto UUID idempotency, network status detection, and persistent offline banner (`P4.08`).
-    - Added full keyboard shortcuts (1-4 keys, arrows, enter, escape) and accessible `aria-live="polite"` screen-reader announcements (`P4.09`).
-    - Authored unit/integration test suite (`src/play-flow.test.ts`, 8 tests) and Playwright E2E specification (`e2e/play-flow.spec.ts`) (`P4.10`).
-    - Verified play flow bundle size is $\le 150 \text{ KB}$ gzipped (11.7 kB page chunk, ~55 kB gzipped first load) (`P4.11`).
-    - Passed all 86 tests across monorepo (`@oddly/shared` 70 + `services/api` 8 + `apps/web` 8), typecheck (6/6), lint (6/6), and production build (3/3).
+  - Stage 0, Stage 1, Stage 2, Stage 3, Stage 4, and Stage 5 are 100% COMPLETE.
+  - Stage 5 Reveal, Matching UX and Oddness fully built and verified:
+    - Implemented S5 Searching screen with 2.0s animated world dot-matrix radar journey and tap-to-skip (`P5.01`, `D-025`).
+    - Implemented S6 Twin Reveal screen with animated score count-up, sequential pick-matching dots, confetti burst, and twin location formatted as "City, Country" (`P5.02`, `D-026`).
+    - Implemented S7 Oddness screen with rarity tier badge pop, percentile count-up, and rarest pick card (`P5.03`).
+    - Implemented honest state variations: early day (< 200 players), weak match (<= 2/5 picks), and exact twin match (`P5.04`).
+    - Implemented background polling for provisional upgrades and "Closest so far" tag (`P5.05`, `D-027`).
+    - Persisted completed drop state locally so reopening `/` displays sealed result summary and next drop countdown (`P5.06`).
+    - Wired sound chimes and haptic pulses to reveal beats (`P5.07`).
+    - Implemented reduced-motion alternatives (instant fades, static counters, zero confetti) (`P5.08`).
+    - Authored unit/integration tests and updated Playwright E2E spec verifying S5 Searching, S6 Twin Reveal, and S7 Oddness (`P5.09`).
+    - Passed all 92 tests across monorepo (`@oddly/shared` 70 + `services/api` 8 + `apps/web` 14), typecheck (6/6), lint (6/6), and production build (3/3).
 - **What is half-done:**
-  - Nothing. Stage 4 is 100% complete.
+  - Nothing. Stage 5 is 100% complete.
 - **What is next:**
-  - Await Founder instruction to proceed to **Stage 5 (Reveal, Matching UX and Oddness)**.
-  - In Stage 5: Build S5 Searching screen with 1.5s animated dot-matrix journey, S6 Twin Reveal screen with count-up score, confetti emitter, S7 Oddness screen with rarity tier badge pop, percentile count-up, honest state variations (early day, weak match, no exact twin), and background polling for provisional upgrades.
+  - Await Founder instruction to proceed to **Stage 6 (Server-Rendered Share Cards, Share Pages, and Challenge Links)**.
+  - In Stage 6: Build Satori server-side card layouts (Instagram Story 9:16, Square 1:1, Twitter/OG Link 1.91:1) in 3 themes, high-res `@resvg/resvg-js` PNG renderer, challenge URL generation (`/c/:shortId`), and challenge comparison screen.
 
 ---
 
@@ -67,6 +65,9 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | `D-022` | TanStack Query with Window Focus Refetch Disabled      | Prevents unexpected query refetches and re-renders while player is answering questions                 | Aggressive background refetching            | `apps/web/src/components/providers/QueryProvider.tsx` |
 | `2026-11-08` | `D-023` | Local Storage Draft State Machine (`oddly_draft_{id}`) | Automatically persists partial question choices so accidental refreshes or network drops never lose answers | In-memory only state                        | `apps/web/src/lib/play-state.ts` |
 | `2026-11-08` | `D-024` | Vitest and Playwright Test Separation                  | Excludes `e2e/**` from Vitest runner so unit tests run fast in headless CI without browser binaries      | Mixing unit and E2E in single runner        | `apps/web/vitest.config.ts` |
+| `2026-11-08` | `D-025` | Radar Search Journey Duration Capped at 2.0s           | Maximizes suspense and emotional anticipation before reveal, with instant tap-to-skip per Founder instruction | Longer or indefinite search journeys        | `apps/web/src/components/play/SearchMapAnimation.tsx` |
+| `2026-11-08` | `D-026` | Twin Alias Location Enforced as "City, Country"        | Provides intuitive, relatable international discovery (e.g. "Berlin, Germany") per Founder instruction  | Region-only or generic labels               | `apps/web/src/components/play/TwinRevealScreen.tsx` |
+| `2026-11-08` | `D-027` | Background Polling for Provisional Upgrades            | Automatically checks `/v1/results/:dropId` every 15s to refine twin match as new global players submit  | Static once-and-done provisional matches    | `apps/web/src/app/page.tsx` |
 
 ---
 
@@ -132,6 +133,15 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | Stage 4 | Authored Playwright E2E test specification verifying complete guest journey    | `apps/web/e2e/play-flow.spec.ts` | Phase 4: End-to-end testing (`P4.10`) |
 | `2026-11-08` | Stage 4 | Verified bundle size is <= 150 KB gzipped (11.7 kB page chunk, ~55 kB gzipped) | `apps/web` production build | Phase 4: Performance budget (`P4.11`) |
 | `2026-11-08` | Stage 4 | Marked Phase 4 tasks COMPLETE (68/165 total done, 41% overall)                | `task.md` | Phase 4: Roadmap status update |
+| `2026-11-08` | Stage 5 | Updated SearchMapAnimation to 2.0s duration with audio cues and tap-to-skip   | `apps/web/src/components/play/SearchMapAnimation.tsx` | Phase 5: S5 animated radar journey (`P5.01`, `D-025`) |
+| `2026-11-08` | Stage 5 | Implemented S6 TwinRevealScreen with count-up score, confetti, sequential dots, and City, Country persona | `apps/web/src/components/play/TwinRevealScreen.tsx` | Phase 5: Emotional climax reveal (`P5.02`, `D-026`) |
+| `2026-11-08` | Stage 5 | Implemented S7 OddnessScreen with rarity tier badge pop, percentile count-up, and rarest pick card | `apps/web/src/components/play/OddnessScreen.tsx` | Phase 5: Rarity validation screen (`P5.03`) |
+| `2026-11-08` | Stage 5 | Implemented honest state messaging for early day (< 200 players), weak match, and exact twins | `apps/web/src/components/play/TwinRevealScreen.tsx` | Phase 5: Transparent messaging (`P5.04`) |
+| `2026-11-08` | Stage 5 | Implemented background polling for provisional upgrades and local session persistence | `apps/web/src/app/page.tsx` | Phase 5: Live match refinement (`P5.05`, `P5.06`) |
+| `2026-11-08` | Stage 5 | Added multi-sensory feedback and reduced-motion overrides across reveal beats | `apps/web/src/components/play/*.tsx` | Phase 5: Audio, haptics & accessibility (`P5.07`, `P5.08`) |
+| `2026-11-08` | Stage 5 | Authored unit tests covering tier boundaries, honest states, and location formatting | `apps/web/src/reveal-oddness.test.ts` | Phase 5: Test coverage (`P5.09`) |
+| `2026-11-08` | Stage 5 | Updated Playwright E2E spec verifying complete journey through S5, S6, and S7 | `apps/web/e2e/play-flow.spec.ts` | Phase 5: Automated E2E verification (`P5.09`) |
+| `2026-11-08` | Stage 5 | Marked Phase 5 tasks COMPLETE (77/165 total done, 47% overall)                | `task.md` | Phase 5: Roadmap status update |
 
 ---
 
@@ -156,6 +166,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | `B-015` | Missing `@types/node` in `@oddly/api-client`    | TypeScript traversed `@oddly/shared` `Buffer` and `node:crypto` types                   | Added `@types/node` to `packages/api-client/package.json` devDependencies                                 | `packages/api-client/package.json` | Include node types when traversing shared | `pnpm typecheck` |
 | `2026-11-08` | `B-016` | `window is not defined` in Vitest Node environment | `play-state.ts` guarded with `typeof window !== "undefined"` which skipped mocks in Node | Defined `global.window = { localStorage }` in `apps/web/src/play-flow.test.ts`                           | `apps/web/src/play-flow.test.ts` | Mock window object for browser storage tests | `play-flow.test.ts` |
 | `2026-11-08` | `B-017` | `Cannot find module '@playwright/test'` in web typecheck | Playwright test spec included in `apps/web/tsconfig.json` without package installed     | Installed `@playwright/test` devDependency in `apps/web/package.json` and excluded `e2e` from Vitest     | `apps/web/package.json`, `vitest.config.ts` | Add testing dependencies explicitly | `pnpm typecheck` |
+| `2026-11-08` | `B-018` | `classifyRarityTier is not a function` in web test       | Function name mismatch in test file (`classifyRarityTier` vs `classifyTier`)             | Changed test import to `classifyTier` matching `@oddly/shared` export                                      | `apps/web/src/reveal-oddness.test.ts` | Verify exact export signatures | `pnpm test` |
 
 ---
 
@@ -223,16 +234,17 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ## 11. Next Steps
 
-1. Await Founder review of Stage 4 and instruction to proceed (e.g. "proceed to Stage 5").
-2. In Stage 5 (Reveal, Matching UX and Oddness):
-   - Checkout branch `stage-5-reveal-oddness`.
-   - Implement S5 Searching screen with 1.5s animated dot-matrix radar journey (tap to skip).
-   - Implement S6 Twin Reveal screen with animated score count-up, sequential pick-matching dots, confetti burst, and twin alias display.
-   - Implement S7 Oddness screen with rarity tier badge pop, percentile count-up, and rarest pick card.
-   - Implement honest state variations: early day (< 200 players), weak match (<= 2/5 picks), no exact twin found.
-   - Implement background polling for provisional upgrades and "Closest so far" tag.
-   - Persist completed drop state locally so reopening `/` displays result summary + next countdown.
-   - Wire sound chimes and haptic pulses to reveal beats.
-   - Implement reduced-motion alternatives (instant fades, static counters, zero confetti).
-   - Write automated UX and reveal tests.
-   - Print Stage 5 Report and STOP.
+1. Await Founder review of Stage 5 and instruction to proceed (e.g. "proceed to Stage 6").
+2. In Stage 6 (Server-Rendered Share Cards, Share Pages, and Challenge Links):
+   - Checkout branch `stage-6-share-cards`.
+   - Build Satori JSX card layout templates:
+     * Instagram Story (9:16, 1080x1920)
+     * Square Card (1:1, 1080x1080)
+     * Twitter/OG Link Preview (1.91:1, 1200x630)
+   - Implement BullMQ worker job (`renderCard`) using `@resvg/resvg-js` for deterministic, serverless PNG generation.
+   - Implement challenge link generation (`/c/:shortId`) allowing players to challenge friends directly.
+   - Build S8 Challenge landing page and comparison view ("You vs Friend").
+   - Implement native Web Share API with clipboard fallback.
+   - Verify card generation latency <= 800ms.
+   - Write unit and visual integration tests.
+   - Print Stage 6 Report and STOP.
