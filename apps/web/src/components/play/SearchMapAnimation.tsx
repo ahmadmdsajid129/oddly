@@ -3,14 +3,16 @@
 import React, { useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { BrandMark } from "@/components/icons";
+import { feedback } from "@/lib/feedback";
 
 export function SearchMapAnimation({ onComplete }: { onComplete: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
+    feedback.playSound("tick");
     const timer = setTimeout(() => {
       onComplete();
-    }, shouldReduceMotion ? 100 : 1500);
+    }, shouldReduceMotion ? 100 : 2000);
 
     return () => clearTimeout(timer);
   }, [onComplete, shouldReduceMotion]);
