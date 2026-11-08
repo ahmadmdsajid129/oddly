@@ -377,3 +377,4 @@ model Report {
   @@index([reporter_id])
   @@map("reports")
 }
+
