@@ -291,3 +291,4 @@ export type ValidatedSubmissionRequest = z.infer<typeof SubmissionRequestSchema>
 export type ValidatedAnswerPayload = z.infer<typeof AnswerPayloadSchema>;
 export type ValidatedPlayerSession = z.infer<typeof PlayerSessionSchema>;
 export type ValidatedStoredAnswer = z.infer<typeof StoredAnswerSchema>;
+
