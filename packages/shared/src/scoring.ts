@@ -206,19 +206,15 @@ export function classifyTier(
   pct: number,
   boundaries: TierBoundary[] = DEFAULT_TIER_BOUNDARIES
 ): Tier {
-  // Sort boundaries ascending by min to ensure correct order
-  const sorted = [...boundaries].sort((a, b) => a.min - b.min);
+  // Sort boundaries descending by min so highest tier matches first (e.g. 97+, 85+, 60+, 0+)
+  const sorted = [...boundaries].sort((a, b) => b.min - a.min);
 
   for (const boundary of sorted) {
-    if (pct >= boundary.min && pct <= boundary.max) {
+    if (pct >= boundary.min) {
       return boundary.tier;
     }
   }
 
-  // Edge case: pct === 100 always Mythic
-  if (pct >= 97) return "Mythic";
-
-  // Fallback
   return "Common";
 }
 
@@ -294,3 +290,4 @@ export function submissionSimilarity(
 
   return counted === 0 ? 0 : totalDice / counted;
 }
+
