@@ -62,4 +62,17 @@ export const api = {
   pages: {
     get: (slug: string) => rawClient.getPage(slug),
   },
+  cards: {
+    get: (
+      dropId: string,
+      format?: "story" | "square" | "link",
+      theme?: "dark" | "light" | "mythic"
+    ) => rawClient.getCard(dropId, format, theme),
+  },
+  shares: {
+    create: (dropId: string) => rawClient.createShare(dropId),
+    get: (shortId: string) => rawClient.getShare(shortId),
+  },
 };
+
+export const oddlyApi = rawClient;
