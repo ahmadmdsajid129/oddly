@@ -51,3 +51,4 @@ export default function ChallengePage({ params, searchParams }: PageProps) {
     />
   );
 }
+
