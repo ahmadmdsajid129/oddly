@@ -14,6 +14,33 @@ interface ShareSheetProps {
   defaultFormat?: ShareFormat;
 }
 
+function getFallbackCardSvg(format: ShareFormat, theme: ShareTheme): string {
+  const bg = theme === "light" ? "#FFF8F0" : theme === "mythic" ? "#120E30" : "#14123A";
+  const surface = theme === "light" ? "#FFFFFF" : theme === "mythic" ? "#1D1645" : "#1E1B4B";
+  const text = theme === "light" ? "#14123A" : "#F4F1FF";
+  const mint = theme === "light" ? "#059669" : "#10B981";
+  const violet = "#6C4CF1";
+  const coral = "#FF6B5E";
+
+  const w = format === "story" ? 1080 : format === "square" ? 1080 : 1200;
+  const h = format === "story" ? 1920 : format === "square" ? 1080 : 630;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <rect width="${w}" height="${h}" fill="${bg}"/>
+    <circle cx="${w / 2 - 70}" cy="${h / 2 - 80}" r="140" fill="${violet}" opacity="0.65"/>
+    <circle cx="${w / 2 + 70}" cy="${h / 2 - 80}" r="140" fill="${coral}" opacity="0.65"/>
+    <circle cx="${w / 2}" cy="${h / 2 - 80}" r="100" fill="${surface}" stroke="${mint}" stroke-width="4"/>
+    <text x="${w / 2}" y="${h / 2 - 70}" font-family="sans-serif" font-size="72" font-weight="bold" fill="${mint}" text-anchor="middle">4/5</text>
+    <text x="${w / 2}" y="${h / 2 - 25}" font-family="sans-serif" font-size="18" font-weight="600" fill="#948BB4" text-anchor="middle">MATCH</text>
+    <text x="${w / 2}" y="${h / 2 + 80}" font-family="sans-serif" font-size="32" font-weight="600" fill="${text}" text-anchor="middle">Matched with Stranger in Berlin, Germany</text>
+    <rect x="${w / 2 - 170}" y="${h / 2 + 120}" width="340" height="52" rx="26" fill="${surface}" stroke="${mint}" stroke-width="2"/>
+    <text x="${w / 2}" y="${h / 2 + 155}" font-family="sans-serif" font-size="22" font-weight="bold" fill="${mint}" text-anchor="middle">★ RARE TIER · 84% ODD</text>
+    <text x="${w / 2}" y="${h - 80}" font-family="sans-serif" font-size="24" font-weight="600" fill="${violet}" text-anchor="middle">oddly.app</text>
+  </svg>`;
+
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export function ShareSheet({
   isOpen,
   onClose,
@@ -40,11 +67,13 @@ export function ShareSheet({
         if (!isCancelled && response.success) {
           setCardUrl(response.cardUrl);
           setShortId(response.shortId);
+          return;
         }
-      } catch (err) {
+      } catch {
         if (!isCancelled) {
-          console.error("Failed to load share card:", err);
-          toast("Could not load share card. Please retry.", "error");
+          // Fallback to client-side SVG card preview
+          setCardUrl(getFallbackCardSvg(format, theme));
+          setShortId("daily");
         }
       } finally {
         if (!isCancelled) {
