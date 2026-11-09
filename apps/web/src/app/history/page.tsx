@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { StreakFlame } from "@/components/ui/StreakFlame";
 import { api } from "@/lib/api";
+import type { HistoryResponse } from "@oddly/api-client";
 import { ArrowLeft, Calendar, Trophy, Share2, Sparkles } from "lucide-react";
 
 export default function HistoryPage() {
@@ -20,7 +21,7 @@ export default function HistoryPage() {
     staleTime: 60 * 1000,
   });
 
-  const items = data?.items || [];
+  const items: HistoryResponse["items"] = data?.items || [];
   const streak = data?.streak || {
     current: 0,
     longest: 0,
@@ -178,3 +179,4 @@ export default function HistoryPage() {
     </main>
   );
 }
+
