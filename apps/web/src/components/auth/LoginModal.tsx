@@ -128,7 +128,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 onChange={(e) => setCustomToken(e.target.value)}
                 className="w-full px-3 py-2 text-xs rounded-xl bg-surface-alt border border-border text-text placeholder:text-text-muted focus:outline-none focus:border-violet"
               />
-              <Button type="submit" variant="secondary" size="sm" loading={loading}>
+              <Button type="submit" variant="secondary" size="sm" isLoading={loading}>
                 Submit Token
               </Button>
             </form>
