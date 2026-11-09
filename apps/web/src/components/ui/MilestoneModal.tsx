@@ -15,7 +15,7 @@ interface MilestoneModalProps {
   onShare?: () => void;
 }
 
-const MILESTONE_CONFIG: Record<
+export const MILESTONE_CONFIG: Record<
   MilestoneTier,
   {
     title: string;
