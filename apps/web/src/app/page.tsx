@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Countdown } from "@/components/ui/Countdown";
 import { Skeleton } from "@/components/ui/FeedbackPrimitives";
 import { StreakFlame } from "@/components/ui/StreakFlame";
+import { PwaInstallButton } from "@/components/ui/PwaInstallButton";
 import { useTheme } from "@/components/ui/ThemeProvider";
 import { useToast } from "@/components/ui/Toast";
 import { feedback } from "@/lib/feedback";
@@ -498,6 +499,8 @@ export default function HomePage() {
             longestStreak={auth.isAuthenticated ? 1 : 0}
             onFlameClick={() => router.push("/history")}
           />
+
+          <PwaInstallButton className="hidden sm:inline-flex" />
 
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint/10 border border-mint/20 text-xs font-semibold text-mint">
             <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />

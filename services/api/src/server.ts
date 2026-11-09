@@ -36,6 +36,7 @@ import { authRoutes } from "./routes/auth.js";
 import { historyRoutes } from "./routes/history.js";
 import { meRoutes } from "./routes/me.js";
 import { reportsRoutes } from "./routes/reports.js";
+import { pushRoutes } from "./routes/push.js";
 
 export interface ServerOptions {
   logger?: boolean;
@@ -163,6 +164,7 @@ export async function buildServer(
   await app.register(historyRoutes);
   await app.register(meRoutes);
   await app.register(reportsRoutes);
+  await app.register(pushRoutes);
 
   // 8. Propagate correlation requestId header on all responses
   app.addHook("onSend", async (request, reply) => {

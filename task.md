@@ -31,9 +31,9 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | **Phase 5**  | Reveal, Matching UX & Oddness           | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 5              |
 | **Phase 6**  | Server-Rendered Share Cards & Links     | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 6              |
 | **Phase 7**  | Authentication & Guest Merge            | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 7              |
-| **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | TODO      | `[----------] 0%` | 0 / 10             | Stage 8              |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler       | Critical | TODO      | `[----------] 0%` | 0 / 11             | Stage 9              |
-| **Phase 10** | Web Push Notifications & PWA Caching    | Medium   | TODO        | `[----------] 0%` | 0 / 10             | Stage 10             |
+| **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 8              |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler       | Critical | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 9              |
+| **Phase 10** | Web Push Notifications & PWA Caching    | Medium   | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 10             |
 | **Phase 11** | Admin Question Tool & Dynamic Importer  | High     | TODO        | `[----------] 0%` | 0 / 10             | Stage 11             |
 | **Phase 12** | Observability, Telemetry & Security     | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 12             |
 | **Phase 13** | End-to-End QA, Load Tests & Audits      | Critical | TODO        | `[----------] 0%` | 0 / 10             | Stage 13             |
@@ -253,20 +253,20 @@ _Status: DONE | Target: BullMQ repeatable daily timeline, accelerated staging cl
 
 ### Phase 10: Notifications and PWA (Stage 10)
 
-_Status: TODO | Target: Web Push sender, 2-per-day cap, quiet hours, installable PWA._
+_Status: COMPLETE | Target: Web Push sender, 2-per-day cap, quiet hours, installable PWA._
 
 | ID       | Task Description                                                                           | Priority | Status | Depends On     | Owner | Done Date | Notes                         |
 | -------- | ------------------------------------------------------------------------------------------ | -------- | ------ | -------------- | ----- | --------- | ----------------------------- |
-| `P10.01` | Implement service worker and Web App Manifest (standalone display, icons, `/offline`)      | Critical | TODO   | P0.04          | Agent | —         | PWA installability            |
-| `P10.02` | Build Web Push permission request flow and second-visit prompt sheet                       | High     | TODO   | P1.08, P3.01   | Agent | —         | Contextual permission request |
-| `P10.03` | Configure VAPID signing and BullMQ `sendPush` job utilizing `web-push` library             | Critical | TODO   | P0.06          | Agent | —         | Push delivery engine          |
-| `P10.04` | Implement push channels: Drop Live, Smart Nudge, Twin Upgrade, Recap, Streak at Risk       | High     | TODO   | P10.03         | Agent | —         | Template-driven notifications |
-| `P10.05` | Enforce strict delivery constraints: max 2 pushes/user/day, quiet hours (22:00-07:00 IST)  | Critical | TODO   | P10.04         | Agent | —         | Anti-annoyance protection     |
-| `P10.06` | Implement Twin Upgrade push trigger ($\Delta S \ge 0.10$ or jump from 3 to 4/5, max 1/day) | High     | TODO   | P9.02, P10.04  | Agent | —         | High-value retention trigger  |
-| `P10.07` | Implement iOS Safari home-screen installation instruction banner                           | Medium   | TODO   | P10.01         | Agent | —         | Guides iOS push requirement   |
-| `P10.08` | Build in-app PWA install button hooked to `beforeinstallprompt` event                      | Medium   | TODO   | P10.01         | Agent | —         | Streamlined install UX        |
-| `P10.09` | Log push dispatches and track notification open rates in `notifications_log`               | High     | TODO   | P10.04         | Agent | —         | Delivery telemetry            |
-| `P10.10` | Write integration tests verifying push capping, quiet hour silencing, and upgrade triggers | High     | TODO   | P10.05, P10.06 | Agent | —         | Notification test suite       |
+| `[x] P10.01` | Implement service worker and Web App Manifest (standalone display, icons, `/offline`)      | Critical | DONE   | P0.04          | Agent | 2026-11-09 | PWA installability            |
+| `[x] P10.02` | Build Web Push permission request flow and second-visit prompt sheet                       | High     | DONE   | P1.08, P3.01   | Agent | 2026-11-09 | Contextual permission request |
+| `[x] P10.03` | Configure VAPID signing and BullMQ `sendPush` job utilizing `web-push` library             | Critical | DONE   | P0.06          | Agent | 2026-11-09 | Push delivery engine          |
+| `[x] P10.04` | Implement push channels: Drop Live, Smart Nudge, Twin Upgrade, Recap, Streak at Risk       | High     | DONE   | P10.03         | Agent | 2026-11-09 | Template-driven notifications |
+| `[x] P10.05` | Enforce strict delivery constraints: max 2 pushes/user/day, quiet hours (22:00-07:00 IST)  | Critical | DONE   | P10.04         | Agent | 2026-11-09 | Anti-annoyance protection     |
+| `[x] P10.06` | Implement Twin Upgrade push trigger ($\Delta S \ge 0.10$ or jump from 3 to 4/5, max 1/day) | High     | DONE   | P9.02, P10.04  | Agent | 2026-11-09 | High-value retention trigger  |
+| `[x] P10.07` | Implement iOS Safari home-screen installation instruction banner                           | Medium   | DONE   | P10.01         | Agent | 2026-11-09 | Guides iOS push requirement   |
+| `[x] P10.08` | Build in-app PWA install button hooked to `beforeinstallprompt` event                      | Medium   | DONE   | P10.01         | Agent | 2026-11-09 | Streamlined install UX        |
+| `[x] P10.09` | Log push dispatches and track notification open rates in `notifications_log`               | High     | DONE   | P10.04         | Agent | 2026-11-09 | Delivery telemetry            |
+| `[x] P10.10` | Write integration tests verifying push capping, quiet hour silencing, and upgrade triggers | High     | DONE   | P10.05, P10.06 | Agent | 2026-11-09 | Notification test suite       |
 
 ---
 
@@ -391,7 +391,7 @@ _Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
 - **Stage 9 Checklist:**
   - [ ] Run accelerated staging pipeline (`CLOCK_ACCELERATION=true`); observe automated 10-minute drop cycles.
 - **Stage 10 Checklist:**
-  - [ ] Install PWA to mobile home screen; accept push prompt; receive test notification on drop time.
+  - [x] Install PWA to mobile home screen; accept push prompt; receive test notification on drop time.
 - **Stage 11 Checklist:**
   - [ ] Log into Admin portal; import a new batch JSON; verify validation report and approve drops.
 - **Stage 12 Checklist:**

@@ -14,10 +14,12 @@
   "dependencies": {
     "@oddly/shared": "workspace:*",
     "bullmq": "^5.21.5",
-    "ioredis": "^5.4.1"
+    "ioredis": "^5.4.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",
+    "@types/web-push": "^3.6.3",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^2.1.9"
