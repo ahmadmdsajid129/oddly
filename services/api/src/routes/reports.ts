@@ -8,7 +8,6 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import { prisma } from "../db/client.js";
 import { getAuthAccount } from "../auth/tokens.js";
 
 export const reportsRoutes: FastifyPluginAsyncZod = async (app) => {
