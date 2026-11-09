@@ -132,14 +132,14 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       // 5. Find or create Account
-      const existingAccount = await AccountsRepository.findByGoogleSub(googleSub);
-      const account =
-        existingAccount ??
-        (await AccountsRepository.createAccount({
+      let account = await AccountsRepository.findByGoogleSub(googleSub);
+      if (!account) {
+        account = await AccountsRepository.createAccount({
           googleSub,
           emailHash,
           displayName,
-        }));
+        });
+      }
 
       // 6. Seamless guest history merge without data loss (P7.04)
       let mergedResult = {
@@ -348,3 +348,4 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
     }
   );
 };
+
