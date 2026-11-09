@@ -204,10 +204,19 @@ export class AccountsRepository {
     }
 
     // 4. Gather all distinct drop dates across all linked devices
+    const seenPlayerIds = new Set<string>();
+    const uniqueLinkedPlayers: any[] = [];
+    for (const p of allLinkedPlayers) {
+      if (p && !seenPlayerIds.has(p.id)) {
+        seenPlayerIds.add(p.id);
+        uniqueLinkedPlayers.push(p);
+      }
+    }
+
     const distinctDates = new Set<string>();
     let totalSubmissionsCount = 0;
 
-    for (const player of allLinkedPlayers) {
+    for (const player of uniqueLinkedPlayers) {
       const subs = player.submissions || [];
       totalSubmissionsCount += subs.length;
       for (const sub of subs) {
@@ -228,7 +237,8 @@ export class AccountsRepository {
     }
 
     // 5. Recalculate official streak across merged submission dates
-    const streakResult = calculateStreak(Array.from(distinctDates));
+    const streakNum = calculateStreak(Array.from(distinctDates));
+    const currentStreak = typeof streakNum === "number" ? streakNum : 0;
 
     // 6. Record or update streak log
     try {
@@ -236,7 +246,7 @@ export class AccountsRepository {
         data: {
           player_id: guestPlayer.id,
           date_ist: new Date().toISOString().slice(0, 10),
-          length: streakResult.currentStreak,
+          length: currentStreak,
         },
       });
     } catch {
@@ -246,7 +256,7 @@ export class AccountsRepository {
     return {
       merged: true,
       mergedSubmissionsCount: totalSubmissionsCount,
-      currentStreak: streakResult.currentStreak,
+      currentStreak: currentStreak,
       playerId: guestPlayer.id,
     };
   }
