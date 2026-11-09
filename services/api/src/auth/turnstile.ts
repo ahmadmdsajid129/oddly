@@ -14,17 +14,15 @@ export async function verifyTurnstileToken(
   const secretKey =
     process.env.TURNSTILE_SECRET_KEY || "1x0000000000000000000000000000000AA";
 
-  // Special test token for simulating bot failures in tests
-  if (token === "invalid_bot_token_fail" || token === "fail-turnstile") {
-    return { success: false, errorCodes: ["invalid-input-response"] };
-  }
-
   // Development / Test pass-through
   if (
     process.env.NODE_ENV !== "production" ||
     secretKey.startsWith("1x000") ||
     secretKey.startsWith("mock")
   ) {
+    if (token === "invalid_bot_token_fail" || token === "simulate_fail") {
+      return { success: false, errorCodes: ["invalid-input-response"] };
+    }
     return { success: true };
   }
 
@@ -66,3 +64,4 @@ export async function verifyTurnstileToken(
     return { success: true };
   }
 }
+
