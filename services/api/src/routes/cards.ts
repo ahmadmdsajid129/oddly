@@ -154,7 +154,9 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
         });
 
         publicUrl = await storage.putCard(storageKey, pngBuffer);
-        await SharesRepository.saveShareCard(submission.id, format, storageKey);
+        if (submission) {
+          await SharesRepository.saveShareCard(submission.id, format, storageKey);
+        }
       }
 
       // Set CDN immutable caching
