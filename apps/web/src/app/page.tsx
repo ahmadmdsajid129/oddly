@@ -34,7 +34,8 @@ import { TwinRevealScreen, TwinMatchData } from "@/components/play/TwinRevealScr
 import { OddnessScreen, OddnessData } from "@/components/play/OddnessScreen";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import type { AnswerPayload, ShareFormat } from "@oddly/shared";
-import { Sun, Moon, Sparkles, Trophy, ArrowRight } from "lucide-react";
+import { Sun, Moon, Sparkles, Trophy, ArrowRight, User, LogOut } from "lucide-react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 // Fallback launch questions for offline or initial zero-db states
 const FALLBACK_QUESTIONS: QuestionData[] = [
@@ -125,6 +126,7 @@ interface StoredPlayResult {
 export default function HomePage() {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+  const auth = useAuth();
   const isOnline = useNetworkStatus();
 
   // Screen state
@@ -501,6 +503,32 @@ export default function HomePage() {
           >
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+
+          {auth.isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet/10 border border-violet/30 text-violet max-w-[120px] truncate">
+                {auth.account?.displayName || "Player"}
+              </span>
+              <button
+                type="button"
+                onClick={() => auth.logout()}
+                className="p-2 rounded-full border border-border bg-surface text-text-muted hover:text-flame transition-all cursor-pointer"
+                aria-label="Sign out"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => auth.openLoginModal()}
+              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+            >
+              <User className="w-3.5 h-3.5 text-violet" />
+              <span>Sign in</span>
+            </button>
+          )}
         </div>
       </header>
 

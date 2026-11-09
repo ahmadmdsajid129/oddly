@@ -77,3 +77,4 @@ describe("Stage 6: Share Cards & Challenge Links (P6.01, P6.06, P6.07, P6.10)", 
     expect(url.searchParams.get("challenge")).toBe("1");
   });
 });
+

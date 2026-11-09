@@ -118,6 +118,40 @@ export interface PublicShareResponse {
   }>;
 }
 
+export interface OAuthResponse {
+  ok: boolean;
+  account: {
+    id: string;
+    displayName: string;
+    emailHash: string;
+  };
+  mergedHistory: {
+    merged: boolean;
+    submissionsCount: number;
+    currentStreak: number;
+  };
+}
+
+export interface MergeGuestResponse {
+  ok: boolean;
+  merged_submissions_count: number;
+  current_streak: number;
+}
+
+export interface LogoutResponse {
+  ok: boolean;
+  message: string;
+}
+
+export interface SessionResponse {
+  authenticated: boolean;
+  account: {
+    id: string;
+    displayName: string;
+    emailHash: string;
+  } | null;
+}
+
 export class OddlyApiClient {
   private baseUrl: string;
   private fetchFn: typeof fetch;
@@ -260,6 +294,44 @@ export class OddlyApiClient {
   /** Resolve public challenge link and receiver payload */
   async getShare(shortId: string): Promise<PublicShareResponse> {
     return this.request<PublicShareResponse>(`/v1/shares/${shortId}`);
+  }
+
+  /** Google OAuth sign-in and guest history merge */
+  async loginOAuth(
+    idToken: string,
+    turnstileToken?: string
+  ): Promise<OAuthResponse> {
+    return this.request<OAuthResponse>("/v1/auth/oauth", {
+      method: "POST",
+      body: JSON.stringify({
+        provider: "google",
+        id_token: idToken,
+        turnstile_token: turnstileToken,
+      }),
+    });
+  }
+
+  /** Explicit guest history merge into account */
+  async mergeGuest(data: {
+    guest_player_id?: string;
+    guest_did?: string;
+  }): Promise<MergeGuestResponse> {
+    return this.request<MergeGuestResponse>("/v1/auth/merge-guest", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  /** Sign out and clear session cookies */
+  async logout(): Promise<LogoutResponse> {
+    return this.request<LogoutResponse>("/v1/auth/logout", {
+      method: "POST",
+    });
+  }
+
+  /** Current session status */
+  async getSession(): Promise<SessionResponse> {
+    return this.request<SessionResponse>("/v1/auth/session");
   }
 }
 

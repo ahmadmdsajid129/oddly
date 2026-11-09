@@ -73,6 +73,14 @@ export const api = {
     create: (dropId: string) => rawClient.createShare(dropId),
     get: (shortId: string) => rawClient.getShare(shortId),
   },
+  auth: {
+    login: (idToken: string, turnstileToken?: string) =>
+      rawClient.loginOAuth(idToken, turnstileToken),
+    merge: (data: { guest_player_id?: string; guest_did?: string }) =>
+      rawClient.mergeGuest(data),
+    logout: () => rawClient.logout(),
+    getSession: () => rawClient.getSession(),
+  },
 };
 
 export const oddlyApi = rawClient;

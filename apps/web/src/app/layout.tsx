@@ -3,6 +3,8 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import { LoginModal } from "@/components/auth/LoginModal";
 import "../styles/globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -30,7 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-bg text-text antialiased min-h-screen">
         <QueryProvider>
           <ThemeProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <AuthProvider>
+                {children}
+                <LoginModal />
+              </AuthProvider>
+            </ToastProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

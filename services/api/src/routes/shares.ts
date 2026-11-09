@@ -138,7 +138,10 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
 
       // Fetch drop, oddness, and match details
       const drop = await DropsRepository.getDropById(submission.drop_id);
-      const match = await MatchesRepository.getMatchForPlayer(submission.drop_id, submission.player_id);
+      const match = await MatchesRepository.getMatchForPlayer(
+        submission.drop_id,
+        submission.player_id
+      );
       const oddness = await prisma.oddnessScore.findUnique({
         where: { submission_id: submission.id },
       });
@@ -188,7 +191,9 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
         success: true,
         shortId,
         dropId: submission.drop_id,
-        dropDate: drop?.drop_date ? new Date(drop.drop_date).toISOString() : new Date().toISOString(),
+        dropDate: drop?.drop_date
+          ? new Date(drop.drop_date).toISOString()
+          : new Date().toISOString(),
         sharerScore: match ? Math.round(match.similarity_score * 5) : 3,
         sharerTier: oddness?.tier ?? "Common",
         sharerPercentile: oddness?.percentile ?? 50,

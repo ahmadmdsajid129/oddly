@@ -96,3 +96,4 @@ export function getCardStorage(): CardStorageClient {
   }
   return defaultStorage;
 }
+

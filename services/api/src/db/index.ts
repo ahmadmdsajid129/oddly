@@ -11,4 +11,5 @@ export * from "./submissions.repo.js";
 export * from "./players.repo.js";
 export * from "./matches.repo.js";
 export * from "./shares.repo.js";
+export * from "./accounts.repo.js";
 
