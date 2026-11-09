@@ -58,15 +58,15 @@ export class HistoryRepository {
         }
       }
 
-      // 2. Query submissions with drop and oddness
+      // 2. Query submissions with drop, oddnessScore, and shareCards
       const submissions = await prisma.submission.findMany({
         where: { player_id: { in: playerIds } },
         include: {
           drop: true,
-          oddness_score: true,
-          share_cards: true,
+          oddnessScore: true,
+          shareCards: true,
         },
-        orderBy: { created_at: "desc" },
+        orderBy: { submitted_at: "desc" },
         take: limit,
         skip: offset,
       });
@@ -78,29 +78,28 @@ export class HistoryRepository {
       // 3. Map into HistoryItem
       const items: HistoryItem[] = [];
       for (const sub of submissions) {
-        // Query match for this drop
-        const match = await prisma.twinMatch.findFirst({
+        const match = await prisma.match.findFirst({
           where: {
             drop_id: sub.drop_id,
-            OR: [{ player1_id: sub.player_id }, { player2_id: sub.player_id }],
+            OR: [{ player_a_id: sub.player_id }, { player_b_id: sub.player_id }],
           },
         });
 
         const dropDateStr = sub.drop?.drop_date
           ? sub.drop.drop_date.toISOString().slice(0, 10)
-          : sub.created_at.toISOString().slice(0, 10);
+          : sub.submitted_at.toISOString().slice(0, 10);
 
         items.push({
           submissionId: sub.id,
           dropId: sub.drop_id,
           dropDate: dropDateStr,
-          completedAt: sub.created_at.toISOString(),
+          completedAt: sub.submitted_at.toISOString(),
           sharerScore: match ? Math.round(match.similarity_score * 5) : 3,
-          sharerTier: sub.oddness_score?.tier ?? "Common",
-          sharerPercentile: sub.oddness_score?.percentile ?? 50,
+          sharerTier: sub.oddnessScore?.tier ?? "Common",
+          sharerPercentile: sub.oddnessScore?.percentile ?? 50,
           twinCity: "Tokyo, Japan",
-          shareCardUrl: sub.share_cards?.[0]?.storage_key
-            ? `http://localhost:3000/cards/${sub.share_cards[0].storage_key}`
+          shareCardUrl: sub.shareCards?.[0]?.storage_key
+            ? `http://localhost:3000/cards/${sub.shareCards[0].storage_key}`
             : null,
           answersCount: 5,
         });
