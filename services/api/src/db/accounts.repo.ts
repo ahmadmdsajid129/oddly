@@ -14,15 +14,43 @@ export interface MergeGuestResult {
   playerId: string;
 }
 
+export interface InMemoryAccountRecord {
+  id: string;
+  google_sub: string;
+  email_hash: string;
+  display_name: string;
+  created_at: Date;
+  updated_at: Date;
+  players?: InMemoryPlayerRecord[];
+}
+
+export interface InMemoryPlayerRecord {
+  id: string;
+  did: string;
+  nickname: string;
+  status: string;
+  account_id?: string | null;
+  account?: InMemoryAccountRecord | null;
+  submissions?: Array<{
+    id: string;
+    player_id: string;
+    drop_id?: string;
+    created_at?: Date | string;
+    drop?: {
+      drop_date?: Date | string;
+    };
+  }>;
+}
+
 // In-memory fallback stores for test and offline environments
-const inMemoryAccounts = new Map<string, any>();
-const inMemoryPlayers = new Map<string, any>();
+const inMemoryAccounts = new Map<string, InMemoryAccountRecord>();
+const inMemoryPlayers = new Map<string, InMemoryPlayerRecord>();
 
 export class AccountsRepository {
   /**
    * Helper to register player in in-memory store for test mocking
    */
-  static setInMemoryPlayer(player: any) {
+  static setInMemoryPlayer(player: InMemoryPlayerRecord) {
     inMemoryPlayers.set(player.id, player);
     if (player.did) inMemoryPlayers.set(player.did, player);
   }
@@ -100,7 +128,7 @@ export class AccountsRepository {
       inMemoryAccounts.set(created.id, created);
       return created;
     } catch {
-      const record = {
+      const record: InMemoryAccountRecord = {
         id: "acc_" + Math.random().toString(36).slice(2) + Date.now().toString(36),
         google_sub: data.googleSub,
         email_hash: data.emailHash,
@@ -144,18 +172,18 @@ export class AccountsRepository {
     const { guestPlayerId, guestDid, accountId } = data;
 
     // 1. Locate guest player record
-    let guestPlayer: any = null;
+    let guestPlayer: InMemoryPlayerRecord | null = null;
     try {
       if (guestPlayerId) {
-        guestPlayer = await prisma.player.findUnique({
+        guestPlayer = (await prisma.player.findUnique({
           where: { id: guestPlayerId },
           include: { submissions: true },
-        });
+        })) as unknown as InMemoryPlayerRecord;
       } else if (guestDid) {
-        guestPlayer = await prisma.player.findUnique({
+        guestPlayer = (await prisma.player.findUnique({
           where: { did: guestDid },
           include: { submissions: true },
-        });
+        })) as unknown as InMemoryPlayerRecord;
       }
     } catch {
       if (guestPlayerId) {
@@ -185,9 +213,9 @@ export class AccountsRepository {
     }
 
     // 3. Find all linked players under this account
-    let allLinkedPlayers: any[] = [];
+    let allLinkedPlayers: InMemoryPlayerRecord[] = [];
     try {
-      allLinkedPlayers = await prisma.player.findMany({
+      allLinkedPlayers = (await prisma.player.findMany({
         where: { account_id: accountId },
         include: {
           submissions: {
@@ -196,7 +224,7 @@ export class AccountsRepository {
             },
           },
         },
-      });
+      })) as unknown as InMemoryPlayerRecord[];
     } catch {
       allLinkedPlayers = Array.from(inMemoryPlayers.values()).filter(
         (p) => p.account_id === accountId
@@ -205,7 +233,7 @@ export class AccountsRepository {
 
     // 4. Gather all distinct drop dates across all linked devices
     const seenPlayerIds = new Set<string>();
-    const uniqueLinkedPlayers: any[] = [];
+    const uniqueLinkedPlayers: InMemoryPlayerRecord[] = [];
     for (const p of allLinkedPlayers) {
       if (p && !seenPlayerIds.has(p.id)) {
         seenPlayerIds.add(p.id);
