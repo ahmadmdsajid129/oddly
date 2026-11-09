@@ -20,22 +20,22 @@ interface DigitProps {
 const Digit = React.memo(function Digit({ digit, shouldReduceMotion }: DigitProps) {
   if (shouldReduceMotion) {
     return (
-      <span className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text inline-block w-[0.65em] text-center">
+      <span className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text">
         {digit}
       </span>
     );
   }
 
   return (
-    <span className="relative inline-flex items-center justify-center w-[0.65em] h-[1.25em] overflow-hidden">
+    <span className="relative inline-block tabular-nums">
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={digit}
-          initial={{ y: "60%", opacity: 0 }}
-          animate={{ y: "0%", opacity: 1 }}
-          exit={{ y: "-60%", opacity: 0 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
-          className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text absolute inset-0 flex items-center justify-center"
+          initial={{ y: 16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -16, opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text inline-block"
         >
           {digit}
         </motion.span>
