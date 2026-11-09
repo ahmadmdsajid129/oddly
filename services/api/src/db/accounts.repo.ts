@@ -240,17 +240,27 @@ export class AccountsRepository {
     const streakNum = calculateStreak(Array.from(distinctDates));
     const currentStreak = typeof streakNum === "number" ? streakNum : 0;
 
-    // 6. Record or update streak log
-    try {
-      await prisma.streakLog.create({
-        data: {
-          player_id: guestPlayer.id,
-          date_ist: new Date().toISOString().slice(0, 10),
-          length: currentStreak,
-        },
-      });
-    } catch {
-      // Non-blocking streak log recording
+    // 6. Record or update streak log if latest submission drop is available
+    const latestSub = allLinkedPlayers[0]?.submissions?.[0];
+    if (latestSub?.drop_id) {
+      try {
+        await prisma.streakLog.upsert({
+          where: {
+            player_id_drop_id: {
+              player_id: guestPlayer.id,
+              drop_id: latestSub.drop_id,
+            },
+          },
+          update: { streak_count: currentStreak },
+          create: {
+            player_id: guestPlayer.id,
+            drop_id: latestSub.drop_id,
+            streak_count: currentStreak,
+          },
+        });
+      } catch {
+        // Non-blocking streak log recording
+      }
     }
 
     return {
