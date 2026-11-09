@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "echo \"worker: ready for stage 9 pipeline tests\""
+    "test": "vitest run"
   },
   "dependencies": {
     "@oddly/shared": "workspace:*",
@@ -19,7 +19,8 @@
   "devDependencies": {
     "@types/node": "^20.17.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.9"
   }
 }
 
