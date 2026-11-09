@@ -9,13 +9,13 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 
 | Metric                          | Current Value                                             |
 | ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[████████░░░░░░░░░░] 47%`                              |
-| **Current Active Stage**        | **Stage 5 Complete (Awaiting Founder review for Stage 6)**|
+| **Overall Project Progress**    | `[███████████░░░░░░░] 58%`                                |
+| **Current Active Stage**        | **Stage 7 Complete (Awaiting Founder review for Stage 8)**|
 | **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 77 tasks                                                  |
+| **Completed Tasks (`DONE`)**    | 96 tasks                                                  |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 88 tasks                                                  |
+| **Pending (`TODO`)**            | 69 tasks                                                  |
 
 ---
 
@@ -29,10 +29,10 @@ Purpose of this file: Authoritative project roadmap, task tracking, progress bar
 | **Phase 3**  | Fastify REST API Core                   | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 3              |
 | **Phase 4**  | Play Flow Frontend (PWA)                | Critical | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 4              |
 | **Phase 5**  | Reveal, Matching UX & Oddness           | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 5              |
-| **Phase 6**  | Server-Rendered Share Cards & Links     | High     | TODO      | `[----------] 0%` | 0 / 10             | Stage 6              |
-| **Phase 7**  | Authentication & Guest Merge            | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 7              |
-| **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | TODO        | `[----------] 0%` | 0 / 10             | Stage 8              |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler       | Critical | TODO        | `[----------] 0%` | 0 / 11             | Stage 9              |
+| **Phase 6**  | Server-Rendered Share Cards & Links     | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 6              |
+| **Phase 7**  | Authentication & Guest Merge            | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 7              |
+| **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | TODO      | `[----------] 0%` | 0 / 10             | Stage 8              |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler       | Critical | TODO      | `[----------] 0%` | 0 / 11             | Stage 9              |
 | **Phase 10** | Web Push Notifications & PWA Caching    | Medium   | TODO        | `[----------] 0%` | 0 / 10             | Stage 10             |
 | **Phase 11** | Admin Question Tool & Dynamic Importer  | High     | TODO        | `[----------] 0%` | 0 / 10             | Stage 11             |
 | **Phase 12** | Observability, Telemetry & Security     | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 12             |
@@ -196,19 +196,19 @@ _Status: COMPLETE | Target: Satori PNG card generator, `/c/:shortId` landing pag
 
 ### Phase 7: Authentication and Login Panel (Stage 7)
 
-_Status: TODO | Target: Google OAuth, guest-to-account merge, session cookies._
+_Status: COMPLETE | Target: Google OAuth, guest-to-account merge, session cookies._
 
-| ID      | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
-| ------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
-| `P7.01` | Implement JWT token generation, rotating refresh tokens, and CSRF protection                | Critical | TODO   | P3.01        | Agent | —         | Robust token infrastructure    |
-| `P7.02` | Implement `POST /v1/auth/oauth` verifying Google ID tokens                                  | Critical | TODO   | P7.01        | Agent | —         | Google Sign-In endpoint        |
-| `P7.03` | Build Login Panel (Modal on desktop, Bottom Sheet on mobile) and `/login` fallback page     | High     | TODO   | P1.08, P7.02 | Agent | —         | Non-intrusive login sheet      |
-| `P7.04` | Implement `POST /v1/auth/merge-guest` relinking guest submissions and recalculating streaks | Critical | TODO   | P7.02, P2.09 | Agent | —         | Seamless guest history merge   |
-| `P7.05` | Implement `POST /v1/auth/logout` revoking refresh tokens and clearing HTTP-only cookies     | High     | TODO   | P7.01        | Agent | —         | Clean sign-out handler         |
-| `P7.06` | Integrate invisible Cloudflare Turnstile bot verification on sign-in                        | High     | TODO   | P7.02        | Agent | —         | Bot challenge protection       |
-| `P7.07` | Implement duplicate account detection hooks (matching phone hash, device clusters)          | Medium   | TODO   | P7.04        | Agent | —         | Anti-abuse safeguards          |
-| `P7.08` | Write comprehensive integration tests for OAuth authentication and guest merge              | Critical | TODO   | P7.04        | Agent | —         | Full auth test coverage        |
-| `P7.09` | Implement stub interface for Phone OTP behind `FEATURE_PHONE_OTP` feature flag              | Low      | TODO   | P7.01        | Agent | —         | Flagged, ready for SMS gateway |
+| ID          | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date  | Notes                          |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ------------------------------ |
+| `[x] P7.01` | Implement JWT token generation, rotating refresh tokens, and CSRF protection                | Critical | DONE   | P3.01        | Agent | 2026-11-09 | Robust token infrastructure    |
+| `[x] P7.02` | Implement `POST /v1/auth/oauth` verifying Google ID tokens                                  | Critical | DONE   | P7.01        | Agent | 2026-11-09 | Google Sign-In endpoint        |
+| `[x] P7.03` | Build Login Panel (Modal on desktop, Bottom Sheet on mobile) and `/login` fallback page     | High     | DONE   | P1.08, P7.02 | Agent | 2026-11-09 | Non-intrusive login sheet      |
+| `[x] P7.04` | Implement `POST /v1/auth/merge-guest` relinking guest submissions and recalculating streaks | Critical | DONE   | P7.02, P2.09 | Agent | 2026-11-09 | Seamless guest history merge   |
+| `[x] P7.05` | Implement `POST /v1/auth/logout` revoking refresh tokens and clearing HTTP-only cookies     | High     | DONE   | P7.01        | Agent | 2026-11-09 | Clean sign-out handler         |
+| `[x] P7.06` | Integrate invisible Cloudflare Turnstile bot verification on sign-in                        | High     | DONE   | P7.02        | Agent | 2026-11-09 | Bot challenge protection       |
+| `[x] P7.07` | Implement duplicate account detection hooks (matching phone hash, device clusters)          | Medium   | DONE   | P7.04        | Agent | 2026-11-09 | Anti-abuse safeguards          |
+| `[x] P7.08` | Write comprehensive integration tests for OAuth authentication and guest merge              | Critical | DONE   | P7.04        | Agent | 2026-11-09 | Full auth test coverage        |
+| `[x] P7.09` | Implement stub interface for Phone OTP behind `FEATURE_PHONE_OTP` feature flag              | Low      | DONE   | P7.01        | Agent | 2026-11-09 | Flagged, ready for SMS gateway |
 
 ---
 
