@@ -64,7 +64,7 @@ export async function subscribeUserToPush(
     let subscription = await registration.pushManager.getSubscription();
 
     if (!subscription) {
-      const applicationServerKey = urlBase64ToUint8Array(vapidKey);
+      const applicationServerKey = urlBase64ToUint8Array(vapidKey) as unknown as BufferSource;
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey,
