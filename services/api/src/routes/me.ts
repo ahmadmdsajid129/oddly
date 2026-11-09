@@ -9,7 +9,6 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
 import { getAuthAccount, clearAuthCookies } from "../auth/tokens.js";
-import { PlayersRepository } from "../db/players.repo.js";
 import { StreaksRepository } from "../db/streaks.repo.js";
 
 // In-memory fallback preferences
@@ -162,8 +161,20 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
       const auth = await getAuthAccount(req);
       const playerId = req.cookies.oddly_session || req.cookies.oddly_did;
 
-      let accountData: any = null;
-      let submissions: any[] = [];
+      let accountData: {
+        id: string;
+        displayName: string;
+        emailHash: string;
+        createdAt: string;
+      } | null = null;
+      const submissions: Array<{
+        id: string;
+        dropId: string;
+        dropDate?: string;
+        completedAt: string;
+        percentile?: number;
+        tier?: string;
+      }> = [];
       let streakSummary = {
         currentStreak: 0,
         longestStreak: 0,
@@ -180,7 +191,7 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
               players: {
                 include: {
                   submissions: {
-                    include: { drop: true, oddness_score: true },
+                    include: { drop: true, oddnessScore: true },
                   },
                 },
               },
@@ -201,9 +212,9 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
                   id: sub.id,
                   dropId: sub.drop_id,
                   dropDate: sub.drop?.drop_date?.toISOString().slice(0, 10),
-                  completedAt: sub.created_at.toISOString(),
-                  percentile: sub.oddness_score?.percentile,
-                  tier: sub.oddness_score?.tier,
+                  completedAt: sub.submitted_at.toISOString(),
+                  percentile: sub.oddnessScore?.percentile,
+                  tier: sub.oddnessScore?.tier,
                 });
               }
             }
@@ -282,7 +293,7 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
             where: { id: playerId },
             data: {
               account_id: null,
-              status: "erased",
+              push_token_enc: null,
             },
           });
         } catch {
