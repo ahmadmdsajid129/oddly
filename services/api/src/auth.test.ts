@@ -222,7 +222,7 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       expect(mergeData.current_streak).toBeGreaterThanOrEqual(1);
 
       // 4. Verify player record now links to the account
-      expect(guestPlayer.account_id).toBeDefined();
+      expect((guestPlayer as any).account_id).toBeDefined();
     });
   });
 
