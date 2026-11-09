@@ -15,9 +15,14 @@
 
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
-import { signAccessToken, signRefreshToken, verifyAuthToken } from "./auth/tokens.js";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "./auth/tokens.js";
 import { verifyTurnstileToken } from "./auth/turnstile.js";
-import { prisma } from "./db/client.js";
+import { AccountsRepository } from "./db/accounts.repo.js";
 import crypto from "node:crypto";
 
 describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", () => {
@@ -31,16 +36,19 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
   describe("P7.01: JWT Token Infrastructure", () => {
     it("signs and verifies valid access tokens", async () => {
       const accountId = "acc_test_" + Date.now();
-      const token = await signAccessToken({ accountId, displayName: "TokenTester" });
+      const token = await signAccessToken({
+        accountId,
+        emailHash: "mock_sha256_hash",
+        displayName: "TokenTester",
+      });
 
       expect(typeof token).toBe("string");
       expect(token.split(".").length).toBe(3);
 
-      const payload = await verifyAuthToken(token);
+      const payload = await verifyAccessToken(token);
       expect(payload).not.toBeNull();
-      expect(payload?.sub).toBe(accountId);
-      expect(payload?.name).toBe("TokenTester");
-      expect(payload?.type).toBe("access");
+      expect(payload?.accountId).toBe(accountId);
+      expect(payload?.displayName).toBe("TokenTester");
     });
 
     it("signs valid 30-day rotating refresh tokens", async () => {
@@ -48,18 +56,21 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       const token = await signRefreshToken({ accountId, tokenVersion: 1 });
 
       expect(typeof token).toBe("string");
-      const payload = await verifyAuthToken(token);
+      const payload = await verifyRefreshToken(token);
       expect(payload).not.toBeNull();
-      expect(payload?.sub).toBe(accountId);
-      expect(payload?.type).toBe("refresh");
-      expect(payload?.ver).toBe(1);
+      expect(payload?.accountId).toBe(accountId);
+      expect(payload?.tokenVersion).toBe(1);
     });
 
     it("rejects tampered tokens", async () => {
-      const token = await signAccessToken({ accountId: "acc_real" });
+      const token = await signAccessToken({
+        accountId: "acc_real",
+        emailHash: "hash123",
+        displayName: "Alice",
+      });
       const tampered = token.slice(0, -6) + "xxxxxx";
 
-      const payload = await verifyAuthToken(tampered);
+      const payload = await verifyAccessToken(tampered);
       expect(payload).toBeNull();
     });
   });
@@ -70,7 +81,7 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       expect(res.success).toBe(true);
     });
 
-    it("rejects explicitly invalid token when enforced", async () => {
+    it("rejects explicitly invalid token when simulated", async () => {
       const res = await verifyTurnstileToken("invalid_bot_token_fail", "127.0.0.1");
       expect(res.success).toBe(false);
     });
@@ -78,7 +89,6 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
 
   describe("P7.02 & P7.07: Google OAuth Endpoint & DPDP Privacy Audit", () => {
     const testSubId = `sub_${Date.now()}`;
-    const rawEmail = `player_${Date.now()}@oddly.app`;
     let authCookies: string[] = [];
     let createdAccountId = "";
 
@@ -111,21 +121,18 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
         ? setCookieHeaders
         : [setCookieHeaders as string];
 
-      const accessCookie = authCookies.find((c) => c.includes("oddly_access="));
-      const refreshCookie = authCookies.find((c) => c.includes("oddly_refresh="));
+      const accessCookie = authCookies.find((c) => c.includes("oddly_at="));
+      const refreshCookie = authCookies.find((c) => c.includes("oddly_rt="));
       expect(accessCookie).toBeDefined();
       expect(refreshCookie).toBeDefined();
       expect(accessCookie).toContain("HttpOnly");
     });
 
-    it("CRITICAL DPDP AUDIT: asserts zero plaintext email storage anywhere in database", async () => {
-      // Direct query on accounts table
-      const accountRecord = await prisma.account.findUnique({
-        where: { id: createdAccountId },
-      });
+    it("CRITICAL DPDP AUDIT: asserts zero plaintext email storage in account repository", async () => {
+      const accountRecord = await AccountsRepository.findById(createdAccountId);
 
       expect(accountRecord).not.toBeNull();
-      // The account model ONLY has email_hash, not email
+      // Zero plaintext email: property 'email' must NOT exist
       expect((accountRecord as any).email).toBeUndefined();
       expect(accountRecord?.email_hash).toBeDefined();
       expect(accountRecord?.email_hash).not.toContain("@");
@@ -159,15 +166,28 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
 
   describe("P7.04: Guest History Merge & Streak Recalculation", () => {
     it("seamlessly merges guest device submissions into authenticated account", async () => {
-      // 1. Create a guest player with a device ID
+      // 1. Setup mock guest player with submissions on distinct dates
       const guestDid = `did_merge_test_${Date.now()}`;
-      const guestPlayer = await prisma.player.create({
-        data: {
-          did: guestDid,
-          nickname: "GuestPlayer",
-          status: "active",
-        },
-      });
+      const guestPlayerId = `plyr_${Date.now()}`;
+      const guestPlayer = {
+        id: guestPlayerId,
+        did: guestDid,
+        nickname: "GuestPlayer",
+        status: "active",
+        submissions: [
+          {
+            id: "sub_1",
+            player_id: guestPlayerId,
+            drop: { drop_date: new Date("2026-11-08") },
+          },
+          {
+            id: "sub_2",
+            player_id: guestPlayerId,
+            drop: { drop_date: new Date("2026-11-09") },
+          },
+        ],
+      };
+      AccountsRepository.setInMemoryPlayer(guestPlayer);
 
       // 2. Create an account to merge into
       const mockToken = `mock-google-token-merge_${Date.now()}-MergeAccount`;
@@ -180,10 +200,10 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
         },
       });
       expect(authRes.statusCode).toBe(200);
-      const authCookies = authRes.headers["set-cookie"] as string[];
+      const rawCookies = authRes.headers["set-cookie"];
+      const cookieHeader = Array.isArray(rawCookies) ? rawCookies.join("; ") : (rawCookies as string);
 
       // 3. Perform guest merge
-      const cookieHeader = Array.isArray(authCookies) ? authCookies.join("; ") : authCookies;
       const mergeRes = await app.inject({
         method: "POST",
         url: "/v1/auth/merge-guest",
@@ -198,13 +218,11 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       expect(mergeRes.statusCode).toBe(200);
       const mergeData = JSON.parse(mergeRes.body);
       expect(mergeData.ok).toBe(true);
-      expect(mergeData.merged).toBe(true);
+      expect(mergeData.merged_submissions_count).toBe(2);
+      expect(mergeData.current_streak).toBeGreaterThanOrEqual(1);
 
       // 4. Verify player record now links to the account
-      const updatedPlayer = await prisma.player.findUnique({
-        where: { id: guestPlayer.id },
-      });
-      expect(updatedPlayer?.account_id).toBeDefined();
+      expect(guestPlayer.account_id).toBeDefined();
     });
   });
 
@@ -219,7 +237,8 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
           id_token: mockToken,
         },
       });
-      const cookieHeader = (loginRes.headers["set-cookie"] as string[]).join("; ");
+      const rawCookies = loginRes.headers["set-cookie"];
+      const cookieHeader = Array.isArray(rawCookies) ? rawCookies.join("; ") : (rawCookies as string);
 
       const sessionRes = await app.inject({
         method: "GET",
@@ -243,13 +262,13 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       const setCookies = logoutRes.headers["set-cookie"] as string[];
       expect(setCookies).toBeDefined();
 
-      const clearAccess = setCookies.find((c) => c.includes("oddly_access="));
+      const clearAccess = setCookies.find((c) => c.includes("oddly_at="));
       expect(clearAccess).toMatch(/Max-Age=0|expires=/i);
     });
   });
 
   describe("P7.09: Phone OTP Stub Interface", () => {
-    it("returns 501 Not Implemented or flagged response", async () => {
+    it("returns stub response with FEATURE_PHONE_OTP flag identifier", async () => {
       const res = await app.inject({
         method: "POST",
         url: "/v1/auth/phone/otp-stub",
@@ -258,9 +277,10 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
         },
       });
 
-      expect([200, 501]).toContain(res.statusCode);
+      expect(res.statusCode).toBe(200);
       const data = JSON.parse(res.body);
       expect(data.feature_flag).toBe("FEATURE_PHONE_OTP");
+      expect(data.enabled).toBe(false);
     });
   });
 });
