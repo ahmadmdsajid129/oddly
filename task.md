@@ -214,40 +214,40 @@ _Status: COMPLETE | Target: Google OAuth, guest-to-account merge, session cookie
 
 ### Phase 8: Streaks, History, Settings, Privacy, and Reports (Stage 8)
 
-_Status: TODO | Target: Streak milestones, history calendar, Me settings, export/deletion, reporting._
+_Status: DONE | Target: Streak milestones, history calendar, Me settings, export/deletion, reporting._
 
-| ID      | Task Description                                                                      | Priority | Status | Depends On   | Owner | Done Date | Notes                           |
-| ------- | ------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------- |
-| `P8.01` | Implement streak verification and `streak_log` transaction logic                      | Critical | TODO   | P2.09, P3.05 | Agent | —         | Daily streak management         |
-| `P8.02` | Build Header Streak Flame and milestone celebration modal (7, 30, 100, 365 days)      | High     | TODO   | P1.13, P8.01 | Agent | —         | Streak gamification             |
-| `P8.03` | Implement `GET /v1/history` API and S10 History screen (calendar strip + past cards)  | High     | TODO   | P3.07, P4.01 | Agent | —         | Historical game archive         |
-| `P8.04` | Implement S14 Me / Settings screen (notification prefs, quiet hours, theme, privacy)  | High     | TODO   | P1.07, P4.01 | Agent | —         | User control panel              |
-| `P8.05` | Build user data export worker job (`POST /v1/me/export`) generating downloadable JSON | High     | TODO   | P0.06, P2.11 | Agent | —         | DPDP data portability           |
-| `P8.06` | Build account deletion flow (`DELETE /v1/me`) with 2-tap confirmation sheet           | Critical | TODO   | P1.08, P2.11 | Agent | —         | DPDP right to erasure           |
-| `P8.07` | Implement Report flow (`POST /v1/reports`) with reason selector and 140-char note     | High     | TODO   | P1.08, P3.01 | Agent | —         | Content moderation intake       |
-| `P8.08` | Build dynamic Privacy Notice and Terms of Service pages rendered from `pages` table   | High     | TODO   | P3.03        | Agent | —         | Marked "lawyer review required" |
-| `P8.09` | Build About Oddly page rendering verbatim brand story from Section 4.1                | Medium   | TODO   | P3.03        | Agent | —         | Brand storytelling              |
-| `P8.10` | Write Playwright tests for settings changes, data export, deletion, and reporting     | High     | TODO   | P8.04-P8.07  | Agent | —         | Automated settings verification |
+| ID          | Task Description                                                                      | Priority | Status | Depends On   | Owner | Done Date  | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ------------------------------- |
+| `[x] P8.01` | Implement streak verification and `streak_log` transaction logic                      | Critical | DONE   | P2.09, P3.05 | Agent | 2026-11-09 | Daily streak management         |
+| `[x] P8.02` | Build Header Streak Flame and milestone celebration modal (7, 30, 100, 365 days)      | High     | DONE   | P1.13, P8.01 | Agent | 2026-11-09 | Streak gamification             |
+| `[x] P8.03` | Implement `GET /v1/history` API and S10 History screen (calendar strip + past cards)  | High     | DONE   | P3.07, P4.01 | Agent | 2026-11-09 | Historical game archive         |
+| `[x] P8.04` | Implement S14 Me / Settings screen (notification prefs, quiet hours, theme, privacy)  | High     | DONE   | P1.07, P4.01 | Agent | 2026-11-09 | User control panel              |
+| `[x] P8.05` | Build user data export worker job (`POST /v1/me/export`) generating downloadable JSON | High     | DONE   | P0.06, P2.11 | Agent | 2026-11-09 | DPDP data portability           |
+| `[x] P8.06` | Build account deletion flow (`DELETE /v1/me`) with 2-tap confirmation sheet           | Critical | DONE   | P1.08, P2.11 | Agent | 2026-11-09 | DPDP right to erasure           |
+| `[x] P8.07` | Implement Report flow (`POST /v1/reports`) with reason selector and 140-char note     | High     | DONE   | P1.08, P3.01 | Agent | 2026-11-09 | Content moderation intake       |
+| `[x] P8.08` | Build dynamic Privacy Notice and Terms of Service pages rendered from `pages` table   | High     | DONE   | P3.03        | Agent | 2026-11-09 | Marked "lawyer review required" |
+| `[x] P8.09` | Build About Oddly page rendering verbatim brand story from Section 4.1                | Medium   | DONE   | P3.03        | Agent | 2026-11-09 | Brand storytelling              |
+| `[x] P8.10` | Write Playwright tests for settings changes, data export, deletion, and reporting     | High     | DONE   | P8.04-P8.07  | Agent | 2026-11-09 | Automated settings verification |
 
 ---
 
 ### Phase 9: Scheduler and Daily Pipeline (Stage 9)
 
-_Status: TODO | Target: BullMQ repeatable daily timeline, accelerated staging clock._
+_Status: DONE | Target: BullMQ repeatable daily timeline, accelerated staging clock._
 
-| ID      | Task Description                                                                             | Priority | Status | Depends On   | Owner | Done Date | Notes                        |
-| ------- | -------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------- |
-| `P9.01` | Implement BullMQ scheduler for daily timeline (06:30 stage, 07:00 open, 06:59 close)         | Critical | TODO   | P0.06, P2.01 | Agent | —         | Core timeline automation     |
-| `P9.02` | Build 5-minute repeatable worker job refreshing provisional pairings                         | High     | TODO   | P2.06, P9.01 | Agent | —         | Background match updates     |
-| `P9.03` | Build 07:00 final batch job: locks $p(a)$, final twins, oddness, streaks, immutable rows     | Critical | TODO   | P2.04, P9.01 | Agent | —         | Definitive recap computation |
-| `P9.04` | Implement world stats calculation job (total players, rarest pick, most popular pick)        | High     | TODO   | P9.03        | Agent | —         | Global community stats       |
-| `P9.05` | Implement share card regeneration job appending immutable "FINAL" badge                      | High     | TODO   | P6.02, P9.03 | Agent | —         | Final card rendering         |
-| `P9.06` | Build S9 Recap screen displaying yesterday's locked twin, world stats, and new drop CTA      | High     | TODO   | P5.02, P9.04 | Agent | —         | Morning recap interface      |
-| `P9.07` | Implement staging accelerated clock (`CLOCK_ACCELERATION=true`) running a Drop every 10 mins | Critical | TODO   | P9.01        | Agent | —         | Rapid pipeline verification  |
-| `P9.08` | Build dead-letter queue, automated job retries, and late-recap fallback UI banner            | High     | TODO   | P9.03        | Agent | —         | Fault tolerance              |
-| `P9.09` | Implement live question-pull recompute pipeline (re-scoring on remaining 4 questions)        | High     | TODO   | P9.03        | Agent | —         | Emergency question pull      |
-| `P9.10` | Implement daily cleanup worker job (purging expired guest records, transient Redis keys)     | Medium   | TODO   | P9.01        | Agent | —         | Data retention hygiene       |
-| `P9.11` | Run automated test suite simulating full 24-hour cycle via accelerated clock                 | Critical | TODO   | P9.07        | Agent | —         | Full lifecycle validation    |
+| ID          | Task Description                                                                             | Priority | Status | Depends On   | Owner | Done Date  | Notes                        |
+| ----------- | -------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ---------------------------- |
+| `[x] P9.01` | Implement BullMQ scheduler for daily timeline (06:30 stage, 07:00 open, 06:59 close)         | Critical | DONE   | P0.06, P2.01 | Agent | 2026-11-09 | Core timeline automation     |
+| `[x] P9.02` | Build 5-minute repeatable worker job refreshing provisional pairings                         | High     | DONE   | P2.06, P9.01 | Agent | 2026-11-09 | Background match updates     |
+| `[x] P9.03` | Build 07:00 final batch job: locks $p(a)$, final twins, oddness, streaks, immutable rows     | Critical | DONE   | P2.04, P9.01 | Agent | 2026-11-09 | Definitive recap computation |
+| `[x] P9.04` | Implement world stats calculation job (total players, rarest pick, most popular pick)        | High     | DONE   | P9.03        | Agent | 2026-11-09 | Global community stats       |
+| `[x] P9.05` | Implement share card regeneration job appending immutable "FINAL" badge                      | High     | DONE   | P6.02, P9.03 | Agent | 2026-11-09 | Final card rendering         |
+| `[x] P9.06` | Build S9 Recap screen displaying yesterday's locked twin, world stats, and new drop CTA      | High     | DONE   | P5.02, P9.04 | Agent | 2026-11-09 | Morning recap interface      |
+| `[x] P9.07` | Implement staging accelerated clock (`CLOCK_ACCELERATION=true`) running a Drop every 10 mins | Critical | DONE   | P9.01        | Agent | 2026-11-09 | Rapid pipeline verification  |
+| `[x] P9.08` | Build dead-letter queue, automated job retries, and late-recap fallback UI banner            | High     | DONE   | P9.03        | Agent | 2026-11-09 | Fault tolerance              |
+| `[x] P9.09` | Implement live question-pull recompute pipeline (re-scoring on remaining 4 questions)        | High     | DONE   | P9.03        | Agent | 2026-11-09 | Emergency question pull      |
+| `[x] P9.10` | Implement daily cleanup worker job (purging expired guest records, transient Redis keys)     | Medium   | DONE   | P9.01        | Agent | 2026-11-09 | Data retention hygiene       |
+| `[x] P9.11` | Run automated test suite simulating full 24-hour cycle via accelerated clock                 | Critical | DONE   | P9.07        | Agent | 2026-11-09 | Full lifecycle validation    |
 
 ---
 
