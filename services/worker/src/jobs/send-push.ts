@@ -74,8 +74,13 @@ export async function processSendPushJob(
       statusCode: response.statusCode,
       durationMs: Date.now() - start,
     };
-  } catch (err: any) {
-    const statusCode = err.statusCode || err.status;
+  } catch (err: unknown) {
+    const pushErr = err as {
+      statusCode?: number;
+      status?: number;
+      message?: string;
+    };
+    const statusCode = pushErr.statusCode || pushErr.status;
     const isExpired = statusCode === 410 || statusCode === 404;
 
     if (isExpired) {
@@ -85,7 +90,7 @@ export async function processSendPushJob(
     } else {
       console.error(
         `[WebPush] Dispatch error (HTTP ${statusCode}) for player ${playerId || "anonymous"}:`,
-        err.message || err
+        pushErr.message || err
       );
     }
 
@@ -93,7 +98,7 @@ export async function processSendPushJob(
       delivered: false,
       statusCode,
       expired: isExpired,
-      reason: err.message || `WebPush failed with HTTP ${statusCode}`,
+      reason: pushErr.message || `WebPush failed with HTTP ${statusCode}`,
       durationMs: Date.now() - start,
     };
   }
