@@ -144,7 +144,10 @@ export default function HomePage() {
     queryKey: ["today-drop"],
     queryFn: async () => {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
         const res = await api.drops.getToday();
+        clearTimeout(timeoutId);
         return res;
       } catch {
         // Fallback to local data if backend is offline
@@ -156,6 +159,13 @@ export default function HomePage() {
           questions: FALLBACK_QUESTIONS,
         };
       }
+    },
+    initialData: {
+      id: "drop-today-local",
+      drop_number: 1,
+      date: new Date().toISOString().slice(0, 10),
+      status: "live",
+      questions: FALLBACK_QUESTIONS,
     },
     staleTime: 60 * 1000,
   });
