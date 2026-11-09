@@ -84,6 +84,17 @@ export const api = {
   history: {
     get: (params?: { limit?: number; offset?: number }) => rawClient.getHistory(params),
   },
+  me: {
+    getPreferences: () => rawClient.getPreferences(),
+    updatePreferences: (prefs: Parameters<typeof rawClient.updatePreferences>[0]) =>
+      rawClient.updatePreferences(prefs),
+    exportData: () => rawClient.exportData(),
+    deleteAccount: () => rawClient.deleteAccount(),
+  },
+  reports: {
+    submit: (data: Parameters<typeof rawClient.submitReport>[0]) =>
+      rawClient.submitReport(data),
+  },
 };
 
 export const oddlyApi = rawClient;
