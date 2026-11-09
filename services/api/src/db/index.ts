@@ -12,4 +12,6 @@ export * from "./players.repo.js";
 export * from "./matches.repo.js";
 export * from "./shares.repo.js";
 export * from "./accounts.repo.js";
+export * from "./streaks.repo.js";
+export * from "./history.repo.js";
 

@@ -143,6 +143,64 @@ export interface LogoutResponse {
   message: string;
 }
 
+export interface HistoryResponse {
+  ok: boolean;
+  items: Array<{
+    submissionId: string;
+    dropId: string;
+    dropDate: string;
+    completedAt: string;
+    sharerScore: number;
+    sharerTier: string;
+    sharerPercentile: number;
+    twinCity: string;
+    shareCardUrl: string | null;
+    answersCount: number;
+  }>;
+  total: number;
+  streak: {
+    current: number;
+    longest: number;
+    total_played: number;
+    next_milestone: number;
+  };
+}
+
+export interface PreferencesResponse {
+  ok: boolean;
+  preferences: {
+    notifications_enabled: boolean;
+    quiet_hours_enabled: boolean;
+    quiet_hours_start: string;
+    quiet_hours_end: string;
+    theme: string;
+  };
+}
+
+export interface ExportDataResponse {
+  ok: boolean;
+  export_date: string;
+  account: {
+    id: string;
+    displayName: string;
+    emailHash: string;
+    createdAt: string;
+  } | null;
+  submissions_count: number;
+  submissions: Record<string, unknown>[];
+  streaks: {
+    currentStreak: number;
+    longestStreak: number;
+    totalActiveDays: number;
+  };
+}
+
+export interface ReportResponse {
+  ok: boolean;
+  report_id: string;
+  message: string;
+}
+
 export interface SessionResponse {
   authenticated: boolean;
   account: {
@@ -332,6 +390,55 @@ export class OddlyApiClient {
   /** Current session status */
   async getSession(): Promise<SessionResponse> {
     return this.request<SessionResponse>("/v1/auth/session");
+  }
+
+  /** Player historical gameplay and past sealed drops */
+  async getHistory(params?: { limit?: number; offset?: number }): Promise<HistoryResponse> {
+    const query = new URLSearchParams();
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.offset) query.set("offset", String(params.offset));
+    const qs = query.toString() ? `?${query.toString()}` : "";
+    return this.request<HistoryResponse>(`/v1/history${qs}`);
+  }
+
+  /** Retrieve user preferences */
+  async getPreferences(): Promise<PreferencesResponse> {
+    return this.request<PreferencesResponse>("/v1/me/preferences");
+  }
+
+  /** Update user preferences */
+  async updatePreferences(prefs: Partial<PreferencesResponse["preferences"]>): Promise<{ ok: boolean; message: string }> {
+    return this.request<{ ok: boolean; message: string }>("/v1/me/preferences", {
+      method: "PUT",
+      body: JSON.stringify(prefs),
+    });
+  }
+
+  /** Export all user data as JSON per DPDP portability (P8.05) */
+  async exportData(): Promise<ExportDataResponse> {
+    return this.request<ExportDataResponse>("/v1/me/export", {
+      method: "POST",
+    });
+  }
+
+  /** Erase account and data per DPDP Right to Erasure (P8.06) */
+  async deleteAccount(): Promise<{ ok: boolean; message: string }> {
+    return this.request<{ ok: boolean; message: string }>("/v1/me", {
+      method: "DELETE",
+    });
+  }
+
+  /** Submit a moderation report (P8.07) */
+  async submitReport(data: {
+    target_type: "drop" | "question" | "twin" | "other";
+    target_id: string;
+    reason: "inappropriate" | "offensive" | "bot_abuse" | "technical_glitch" | "other";
+    note?: string;
+  }): Promise<ReportResponse> {
+    return this.request<ReportResponse>("/v1/reports", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 }
 

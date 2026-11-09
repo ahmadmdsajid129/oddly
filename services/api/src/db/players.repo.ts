@@ -36,6 +36,25 @@ export class PlayersRepository {
   }
 
   /**
+   * Find player by linked account ID.
+   */
+  static async findByAccountId(accountId: string) {
+    return prisma.player.findFirst({
+      where: { account_id: accountId },
+      orderBy: { created_at: "desc" },
+    });
+  }
+
+  /**
+   * Find player by device fingerprint (did).
+   */
+  static async findByDid(did: string) {
+    return prisma.player.findUnique({
+      where: { did },
+    });
+  }
+
+  /**
    * Link a guest player to an authenticated Google Account.
    */
   static async linkAccount(playerId: string, accountId: string) {

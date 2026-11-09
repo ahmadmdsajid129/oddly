@@ -31,7 +31,7 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
     Params: { dropId: string };
     Querystring: { format?: ShareFormat; theme?: ShareTheme };
   }>(
-    "/results/:dropId/card",
+    "/v1/results/:dropId/card",
     {
       schema: {
         tags: ["Cards"],
@@ -178,7 +178,7 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
    * Raw image streaming endpoint serving PNG buffers from storage.
    */
   app.get<{ Params: { "*": string } }>(
-    "/cards/*",
+    "/v1/cards/*",
     async (req, reply) => {
       const wildcard = req.params["*"];
       const storageKey = `cards/${wildcard}`;
