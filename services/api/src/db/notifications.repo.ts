@@ -7,6 +7,7 @@
  */
 
 import { prisma } from "./client.js";
+import type { Prisma } from "@oddly/shared";
 
 export interface PushSubscriptionInput {
   playerId: string;
@@ -59,11 +60,11 @@ export class NotificationsRepository {
         create: {
           player_id: input.playerId,
           endpoint: input.endpoint,
-          keys: input.keys as any,
+          keys: input.keys as unknown as Prisma.InputJsonValue,
           is_active: true,
         },
         update: {
-          keys: input.keys as any,
+          keys: input.keys as unknown as Prisma.InputJsonValue,
           is_active: true,
         },
       });
