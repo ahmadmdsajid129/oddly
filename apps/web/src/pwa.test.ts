@@ -57,7 +57,7 @@ describe("Stage 10: PWA & Push Client (P10.01, P10.02, P10.08, P10.10)", () => {
     it("should provide valid manifest configuration for standalone PWA", () => {
       const config = manifest();
 
-      expect(config.name.toLowerCase()).toContain("oddly");
+      expect(config.name?.toLowerCase()).toContain("oddly");
       expect(config.short_name?.toLowerCase()).toBe("oddly");
       expect(config.start_url).toBe("/");
       expect(config.display).toBe("standalone");
