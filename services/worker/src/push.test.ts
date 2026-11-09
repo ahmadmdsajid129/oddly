@@ -20,6 +20,7 @@ import {
 } from "./push/triggers.js";
 import { buildPushPayload } from "./push/templates.js";
 import { processSendPushJob, type SendPushJobData } from "./jobs/send-push.js";
+import type { Job } from "bullmq";
 import { webpush } from "./push/vapid.js";
 
 // Mock web-push for controlled job execution
@@ -328,7 +329,7 @@ describe("Stage 10: Push Notifications Engine (P10.03 - P10.10)", () => {
           subscription: mockSubscription,
           payload: buildPushPayload("drop_live"),
         },
-      } as any;
+      } as unknown as Job<SendPushJobData>;
 
       const result = await processSendPushJob(mockJob);
       expect(result.delivered).toBe(true);
@@ -337,8 +338,10 @@ describe("Stage 10: Push Notifications Engine (P10.03 - P10.10)", () => {
     });
 
     it("should detect expired subscriptions on HTTP 410 Gone", async () => {
-      const err: any = new Error("Subscription has expired or is no longer valid");
-      err.statusCode = 410;
+      const err = Object.assign(
+        new Error("Subscription has expired or is no longer valid"),
+        { statusCode: 410 }
+      );
       vi.mocked(webpush.sendNotification).mockRejectedValueOnce(err);
 
       const mockJob = {
@@ -347,7 +350,7 @@ describe("Stage 10: Push Notifications Engine (P10.03 - P10.10)", () => {
           subscription: mockSubscription,
           payload: "Test payload",
         },
-      } as any;
+      } as unknown as Job<SendPushJobData>;
 
       const result = await processSendPushJob(mockJob);
       expect(result.delivered).toBe(false);
@@ -366,7 +369,7 @@ describe("Stage 10: Push Notifications Engine (P10.03 - P10.10)", () => {
             currentPushesToday: 2, // cap reached
           },
         },
-      } as any;
+      } as unknown as Job<SendPushJobData>;
 
       const result = await processSendPushJob(mockJob);
       expect(result.delivered).toBe(false);
