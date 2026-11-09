@@ -22,7 +22,7 @@ import {
   verifyRefreshToken,
 } from "./auth/tokens.js";
 import { verifyTurnstileToken } from "./auth/turnstile.js";
-import { AccountsRepository } from "./db/accounts.repo.js";
+import { AccountsRepository, InMemoryPlayerRecord } from "./db/accounts.repo.js";
 import crypto from "node:crypto";
 
 describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", () => {
@@ -133,7 +133,7 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
 
       expect(accountRecord).not.toBeNull();
       // Zero plaintext email: property 'email' must NOT exist
-      expect((accountRecord as any).email).toBeUndefined();
+      expect("email" in (accountRecord as object)).toBe(false);
       expect(accountRecord?.email_hash).toBeDefined();
       expect(accountRecord?.email_hash).not.toContain("@");
       expect(accountRecord?.email_hash).toHaveLength(64);
@@ -169,7 +169,7 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       // 1. Setup mock guest player with submissions on distinct dates
       const guestDid = `did_merge_test_${Date.now()}`;
       const guestPlayerId = `plyr_${Date.now()}`;
-      const guestPlayer = {
+      const guestPlayer: InMemoryPlayerRecord = {
         id: guestPlayerId,
         did: guestDid,
         nickname: "GuestPlayer",
@@ -222,7 +222,7 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       expect(mergeData.current_streak).toBeGreaterThanOrEqual(1);
 
       // 4. Verify player record now links to the account
-      expect((guestPlayer as any).account_id).toBeDefined();
+      expect(guestPlayer.account_id).toBeDefined();
     });
   });
 
