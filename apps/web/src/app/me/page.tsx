@@ -270,7 +270,7 @@ export default function MePage() {
                 </p>
               </div>
               <Button
-                variant="danger"
+                variant="destructive"
                 size="sm"
                 onClick={() => setShowDeleteConfirm(true)}
               >
@@ -355,7 +355,7 @@ export default function MePage() {
                 Keep Account
               </Button>
               <Button
-                variant="danger"
+                variant="destructive"
                 size="md"
                 onClick={handleDeleteAccount}
                 isLoading={isDeleting}
