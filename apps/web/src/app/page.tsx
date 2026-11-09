@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BrandMark } from "@/components/icons";
 import { Atmosphere } from "@/components/ui/Atmosphere";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Countdown } from "@/components/ui/Countdown";
 import { Skeleton } from "@/components/ui/FeedbackPrimitives";
+import { StreakFlame } from "@/components/ui/StreakFlame";
 import { useTheme } from "@/components/ui/ThemeProvider";
 import { useToast } from "@/components/ui/Toast";
 import { feedback } from "@/lib/feedback";
@@ -34,7 +36,7 @@ import { TwinRevealScreen, TwinMatchData } from "@/components/play/TwinRevealScr
 import { OddnessScreen, OddnessData } from "@/components/play/OddnessScreen";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import type { AnswerPayload, ShareFormat } from "@oddly/shared";
-import { Sun, Moon, Sparkles, Trophy, ArrowRight, User, LogOut } from "lucide-react";
+import { Sun, Moon, Sparkles, Trophy, ArrowRight, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 // Fallback launch questions for offline or initial zero-db states
@@ -124,6 +126,7 @@ interface StoredPlayResult {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const auth = useAuth();
@@ -489,8 +492,14 @@ export default function HomePage() {
           <span className="font-heading text-xl font-bold tracking-tight text-text">oddly</span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint/10 border border-mint/20 text-xs font-semibold text-mint">
+        <div className="flex items-center gap-2">
+          <StreakFlame
+            streak={auth.isAuthenticated ? 1 : 0}
+            longestStreak={auth.isAuthenticated ? 1 : 0}
+            onFlameClick={() => router.push("/history")}
+          />
+
+          <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint/10 border border-mint/20 text-xs font-semibold text-mint">
             <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
             Live
           </div>
@@ -504,19 +513,29 @@ export default function HomePage() {
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
+          <button
+            type="button"
+            onClick={() => router.push("/me")}
+            className="p-2 rounded-full border border-border bg-surface text-text-muted hover:text-text transition-all cursor-pointer"
+            aria-label="Settings"
+            title="Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+
           {auth.isAuthenticated ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet/10 border border-violet/30 text-violet max-w-[120px] truncate">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet/10 border border-violet/30 text-violet max-w-[90px] truncate">
                 {auth.account?.displayName || "Player"}
               </span>
               <button
                 type="button"
                 onClick={() => auth.logout()}
-                className="p-2 rounded-full border border-border bg-surface text-text-muted hover:text-flame transition-all cursor-pointer"
+                className="p-1.5 rounded-full border border-border bg-surface text-text-muted hover:text-flame transition-all cursor-pointer"
                 aria-label="Sign out"
                 title="Sign out"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
@@ -618,9 +637,30 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-20 text-center pb-4 space-y-1">
-        <p className="text-xs text-text-muted">
-          A daily game of coincidences & human connection
+      <footer className="relative z-20 text-center pb-4 space-y-2">
+        <div className="flex items-center justify-center gap-3 text-xs font-medium text-text-muted">
+          <button type="button" onClick={() => router.push("/about")} className="hover:text-text cursor-pointer">
+            About
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => router.push("/history")} className="hover:text-text cursor-pointer">
+            Archive
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => router.push("/me")} className="hover:text-text cursor-pointer">
+            Settings
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => router.push("/privacy")} className="hover:text-text cursor-pointer">
+            Privacy
+          </button>
+          <span>•</span>
+          <button type="button" onClick={() => router.push("/terms")} className="hover:text-text cursor-pointer">
+            Terms
+          </button>
+        </div>
+        <p className="text-[11px] text-text-muted">
+          A daily game of coincidences &amp; human connection
         </p>
       </footer>
 
