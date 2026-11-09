@@ -81,6 +81,9 @@ export const api = {
     logout: () => rawClient.logout(),
     getSession: () => rawClient.getSession(),
   },
+  history: {
+    get: (params?: { limit?: number; offset?: number }) => rawClient.getHistory(params),
+  },
 };
 
 export const oddlyApi = rawClient;
