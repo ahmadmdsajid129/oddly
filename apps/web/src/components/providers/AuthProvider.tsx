@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [account, setAccount] = useState<AuthAccount | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { showToast } = useToast();
+  const { toast, success, error, info } = useToast();
 
   const refreshSession = useCallback(async () => {
     try {
@@ -88,26 +88,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           }
 
-          showToast({
-            title: `Welcome, ${res.account.displayName}!`,
-            description: "Your streaks and daily twins are now synced.",
-            variant: "success",
-          });
+          success(`Welcome, ${res.account.displayName}! Your streaks are synced.`);
           closeLoginModal();
           return { ok: true };
         }
         return { ok: false, error: (res as any)?.message || "Authentication failed" };
       } catch (err: any) {
         const message = err?.message || "Login failed. Please try again.";
-        showToast({
-          title: "Sign-in error",
-          description: message,
-          variant: "error",
-        });
+        error(message);
         return { ok: false, error: message };
       }
     },
-    [closeLoginModal, showToast]
+    [closeLoginModal, success, error]
   );
 
   const logout = useCallback(async () => {
@@ -118,13 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsAuthenticated(false);
       setAccount(null);
-      showToast({
-        title: "Signed out",
-        description: "You are currently playing as a guest.",
-        variant: "info",
-      });
+      info("Signed out. You are playing as a guest.");
     }
-  }, [showToast]);
+  }, [info]);
 
   return (
     <AuthContext.Provider
