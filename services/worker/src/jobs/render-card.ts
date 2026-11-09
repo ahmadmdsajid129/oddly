@@ -72,12 +72,7 @@ export async function processRenderCardJob(
     percentile: data.percentile,
   });
 
-  const storageKey = computeCardStorageKey(
-    data.submissionId,
-    format,
-    theme,
-    contentHash
-  );
+  const storageKey = computeCardStorageKey(data.submissionId, format, theme, contentHash);
 
   // 3. Put into storage client
   const storage = getCardStorage();
