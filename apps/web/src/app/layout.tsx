@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { PwaProvider } from "@/components/providers/PwaProvider";
 import { LoginModal } from "@/components/auth/LoginModal";
 import "../styles/globals.css";
 
@@ -34,8 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ThemeProvider>
             <ToastProvider>
               <AuthProvider>
-                {children}
-                <LoginModal />
+                <PwaProvider>
+                  {children}
+                  <LoginModal />
+                </PwaProvider>
               </AuthProvider>
             </ToastProvider>
           </ThemeProvider>
