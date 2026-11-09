@@ -28,7 +28,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       turnstile_token?: string;
     };
   }>(
-    "/auth/oauth",
+    "/v1/auth/oauth",
     {
       schema: {
         tags: ["Authentication"],
@@ -196,7 +196,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       guest_did?: string;
     };
   }>(
-    "/auth/merge-guest",
+    "/v1/auth/merge-guest",
     {
       schema: {
         tags: ["Authentication"],
@@ -251,7 +251,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
    * Revokes session and clears HTTP-only cookies (P7.05).
    */
   app.post(
-    "/auth/logout",
+    "/v1/auth/logout",
     {
       schema: {
         tags: ["Authentication"],
@@ -278,7 +278,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
    * Returns current authenticated account or null if guest.
    */
   app.get(
-    "/auth/session",
+    "/v1/auth/session",
     {
       schema: {
         tags: ["Authentication"],
@@ -322,7 +322,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
    * Stub endpoint for SMS phone authentication behind FEATURE_PHONE_OTP flag (P7.09).
    */
   app.post(
-    "/auth/phone/otp-stub",
+    "/v1/auth/phone/otp-stub",
     {
       schema: {
         tags: ["Authentication"],
@@ -331,6 +331,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
           200: z.object({
             ok: z.boolean(),
             enabled: z.boolean(),
+            feature_flag: z.string(),
             message: z.string(),
           }),
         },
@@ -340,6 +341,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       return reply.send({
         ok: false,
         enabled: false,
+        feature_flag: "FEATURE_PHONE_OTP",
         message:
           "Phone OTP verification is reserved for production SMS gateway behind FEATURE_PHONE_OTP flag.",
       });
