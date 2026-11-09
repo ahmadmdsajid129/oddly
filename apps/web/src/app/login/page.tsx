@@ -38,7 +38,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen relative flex flex-col items-center justify-center p-4">
-      <Atmosphere variant="neutral" />
+      <Atmosphere />
 
       <div className="w-full max-w-md rounded-3xl bg-surface p-8 shadow-2xl border border-border flex flex-col items-center text-center relative z-10 backdrop-blur-md">
         {/* Brand Rings */}
