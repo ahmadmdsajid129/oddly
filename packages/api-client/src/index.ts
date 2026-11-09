@@ -143,6 +143,29 @@ export interface LogoutResponse {
   message: string;
 }
 
+export interface HistoryResponse {
+  ok: boolean;
+  items: Array<{
+    submissionId: string;
+    dropId: string;
+    dropDate: string;
+    completedAt: string;
+    sharerScore: number;
+    sharerTier: string;
+    sharerPercentile: number;
+    twinCity: string;
+    shareCardUrl: string | null;
+    answersCount: number;
+  }>;
+  total: number;
+  streak: {
+    current: number;
+    longest: number;
+    total_played: number;
+    next_milestone: number;
+  };
+}
+
 export interface SessionResponse {
   authenticated: boolean;
   account: {
@@ -332,6 +355,15 @@ export class OddlyApiClient {
   /** Current session status */
   async getSession(): Promise<SessionResponse> {
     return this.request<SessionResponse>("/v1/auth/session");
+  }
+
+  /** Player historical gameplay and past sealed drops */
+  async getHistory(params?: { limit?: number; offset?: number }): Promise<HistoryResponse> {
+    const query = new URLSearchParams();
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.offset) query.set("offset", String(params.offset));
+    const qs = query.toString() ? `?${query.toString()}` : "";
+    return this.request<HistoryResponse>(`/v1/history${qs}`);
   }
 }
 
