@@ -17,7 +17,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "./server.js";
 import { signAccessToken, signRefreshToken, verifyAuthToken } from "./auth/tokens.js";
 import { verifyTurnstileToken } from "./auth/turnstile.js";
-import { prisma } from "./db/prisma.js";
+import { prisma } from "./db/client.js";
 import crypto from "node:crypto";
 
 describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", () => {
