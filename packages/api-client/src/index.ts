@@ -166,6 +166,41 @@ export interface HistoryResponse {
   };
 }
 
+export interface PreferencesResponse {
+  ok: boolean;
+  preferences: {
+    notifications_enabled: boolean;
+    quiet_hours_enabled: boolean;
+    quiet_hours_start: string;
+    quiet_hours_end: string;
+    theme: string;
+  };
+}
+
+export interface ExportDataResponse {
+  ok: boolean;
+  export_date: string;
+  account: {
+    id: string;
+    displayName: string;
+    emailHash: string;
+    createdAt: string;
+  } | null;
+  submissions_count: number;
+  submissions: any[];
+  streaks: {
+    currentStreak: number;
+    longestStreak: number;
+    totalActiveDays: number;
+  };
+}
+
+export interface ReportResponse {
+  ok: boolean;
+  report_id: string;
+  message: string;
+}
+
 export interface SessionResponse {
   authenticated: boolean;
   account: {
@@ -364,6 +399,46 @@ export class OddlyApiClient {
     if (params?.offset) query.set("offset", String(params.offset));
     const qs = query.toString() ? `?${query.toString()}` : "";
     return this.request<HistoryResponse>(`/v1/history${qs}`);
+  }
+
+  /** Retrieve user preferences */
+  async getPreferences(): Promise<PreferencesResponse> {
+    return this.request<PreferencesResponse>("/v1/me/preferences");
+  }
+
+  /** Update user preferences */
+  async updatePreferences(prefs: Partial<PreferencesResponse["preferences"]>): Promise<{ ok: boolean; message: string }> {
+    return this.request<{ ok: boolean; message: string }>("/v1/me/preferences", {
+      method: "PUT",
+      body: JSON.stringify(prefs),
+    });
+  }
+
+  /** Export all user data as JSON per DPDP portability (P8.05) */
+  async exportData(): Promise<ExportDataResponse> {
+    return this.request<ExportDataResponse>("/v1/me/export", {
+      method: "POST",
+    });
+  }
+
+  /** Erase account and data per DPDP Right to Erasure (P8.06) */
+  async deleteAccount(): Promise<{ ok: boolean; message: string }> {
+    return this.request<{ ok: boolean; message: string }>("/v1/me", {
+      method: "DELETE",
+    });
+  }
+
+  /** Submit a moderation report (P8.07) */
+  async submitReport(data: {
+    target_type: "drop" | "question" | "twin" | "other";
+    target_id: string;
+    reason: "inappropriate" | "offensive" | "bot_abuse" | "technical_glitch" | "other";
+    note?: string;
+  }): Promise<ReportResponse> {
+    return this.request<ReportResponse>("/v1/reports", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 }
 
