@@ -11,39 +11,59 @@ interface TimeRemaining {
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+interface DigitProps {
+  digit: string;
+  shouldReduceMotion: boolean | null;
+}
+
+// Individual digit component: only re-renders and animates when this specific digit changes
+const Digit = React.memo(function Digit({ digit, shouldReduceMotion }: DigitProps) {
+  if (shouldReduceMotion) {
+    return (
+      <span className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text inline-block w-[0.65em] text-center">
+        {digit}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative inline-flex items-center justify-center w-[0.65em] h-[1.25em] overflow-hidden">
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={digit}
+          initial={{ y: "60%", opacity: 0 }}
+          animate={{ y: "0%", opacity: 1 }}
+          exit={{ y: "-60%", opacity: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text absolute inset-0 flex items-center justify-center"
+        >
+          {digit}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+});
+
 interface UnitCardProps {
   value: string;
   label: string;
   shouldReduceMotion: boolean | null;
 }
 
-// Memoized outside of Countdown to prevent unmounting/remounting on every second
+// Unit card containing tens digit and ones digit independently
 const UnitCard = React.memo(function UnitCard({
   value,
   label,
   shouldReduceMotion,
 }: UnitCardProps) {
+  const tens = value[0] ?? "0";
+  const ones = value[1] ?? "0";
+
   return (
     <div className="flex flex-col items-center">
-      <div className="w-16 sm:w-20 h-20 sm:h-24 rounded-2xl bg-surface-2 border border-border shadow-sm flex items-center justify-center overflow-hidden relative">
-        {shouldReduceMotion ? (
-          <span className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text">
-            {value}
-          </span>
-        ) : (
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span
-              key={value}
-              initial={{ y: 16, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -16, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text block"
-            >
-              {value}
-            </motion.span>
-          </AnimatePresence>
-        )}
+      <div className="w-16 sm:w-20 h-20 sm:h-24 rounded-2xl bg-surface-2 border border-border shadow-sm flex items-center justify-center gap-0.5 overflow-hidden relative">
+        <Digit digit={tens} shouldReduceMotion={shouldReduceMotion} />
+        <Digit digit={ones} shouldReduceMotion={shouldReduceMotion} />
       </div>
       <span className="text-[11px] font-heading font-semibold text-text-muted mt-2 tracking-widest uppercase">
         {label}
