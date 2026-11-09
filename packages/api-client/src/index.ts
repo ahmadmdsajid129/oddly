@@ -187,7 +187,7 @@ export interface ExportDataResponse {
     createdAt: string;
   } | null;
   submissions_count: number;
-  submissions: any[];
+  submissions: Record<string, unknown>[];
   streaks: {
     currentStreak: number;
     longestStreak: number;
