@@ -73,3 +73,4 @@ export function getDropLifecyclePhase(date = new Date()): "staging" | "live" | "
   // Live game window: 07:00 IST through 06:58 IST next morning
   return "live";
 }
+
