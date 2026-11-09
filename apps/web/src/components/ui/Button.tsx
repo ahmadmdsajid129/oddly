@@ -57,13 +57,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sizeStyles: Record<ButtonSize, string> = {
       sm: "h-9 px-3.5 text-xs rounded-full gap-1.5",
       md: "h-11 px-5 text-sm rounded-full gap-2",
-      lg: "h-13 px-6 text-base rounded-full gap-2.5 w-full sm:w-auto",
+      lg: "h-14 px-8 text-base rounded-full gap-2.5",
     };
 
     // Variant styling
     const variantStyles: Record<ButtonVariant, string> = {
       primary:
-        "bg-violet text-white shadow-md hover:bg-violet-press hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] border-t border-white/20",
+        "bg-[#6C4CF1] text-white shadow-lg shadow-[#6C4CF1]/25 hover:bg-[#5538D6] hover:shadow-xl hover:shadow-[#6C4CF1]/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] border-t border-white/20",
       secondary:
         "bg-transparent border-2 border-violet text-violet dark:text-lavender dark:border-lavender hover:bg-violet/10 active:bg-violet/20 active:scale-[0.97]",
       ghost:
