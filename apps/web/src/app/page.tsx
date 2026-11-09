@@ -572,17 +572,17 @@ export default function HomePage() {
             <Countdown />
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="w-full max-w-xs sm:max-w-sm mx-auto flex flex-col items-center gap-3">
             <Button
               variant="primary"
               size="lg"
-              className="w-full py-4 text-base font-bold flex items-center justify-center gap-2 shadow-lg"
+              className="w-full py-4 text-base sm:text-lg font-bold flex items-center justify-center gap-2.5 rounded-full"
               onClick={handleStartPlay}
             >
-              <Sparkles className="w-5 h-5 text-midnight" />
+              <Sparkles className="w-5 h-5 text-mint" />
               <span>{answers.length > 0 ? "Resume today's five" : "Play today's five"}</span>
             </Button>
-            <p className="text-xs text-text-muted">
+            <p className="text-xs text-textMuted font-medium tracking-wide">
               18+ only • No account needed • Free forever
             </p>
           </div>
