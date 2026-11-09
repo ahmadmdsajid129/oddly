@@ -82,7 +82,8 @@ export const api = {
     getSession: () => rawClient.getSession(),
   },
   history: {
-    get: (params?: { limit?: number; offset?: number }) => rawClient.getHistory(params),
+    get: (params?: { limit?: number; offset?: number }) =>
+      rawClient.getHistory(params),
   },
   me: {
     getPreferences: () => rawClient.getPreferences(),
