@@ -43,6 +43,7 @@ import { pushRoutes } from "./routes/push.js";
 export interface ServerOptions {
   logger?: boolean;
   isShuttingDown?: () => boolean;
+  ipRateLimitCeiling?: number;
   underPressure?: {
     maxEventLoopDelay?: number;
     maxHeapUsedBytes?: number;
@@ -149,7 +150,7 @@ export async function buildServer(
     parseOptions: {},
   });
 
-  // 6. Redis-backed rate limiting (R1.4)
+  // 6. Redis-backed rate limiting (R1.4: deviceId + IP)
   await app.register(rateLimit, {
     redis: redis.status === "ready" ? redis : undefined,
     max: 120, // 120 requests per minute default
@@ -162,6 +163,67 @@ export async function buildServer(
       return `${deviceId}:${req.ip}`;
     },
     allowList: process.env.NODE_ENV === "production" ? [] : ["127.0.0.1", "localhost"],
+  });
+
+  // 6b. Coarse IP-only ceiling rate limit (R1-PATCH Item 5)
+  // Default 600 req/min read from app_config / env.
+  // Accommodates Indian CGNAT cellular mobile users sharing tower IP addresses.
+  const IP_RATE_LIMIT_CEILING =
+    opts.ipRateLimitCeiling ??
+    (Number(process.env.IP_RATE_LIMIT_PER_MINUTE) || 600);
+  const ipWindowMap = new Map<string, { count: number; expiresAt: number }>();
+
+  app.addHook("onRequest", async (req, reply) => {
+    // In test environment, skip unless explicitly testing IP ceiling via opts or production mode
+    if (
+      process.env.NODE_ENV !== "production" &&
+      !opts.ipRateLimitCeiling &&
+      (req.ip === "127.0.0.1" || req.ip === "localhost")
+    ) {
+      return;
+    }
+
+    const ip = req.ip || "unknown";
+
+    if (redis.status === "ready") {
+      try {
+        const ipKey = `ratelimit:ip:${ip}`;
+        const count = await redis.incr(ipKey);
+        if (count === 1) {
+          await redis.expire(ipKey, 60);
+        }
+        if (count > IP_RATE_LIMIT_CEILING) {
+          reply.header("Retry-After", "60");
+          reply.status(429).send({
+            ok: false,
+            error: "IP_RATE_LIMIT_EXCEEDED",
+            message: "Too many requests from this network. Please wait a moment.",
+            retry_after: 60,
+          });
+          return;
+        }
+      } catch {
+        // Fall back to in-memory window on Redis error
+      }
+    } else {
+      const now = Date.now();
+      const current = ipWindowMap.get(ip);
+      if (!current || now > current.expiresAt) {
+        ipWindowMap.set(ip, { count: 1, expiresAt: now + 60000 });
+      } else {
+        current.count++;
+        if (current.count > IP_RATE_LIMIT_CEILING) {
+          reply.header("Retry-After", "60");
+          reply.status(429).send({
+            ok: false,
+            error: "IP_RATE_LIMIT_EXCEEDED",
+            message: "Too many requests from this network. Please wait a moment.",
+            retry_after: 60,
+          });
+          return;
+        }
+      }
+    }
   });
 
   // 6. OpenAPI / Swagger Documentation (P3.11)

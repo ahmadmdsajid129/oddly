@@ -250,6 +250,7 @@ export interface SubmissionForMatching {
   drop_id: string;
   answers: StoredAnswer[];
   submitted_at: Date;
+  country?: string; // Optional ISO-3166-1 alpha-2 country code for tie-breaking
 }
 
 /** A match result returned by the matching strategy */

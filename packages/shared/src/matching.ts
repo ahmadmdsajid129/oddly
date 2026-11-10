@@ -45,13 +45,87 @@ export interface MatchingStrategy {
 }
 
 // ---------------------------------------------------------------------------
+// Deterministic Tie-Breaking (R1-PATCH Item 1)
+// ---------------------------------------------------------------------------
+
+/**
+ * Deterministic pseudo-random score seeded by drop_id and both player IDs.
+ * Uses 32-bit FNV-1a hash over sorted player IDs so the score is symmetric
+ * and completely independent of submission order or timestamps.
+ */
+export function deterministicPairHash(
+  dropId: string,
+  playerAId: string,
+  playerBId: string
+): number {
+  // Sort player IDs so (A, B) and (B, A) generate the exact same hash
+  const [p1, p2] = [playerAId, playerBId].sort();
+  const seedStr = `${dropId}:${p1}:${p2}`;
+
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seedStr.length; i++) {
+    h ^= seedStr.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/**
+ * Compares whether candidate A is strictly preferred over candidate B for a target submission.
+ * Rules (R1-PATCH Item 1):
+ * 1. Higher similarity score wins.
+ * 2. If equal similarity: prefer a DIFFERENT country first (if country info is available).
+ * 3. If country preference is equal: deterministic pseudo-random choice seeded by drop date/id and both user ids.
+ * 4. Final tie-break on lexical submission_id.
+ * NEVER by earliest submitted_at or arrival order.
+ */
+export function isCandidatePreferred(
+  target: SubmissionForMatching,
+  candidateA: SubmissionForMatching,
+  scoreA: number,
+  candidateB: SubmissionForMatching,
+  scoreB: number
+): boolean {
+  if (scoreA !== scoreB) {
+    return scoreA > scoreB;
+  }
+
+  // 1. Equal similarity: prefer different country first
+  const targetCountry = target.country?.trim().toUpperCase();
+  const countryA = candidateA.country?.trim().toUpperCase();
+  const countryB = candidateB.country?.trim().toUpperCase();
+
+  if (targetCountry && countryA && countryB) {
+    const aDiff = countryA !== targetCountry;
+    const bDiff = countryB !== targetCountry;
+    if (aDiff && !bDiff) return true;
+    if (!aDiff && bDiff) return false;
+  } else if (targetCountry) {
+    const aDiff = Boolean(countryA && countryA !== targetCountry);
+    const bDiff = Boolean(countryB && countryB !== targetCountry);
+    if (aDiff && !bDiff) return true;
+    if (!aDiff && bDiff) return false;
+  }
+
+  // 2. Deterministic pseudo-random choice seeded by drop date / id and both user IDs
+  const dropKey = target.drop_id;
+  const hashA = deterministicPairHash(dropKey, target.player_id, candidateA.player_id);
+  const hashB = deterministicPairHash(dropKey, target.player_id, candidateB.player_id);
+
+  if (hashA !== hashB) {
+    return hashA > hashB;
+  }
+
+  // 3. Final deterministic lexical fallback on submission_id
+  return candidateA.submission_id.localeCompare(candidateB.submission_id) < 0;
+}
+
+// ---------------------------------------------------------------------------
 // BruteForceMatchingStrategy
 // ---------------------------------------------------------------------------
 
 /**
- * O(n) linear scan: compare every candidate, pick highest similarity.
- * Tie-break: earlier submission_at wins (more committed player).
- *
+ * Evaluates candidate submission against all submissions in the drop.
  * Complexity: O(n × Q) where Q = 5 questions.
  * At 10k DAU: ~50k comparisons per player → < 10ms in JS.
  */
@@ -83,13 +157,8 @@ export class BruteForceMatchingStrategy implements MatchingStrategy {
       );
 
       if (
-        score > bestScore ||
-        // Tie-break: pick earlier submission (more committed)
-        (score === bestScore &&
-          bestCandidate !== null &&
-          (candidate.submitted_at < bestCandidate.submitted_at ||
-            (candidate.submitted_at.getTime() === bestCandidate.submitted_at.getTime() &&
-              candidate.submission_id.localeCompare(bestCandidate.submission_id) < 0)))
+        bestCandidate === null ||
+        isCandidatePreferred(submission, candidate, score, bestCandidate, bestScore)
       ) {
         bestScore = score;
         bestCandidate = candidate;
@@ -241,10 +310,13 @@ export function selectBoundedCandidates(
     }
   }
 
-  // 4. Fallback: if zero high-similarity candidates matched, sample from pool up to maxCandidates
-  if (selectedCandidates.length === 0) {
-    for (let i = 0; i < Math.min(validPool.length, maxCandidates); i++) {
-      selectedCandidates.push(validPool[i]);
+  // 4. Fallback (R1-PATCH Item 2a):
+  // When buckets give no candidate or fewer than maxCandidates, or to guarantee
+  // early-day twins (2 of 5, 1 of 5) are found, fill remaining quota up to maxCandidates from the pool.
+  if (selectedCandidates.length < maxCandidates) {
+    for (const c of validPool) {
+      addCandidate(c);
+      if (selectedCandidates.length >= maxCandidates) break;
     }
   }
 
@@ -252,9 +324,9 @@ export function selectBoundedCandidates(
 }
 
 /**
- * Bounded Hash-Bucket Matching Strategy (R1.2)
+ * Bounded Hash-Bucket Matching Strategy (R1.2 / R1-PATCH)
  * Caps candidate comparisons to maxCandidates (default 2000) while selecting
- * candidates via 5-, 4-of-5, and 3-of-5 answer-hash buckets.
+ * candidates via 5-, 4-of-5, and 3-of-5 answer-hash buckets, with bounded scan fallback.
  */
 export class BoundedHashBucketMatchingStrategy implements MatchingStrategy {
   private maxCandidates: number;
@@ -289,16 +361,43 @@ export class BoundedHashBucketMatchingStrategy implements MatchingStrategy {
       );
 
       if (
-        score > bestScore ||
-        // Deterministic tie-break: earlier submitted_at, then lexical submission_id
-        (score === bestScore &&
-          bestCandidate !== null &&
-          (candidate.submitted_at < bestCandidate.submitted_at ||
-            (candidate.submitted_at.getTime() === bestCandidate.submitted_at.getTime() &&
-              candidate.submission_id.localeCompare(bestCandidate.submission_id) < 0)))
+        bestCandidate === null ||
+        isCandidatePreferred(submission, candidate, score, bestCandidate, bestScore)
       ) {
         bestScore = score;
         bestCandidate = candidate;
+      }
+    }
+
+    // Fallback: if best candidate shares fewer than 3 of 5 (score < 0.6) and
+    // the pool has more un-scanned candidates, perform a bounded scan across the pool (R1-PATCH 2a)
+    if (bestScore < 0.6 && boundedCandidates.length < pool.length - 1) {
+      const remainingQuota = this.maxCandidates;
+      let count = 0;
+      for (const candidate of pool) {
+        if (
+          candidate.player_id === submission.player_id ||
+          candidate.submission_id === submission.submission_id
+        ) {
+          continue;
+        }
+
+        const score = submissionSimilarity(
+          submission.answers,
+          candidate.answers,
+          optionMap
+        );
+
+        if (
+          bestCandidate === null ||
+          isCandidatePreferred(submission, candidate, score, bestCandidate, bestScore)
+        ) {
+          bestScore = score;
+          bestCandidate = candidate;
+        }
+
+        count++;
+        if (count >= remainingQuota) break;
       }
     }
 

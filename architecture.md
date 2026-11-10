@@ -179,6 +179,16 @@ Cloudflare sits in front of all services. Over 95% of requests never reach the o
 | `/v1/reports` | POST | 4 s | 10/min/IP | No-store | None | Medium | Queued in BullMQ |
 | `/admin/*` | ALL | 10 s | 120/min/IP | No-store | None | Low | Block writes at L2/L3 |
 
+### 7.2 Layered Rate Limiting and Indian CGNAT Cellular Architecture (R1-PATCH Item 5)
+
+Rate limiting is structured in two distinct layers:
+
+1. **Primary Rate Limit (Device ID + IP):** Keyed by `${deviceId}:${req.ip}` via `@fastify/rate-limit` (120 req/min general, 30 req/min on `POST /v1/submissions`). In production mode, localhost is never bypassed.
+2. **Coarse IP-Only Ceiling:** Configured at 600 req/min default (read from `app_config` / `IP_RATE_LIMIT_PER_MINUTE`), tracked via Redis atomic counters with 60-second windows.
+
+**Why the High IP-Only Ceiling is Mandatory:**  
+In India, major mobile carriers (Reliance Jio, Bharti Airtel, Vodafone Idea) extensively deploy Carrier-Grade NAT (CGNAT) (RFC 6598, `100.64.0.0/10`). Under CGNAT, a single public IPv4 gateway address is shared simultaneously among thousands of mobile devices connected to the same regional cellular base station. Because the 07:00 IST Drop is synchronized across the country, thousands of distinct players in the same city or university campus will originate requests from the exact same public IP within minutes. Enforcing a low IP-only limit (e.g. 60–120 req/min) would cause massive false-positive lockouts for legitimate players. Keying on `${deviceId}:${req.ip}` ensures per-device isolation, while the 600 req/min IP ceiling provides coarse origin protection against volumetric DDoS floods and scraper farms.
+
 ---
 
 ## 8. Data Layer & Multi-Role Redis

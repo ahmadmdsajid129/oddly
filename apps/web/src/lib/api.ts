@@ -38,20 +38,40 @@ export const api = {
     getMe: () => rawClient.getMe(),
   },
   submissions: {
-    create: (data: {
-      drop_id: string;
-      answers: AnswerPayload[];
-      duration_ms?: number;
-      request_id: string;
-      player_id?: string;
-    }) =>
-      rawClient.submitAnswers({
-        drop_id: data.drop_id,
-        player_id: data.player_id || "guest",
-        request_id: data.request_id,
-        timing_ms: data.duration_ms ?? 30000,
-        answers: data.answers,
-      }),
+    create: async (
+      data: {
+        drop_id: string;
+        answers: AnswerPayload[];
+        duration_ms?: number;
+        request_id: string;
+        player_id?: string;
+      },
+      maxRetries = 2
+    ): Promise<Awaited<ReturnType<typeof rawClient.submitAnswers>>> => {
+      let attempt = 0;
+      while (true) {
+        try {
+          return await rawClient.submitAnswers({
+            drop_id: data.drop_id,
+            player_id: data.player_id || "guest",
+            request_id: data.request_id,
+            timing_ms: data.duration_ms ?? 30000,
+            answers: data.answers,
+          });
+        } catch (err: unknown) {
+          const error = err as { status?: number; statusCode?: number; error?: string };
+          const status = error?.status || error?.statusCode;
+          // Handle 409 CONCURRENT_REQUEST by waiting briefly with jitter and replaying with same request_id (R1-PATCH Item 4)
+          if ((status === 409 || error?.error === "CONCURRENT_REQUEST") && attempt < maxRetries) {
+            attempt++;
+            const jitterMs = 500 + Math.floor(Math.random() * 500);
+            await new Promise((resolve) => setTimeout(resolve, jitterMs));
+            continue;
+          }
+          throw err;
+        }
+      }
+    },
   },
   results: {
     get: (dropId: string) => rawClient.getResults(dropId),

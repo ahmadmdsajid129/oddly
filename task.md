@@ -13,12 +13,12 @@
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
 | **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
-| **Current Active Stage**        | **Stage R1 Complete (Reliability Remediation Wave 1 Hardening Verified)**       |
+| **Current Active Stage**        | **Stage R1-PATCH Complete (Verification & Reliability Remediation Hardened)**    |
 | **Total Tasks Tracked**         | 217 tasks                                                                        |
-| **Completed Tasks (`DONE`)**    | 131 tasks (Proven by code & automated failure tests)                             |
+| **Completed Tasks (`DONE`)**    | 130 tasks (Proven by code & automated failure tests)                             |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 86 tasks                                                                         |
+| **Pending (`TODO`)**            | 87 tasks                                                                         |
 
 ---
 
@@ -35,7 +35,7 @@
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 8 & Stage 0.5   |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#########-] 87%` | 13 / 15            | Stage 9 & Stage R1    |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[########--] 80%` | 12 / 15            | Stage 9 & Stage R1    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | PARTIAL   | `[#########-] 91%` | 10 / 11            | Stage 10 & Stage 0.5  |
 | **Phase 11** | Admin Question Tool & Dynamic Importer      | High     | TODO      | `[----------] 0%`  | 0 / 12             | Stage 11              |
 | **Phase 12** | Observability, Telemetry & Security         | High     | TODO      | `[----------] 0%`  | 0 / 11             | Stage 12              |
@@ -272,7 +272,7 @@ _Status: PARTIAL | Target: Staging, live window, final recap batch, S9 Recap scr
 | `[x] P9.01` | Configure BullMQ scheduler registering daily crons for 06:30 staging, 07:00 open, and close | Critical | DONE   | P0.06       | Agent | 2026-11-09  | Core daily clock orchestration  |
 | `[x] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | Critical | DONE   | P9.01, P3.03| Agent | 2026-11-10  | Live pre-caching, warming cache:drop:{date}:pre_cache (R1.1) |
 | `[x] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | Critical | DONE   | P9.01       | Agent | 2026-11-10  | Redis leader-locked transition, harmless double-fire idempotency (R1.1) |
-| `[x] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | DONE   | P3.06       | Agent | 2026-11-10  | Real BullMQ worker with concurrency 2 & candidate sweeps (R1.1) |
+| `[ ] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | TODO   | P3.06       | Agent | —           | True status: processPipelineJob passes empty candidate array; needs live DB sweep query (R1-PATCH Item 7) |
 | `[x] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | Critical | DONE   | P9.01       | Agent | 2026-11-10  | DB drop closure, status: closed, freezes distributions (R1.1) |
 | `[x] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | Critical | DONE   | P9.05, P2.05| Agent | 2026-11-10  | Chunked cursor pagination (5,000/batch), tracks in batch_runs (R1.1) |
 | `[x] P9.07` | Build S9 Morning Recap Screen displaying locked twin, final oddness, and world stats        | Critical | DONE   | P9.06       | Agent | 2026-11-09  | Daily recap experience          |

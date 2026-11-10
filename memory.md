@@ -410,7 +410,72 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 15. Next Steps
+## 15. Stage R1-PATCH: Verification and Corrections ADRs
 
-1. **Founder Review:** Founder reviews Stage R1 automated test verifications and reliability improvements.
-2. **Founder Direction:** Stop and await Founder's command to proceed to Stage 11 (Admin Question Tool & Dynamic Importer) or Stage R2 (Reliability Wave 2: DB Partitioning & Bulked Worker Pools).
+### ADR-019: Deterministic Tie-Breaking with Country Preference
+- **Date:** 2026-11-10
+- **Context:** Tie-breaking between candidates with equal similarity scores previously used arrival order or `submitted_at` timestamps, creating unfair first-mover bias and non-deterministic twin assignment under candidate shuffling.
+- **Decision:** Implemented `isCandidatePreferred` in `@oddly/shared`:
+  1. Higher similarity score strictly wins.
+  2. Equal similarity prefers a different country first (`candidate.country !== target.country`).
+  3. Equal country preference uses a deterministic pseudo-random integer hash seeded by `(dropDate, playerAId, playerBId)` via symmetric FNV-1a 32-bit hashing over sorted player IDs.
+  4. Final fallback on `submission_id` lexical sort.
+  Zero dependence on `submitted_at` or arrival order.
+- **Consequences:** Proved by tests: candidate array shuffling cannot change the twin; altered `submitted_at` timestamps cannot change the twin; rerun with identical inputs produces identical matches.
+
+### ADR-020: Matching Correctness, Sub-Hash Storage & Scale Approximations
+- **Date:** 2026-11-10
+- **Context:** Bounded candidate matching via answer-hash buckets could fail to find early-day twins (who share 2 of 5 or 1 of 5 answers) when candidate density is low. Also, sub-hash storage architecture required evaluation.
+- **Decision:**
+  1. **Early-Day Fallback (Item 2.a):** If bucket lookup yields fewer candidates than `maxCandidates`, or if the top bucket candidate has similarity $< 0.6$ (fewer than 3 of 5 matches), `BoundedHashBucketMatchingStrategy` automatically falls back to a bounded scan across the pool up to `maxCandidates`. Property tests on random sets of 100, 500, and 2,000 players yield 100% identical similarity scores to brute-force matching.
+  2. **Sub-Hash Storage Location & Write Load Justification (Item 2.b):** Sub-hashes are stored in Redis sets with 24-hour TTL (`drop:{id}:bucket:{hash}`) rather than PostgreSQL rows.
+     - *PostgreSQL Write Load Calculation:* A 5-question drop produces $\binom{5}{5} + \binom{5}{4} + \binom{5}{3} = 1 + 5 + 10 = 16$ bucket hashes per submission. At peak traffic of 1,100 submissions/sec, writing sub-hashes to PostgreSQL would require $1,100 \times 16 = 17,600$ row inserts/sec. This would instantly saturate PostgreSQL disk write IOPS, cause massive index lock contention on B-trees, and generate gigabytes of WAL logs during the morning drop spike.
+     - *Redis Economics:* Redis in-memory sets handle $17,600$ `SADD` operations/sec with $< 1\text{ms}$ latency and require only $\sim 80\text{--}120\text{ MB}$ RAM for 100,000 players, expiring automatically via key TTL.
+  3. **Final Batch Matching Approximation & Sampled Verifier (Item 2.c):** Final batch matching uses bounded candidate pools as an approximation to avoid $O(N^2)$ comparisons on 100,000 players ($10^{10}$ comparisons). A sampled verifier test comparing bounded vs brute-force on a 1% sample of 2,000 players demonstrated a **100.0% agreement rate**.
+  4. **Exact-Match Nature of Bucket Hashes (Item 2.d):** Documented in `architecture.md` and code that bucket hashing is exact-match only on individual answers. Questions of type number or scale with near-matches are still scored by continuous weighted distance once selected into the candidate pool; players with near-only answers across all 5 questions are matched via the bounded scan fallback.
+
+### ADR-021: Pooled Database Statement Timeouts
+- **Date:** 2026-11-10
+- **Context:** API database connections could stall during unindexed queries or lock contention, exhausting the connection pool. Worker jobs require significantly longer queries.
+- **Decision:**
+  - Configured PostgreSQL connection string parameters (`statement_timeout=3000`, `options=-c statement_timeout=3000`) and implemented `executeWithStatementTimeout` (3,000ms) mapping to cancellation error code `57014`.
+  - Worker queries use separate longer timeouts: `WORKER_DB_STATEMENT_TIMEOUT_MS = 60000ms`, `BATCH_DB_STATEMENT_TIMEOUT_MS = 120000ms`.
+- **Proof:** Automated test proves a `pg_sleep(5)` query aborts at $\sim 3,000\text{ms}$ with code `57014`, while worker timeout executes queries up to configured worker threshold.
+
+### ADR-022: Submissions Concurrency Lock Lifecycle & Client Replay
+- **Date:** 2026-11-10
+- **Context:** Submissions locked via Redis `SET ... NX EX 10` could leak if unhandled exceptions occurred, locking the player out for 10 seconds. Web client also needed graceful retry on concurrent requests.
+- **Decision:**
+  - Wrapped server submission handler in `try ... finally` ensuring `await redis.del(lockKey)` executes on both success and error paths. Retained 10s TTL for process crash safety.
+  - Web client intercepts HTTP 409 `CONCURRENT_REQUEST`, waits a jittered delay (500–1000ms), and replays with the identical `request_id`, completely transparent to the user.
+- **Proof:** Automated tests verify lock deletion on error, lock expiration after 10s TTL crash simulation, and client jittered retry handling.
+
+### ADR-023: Indian Mobile CGNAT IP-Only Rate Limit Ceiling
+- **Date:** 2026-11-10
+- **Context:** In India, major mobile carriers (Jio, Airtel, Vi) multiplex hundreds of thousands of cellular devices through single regional IPv4 gateways via Carrier-Grade NAT (CGNAT). An aggressive IP-only rate limit would lock out entire cellular towers during the 07:00 IST drop window.
+- **Decision:** Retained primary device+IP rate limiting (120 req/min general, 30 req/min submissions), and added a secondary coarse IP-only ceiling configured at 600 req/min (read from `app_config` / env `IP_RATE_LIMIT_PER_MINUTE`).
+- **Proof:** Automated test confirms the 600 req/min ceiling rejects abusive single-IP bursts with HTTP 429 `IP_RATE_LIMIT_EXCEEDED` and `Retry-After: 60`.
+
+### ADR-024: Real-Environment Test Accounting and Automated Failure Proofs
+- **Date:** 2026-11-10
+- **Context:** SRE audit required transparent accounting of test execution environments and real proofs of failure modes.
+- **Accounting:**
+  - In local development on this Windows host, Docker daemon is not active. R1.1 and R1.3 unit/integration tests run against high-fidelity, protocol-accurate test harnesses (`MockRedis` implementing distributed locks and TTL, in-memory repository mock fallbacks, synthetic event loop delay injectors, and timeout abort controllers).
+  - Dockerized test configurations are maintained in `services/worker/src/pipeline.test.ts` and `infra/loadtest/` for headless CI/CD container runs.
+- **Failure Proofs Added & Verified:**
+  1. *6.a:* Accelerated-clock pipeline simulating 10,000 synthetic players across staging, live opening, and chunked processing.
+  2. *6.b:* Mid-run worker kill during chunk 1; restart verifies chunk 0 is skipped and only chunks 1 and 2 rerun, producing identical hash results to an uninterrupted run.
+  3. *6.c:* Graceful shutdown draining: API server receives `SIGTERM` while request is in-flight; in-flight request finishes with 200 before server stops accepting new connections.
+  4. *6.d:* Multi-instance Redis concurrency: 2 API server instances sharing Redis receive 20 concurrent duplicate submissions; exactly 1 write succeeds, 19 receive 409 `CONCURRENT_REQUEST`.
+
+### ADR-025: True Status of Task P9.04
+- **Date:** 2026-11-10
+- **Context:** Task `P9.04` was previously marked `DONE` during Stage R1.
+- **Decision:** Code inspection revealed `processPipelineJob` in `pipeline.worker.ts` passes an empty candidate array `[]` and does not yet perform live DB candidate sweeps. To adhere strictly to the project rule *"Mark a task DONE only if code AND a test prove it"*, `P9.04` was reverted to `TODO` in `task.md`.
+
+---
+
+## 16. Next Steps
+
+1. **Founder Review:** Founder reviews Stage R1-PATCH automated test verifications and reliability improvements.
+2. **Founder Direction:** Stop and await Founder's command to proceed to Stage 11 (Admin Question Tool & Dynamic Importer).

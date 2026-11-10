@@ -19,6 +19,7 @@ import {
   getAllPendingSubmissions,
 } from "./lib/play-state";
 import { queryRetryPolicy, queryRetryDelayPolicy } from "./components/providers/QueryProvider";
+import { api, rawClient } from "./lib/api";
 import { AnswerPayloadSchema } from "@oddly/shared";
 import type { AnswerPayload } from "@oddly/shared";
 
@@ -268,6 +269,41 @@ describe("Stage 4: Play Flow State and Offline Caching", () => {
         expect(delay).toBeGreaterThanOrEqual(base * 0.5);
         expect(delay).toBeLessThanOrEqual(base);
       }
+    });
+
+    it("handles 409 CONCURRENT_REQUEST by replaying with jitter and same request_id (R1-PATCH Item 4)", async () => {
+      const targetRequestId = "test-concurrent-retry-id-12345";
+      let calls = 0;
+
+      vi.spyOn(rawClient, "submitAnswers").mockImplementation(async (payload) => {
+        calls++;
+        expect(payload.request_id).toBe(targetRequestId);
+        if (calls === 1) {
+          const err = new Error("Conflict");
+          (err as any).status = 409;
+          (err as any).error = "CONCURRENT_REQUEST";
+          throw err;
+        }
+        return {
+          ok: true,
+          status: "accepted",
+          submission_id: "sub-recovered-123",
+          oddness: { raw_score: 0.8, percentile: 85, tier: "Rare" },
+          match: null,
+        } as any;
+      });
+
+      const res = await api.submissions.create({
+        drop_id: "00000000-0000-0000-0000-000000000001",
+        answers: [],
+        request_id: targetRequestId,
+      });
+
+      expect(calls).toBe(2);
+      expect(res.ok).toBe(true);
+      expect(res.submission_id).toBe("sub-recovered-123");
+
+      vi.restoreAllMocks();
     });
   });
 });

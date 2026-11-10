@@ -151,6 +151,8 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         return;
       }
 
+      try {
+
       // 2. Verify drop exists and is currently accepting submissions
       const drop = await DropsRepository.getDropById(drop_id);
       if (!drop) {
@@ -324,23 +326,33 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      return {
-        ok: true,
-        status: "accepted",
-        submission_id: submission.id,
-        oddness: {
-          raw_score: rawScore,
-          percentile: pct,
-          tier,
-        },
-        match: twinToken
-          ? {
-              twin_token: twinToken,
-              similarity_score: similarityScore,
-              is_provisional: true,
-            }
-          : null,
-      };
+        return {
+          ok: true,
+          status: "accepted",
+          submission_id: submission.id,
+          oddness: {
+            raw_score: rawScore,
+            percentile: pct,
+            tier,
+          },
+          match: twinToken
+            ? {
+                twin_token: twinToken,
+                similarity_score: similarityScore,
+                is_provisional: true,
+              }
+            : null,
+        };
+      } finally {
+        // Release lock on both success and failure (R1-PATCH Item 4)
+        if (lockAcquired) {
+          try {
+            await redis.del(lockKey);
+          } catch {
+            // Non-blocking fallback: lock automatically expires by 10s TTL
+          }
+        }
+      }
     }
   );
 };
