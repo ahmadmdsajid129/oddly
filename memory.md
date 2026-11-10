@@ -17,21 +17,16 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 ## 2. Current State
 
 - **What works now:**
-  - Stage 0, Stage 0.5, Stage 1, Stage 2, Stage 3, Stage 4, Stage 5, Stage 6, Stage 7, and Stage 8 are fully verified with 171 automated tests passing across the monorepo (`pnpm turbo run test`, `pnpm turbo run typecheck`, `pnpm turbo run lint`).
-  - **Stage 0.5 Architecture Hardening is 100% COMPLETE:**
+  - Functional features across Stages 0, 1, 2, 3, 4, 5, 6, 7, 8, and 10 have working code passing 171 automated tests across the monorepo (`pnpm turbo run test`, `pnpm turbo run typecheck`, `pnpm turbo run lint`).
+  - **Stage 0.5 Architecture & Reliability Hardening is COMPLETE (Documentation & Configuration):**
     - Authored 8 authoritative operational documents under `docs/`: `scaling-plan.md`, `capacity-model.md`, `slo.md`, `failure-modes.md`, `load-testing.md`, `runbook.md`, `degradation-playbook.md`, `disaster-recovery.md`.
-    - Hardened `.gitignore` and all `.env.example` templates across root, `apps/web`, `services/api`, and `services/worker` with Section 16.7 variables. Confirmed zero `.env` files are tracked.
-    - Created placeholder infrastructure directories `infra/loadtest/` and `infra/terraform/` with README guides.
-    - Hardened `architecture.md` (reliability promise, SLOs, capacity summary, 15 principles, T0–T4 tiers, edge caching, route policies, partitioned data model, degradation ladder, failure modes, ADRs).
-    - Hardened `product.md` (reliability promises, degraded UI copy L1–L4, success metrics, risks).
-    - Hardened `rules.md` (15 reliability & scale rules, error matrix with 503/202/429, extended DoD).
-    - Hardened `design.md` (Section 13 resilience specifications, degraded banners, pending screens, countdowns, performance budgets).
-    - Hardened `task.md` (added 52 scale tasks, added Phase 16 Scale Readiness Gate; 217 total tasks, 130 complete = 60%).
-    - Hardened `README.md` (Reliability and Scale section with SLOs, tier summary table, and documentation links).
-- **What is half-done:**
-  - Nothing. Stage 0.5 is 100% complete.
+    - Authored authoritative `docs/reliability-gap-audit.md` performing a read-only audit of all code against the Scale and Reliability Addendum.
+    - Reconciled `task.md` with codebase reality: 123 tasks truly completed (57%), 94 pending (`TODO`). Reverted 7 tasks (`P1.19`, `P3.09`, `P9.02`, `P9.03`, `P9.04`, `P9.05`, `P9.06`) from `DONE` to `TODO` because they were stubs or lacked automated test coverage.
+  - **What is half-done / Gaps identified:**
+    - Stage 9 worker execution: BullMQ daily pipeline jobs are defined, but worker processors (`stageDrop`, `openDrop`, `closureWorker`) are stubs and uninstantiated in `services/worker/src/index.ts`.
+    - Scale & Resilience code: Timeouts, circuit breakers, load shedding (`under-pressure`), partitioned tables, Redis role separation, candidate pool bounding ($\le 2,000$), and degradation wiring do not yet exist in code.
 - **What is next:**
-  - Await Founder instruction ("proceed to Stage 1" or review comments).
+  - Await Founder review of `docs/reliability-gap-audit.md` and explicit approval before any code changes.
 
 
 ---
@@ -145,6 +140,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 | `2026-11-08` | Stage 7 | Implemented JWT auth, rotating refresh cookies, Google OAuth, guest submission merging, Login modal/sheet, and Turnstile bot protection | `services/api/src/routes/auth.ts`, `apps/web/src/components/auth/LoginModal.tsx` | Phase 7: Guest persistence & authentication (`P7.01`–`P7.09`) |
 | `2026-11-09` | Stage 8 | Implemented BullMQ daily 07:00 IST drop job, final batch scoring pipeline, Web Push notification delivery, and PWA manifest | `services/worker/src/*`, `apps/web/src/lib/push.ts` | Phase 8: Daily pipeline & push notifications (`P8.01`–`P8.09`) |
 | `2026-11-09` | Stage 0.5 | Authored 8 authoritative operational docs (`docs/`), hardened `.env.example`, `.gitignore`, `architecture.md`, `product.md`, `rules.md`, `design.md`, `README.md`, `memory.md`, and added Phase 16 Scale Readiness Gate (`task.md`) | Root specs, `docs/*`, `infra/loadtest/`, `infra/terraform/` | Master Build Prompt Addendum for 10 lakh DAU scale and reliability |
+| `2026-11-10` | Audit     | Conducted Read-Only Reliability Gap Audit (`docs/reliability-gap-audit.md`); reconciled task.md (123 truly done out of 217) | `docs/reliability-gap-audit.md`, `task.md`, `memory.md` | Verification of codebase against Scale & Reliability Addendum |
 
 ---
 
@@ -371,5 +367,5 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ## 14. Next Steps
 
-1. **Founder Review:** Await Founder review of the 8 new operational documents in `docs/` and the hardened architectural specifications.
-2. **Founder Instruction:** Stop and await the Founder command: `"proceed to Stage 1"` (or review guidance) before writing any feature code.
+1. **Founder Review:** Founder reviews `docs/reliability-gap-audit.md`, the reconciled `task.md`, and the 10 highest-risk reliability gaps.
+2. **Founder Direction:** Stop and wait for Founder's explicit approval and instruction regarding whether to remediate reliability gaps first or proceed with the scheduled feature sequence. Zero code changes will be made until approved.

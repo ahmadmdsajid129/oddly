@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
-| **Current Active Stage**        | **Stage 0.5 Complete (Scale and Reliability Architecture Hardening)**             |
+| **Overall Project Progress**    | `[███████████░░░░░░░░░] 57%`                                                     |
+| **Current Active Stage**        | **Stage 0.5 (Reliability Gap Audit & Architecture Hardening Complete)**          |
 | **Total Tasks Tracked**         | 217 tasks                                                                        |
-| **Completed Tasks (`DONE`)**    | 130 tasks                                                                        |
+| **Completed Tasks (`DONE`)**    | 123 tasks (Reconciled with reality)                                              |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 87 tasks                                                                         |
+| **Pending (`TODO`)**            | 94 tasks                                                                         |
 
 ---
 
@@ -27,15 +27,15 @@
 | Phase        | Phase Name                                  | Priority | Status    | Progress Bar       | Tasks (Done/Total) | Stage That Builds It  |
 | ------------ | ------------------------------------------- | -------- | --------- | ------------------ | ------------------ | --------------------- |
 | **Phase 0**  | Documentation & Skeleton Initialisation     | Critical | COMPLETE  | `[##########] 100%`| 17 / 17            | Stage 0 & Stage 0.5   |
-| **Phase 1**  | Design System & UI Kit                      | High     | PARTIAL   | `[########--] 83%` | 19 / 23            | Stage 1 & Stage 0.5   |
+| **Phase 1**  | Design System & UI Kit                      | High     | PARTIAL   | `[########--] 78%` | 18 / 23            | Stage 1 & Stage 0.5   |
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | PARTIAL   | `[#######---] 71%` | 12 / 17            | Stage 2 & Stage 0.5   |
-| **Phase 3**  | Fastify REST API Core                       | Critical | PARTIAL   | `[#######---] 75%` | 12 / 16            | Stage 3 & Stage 0.5   |
+| **Phase 3**  | Fastify REST API Core                       | Critical | PARTIAL   | `[#######---] 69%` | 11 / 16            | Stage 3 & Stage 0.5   |
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | PARTIAL   | `[#######---] 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 8 & Stage 0.5   |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#######---] 73%` | 11 / 15            | Stage 9 & Stage 0.5   |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[####------] 40%` | 6 / 15             | Stage 9 & Stage 0.5   |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | PARTIAL   | `[#########-] 91%` | 10 / 11            | Stage 10 & Stage 0.5  |
 | **Phase 11** | Admin Question Tool & Dynamic Importer      | High     | TODO      | `[----------] 0%`  | 0 / 12             | Stage 11              |
 | **Phase 12** | Observability, Telemetry & Security         | High     | TODO      | `[----------] 0%`  | 0 / 11             | Stage 12              |
@@ -98,7 +98,7 @@ _Status: PARTIAL | Target: Token foundation, accessible UI primitives, 28 custom
 | `[x] P1.16` | Build `ThemeProvider` and theme toggle supporting System, Dark, and Light modes             | Medium   | DONE   | P1.01       | Agent | 2026-11-07  | Theme management system         |
 | `[x] P1.17` | Create visual design showcase page at `apps/web/src/app/design/page.tsx`                    | High     | DONE   | P1.03-P1.16 | Agent | 2026-11-07  | Component verification gallery  |
 | `[x] P1.18` | Implement haptic vibration and sound effect hooks with user preference toggles              | Low      | DONE   | P1.03       | Agent | 2026-11-07  | Sensory feedback system         |
-| `[x] P1.19` | Run automated accessibility audit with `@axe-core/playwright` on all UI components          | High     | DONE   | P1.17       | Agent | 2026-11-07  | Zero WCAG AA violations         |
+| `[ ] P1.19` | Run automated accessibility audit with `@axe-core/playwright` on all UI components          | High     | TODO   | P1.17       | Agent | —           | Reconciled: missing axe package & test spec |
 | `[ ] P1.20` | Build status banner component for degradation levels L1–L4 with dynamic copy                | High     | TODO   | P1.01       | Agent | —           | Degradation UI (Section 17.4)   |
 | `[ ] P1.21` | Build "Saved. Finding your twin..." pending screen for Mode B with reduced-motion support   | High     | TODO   | P1.01       | Agent | —           | Async pending screen (17.4)     |
 | `[ ] P1.22` | Build stale-data freshness labels and 429/503 friendly overload screens with countdown      | Medium   | TODO   | P1.01       | Agent | —           | Overload feedback screens       |
@@ -146,7 +146,7 @@ _Status: PARTIAL | Target: REST routes, Swagger docs, guest identity, load shedd
 | `[x] P3.06` | Implement instant Stage A provisional twin calculation over Redis answer vectors            | Critical | DONE   | P3.05       | Agent | 2026-11-08  | Real-time matching engine       |
 | `[x] P3.07` | Implement `GET /v1/results/:dropId` returning provisional twin and oddness percentile       | Critical | DONE   | P3.06       | Agent | 2026-11-08  | Player result retrieval         |
 | `[x] P3.08` | Implement `GET /v1/content/:locale` dynamic copy endpoint with content-hash cache header    | High     | DONE   | P2.01, P3.02| Agent | 2026-11-08  | Dynamic UI copy delivery        |
-| `[x] P3.09` | Implement `@fastify/rate-limit` with Redis store (120 req/min general, 30 req/min submit)  | High     | DONE   | P3.01       | Agent | 2026-11-08  | Abuse defense layer             |
+| `[ ] P3.09` | Implement `@fastify/rate-limit` with Redis store (120 req/min general, 30 req/min submit)  | High     | TODO   | P3.01       | Agent | —           | Reconciled: in-memory only; needs Redis & submit limit |
 | `[x] P3.10` | Implement Cloudflare Turnstile token validation plugin for anti-bot protection              | High     | DONE   | P3.01       | Agent | 2026-11-08  | Bot challenge verification      |
 | `[x] P3.11` | Configure `@fastify/swagger` and `@fastify/swagger-ui` serving OpenAPI docs at `/docs`      | Medium   | DONE   | P3.02       | Agent | 2026-11-08  | Automated API documentation     |
 | `[x] P3.12` | Implement typed API client in `packages/api-client` wrapping all `/v1` endpoints            | High     | DONE   | P3.03-P3.08 | Agent | 2026-11-08  | Universal typed client library  |
@@ -270,11 +270,11 @@ _Status: PARTIAL | Target: Staging, live window, final recap batch, S9 Recap scr
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P9.01` | Configure BullMQ scheduler registering daily crons for 06:30 staging, 07:00 open, and close | Critical | DONE   | P0.06       | Agent | 2026-11-09  | Core daily clock orchestration  |
-| `[x] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | Critical | DONE   | P9.01, P3.03| Agent | 2026-11-09  | Pre-stage cache warmer          |
-| `[x] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | Critical | DONE   | P9.01       | Agent | 2026-11-09  | Drop release worker             |
-| `[x] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | DONE   | P3.06       | Agent | 2026-11-09  | Background match refiner        |
-| `[x] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | Critical | DONE   | P9.01       | Agent | 2026-11-09  | Drop closure enforcement        |
-| `[x] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | Critical | DONE   | P9.05, P2.05| Agent | 2026-11-09  | Final match computation engine  |
+| `[ ] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | Critical | TODO   | P9.01, P3.03| Agent | —           | Reconciled: stub only; needs live Redis warming |
+| `[ ] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | Critical | TODO   | P9.01       | Agent | —           | Reconciled: stub only; needs live DB transition |
+| `[ ] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | TODO   | P3.06       | Agent | —           | Reconciled: uninstantiated in worker runtime    |
+| `[ ] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | Critical | TODO   | P9.01       | Agent | —           | Reconciled: needs DB drop closure worker        |
+| `[ ] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | Critical | TODO   | P9.05, P2.05| Agent | —           | Reconciled: needs live chunked DB execution     |
 | `[x] P9.07` | Build S9 Morning Recap Screen displaying locked twin, final oddness, and world stats        | Critical | DONE   | P9.06       | Agent | 2026-11-09  | Daily recap experience          |
 | `[x] P9.08` | Implement `GET /v1/world/:dropId` endpoint returning aggregated drop stats                  | High     | DONE   | P9.06       | Agent | 2026-11-09  | Global drop statistics          |
 | `[x] P9.09` | Implement `CLOCK_ACCELERATION=true` staging mode compressing 24-hour cycle to 10 minutes    | High     | DONE   | P9.01-P9.06 | Agent | 2026-11-09  | Accelerated testing harness     |
@@ -488,3 +488,4 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 | `2026-11-09` | Stage 9 Complete          | Built BullMQ daily pipeline, stageDrop, openDrop, closure, and final recap matching worker.                   | Stage 9 Definition of Done achieved.          |
 | `2026-11-09` | Stage 10 Complete         | Built Web Push VAPID delivery, quiet hours capping, PWA manifest, service worker, and install buttons.        | Stage 10 Definition of Done achieved.         |
 | `2026-11-10` | Stage 0.5 Complete        | Hardened scale & reliability architecture: authoring 8 `docs/` files, 52 scale tasks, Phase 16, ADR 009–022.  | Scale and Reliability Addendum integration.   |
+| `2026-11-10` | Reliability Audit         | Conducted read-only reliability gap audit (`docs/reliability-gap-audit.md`); reconciled 7 tasks back to TODO.   | Reconciling task.md with codebase reality.     |
