@@ -11,6 +11,7 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import cookie from "@fastify/cookie";
 import rateLimit from "@fastify/rate-limit";
+import underPressure from "@fastify/under-pressure";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import {
@@ -21,6 +22,7 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { randomUUID } from "node:crypto";
+import { redis } from "./lib/redis.js";
 import { healthRoutes } from "./routes/health.js";
 import { dropsRoutes } from "./routes/drops.js";
 import { contentRoutes } from "./routes/content.js";
@@ -40,6 +42,13 @@ import { pushRoutes } from "./routes/push.js";
 
 export interface ServerOptions {
   logger?: boolean;
+  isShuttingDown?: () => boolean;
+  underPressure?: {
+    maxEventLoopDelay?: number;
+    maxHeapUsedBytes?: number;
+    maxRssBytes?: number;
+    sampleInterval?: number;
+  };
 }
 
 export async function buildServer(
@@ -60,6 +69,10 @@ export async function buildServer(
             }
           : undefined,
     },
+    // Fastify HTTP connection and request timeouts (R1.3)
+    connectionTimeout: 5000,
+    keepAliveTimeout: 5000,
+    requestTimeout: 10000,
     genReqId: (req) => {
       return (
         (req.headers["x-request-id"] as string) ||
@@ -71,16 +84,47 @@ export async function buildServer(
     requestIdLogLabel: "requestId",
   }).withTypeProvider<ZodTypeProvider>();
 
+  // Decorate server with shutdown check function for /ready probe
+  app.decorate("isShuttingDown", opts.isShuttingDown || (() => false));
+
   // 1. Configure Zod validation & serialization
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
-  // 2. Security headers (Helmet)
+  // 2. Load shedding with @fastify/under-pressure (R1.3)
+  const maxDelay =
+    opts.underPressure?.maxEventLoopDelay ??
+    (Number(process.env.UNDER_PRESSURE_MAX_EVENT_LOOP_DELAY_MS) ||
+      (process.env.NODE_ENV === "test" ? 2000 : 250));
+  const maxHeap =
+    opts.underPressure?.maxHeapUsedBytes ??
+    (Number(process.env.UNDER_PRESSURE_MAX_HEAP_BYTES) || 1024 * 1024 * 1024);
+  const maxRss =
+    opts.underPressure?.maxRssBytes ??
+    (Number(process.env.UNDER_PRESSURE_MAX_RSS_BYTES) || 1536 * 1024 * 1024);
+
+  await app.register(underPressure, {
+    maxEventLoopDelay: maxDelay,
+    maxHeapUsedBytes: maxHeap,
+    maxRssBytes: maxRss,
+    sampleInterval: opts.underPressure?.sampleInterval ?? 1000,
+    pressureHandler: (_req, rep) => {
+      rep.header("Retry-After", "5");
+      rep.status(503).send({
+        ok: false,
+        error: "OVERLOADED",
+        message: "Server is temporarily overloaded. Please try again shortly.",
+        retry_after: 5,
+      });
+    },
+  });
+
+  // 3. Security headers (Helmet)
   await app.register(helmet, {
     contentSecurityPolicy: process.env.NODE_ENV === "production",
   });
 
-  // 3. CORS
+  // 4. CORS
   await app.register(cors, {
     origin: (origin, cb) => {
       // Allow localhost in development, or requests without origin (cURL, mobile PWA)
@@ -99,17 +143,25 @@ export async function buildServer(
     credentials: true,
   });
 
-  // 4. Secure signed cookies
+  // 5. Secure signed cookies
   await app.register(cookie, {
     secret: process.env.COOKIE_SECRET || "oddly_dev_cookie_secret_at_least_32_chars!",
     parseOptions: {},
   });
 
-  // 5. Rate limiting (D-005, P3.09)
+  // 6. Redis-backed rate limiting (R1.4)
   await app.register(rateLimit, {
-    max: 120, // 120 requests per minute per IP default
+    redis: redis.status === "ready" ? redis : undefined,
+    max: 120, // 120 requests per minute default
     timeWindow: "1 minute",
-    allowList: ["127.0.0.1", "localhost"],
+    keyGenerator: (req) => {
+      const deviceId =
+        (req.headers["x-device-id"] as string) ||
+        (req.cookies.oddly_did as string) ||
+        "anon";
+      return `${deviceId}:${req.ip}`;
+    },
+    allowList: process.env.NODE_ENV === "production" ? [] : ["127.0.0.1", "localhost"],
   });
 
   // 6. OpenAPI / Swagger Documentation (P3.11)

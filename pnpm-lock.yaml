@@ -352,6 +352,9 @@ importers:
       '@fastify/swagger-ui':
         specifier: 3.0.0
         version: 3.0.0
+      '@fastify/under-pressure':
+        specifier: 8.5.1
+        version: 8.5.1
       '@oddly/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -809,6 +812,9 @@ packages:
 
   '@fastify/swagger@8.14.0':
     resolution: {integrity: sha512-sGiznEb3rl6pKGGUZ+JmfI7ct5cwbTQGo+IjewaTvtzfrshnryu4dZwEsjw0YHABpBA+kCz3kpRaHB7qpa67jg==}
+
+  '@fastify/under-pressure@8.5.1':
+    resolution: {integrity: sha512-4PRp1Y29yNSqNnMIwL9CyBtNP6rqLnY0JmZ0TMzCYj28k9Lw0nrqI6A2JxNQZd0jzbls/8LN4TcuRW2HEqQVmw==}
 
   '@floating-ui/core@1.8.0':
     resolution: {integrity: sha512-0CIZ5itps/8x7BG8dEIhs53BvCUH2PCoogtakwRTut+Arm58sJooJ0AuZhLw2HJYIR5cMLNPBSS728sPho2khQ==}
@@ -4370,6 +4376,11 @@ snapshots:
       yaml: 2.9.1
     transitivePeerDependencies:
       - supports-color
+
+  '@fastify/under-pressure@8.5.1':
+    dependencies:
+      '@fastify/error': 3.4.1
+      fastify-plugin: 4.5.1
 
   '@floating-ui/core@1.8.0':
     dependencies:

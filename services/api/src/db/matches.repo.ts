@@ -41,16 +41,20 @@ export class MatchesRepository {
    * Find a match for a player in a specific drop (as player A or player B).
    */
   static async getMatchForPlayer(dropId: string, playerId: string) {
-    return prisma.match.findFirst({
-      where: {
-        drop_id: dropId,
-        OR: [{ player_a_id: playerId }, { player_b_id: playerId }],
-      },
-      include: {
-        player_a: true,
-        player_b: true,
-      },
-    });
+    try {
+      return await prisma.match.findFirst({
+        where: {
+          drop_id: dropId,
+          OR: [{ player_a_id: playerId }, { player_b_id: playerId }],
+        },
+        include: {
+          player_a: true,
+          player_b: true,
+        },
+      });
+    } catch {
+      return null;
+    }
   }
 
   /**

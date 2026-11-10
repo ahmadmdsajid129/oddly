@@ -109,6 +109,7 @@ model Drop {
   matches      Match[]
   streakLogs   StreakLog[]
   reports      Report[]
+  batchRuns    BatchRun[]
 
   @@index([drop_date])
   @@index([status])
@@ -376,5 +377,46 @@ model Report {
   @@index([drop_id])
   @@index([reporter_id])
   @@map("reports")
+}
+
+// ---------------------------------------------------------------------------
+// 19. batch_runs — chunked resumable final batch progress tracking (R1.1)
+// ---------------------------------------------------------------------------
+model BatchRun {
+  id           String    @id @default(uuid())
+  drop_id      String
+  drop         Drop      @relation(fields: [drop_id], references: [id])
+  chunk_index  Int
+  cursor_from  String?   @db.VarChar(128)
+  cursor_to    String?   @db.VarChar(128)
+  player_count Int       @default(0)
+  status       String    @db.VarChar(20) // pending | processing | completed | failed
+  attempts     Int       @default(0)
+  started_at   DateTime?
+  completed_at DateTime?
+  error        String?   @db.Text
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  @@unique([drop_id, chunk_index])
+  @@index([drop_id, status])
+  @@map("batch_runs")
+}
+
+// ---------------------------------------------------------------------------
+// 20. scheduler_runs — idempotent leader tracking for daily crons (R1.1)
+// ---------------------------------------------------------------------------
+model SchedulerRun {
+  id           String    @id @default(uuid())
+  job_name     String    @db.VarChar(100) // stageDrop | openDrop | closeDrop | matchFinal
+  run_for      String    @db.VarChar(100) // drop_date (e.g. "2026-11-10") or drop_id
+  status       String    @db.VarChar(20)  // running | completed | failed
+  started_at   DateTime  @default(now())
+  completed_at DateTime?
+  error        String?   @db.Text
+
+  @@unique([job_name, run_for])
+  @@index([job_name, run_for, status])
+  @@map("scheduler_runs")
 }
 

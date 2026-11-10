@@ -4,6 +4,64 @@ import type { AnswerPayload } from "@oddly/shared";
 const ADULT_CONFIRMED_KEY = "oddly_adult_confirmed";
 const DRAFT_PREFIX = "oddly_draft_";
 const COMPLETED_PREFIX = "oddly_completed_";
+const PENDING_PREFIX = "oddly_pending_submission_";
+
+export interface PendingSubmissionPayload {
+  drop_id: string;
+  player_id: string;
+  request_id: string;
+  timing_ms?: number;
+  answers: AnswerPayload[];
+  created_at: number;
+}
+
+export function savePendingSubmission(payload: PendingSubmissionPayload): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(`${PENDING_PREFIX}${payload.drop_id}`, JSON.stringify(payload));
+  } catch {
+    // Ignore quota errors
+  }
+}
+
+export function getPendingSubmission(dropId: string): PendingSubmissionPayload | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(`${PENDING_PREFIX}${dropId}`);
+    if (!raw) return null;
+    return JSON.parse(raw) as PendingSubmissionPayload;
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingSubmission(dropId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(`${PENDING_PREFIX}${dropId}`);
+  } catch {
+    // Ignore
+  }
+}
+
+export function getAllPendingSubmissions(): PendingSubmissionPayload[] {
+  if (typeof window === "undefined") return [];
+  const list: PendingSubmissionPayload[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(PENDING_PREFIX)) {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          list.push(JSON.parse(raw) as PendingSubmissionPayload);
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+  return list;
+}
 
 export function isAdultConfirmed(): boolean {
   if (typeof window === "undefined") return false;

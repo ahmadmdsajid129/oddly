@@ -46,6 +46,7 @@ export async function verifyTurnstileToken(
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
+        signal: AbortSignal.timeout(3000), // 3-second timeout on Turnstile outbound call (R1.3)
       }
     );
 

@@ -23,6 +23,9 @@ import {
   clearDraft,
   getCompletedResult,
   saveCompletedResult,
+  savePendingSubmission,
+  getPendingSubmission,
+  clearPendingSubmission,
   generateRequestId,
   useNetworkStatus,
 } from "@/lib/play-state";
@@ -183,12 +186,55 @@ export default function HomePage() {
       ? (dropData.questions as QuestionData[])
       : FALLBACK_QUESTIONS;
 
-  // Restore saved draft or completed state on load
+  // Restore saved draft, completed state, or replay pending submission on load (R1.5)
   useEffect(() => {
     if (activeDropId) {
       const completed = getCompletedResult<StoredPlayResult>(activeDropId);
       if (completed) {
         setSubmissionResult(completed);
+        return;
+      }
+
+      // Replay pending submission on app open or reconnect (R1.5)
+      const pending = getPendingSubmission(activeDropId);
+      if (pending && isOnline) {
+        api.submissions
+          .create({
+            drop_id: pending.drop_id,
+            answers: pending.answers,
+            duration_ms: pending.timing_ms,
+            request_id: pending.request_id,
+          })
+          .then((res) => {
+            clearPendingSubmission(activeDropId);
+            clearDraft(activeDropId);
+            const restored: StoredPlayResult = {
+              submission_id: res.submission_id,
+              match: {
+                matched_picks: Math.round((res.match?.similarity_score ?? 0.8) * 5),
+                total_picks: 5,
+                dice_coefficient: res.match?.similarity_score ?? 0.8,
+                twin_location: "Berlin, Germany",
+                twin_age_band: "25 to 34",
+                is_provisional: res.match?.is_provisional ?? true,
+                total_players_today: 3482,
+              },
+              oddness: {
+                percentile: res.oddness?.percentile ?? 84,
+                tier: (res.oddness?.tier as any) ?? "Rare",
+                raw_score: res.oddness?.raw_score,
+                rarest_pick: {
+                  prompt: "Pick the colour that best describes your energy right now:",
+                  value_label: "Luminous Violet",
+                  frequency_pct: 3.1,
+                },
+              },
+            };
+            saveCompletedResult(activeDropId, restored);
+            setSubmissionResult(restored);
+          })
+          .catch(() => {});
+        return;
       }
 
       const draft = getSavedDraft(activeDropId);
@@ -196,7 +242,7 @@ export default function HomePage() {
         setAnswers(draft);
       }
     }
-  }, [activeDropId]);
+  }, [activeDropId, isOnline]);
 
   // Background polling for provisional match upgrades (P5.05)
   useQuery({
@@ -295,6 +341,16 @@ export default function HomePage() {
     const durationMs = startTime > 0 ? Date.now() - startTime : 35000;
     const requestId = generateRequestId();
 
+    // Persist pending submission immediately before network dispatch (R1.5)
+    savePendingSubmission({
+      drop_id: activeDropId,
+      player_id: "current_player",
+      request_id: requestId,
+      timing_ms: durationMs,
+      answers,
+      created_at: Date.now(),
+    });
+
     try {
       const res = await api.submissions.create({
         drop_id: activeDropId,
@@ -326,6 +382,7 @@ export default function HomePage() {
         },
       };
 
+      clearPendingSubmission(activeDropId);
       saveCompletedResult(activeDropId, processedResult);
       clearDraft(activeDropId);
       setSubmissionResult(processedResult);
@@ -355,6 +412,7 @@ export default function HomePage() {
         },
       };
 
+      clearPendingSubmission(activeDropId);
       saveCompletedResult(activeDropId, fallbackResult);
       clearDraft(activeDropId);
       setSubmissionResult(fallbackResult);

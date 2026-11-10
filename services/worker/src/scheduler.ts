@@ -11,9 +11,10 @@
  */
 
 import { Queue, type ConnectionOptions } from "bullmq";
+import { Redis, type RedisOptions } from "ioredis";
 import { getTimelineConfig, type ScheduleTimelineConfig } from "./clock.js";
 import { PairingWorker } from "./workers/pairing.worker.js";
-import { ClosureWorker } from "./workers/closure.worker.js";
+import { PipelineWorker } from "./workers/pipeline.worker.js";
 
 export interface ScheduledJobDef {
   name: string;
@@ -25,6 +26,7 @@ export class DailyScheduler {
   private timelineConfig: ScheduleTimelineConfig;
   private queue: Queue | null = null;
   private isRunning = false;
+  private redisClient: Redis | null = null;
 
   constructor(timelineConfig = getTimelineConfig()) {
     this.timelineConfig = timelineConfig;
@@ -34,13 +36,15 @@ export class DailyScheduler {
    * Initializes BullMQ queue with connection.
    */
   initQueue(connection: ConnectionOptions): Queue {
+    this.redisClient =
+      connection instanceof Redis ? connection : new Redis(connection as RedisOptions);
     this.queue = new Queue("daily-pipeline", {
       connection,
       defaultJobOptions: {
         attempts: 3,
         backoff: {
           type: "exponential",
-          delay: 1000,
+          delay: 2000,
         },
         removeOnComplete: 100,
         removeOnFail: 500,
@@ -103,43 +107,42 @@ export class DailyScheduler {
   }
 
   /**
-   * Manual trigger for staging step (P9.01).
+   * Trigger for staging step (R1.1 / P9.02).
    */
-  async triggerStageDrop(dropId: string): Promise<{ ok: boolean; dropId: string; status: "pending" }> {
-    return {
-      ok: true,
-      dropId,
-      status: "pending",
-    };
+  async triggerStageDrop(dropDate?: string) {
+    if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
+    return PipelineWorker.executeStageDrop(this.redisClient, dropDate);
   }
 
   /**
-   * Manual trigger for opening live drop (P9.01).
+   * Trigger for opening live drop (R1.1 / P9.03).
    */
-  async triggerOpenDrop(dropId: string): Promise<{ ok: boolean; dropId: string; status: "live" }> {
-    return {
-      ok: true,
-      dropId,
-      status: "live",
-    };
+  async triggerOpenDrop(dropDate?: string) {
+    if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
+    return PipelineWorker.executeOpenDrop(this.redisClient, dropDate);
   }
 
   /**
-   * Manual trigger for pairing sweep (P9.02).
+   * Trigger for closure (R1.1 / P9.05).
+   */
+  async triggerDropClosure(dropDate?: string) {
+    if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
+    return PipelineWorker.executeCloseDrop(this.redisClient, dropDate);
+  }
+
+  /**
+   * Trigger for final batch matching (R1.1 / P9.06).
+   */
+  async triggerMatchFinal(dropId: string, options?: { chunkSize?: number; simulateFailureAtChunk?: number }) {
+    if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
+    return PipelineWorker.executeMatchFinal(this.redisClient, dropId, options);
+  }
+
+  /**
+   * Manual trigger for pairing sweep (P9.04).
    */
   async triggerPairingSweep(dropId: string, candidates: Parameters<typeof PairingWorker.runPairingSweep>[1]) {
     return PairingWorker.runPairingSweep(dropId, candidates);
-  }
-
-  /**
-   * Manual trigger for closure and freeze (P9.03).
-   */
-  async triggerDropClosure(
-    dropId: string,
-    submissions: Parameters<typeof ClosureWorker.runBatchClosure>[1],
-    playerHistoricalDates?: Map<string, string[]>
-  ) {
-    return ClosureWorker.runBatchClosure(dropId, submissions, playerHistoricalDates);
   }
 
   isSchedulerRunning(): boolean {

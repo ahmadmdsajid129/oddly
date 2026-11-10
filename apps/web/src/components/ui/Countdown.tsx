@@ -74,38 +74,50 @@ const UnitCard = React.memo(function UnitCard({
 
 export function Countdown({
   targetDate,
+  serverDateOffsetMs = 0,
   onComplete,
   className = "",
 }: {
   targetDate?: Date;
+  serverDateOffsetMs?: number;
   onComplete?: () => void;
   className?: string;
 }) {
   const shouldReduceMotion = useReducedMotion();
-
-  // Helper calculating next 07:00 IST (01:30 UTC)
-  const calculateDefaultTarget = (): Date => {
-    const now = new Date();
-    // 07:00 IST is 01:30 UTC
-    const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 1, 30, 0, 0));
-    if (now.getTime() >= target.getTime()) {
-      target.setUTCDate(target.getUTCDate() + 1);
-    }
-    return target;
-  };
+  const hasTriggeredRef = React.useRef(false);
 
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({ hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    // Helper calculating next 07:00 IST (01:30 UTC)
+    const calculateDefaultTarget = (): Date => {
+      const now = new Date(Date.now() + serverDateOffsetMs);
+      // 07:00 IST is 01:30 UTC
+      const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 1, 30, 0, 0));
+      if (now.getTime() >= target.getTime()) {
+        target.setUTCDate(target.getUTCDate() + 1);
+      }
+      return target;
+    };
+
+    hasTriggeredRef.current = false;
     const target = targetDate || calculateDefaultTarget();
 
     const update = () => {
-      const now = new Date();
+      // Adjusted client time using server Date header offset (R1.5)
+      const now = new Date(Date.now() + serverDateOffsetMs);
       const diffMs = target.getTime() - now.getTime();
 
       if (diffMs <= 0) {
         setTimeRemaining({ hours: 0, minutes: 0, seconds: 0 });
-        onComplete?.();
+        if (!hasTriggeredRef.current) {
+          hasTriggeredRef.current = true;
+          // Thundering Herd Defense: randomized 0 to 4-second jitter before firing fetch (R1.5)
+          const jitterMs = Math.floor(Math.random() * 4000);
+          setTimeout(() => {
+            onComplete?.();
+          }, jitterMs);
+        }
         return;
       }
 
@@ -120,7 +132,7 @@ export function Countdown({
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
-  }, [targetDate, onComplete]);
+  }, [targetDate, serverDateOffsetMs, onComplete]);
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>

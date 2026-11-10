@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[███████████░░░░░░░░░] 57%`                                                     |
-| **Current Active Stage**        | **Stage 0.5 (Reliability Gap Audit & Architecture Hardening Complete)**          |
+| **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
+| **Current Active Stage**        | **Stage R1 Complete (Reliability Remediation Wave 1 Hardening Verified)**       |
 | **Total Tasks Tracked**         | 217 tasks                                                                        |
-| **Completed Tasks (`DONE`)**    | 123 tasks (Reconciled with reality)                                              |
+| **Completed Tasks (`DONE`)**    | 131 tasks (Proven by code & automated failure tests)                             |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 94 tasks                                                                         |
+| **Pending (`TODO`)**            | 86 tasks                                                                         |
 
 ---
 
@@ -29,13 +29,13 @@
 | **Phase 0**  | Documentation & Skeleton Initialisation     | Critical | COMPLETE  | `[##########] 100%`| 17 / 17            | Stage 0 & Stage 0.5   |
 | **Phase 1**  | Design System & UI Kit                      | High     | PARTIAL   | `[########--] 78%` | 18 / 23            | Stage 1 & Stage 0.5   |
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | PARTIAL   | `[#######---] 71%` | 12 / 17            | Stage 2 & Stage 0.5   |
-| **Phase 3**  | Fastify REST API Core                       | Critical | PARTIAL   | `[#######---] 69%` | 11 / 16            | Stage 3 & Stage 0.5   |
+| **Phase 3**  | Fastify REST API Core                       | Critical | PARTIAL   | `[#######---] 75%` | 12 / 16            | Stage 3 & Stage R1    |
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | PARTIAL   | `[#######---] 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 8 & Stage 0.5   |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[####------] 40%` | 6 / 15             | Stage 9 & Stage 0.5   |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#########-] 87%` | 13 / 15            | Stage 9 & Stage R1    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | PARTIAL   | `[#########-] 91%` | 10 / 11            | Stage 10 & Stage 0.5  |
 | **Phase 11** | Admin Question Tool & Dynamic Importer      | High     | TODO      | `[----------] 0%`  | 0 / 12             | Stage 11              |
 | **Phase 12** | Observability, Telemetry & Security         | High     | TODO      | `[----------] 0%`  | 0 / 11             | Stage 12              |
@@ -146,7 +146,7 @@ _Status: PARTIAL | Target: REST routes, Swagger docs, guest identity, load shedd
 | `[x] P3.06` | Implement instant Stage A provisional twin calculation over Redis answer vectors            | Critical | DONE   | P3.05       | Agent | 2026-11-08  | Real-time matching engine       |
 | `[x] P3.07` | Implement `GET /v1/results/:dropId` returning provisional twin and oddness percentile       | Critical | DONE   | P3.06       | Agent | 2026-11-08  | Player result retrieval         |
 | `[x] P3.08` | Implement `GET /v1/content/:locale` dynamic copy endpoint with content-hash cache header    | High     | DONE   | P2.01, P3.02| Agent | 2026-11-08  | Dynamic UI copy delivery        |
-| `[ ] P3.09` | Implement `@fastify/rate-limit` with Redis store (120 req/min general, 30 req/min submit)  | High     | TODO   | P3.01       | Agent | —           | Reconciled: in-memory only; needs Redis & submit limit |
+| `[x] P3.09` | Implement `@fastify/rate-limit` with Redis store (120 req/min general, 30 req/min submit)  | High     | DONE   | P3.01       | Agent | 2026-11-10  | Redis-backed rate limit, dedicated 30 req/min on submissions, no prod localhost bypass (R1.4) |
 | `[x] P3.10` | Implement Cloudflare Turnstile token validation plugin for anti-bot protection              | High     | DONE   | P3.01       | Agent | 2026-11-08  | Bot challenge verification      |
 | `[x] P3.11` | Configure `@fastify/swagger` and `@fastify/swagger-ui` serving OpenAPI docs at `/docs`      | Medium   | DONE   | P3.02       | Agent | 2026-11-08  | Automated API documentation     |
 | `[x] P3.12` | Implement typed API client in `packages/api-client` wrapping all `/v1` endpoints            | High     | DONE   | P3.03-P3.08 | Agent | 2026-11-08  | Universal typed client library  |
@@ -270,19 +270,19 @@ _Status: PARTIAL | Target: Staging, live window, final recap batch, S9 Recap scr
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P9.01` | Configure BullMQ scheduler registering daily crons for 06:30 staging, 07:00 open, and close | Critical | DONE   | P0.06       | Agent | 2026-11-09  | Core daily clock orchestration  |
-| `[ ] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | Critical | TODO   | P9.01, P3.03| Agent | —           | Reconciled: stub only; needs live Redis warming |
-| `[ ] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | Critical | TODO   | P9.01       | Agent | —           | Reconciled: stub only; needs live DB transition |
-| `[ ] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | TODO   | P3.06       | Agent | —           | Reconciled: uninstantiated in worker runtime    |
-| `[ ] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | Critical | TODO   | P9.01       | Agent | —           | Reconciled: needs DB drop closure worker        |
-| `[ ] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | Critical | TODO   | P9.05, P2.05| Agent | —           | Reconciled: needs live chunked DB execution     |
+| `[x] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | Critical | DONE   | P9.01, P3.03| Agent | 2026-11-10  | Live pre-caching, warming cache:drop:{date}:pre_cache (R1.1) |
+| `[x] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | Critical | DONE   | P9.01       | Agent | 2026-11-10  | Redis leader-locked transition, harmless double-fire idempotency (R1.1) |
+| `[x] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | DONE   | P3.06       | Agent | 2026-11-10  | Real BullMQ worker with concurrency 2 & candidate sweeps (R1.1) |
+| `[x] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | Critical | DONE   | P9.01       | Agent | 2026-11-10  | DB drop closure, status: closed, freezes distributions (R1.1) |
+| `[x] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | Critical | DONE   | P9.05, P2.05| Agent | 2026-11-10  | Chunked cursor pagination (5,000/batch), tracks in batch_runs (R1.1) |
 | `[x] P9.07` | Build S9 Morning Recap Screen displaying locked twin, final oddness, and world stats        | Critical | DONE   | P9.06       | Agent | 2026-11-09  | Daily recap experience          |
 | `[x] P9.08` | Implement `GET /v1/world/:dropId` endpoint returning aggregated drop stats                  | High     | DONE   | P9.06       | Agent | 2026-11-09  | Global drop statistics          |
 | `[x] P9.09` | Implement `CLOCK_ACCELERATION=true` staging mode compressing 24-hour cycle to 10 minutes    | High     | DONE   | P9.01-P9.06 | Agent | 2026-11-09  | Accelerated testing harness     |
 | `[x] P9.10` | Implement streak increment and freeze logic executed in final recap batch                   | High     | DONE   | P8.02, P9.06| Agent | 2026-11-09  | Automated streak progression    |
 | `[x] P9.11` | Run automated test suite simulating full 24-hour cycle via accelerated clock                | Critical | DONE   | P9.07       | Agent | 2026-11-09  | Full lifecycle validation       |
 | `[ ] P9.12` | Isolate final batch worker pool with max 25% DB connection limit and separate queue         | Critical | TODO   | P9.06       | Agent | —           | Worker pool bulkhead (Sec 10)   |
-| `[ ] P9.13` | Implement chunked resumable final batch (5,000 users/chunk) with progressive publishing     | Critical | TODO   | P9.06       | Agent | —           | Parallel final batch (Sec 10)   |
-| `[ ] P9.14` | Implement scheduler distributed leader lock and catch-up handler on boot                    | Critical | TODO   | P9.01       | Agent | —           | Leader election & catchup (9)   |
+| `[x] P9.13` | Implement chunked resumable final batch (5,000 users/chunk) with progressive publishing     | Critical | DONE   | P9.06       | Agent | 2026-11-10  | Cursor pagination, batch_runs resumable tracking, zero full memory loads (R1.1) |
+| `[x] P9.14` | Implement scheduler distributed leader lock and catch-up handler on boot                    | Critical | DONE   | P9.01       | Agent | 2026-11-10  | Distributed leader lock & sequential catch-up on startup (R1.1) |
 | `[ ] P9.15` | Build BullMQ dead-letter queue (DLQ) replay tool and alert trigger                          | High     | TODO   | P0.06       | Agent | —           | Poison job quarantine (Sec 9)   |
 
 ---

@@ -94,10 +94,14 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
         displayName = parts[1] || "Test Player";
       } else {
         try {
-          const ticket = await googleClient.verifyIdToken({
+          const verifyPromise = googleClient.verifyIdToken({
             idToken: id_token,
             audience: process.env.GOOGLE_CLIENT_ID,
           });
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("Google ID token verification timed out")), 4000)
+          );
+          const ticket = await Promise.race([verifyPromise, timeoutPromise]);
           const payload = ticket.getPayload();
           if (!payload || !payload.sub || !payload.email) {
             return reply.status(401).send({

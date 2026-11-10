@@ -13,26 +13,34 @@ export class SubmissionsRepository {
    * Check if a submission with the given idempotency request_id already exists.
    */
   static async findByRequestId(requestId: string) {
-    return prisma.submission.findUnique({
-      where: { request_id: requestId },
-    });
+    try {
+      return await prisma.submission.findUnique({
+        where: { request_id: requestId },
+      });
+    } catch {
+      return null;
+    }
   }
 
   /**
    * Get submission by player and drop ID.
    */
   static async findByPlayerAndDrop(playerId: string, dropId: string) {
-    return prisma.submission.findUnique({
-      where: {
-        drop_id_player_id: {
-          drop_id: dropId,
-          player_id: playerId,
+    try {
+      return await prisma.submission.findUnique({
+        where: {
+          drop_id_player_id: {
+            drop_id: dropId,
+            player_id: playerId,
+          },
         },
-      },
-      include: {
-        oddnessScore: true,
-      },
-    });
+        include: {
+          oddnessScore: true,
+        },
+      });
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -58,12 +66,13 @@ export class SubmissionsRepository {
   }
 
   /**
-   * Get all submissions for a given drop (used by matching engine and worker).
+   * Get submissions for a given drop capped at limit (default 2000) for bounded matching (R1.2).
    */
-  static async listByDrop(dropId: string) {
+  static async listByDrop(dropId: string, limit = 2000) {
     return prisma.submission.findMany({
       where: { drop_id: dropId },
-      orderBy: { submitted_at: "asc" },
+      orderBy: { submitted_at: "desc" },
+      take: limit,
       select: {
         id: true,
         player_id: true,

@@ -11,7 +11,7 @@ import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import {
   AnswerPayloadSchema,
-  BruteForceMatchingStrategy,
+  BoundedHashBucketMatchingStrategy,
   classifyTier,
   hashTwinId,
   isDayOpen,
@@ -25,6 +25,7 @@ import { prisma } from "../db/client.js";
 import { SubmissionsRepository } from "../db/submissions.repo.js";
 import { MatchesRepository } from "../db/matches.repo.js";
 import { DropsRepository } from "../db/drops.repo.js";
+import { redis } from "../lib/redis.js";
 
 export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post<{
@@ -38,6 +39,12 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
   }>(
     "/v1/submissions",
     {
+      config: {
+        rateLimit: {
+          max: 30, // 30 requests per minute dedicated limit on submissions (R1.4)
+          timeWindow: "1 minute",
+        },
+      },
       schema: {
         description:
           "Submit answers for today's drop, execute instant Stage A matching, and compute Oddness score",
@@ -88,7 +95,18 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         AnswerPayloadSchema.parse(a)
       );
 
-      // 1. Check idempotency: if request_id already exists, return existing submission
+      // 1. Idempotency Lock with Redis NX (R1.4)
+      const lockKey = `submission:lock:${request_id}`;
+      let lockAcquired = false;
+      try {
+        const res = await redis.set(lockKey, "1", "EX", 10, "NX");
+        lockAcquired = res === "OK";
+      } catch {
+        // If Redis is offline, continue to database unique constraint
+        lockAcquired = true;
+      }
+
+      // Check if request_id already exists in DB
       const existingRequest = await SubmissionsRepository.findByRequestId(request_id);
       if (existingRequest) {
         const existingScore = await prisma.oddnessScore.findUnique({
@@ -122,6 +140,15 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
               }
             : null,
         };
+      }
+
+      if (!lockAcquired) {
+        reply.status(409).send({
+          ok: false,
+          error: "CONCURRENT_REQUEST",
+          message: "A submission with this request_id is currently being processed. Please retry shortly.",
+        });
+        return;
       }
 
       // 2. Verify drop exists and is currently accepting submissions
@@ -247,8 +274,9 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         },
       });
 
-      // 9. Instant Stage A Matching (P3.06, D-009)
-      const otherSubmissions = await SubmissionsRepository.listByDrop(drop_id);
+      // 9. Instant Bounded Stage A Matching (R1.2)
+      const maxCandidates = Number(process.env.MAX_MATCH_CANDIDATES) || 2000;
+      const otherSubmissions = await SubmissionsRepository.listByDrop(drop_id, maxCandidates);
       const pool: SubmissionForMatching[] = otherSubmissions.map((s) => ({
         submission_id: s.id,
         player_id: s.player_id,
@@ -265,7 +293,7 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         );
       }
 
-      const matcher = new BruteForceMatchingStrategy();
+      const matcher = new BoundedHashBucketMatchingStrategy(maxCandidates);
       const matchResult = matcher.findBestMatch(
         {
           submission_id: submission.id,

@@ -62,12 +62,16 @@ export async function processSendPushJob(
   const stringifiedPayload =
     typeof payload === "string" ? payload : JSON.stringify(payload);
 
-  // 4. Send via web-push
+  // 4. Send via web-push with 5-second timeout (R1.3)
   try {
-    const response = await webpush.sendNotification(
+    const pushPromise = webpush.sendNotification(
       subscription,
       stringifiedPayload
     );
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("WebPush notification dispatch timed out")), 5000)
+    );
+    const response = await Promise.race([pushPromise, timeoutPromise]);
 
     return {
       delivered: true,

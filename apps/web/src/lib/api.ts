@@ -41,7 +41,7 @@ export const api = {
     create: (data: {
       drop_id: string;
       answers: AnswerPayload[];
-      duration_ms: number;
+      duration_ms?: number;
       request_id: string;
       player_id?: string;
     }) =>
@@ -49,7 +49,7 @@ export const api = {
         drop_id: data.drop_id,
         player_id: data.player_id || "guest",
         request_id: data.request_id,
-        timing_ms: data.duration_ms,
+        timing_ms: data.duration_ms ?? 30000,
         answers: data.answers,
       }),
   },

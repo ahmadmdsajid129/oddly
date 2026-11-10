@@ -7,7 +7,8 @@
 
 import { Redis } from "ioredis";
 
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+const REDIS_URL = process.env.CACHE_REDIS_URL || process.env.REDIS_URL || "redis://localhost:6379";
+const REDIS_COMMAND_TIMEOUT_MS = Number(process.env.REDIS_COMMAND_TIMEOUT_MS) || 1000;
 
 declare global {
   var __redis: Redis | undefined;
@@ -20,6 +21,8 @@ export function createRedisClient(): Redis {
 
   const client = new Redis(REDIS_URL, {
     maxRetriesPerRequest: 1,
+    commandTimeout: REDIS_COMMAND_TIMEOUT_MS,
+    connectTimeout: 2000,
     retryStrategy(times) {
       if (times > 3) {
         return null; // Stop reconnecting after 3 attempts
