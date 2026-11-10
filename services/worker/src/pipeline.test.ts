@@ -436,7 +436,6 @@ describe("Stage 9: Daily Pipeline & Scheduler (P9.01 - P9.07)", () => {
       expect(BATCH_DB_STATEMENT_TIMEOUT_MS).toBe(120000);
 
       const start = Date.now();
-      // Worker timeout configured for 60 seconds allows longer running background tasks
       const res = await executeWorkerWithTimeout(async () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
         return { recordsProcessed: 5000 };

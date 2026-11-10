@@ -473,9 +473,20 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 - **Context:** Task `P9.04` was previously marked `DONE` during Stage R1.
 - **Decision:** Code inspection revealed `processPipelineJob` in `pipeline.worker.ts` passes an empty candidate array `[]` and does not yet perform live DB candidate sweeps. To adhere strictly to the project rule *"Mark a task DONE only if code AND a test prove it"*, `P9.04` was reverted to `TODO` in `task.md`.
 
+### ADR-026: Real-Infrastructure Gate Assessment for Stage R2
+- **Date:** 2026-11-10
+- **Context:** Stage R2 Ground Rule 2 and Section R2.0 mandate that all partitioning, Redis roles, caching, and circuit breaker proofs must run against real Postgres 16 and Redis 7 via Docker, and explicitly dictates: *"If Docker (or real Postgres and Redis) is not available on the Founder's machine, STOP after reporting that and ask the Founder to fix the environment; do not substitute mocks for the proofs in R2.0 to R2.4."*
+- **Finding:**
+  - `docker --version` and `docker compose version` return `CommandNotFoundException` (Docker is not installed or not in PATH).
+  - `wsl.exe -l -v` reports Windows Subsystem for Linux is not installed.
+  - Native Postgres (`psql`, `postgres`) and Redis (`redis-server`) are not installed.
+  - TCP ports 5432 and 6379 are closed.
+- **Decision:** In accordance with the Stage R2 protocol, halted execution immediately at Gate R2.0. No code changes for R2.1 through R2.10 will be made with mock substitutions. Awaiting Founder environment setup.
+
 ---
 
 ## 16. Next Steps
 
-1. **Founder Review:** Founder reviews Stage R1-PATCH automated test verifications and reliability improvements.
+1. **Founder Environment Setup:** Founder installs Docker Desktop (or starts local PostgreSQL 16 on port 5432 and Redis 7 on port 6379) so `docker compose up -d` in `infra/` can run.
+2. **Resume Stage R2.0:** Once real services are active, run the 6 real-infrastructure proofs in R2.0 before progressing to R2.1 table partitioning.
 2. **Founder Direction:** Stop and await Founder's command to proceed to Stage 11 (Admin Question Tool & Dynamic Importer).

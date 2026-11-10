@@ -13,12 +13,12 @@
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
 | **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
-| **Current Active Stage**        | **Stage R1-PATCH Complete (Verification & Reliability Remediation Hardened)**    |
+| **Current Active Stage**        | **Stage R2: Gate R2.0 Environment Check (Awaiting Docker / Real Infrastructure)** |
 | **Total Tasks Tracked**         | 217 tasks                                                                        |
 | **Completed Tasks (`DONE`)**    | 130 tasks (Proven by code & automated failure tests)                             |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
-| **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 87 tasks                                                                         |
+| **Blocked (`BLOCKED`)**         | 1 task (R2.0 Real Infrastructure Gate - Docker/Postgres/Redis missing on host)  |
+| **Pending (`TODO`)**            | 86 tasks                                                                         |
 
 ---
 
