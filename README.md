@@ -76,7 +76,45 @@ The architecture and operational standards are fully articulated across six foun
 
 ---
 
-## 6. Monorepo Structure
+## 6. Reliability and Scale
+
+Oddly is engineered for high-concurrency burst traffic: everyone on Earth is invited to play at the exact same minute (the 07:00 IST morning Drop).
+
+### Core Service Level Objectives (SLOs)
+- **Play Path Availability:** 99.9% monthly; 99.95% inside the 07:00 to 08:00 IST drop window.
+- **Drop Payload (`GET /v1/drop/today`):** p95 < 100 ms with > 99% CDN edge hit ratio.
+- **Submissions (`POST /v1/submissions`):** p95 < 500 ms, p99 < 1.5 s, error rate < 0.5% at planned peak (1,100–2,200 submits/sec).
+- **Durability:** 100% of acknowledged submissions persisted in PostgreSQL (zero data loss).
+
+### Progressive Scale Tiers (T0 to T4)
+
+| Tier | Scale (Daily Active Players) | Peak Submits/sec | Primary Architecture | Ingestion Mode |
+|---|---|---|---|---|
+| **T0: Dev/Test** | < 1k DAU | < 5 submits/sec | Local Docker Compose (single DB, single Redis) | Mode A (Direct synchronous DB transaction) |
+| **T1: Launch** | 1k – 25k DAU | 25 – 35 submits/sec | Single Postgres (managed), 1 Redis instance, 2 API containers | Mode A (Direct synchronous DB transaction) |
+| **T2: Growth** | 25k – 100k DAU | 35 – 220 submits/sec | Managed Postgres + read replica, dedicated Redis instances (cache, queues, counters) | Mode A with connection pooling |
+| **T3: Planned Target** | 100k – 10 lakh DAU | 220 – 1,100 (burst 2,200) | Clustered Postgres + PgBouncer, partitioned daily tables, 3 dedicated Redis instances | Mode B (Redis buffer queue + batched worker ingestion) |
+| **T4: Beyond Planned** | > 10 lakh DAU | > 2,200 submits/sec | Sharded PostgreSQL, distributed Redis clusters, global edge compute | Mode B with multi-region ingestion |
+
+### Authoritative Operational Documentation
+
+For detailed architectural runbooks, load testing protocols, and incident response procedures, consult the [`docs/`](./docs/) directory:
+- [`docs/scaling-plan.md`](./docs/scaling-plan.md): Comprehensive T0–T4 scaling progression, component upgrade triggers, and cost guardrails.
+- [`docs/capacity-model.md`](./docs/capacity-model.md): Mathematical derivations for 10 lakh DAU, 4,400 peak RPS, and memory models.
+- [`docs/slo.md`](./docs/slo.md): Formal Service Level Objectives, error budgets, and resource allocation priority ranking.
+- [`docs/failure-modes.md`](./docs/failure-modes.md): 21 failure modes, blast radiuses, circuit breaker topologies, and automated recovery actions.
+- [`docs/load-testing.md`](./docs/load-testing.md): k6 stress scripts, `pnpm loadgen` simulation CLI, and 15 required verification scenarios.
+- [`docs/runbook.md`](./docs/runbook.md): On-call SEV-1 to SEV-4 alert triage playbooks and emergency intervention procedures.
+- [`docs/degradation-playbook.md`](./docs/degradation-playbook.md): Five-level degradation ladder (L0 to L4) with 5-minute hysteresis recovery.
+- [`docs/disaster-recovery.md`](./docs/disaster-recovery.md): RTO < 30 min, RPO < 5 min recovery protocols and clean-slate restore runbooks.
+
+### Load Testing & Performance Validation
+- Load test scripts and scenarios: [`infra/loadtest/`](./infra/loadtest/)
+- Synthetic player traffic simulation: `pnpm loadgen` (Stage 16)
+
+---
+
+## 7. Monorepo Structure
 
 ```
 oddly/

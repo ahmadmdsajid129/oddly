@@ -523,3 +523,59 @@ All share cards are generated on the server using `satori` and rendered to PNG v
 │ By continuing, you agree to our Terms.   │
 └──────────────────────────────────────────┘
 ```
+
+---
+
+## 13. Resilience and Degraded-State UI Specifications
+
+### 13.1 Status Banner Component (Levels L1 to L4 & Maintenance)
+- **Position & Layout:** Affixed to top of viewport (`z-50`), spanning 100% width. Padding `py-2 px-4`.
+- **Accessibility:** `role="status"`, `aria-live="polite"` (for L1/L2) and `role="alert"`, `aria-live="assertive"` (for L3/L4).
+- **Behavior:** Dismissible only on informational Level L1; sticky and non-dismissible on L2, L3, and L4.
+- **Copy Source:** Text is loaded dynamically from database `app_content` (`banner.degradation.L1` to `L4`).
+- **Styling Tokens:**
+  - *L1 (Conserve):* Subtle dark violet tint (`bg-surface-elevated text-text-muted border-b border-border`).
+  - *L2 (Protect Core):* Amber warning accent (`bg-amber-950/40 text-amber-200 border-b border-amber-800/40`).
+  - *L3 (Survive):* Coral notification accent (`bg-coral/20 text-coral border-b border-coral/30`).
+  - *L4 (Static Fallback):* Deep urgent coral background with white text (`bg-coral text-white font-medium`).
+
+### 13.2 "Saved. Finding Your Twin..." Pending Screen (Mode B & Slow Matching)
+- **Context:** Rendered upon HTTP `202 Accepted` when asynchronous ingestion is active or pairwise search is completing in background.
+- **Visuals:** Two luminous dots (Mint `#4ECCA3` and Violet `#9B5DE5`) orbiting one another in a calming, continuous 2-second circular loop (`animate-spin-slow`).
+- **Reduced Motion:** If `prefers-reduced-motion: reduce`, the looping orbit is replaced with a gentle opacity pulse (1.0 to 0.4 over 2.5s).
+- **Polling & Refresh:** Automatically polls `GET /v1/results/:dropId` with exponential backoff and full jitter (5s, 10s, 30s). Includes a prominent manual *"Check now"* button.
+- **Copy:**
+  - Title: *"Saved! Finding your twin..."*
+  - Subtitle: *"Thousands of people are playing right now. We're searching for your closest match."*
+
+### 13.3 Stale-Data Labels & Freshness Timestamps
+- **Context:** Rendered adjacent to live player counters or world statistics when served from edge cache under Level L1/L2.
+- **Visuals:** Small badge (`text-[11px] font-mono text-text-muted bg-surface/60 px-2 py-0.5 rounded-full`).
+- **Copy:** *"Updated 2 minutes ago"* or *"Refreshed at 07:15 AM"*.
+
+### 13.4 Offline & Queued-Submission States
+- **Context:** Cellular connection lost mid-play or during submission.
+- **Visuals:** Top pill indicator: Wi-Fi off icon + *"Saved offline. Will send automatically when you're back."*
+- **Action:** Manual *"Retry now"* primary action button. Picks remain in `localStorage` until confirmed.
+
+### 13.5 HTTP 429 and 503 Friendly Overload Screens
+- **Context:** API rate limiting or `@fastify/under-pressure` load shedding.
+- **Visuals:** Calm geometric illustration of two waiting cups with steam.
+- **Copy:**
+  - 429: *"Easy there! Lots of players are here. Retrying in [N] seconds..."*
+  - 503: *"Lots of people are here right now. Taking a quick breather. Trying again in [N] seconds..."*
+- **Behavior:** Live countdown timer decrementing based on the HTTP `Retry-After` header value (default 5s to 15s), with a manual *"Retry now"* button.
+
+### 13.6 Skeleton Loading Rules
+- **Skeleton Primitives:** Use smooth shimmer pulse (`bg-surface-elevated animate-pulse rounded-2xl`).
+- **Minimum Display Threshold:** Minimum skeleton presentation time is **200 ms** to eliminate jarring visual flickers on ultra-fast cache hits.
+- **Zero Layout Shift:** Skeletons must precisely mirror the pixel height and aspect ratio of loaded components.
+
+### 13.7 Error Boundary Fallbacks per Area
+- **Route Level:** Top-level Next.js `error.tsx` boundary catches uncaught routing crashes; provides *"Return to today's drop"* button.
+- **Widget Level:** Independent error boundaries isolate non-essential widgets (Live Counter, Streak Flame, History Chart). If the Live Counter fails, it quietly collapses without breaking the play flow.
+
+### 13.8 Performance & Rendering Budgets
+- **Explicit Image Dimensions:** All raster assets specify `width`, `height`, and `sizes` to guarantee zero Cumulative Layout Shift (CLS = 0).
+- **Typography Budget:** Self-hosted Space Grotesk and Inter subsetted with `font-display: swap`.
+- **Motion Budget:** Heavy particle animations (confetti) are dynamically imported and deferred until after result paint. Zero animation runs during critical question loading.

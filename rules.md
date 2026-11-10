@@ -91,12 +91,34 @@ All API responses on failure must return a uniform JSON error payload:
 | **Drop Not Open**     | Querying Drop before 07:00 IST          | 404 / 409   | `DROP_NOT_OPEN`       | Displays S2 Countdown screen until drop time                                                   | `info`           | Poll with exponential backoff    |
 | **Window Closed**     | Submitting answer at 07:01 IST next day | 409         | `DROP_CLOSED`         | _"Today's window has closed. Check out yesterday's recap!"_                                    | `info`           | No retry; redirect to recap      |
 | **Duplicate Submit**  | Submitting same Drop twice              | 200 / 409   | `ALREADY_SUBMITTED`   | Returns existing stored result idempotently; displays S6 Reveal                                | `info`           | No retry                         |
-| **Rate Limited**      | Flooding API with requests              | 429         | `RATE_LIMITED`        | _"Easy there! Take a breath and try again in a moment."_                                       | `warn`           | Retry after `Retry-After` header |
+| **Rate Limited**      | Exceeded per-minute request ceiling     | 429         | `RATE_LIMITED`        | _"Easy there! Lots of players are here. Retrying in a few moments..."_ with auto countdown    | `warn`           | Retry strictly after `Retry-After` header |
+| **Pending Persist**   | Mode B asynchronous ingestion active    | 202         | `PENDING_PERSIST`     | _"Saved! Finding your stranger twin... This may take a moment."_ with two-dot animation        | `info`           | Poll with backoff & jitter (5s, 10s, 30s) |
+| **Overloaded (Shed)** | Event loop delay or memory saturated    | 503         | `OVERLOADED`          | _"Lots of people are here right now. Trying again in a few seconds..."_ with countdown        | `warn`           | Exponential backoff with jitter + `Retry-After` |
 | **Bot Challenge**     | Suspicious timing or failed Turnstile   | 403         | `CHALLENGE_FAILED`    | Displays interactive Cloudflare Turnstile verification modal                                   | `warn`           | Retry on human solve             |
-| **Offline / Network** | Network drops mid-submission            | Client-side | `NETWORK_ERROR`       | Stores picks in `localStorage`, displays _"Offline. Trying again..."_ with manual retry button | `info`           | Exponential backoff (5 attempts) |
+| **Offline / Network** | Network drops mid-submission            | Client-side | `NETWORK_ERROR`       | Stores picks in `localStorage`, displays _"Offline. Trying again..."_ with manual retry button | `info`           | Exponential backoff (500ms, 1s, 2s, 4s, 8s + jitter) |
 | **Internal Server**   | Unhandled exception in route            | 500         | `INTERNAL_ERROR`      | _"Something went wrong on our side. Your picks are saved. Try again in a few moments."_        | `error` (Sentry) | Manual retry button              |
 | **Dependency Down**   | PostgreSQL or Redis unavailable         | 503         | `SERVICE_UNAVAILABLE` | Friendly error page; cached static Drop still served from Cloudflare CDN                       | `error` (Alert)  | Backoff poll                     |
 | **Late Final Batch**  | Recap worker delayed past 07:10         | Worker/API  | `RECAP_PENDING`       | Displays provisional twin with _"Final results are being finalized"_ badge                     | `warn`           | Automatic worker retry           |
+
+---
+
+## 6. Reliability and Scalability Rules (Non-Negotiable)
+
+1. **Per-Route Policy Mandatory:** Every new or modified API route must have an approved row in the `architecture.md` Per-Route Policy Table before merge (specifying timeout, rate-limit class, cache policy, idempotency key, priority lane, and degradation behavior).
+2. **Outbound Call Defenses:** Every outbound network call (database, Redis, Cloudflare R2, push gateways, Google Auth, Turnstile) must enforce a strict timeout, bounded retries with exponential backoff and full jitter, and an `opossum` circuit breaker.
+3. **Bounded Everything:** No unbounded database queries (`SELECT *` without `LIMIT`), no unbounded loops, no unbounded queue depths, no unbounded Redis sets/lists, and no unbounded cache keys (all keys must carry TTLs).
+4. **Zero N+1 Queries:** Database operations must use multi-row inserts and structured relational joins. Enforced via query profiling in CI and automated test suites.
+5. **Keep CPU off the Request Path:** Image rendering, PDF/PNG compilation, heavy pairwise matching, and compression run strictly in worker threads (`piscina`) or the background worker service. Never block the event loop.
+6. **No Inline Side-Effects:** Analytics logging, notification scheduling, share-card generation, and streak milestone rewards must be enqueued asynchronously in BullMQ, never executed inline during the HTTP submit request.
+7. **Every Queue Job Idempotent:** All worker job processors must use deterministic job IDs (`prefix:userId:dropId:hash`) and idempotent database upserts so that running a job twice produces zero side-effects.
+8. **Expand and Contract Migrations:** Every database schema migration must follow the zero-downtime expand-and-contract pattern. Never drop or rename a column in the same deployment that modifies application code.
+9. **Deploy Freeze Window:** Never deploy code between **06:30 IST and 08:30 IST** daily, or at any time when the degradation ladder is at Level L2 or above. Emergency hotfixes require written Founder sign-off.
+10. **Evidence-Based Limit Changes:** Never increase an API rate limit, database connection pool, statement timeout, or queue concurrency without attaching a supporting load-test benchmark in `memory.md`.
+11. **No Dependency Without Failure Modes:** Before introducing any new dependency, document its failure modes, fallback path, and circuit breaker behavior in `docs/failure-modes.md`.
+12. **Absolute Prohibition on Printing or Reading `.env`:** Never read, echo, display, or commit `.env` files. Work only with documented placeholder templates in `.env.example`.
+13. **Dynamic Copy for All Failure States:** All user-facing error banners, modal dialogs, and degradation notices must read text dynamically from the database `app_content` table.
+14. **Hot-Path Benchmarking:** Any architectural change to the core submit or reveal path requires automated before-and-after throughput benchmarks on staging.
+15. **Error Budget Depletion Halt:** Releases stop immediately whenever more than **50% of the monthly error budget** is burned. All engineering efforts pivot exclusively to reliability and performance hardening.
 
 ---
 
@@ -146,6 +168,10 @@ A task is marked `DONE` in `task.md` only when:
 3. ESLint passes with zero warnings or errors (`pnpm lint`).
 4. Unit/integration tests covering the task pass (`pnpm test`).
 5. Accessibility requirements (WCAG 2.2 AA) are verified for any UI elements.
+6. Structured `pino` JSON logs and `prom-client` metrics are instrumented.
+7. Any new or altered API endpoint has an approved entry in the Per-Route Policy Table (`architecture.md`).
+8. Hot-path changes include an attached load/performance benchmark note in `memory.md`.
+9. Any newly introduced failure mode or dependency has an actionable runbook entry in `docs/runbook.md`.
 
 ### 8.2 Per-Stage Definition of Done
 

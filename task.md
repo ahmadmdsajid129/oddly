@@ -1,395 +1,458 @@
 # Phase and Task Breakdown — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-08 | Owner: Founder + AI agent
-Purpose of this file: Authoritative project roadmap, task tracking, progress bars, phase dependencies, and verification criteria across all 16 stages (Stage 0 to Stage 15).
+> **The Reliability Promise:**  
+> *"No acknowledged submission is ever lost, the Drop is always reachable, and when we are overloaded we shed non-essential work first and say so honestly."*
+
+**Project:** Oddly v1 | **Last updated:** 2026-11-10 | **Owner:** Senior System Designer & SRE + Founder  
+**Purpose of this file:** Authoritative project roadmap, task tracking, progress bars, phase dependencies, scale readiness gates, and verification criteria across all 17 phases (Phase 0 to Phase 16).
 
 ---
 
 ## 1. Master Progress Dashboard
 
-| Metric                          | Current Value                                             |
-| ------------------------------- | --------------------------------------------------------- |
-| **Overall Project Progress**    | `[███████████░░░░░░░] 58%`                                |
-| **Current Active Stage**        | **Stage 7 Complete (Awaiting Founder review for Stage 8)**|
-| **Total Tasks Tracked**         | 165 tasks                                                 |
-| **Completed Tasks (`DONE`)**    | 96 tasks                                                  |
-| **In Progress (`IN PROGRESS`)** | 0 tasks                                                   |
-| **Blocked (`BLOCKED`)**         | 0 tasks                                                   |
-| **Pending (`TODO`)**            | 69 tasks                                                  |
+| Metric                          | Current Value                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------- |
+| **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
+| **Current Active Stage**        | **Stage 0.5 Complete (Scale and Reliability Architecture Hardening)**             |
+| **Total Tasks Tracked**         | 217 tasks                                                                        |
+| **Completed Tasks (`DONE`)**    | 130 tasks                                                                        |
+| **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
+| **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
+| **Pending (`TODO`)**            | 87 tasks                                                                         |
 
 ---
 
 ## 2. Phase Overview Table
 
-| Phase        | Phase Name                              | Priority | Status    | Progress Bar      | Tasks (Done/Total) | Stage That Builds It |
-| ------------ | --------------------------------------- | -------- | --------- | ----------------- | ------------------ | -------------------- |
-| **Phase 0**  | Documentation & Skeleton Initialisation | Critical | COMPLETE  | `[##########] 100%`| 14 / 14            | Stage 0              |
-| **Phase 1**  | Design System & UI Kit                  | High     | COMPLETE  | `[##########] 100%`| 19 / 19            | Stage 1              |
-| **Phase 2**  | Database & Shared Core Scoring          | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 2              |
-| **Phase 3**  | Fastify REST API Core                   | Critical | COMPLETE  | `[##########] 100%`| 12 / 12            | Stage 3              |
-| **Phase 4**  | Play Flow Frontend (PWA)                | Critical | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 4              |
-| **Phase 5**  | Reveal, Matching UX & Oddness           | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 5              |
-| **Phase 6**  | Server-Rendered Share Cards & Links     | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 6              |
-| **Phase 7**  | Authentication & Guest Merge            | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage 7              |
-| **Phase 8**  | Streaks, History, Settings & Privacy    | Medium   | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 8              |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler       | Critical | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 9              |
-| **Phase 10** | Web Push Notifications & PWA Caching    | Medium   | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage 10             |
-| **Phase 11** | Admin Question Tool & Dynamic Importer  | High     | TODO        | `[----------] 0%` | 0 / 10             | Stage 11             |
-| **Phase 12** | Observability, Telemetry & Security     | High     | TODO        | `[----------] 0%` | 0 / 9              | Stage 12             |
-| **Phase 13** | End-to-End QA, Load Tests & Audits      | Critical | TODO        | `[----------] 0%` | 0 / 10             | Stage 13             |
-| **Phase 14** | Cloud Deployment & Infrastructure       | Critical | TODO        | `[----------] 0%` | 0 / 9              | Stage 14             |
-| **Phase 15** | Beta Launch & Go/No-Go Decision Gates   | High     | TODO        | `[----------] 0%` | 0 / 5              | Stage 15             |
+| Phase        | Phase Name                                  | Priority | Status    | Progress Bar       | Tasks (Done/Total) | Stage That Builds It  |
+| ------------ | ------------------------------------------- | -------- | --------- | ------------------ | ------------------ | --------------------- |
+| **Phase 0**  | Documentation & Skeleton Initialisation     | Critical | COMPLETE  | `[##########] 100%`| 17 / 17            | Stage 0 & Stage 0.5   |
+| **Phase 1**  | Design System & UI Kit                      | High     | PARTIAL   | `[########--] 83%` | 19 / 23            | Stage 1 & Stage 0.5   |
+| **Phase 2**  | Database & Shared Core Scoring              | Critical | PARTIAL   | `[#######---] 71%` | 12 / 17            | Stage 2 & Stage 0.5   |
+| **Phase 3**  | Fastify REST API Core                       | Critical | PARTIAL   | `[#######---] 75%` | 12 / 16            | Stage 3 & Stage 0.5   |
+| **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | PARTIAL   | `[#######---] 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
+| **Phase 5**  | Reveal, Matching UX & Oddness               | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 5 & Stage 0.5   |
+| **Phase 6**  | Server-Rendered Share Cards & Links         | High     | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
+| **Phase 7**  | Authentication & Guest Merge                | High     | PARTIAL   | `[########--] 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
+| **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | PARTIAL   | `[########--] 83%` | 10 / 12            | Stage 8 & Stage 0.5   |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#######---] 73%` | 11 / 15            | Stage 9 & Stage 0.5   |
+| **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | PARTIAL   | `[#########-] 91%` | 10 / 11            | Stage 10 & Stage 0.5  |
+| **Phase 11** | Admin Question Tool & Dynamic Importer      | High     | TODO      | `[----------] 0%`  | 0 / 12             | Stage 11              |
+| **Phase 12** | Observability, Telemetry & Security         | High     | TODO      | `[----------] 0%`  | 0 / 11             | Stage 12              |
+| **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | TODO      | `[----------] 0%`  | 0 / 12             | Stage 13              |
+| **Phase 14** | Cloud Deployment & Infrastructure           | Critical | TODO      | `[----------] 0%`  | 0 / 11             | Stage 14              |
+| **Phase 15** | Beta Launch & Go/No-Go Decision Gates       | High     | TODO      | `[----------] 0%`  | 0 / 6              | Stage 15              |
+| **Phase 16** | Scale Readiness Gate (T1, T2, T3)           | Critical | TODO      | `[----------] 0%`  | 0 / 5              | Stage 16 (Scale Gate) |
 
 ---
 
 ## 3. Detailed Phase Breakdown and Task Catalog
 
-### Phase 0: Documentation and Initialisation (Stage 0)
+### Phase 0: Documentation and Initialisation (Stage 0 & Stage 0.5)
 
-_Status: COMPLETE | Target: Skeleton verified, zero features implemented._
+_Status: COMPLETE | Target: Skeleton verified, zero features implemented, scale & reliability architecture hardened._
 
-| ID      | Task Description                                                                                                                   | Priority | Status | Depends On  | Owner | Done Date   | Notes                              |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ---------------------------------- |
-| `[x] P0.01` | Create 6 core markdown files (`architecture.md`, `product.md`, `rules.md`, `design.md`, `task.md`, `memory.md`)                    | Critical | DONE   | None        | Agent | 2026-11-07  | Fully detailed, cross-consistent   |
-| `[x] P0.02` | Git repo initialization, `.gitignore`, `.editorconfig`, `.nvmrc` (Node 20), `.prettierrc`, ESLint config, `tsconfig.base.json`     | High     | DONE   | P0.01       | Agent | 2026-11-07  | Standard base configs              |
-| `[x] P0.03` | Configure pnpm workspace (`pnpm-workspace.yaml`), `turbo.json`, root `package.json` with dev, build, lint, typecheck, test scripts | Critical | DONE   | P0.02       | Agent | 2026-11-07  | Monorepo orchestration             |
-| `[x] P0.04` | Scaffold `apps/web` (Next.js 14 App Router, Tailwind, brand fonts placeholder "oddly — coming soon")                               | High     | DONE   | P0.03       | Agent | 2026-11-07  | Proves design tokens work          |
-| `[x] P0.05` | Scaffold `services/api` (Fastify + TypeScript) with single `GET /health` route returning `{ ok: true, service: "api" }`            | High     | DONE   | P0.03       | Agent | 2026-11-07  | Strict type providers              |
-| `[x] P0.06` | Scaffold `services/worker` (BullMQ + TypeScript) that boots, connects to Redis, logs "worker ready", and idles                     | Medium   | DONE   | P0.03       | Agent | 2026-11-07  | Background queue worker skeleton   |
-| `[x] P0.07` | Scaffold `packages/shared`, `packages/ui-tokens`, and `packages/api-client` with typed exports                                     | High     | DONE   | P0.03       | Agent | 2026-11-07  | Internal monorepo library packages |
-| `[x] P0.08` | Create `infra/docker-compose.yml` (PostgreSQL 16, Redis 7) and `infra/README.md`                                                   | Medium   | DONE   | P0.03       | Agent | 2026-11-07  | Local development services         |
-| `[x] P0.09` | Create comprehensive `.env.example` at root, `apps/web`, `services/api`, `services/worker`                                         | High     | DONE   | P0.03       | Agent | 2026-11-07  | Every variable commented           |
-| `[x] P0.10` | Set up Husky, lint-staged, and commitlint (Conventional Commits)                                                                   | Low      | DONE   | P0.02       | Agent | 2026-11-07  | Enforce git discipline             |
-| `[x] P0.11` | Set up GitHub Actions CI workflow skeleton (`lint`, `typecheck`, `test`, `build`)                                                  | Medium   | DONE   | P0.03       | Agent | 2026-11-07  | Continuous integration             |
-| `[x] P0.12` | Write root `README.md` (quick start, architecture overview, running commands)                                                      | High     | DONE   | P0.01       | Agent | 2026-11-07  | Project documentation              |
-| `[x] P0.13` | Verify `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm dev` run cleanly                                      | Critical | DONE   | P0.04-P0.07 | Agent | 2026-11-07  | Verify all tooling                 |
-| `[x] P0.14` | Stage 0 Report output and execution stop                                                                                           | Critical | DONE   | P0.13       | Agent | 2026-11-07  | Stop and wait for Founder go-ahead |
-
----
-
-### Phase 1: Design System and UI Kit (Stage 1)
-
-_Status: COMPLETE | Target: Visual kit verified on `/design` route in light and dark mode._
-
-| ID          | Task Description                                                                                                | Priority | Status | Depends On   | Owner | Done Date   | Notes                              |
-| ----------- | --------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------- |
-| `[x] P1.01` | Implement CSS variable design tokens and Tailwind preset in `packages/ui-tokens`                                | High     | DONE   | P0.07        | Agent | 2026-11-07  | Color, spacing, radius tokens      |
-| `[x] P1.02` | Self-host Space Grotesk and Inter fonts via `next/font` in `apps/web`                                           | High     | DONE   | P1.01        | Agent | 2026-11-07  | Zero external font CDN calls       |
-| `[x] P1.03` | Build theme provider with system preference detection and manual light/dark toggle                              | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Persisted in cookie/localStorage   |
-| `[x] P1.04` | Implement atmospheric hero backgrounds (drifting circles, star dots, question glows)                            | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Animated and reduce-motion modes   |
-| `[x] P1.05` | Build core button primitives (Primary, Secondary, Ghost, Destructive, Icon, Close X)                            | High     | DONE   | P1.01        | Agent | 2026-11-07  | All 8 interactive states           |
-| `[x] P1.06` | Build container components: Card (Default, Elevated, Glass), Badge, Chip, Link                                  | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Accessible primitives              |
-| `[x] P1.07` | Build form controls: Toggle (Radix Switch), Checkbox (Age Gate), Input, Textarea                                | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Form states and validation styling |
-| `[x] P1.08` | Build Modal and Bottom Sheet component (Radix Dialog, mobile drag-to-dismiss)                                   | High     | DONE   | P1.01        | Agent | 2026-11-07  | Accessible dialog wrapper          |
-| `[x] P1.09` | Implement global Toast notification system                                                                      | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Success, Error, Info variants      |
-| `[x] P1.10` | Build Tab Navigation and Mobile Bottom Tab Bar (Today, History, Me)                                             | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Responsive touch navigation        |
-| `[x] P1.11` | Implement Progress Dots, Skeleton shimmers, and Empty state components                                          | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Polished transition primitives     |
-| `[x] P1.12` | Build flip/tabular Countdown clock component for S2                                                             | Medium   | DONE   | P1.02        | Agent | 2026-11-07  | Next-drop countdown timer          |
-| `[x] P1.13` | Create custom SVG vector components (Brand Mark, Streak Flame, 4 Tier Badges)                                   | High     | DONE   | P1.01        | Agent | 2026-11-07  | Bespoke SVG icons                  |
-| `[x] P1.14` | Create vector illustration SVG library for image questions (28 illustrated tiles)                               | High     | DONE   | P1.01        | Agent | 2026-11-07  | Flat vector style in brand tones   |
-| `[x] P1.15` | Build interactive question answer components (Text Tile, Image Tile, Number Picker, 12-Swatch Grid, Word Chips) | Critical | DONE   | P1.05, P1.14 | Agent | 2026-11-07  | Interactive, stateful UI controls  |
-| `[x] P1.16` | Wire Framer Motion presets, reduce-motion hooks, and sound/haptic helpers                                       | Medium   | DONE   | P1.01        | Agent | 2026-11-07  | Accessibility-compliant feedback   |
-| `[x] P1.17` | Build `/design` showcase route displaying every component across all states                                     | High     | DONE   | P1.05-P1.15  | Agent | 2026-11-07  | Living visual component library    |
-| `[x] P1.18` | Execute automated accessibility audit (`axe-core`) on design kit                                                | High     | DONE   | P1.17        | Agent | 2026-11-07  | WCAG 2.2 AA validation             |
-| `[x] P1.19` | Record token contrast ratios and component decisions in `design.md` and `memory.md`                             | Medium   | DONE   | P1.18        | Agent | 2026-11-07  | Documentation update               |
+| ID          | Task Description                                                                                                                   | Priority | Status | Depends On  | Owner | Done Date   | Notes                                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | -------------------------------------- |
+| `[x] P0.01` | Create 6 core markdown files (`architecture.md`, `product.md`, `rules.md`, `design.md`, `task.md`, `memory.md`)                    | Critical | DONE   | None        | Agent | 2026-11-07  | Fully detailed, cross-consistent       |
+| `[x] P0.02` | Git repo initialization, `.gitignore`, `.editorconfig`, `.nvmrc` (Node 20), `.prettierrc`, ESLint config, `tsconfig.base.json`     | High     | DONE   | P0.01       | Agent | 2026-11-07  | Standard base configs                  |
+| `[x] P0.03` | Configure pnpm workspace (`pnpm-workspace.yaml`), `turbo.json`, root `package.json` with dev, build, lint, typecheck, test scripts | Critical | DONE   | P0.02       | Agent | 2026-11-07  | Monorepo orchestration                 |
+| `[x] P0.04` | Scaffold `apps/web` (Next.js 14 App Router, Tailwind, brand fonts placeholder "oddly — coming soon")                               | High     | DONE   | P0.03       | Agent | 2026-11-07  | Proves design tokens work              |
+| `[x] P0.05` | Scaffold `services/api` (Fastify + TypeScript) with single `GET /health` route returning `{ ok: true, service: "api" }`            | High     | DONE   | P0.03       | Agent | 2026-11-07  | Strict type providers                  |
+| `[x] P0.06` | Scaffold `services/worker` (BullMQ + TypeScript) that boots, connects to Redis, logs "worker ready", and idles                     | Medium   | DONE   | P0.03       | Agent | 2026-11-07  | Background queue worker skeleton       |
+| `[x] P0.07` | Scaffold `packages/shared`, `packages/ui-tokens`, and `packages/api-client` with typed exports                                     | High     | DONE   | P0.03       | Agent | 2026-11-07  | Internal monorepo library packages     |
+| `[x] P0.08` | Create `infra/docker-compose.yml` (PostgreSQL 16, Redis 7) and `infra/README.md`                                                   | Medium   | DONE   | P0.03       | Agent | 2026-11-07  | Local development services             |
+| `[x] P0.09` | Author `.env.example` with clear documentation of all required variables and dummy values                                          | Medium   | DONE   | P0.03       | Agent | 2026-11-07  | Environment config template            |
+| `[x] P0.10` | Configure GitHub Actions CI workflow running typecheck, lint, and test on all PRs                                                  | High     | DONE   | P0.03       | Agent | 2026-11-07  | Continuous integration                 |
+| `[x] P0.11` | Verify end-to-end local startup: `pnpm install`, `pnpm build`, `pnpm typecheck`, `pnpm lint`, `pnpm test`                           | Critical | DONE   | P0.04-P0.08 | Agent | 2026-11-07  | Zero compile/lint/test errors          |
+| `[x] P0.12` | Author `README.md` with complete developer setup instructions, local dev commands, and architecture links                          | Medium   | DONE   | P0.11       | Agent | 2026-11-07  | Onboarding guide                       |
+| `[x] P0.13` | Confirm no functional feature code is written; commit Stage 0 files, tag `stage-0-complete`                                        | Critical | DONE   | P0.11       | Agent | 2026-11-07  | Stage 0 milestone gate                 |
+| `[x] P0.14` | Integrate Override Addendum: enforce dynamic content from PostgreSQL across all documents                                          | Critical | DONE   | P0.01       | Agent | 2026-11-07  | Architecture compliance                |
+| `[x] P0.15` | Apply Scale and Reliability Addendum across all core markdown specifications and README                                            | Critical | DONE   | P0.01       | Agent | 2026-11-10  | Stage 0.5 Architecture hardening       |
+| `[x] P0.16` | Author complete operational and scaling documentation suite under `docs/` (8 authoritative documents)                             | Critical | DONE   | P0.15       | Agent | 2026-11-10  | Stage 0.5 SRE documentation suite      |
+| `[x] P0.17` | Update all `.env.example` files with multi-role Redis, DB pooler, load shedding, and observability variables                      | High     | DONE   | P0.15       | Agent | 2026-11-10  | Stage 0.5 Configuration hardening      |
 
 ---
 
-### Phase 2: Database and Shared Core Scoring (Stage 2)
+### Phase 1: Design System & UI Kit (Stage 1)
 
-_Status: COMPLETE | Target: Prisma schema, dynamic seed files, mathematical scoring formulas, and 70 unit tests._
+_Status: PARTIAL | Target: Token foundation, accessible UI primitives, 28 custom SVGs, degraded state UI._
 
-| ID      | Task Description                                                                                     | Priority | Status | Depends On | Owner | Done Date   | Notes                               |
-| ------- | ---------------------------------------------------------------------------------------------------- | -------- | ------ | ---------- | ----- | ----------- | ----------------------------------- |
-| `[x] P2.01` | Write authoritative `schema.prisma` covering all 18 tables defined in `architecture.md`              | Critical | DONE   | P0.08      | Agent | 2026-11-08  | Fully typed PostgreSQL schema       |
-| `[x] P2.02` | Build dynamic seed script importing `seed/oddly_batch_001_first_14_days.json`, palettes, and content | Critical | DONE   | P2.01      | Agent | 2026-11-08  | Seeds via the actual batch importer |
-| `[x] P2.03` | Define Zod schemas and TypeScript types for all API payloads in `packages/shared`                    | Critical | DONE   | P0.07      | Agent | 2026-11-08  | Shared contract validation          |
-| `[x] P2.04` | Implement pure mathematical functions: `similarity`, `information`, `oddness`, `percentile`, `tier`  | Critical | DONE   | P0.07      | Agent | 2026-11-08  | Pure scoring math                   |
-| `[x] P2.05` | Unit test scoring functions with Master Prompt worked-example fixtures and property tests            | Critical | DONE   | P2.04      | Agent | 2026-11-08  | Strict symmetry, bounds [0, 1]      |
-| `[x] P2.06` | Implement `MatchingStrategy` interface and Stage A brute-force pairwise matcher                      | Critical | DONE   | P2.04      | Agent | 2026-11-08  | In-memory matcher with tie-breakers |
-| `[x] P2.07` | Build match simulation script (`pnpm sim`) reproducing entropy and pair distributions                | High     | DONE   | P2.06      | Agent | 2026-11-08  | Validates theoretical match odds    |
-| `[x] P2.08` | Implement k-anonymity privacy helpers for region and age-band merging with unit tests                | High     | DONE   | P2.03      | Agent | 2026-11-08  | Prevents deanonymisation            |
-| `[x] P2.09` | Implement Twin Day UTC/IST boundary helpers and streak calculation logic with tests                  | High     | DONE   | P2.03      | Agent | 2026-11-08  | Handles cross-timezone players      |
-| `[x] P2.10` | Build dynamic content registry and seed JSON files (`app_content`, `app_config`, `tier_definitions`) | High     | DONE   | P2.01      | Agent | 2026-11-08  | Section 12 dynamic architecture     |
-| `[x] P2.11` | Build repository data access layer in `services/api/src/db`                                          | High     | DONE   | P2.01      | Agent | 2026-11-08  | Clean Prisma query abstraction      |
-| `[x] P2.12` | Build AES-256-GCM encryption/decryption helpers for PII fields with unit tests                       | High     | DONE   | P2.03      | Agent | 2026-11-08  | Encrypts push tokens & IDs          |
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P1.01` | Export Tailwind CSS preset from `packages/ui-tokens` with all brand colors and fonts         | Critical | DONE   | P0.07       | Agent | 2026-11-07  | Color palette and typography    |
+| `[x] P1.02` | Configure Space Grotesk and Inter fonts in Next.js with `font-display: swap`                 | High     | DONE   | P1.01       | Agent | 2026-11-07  | Zero FOIT font delivery         |
+| `[x] P1.03` | Build `Button` component (primary, secondary, ghost, danger, with haptic feedback trigger)   | High     | DONE   | P1.01       | Agent | 2026-11-07  | Core interactive primitive      |
+| `[x] P1.04` | Build `Card` component with Dark, Light, and Mythic theme variants                          | High     | DONE   | P1.01       | Agent | 2026-11-07  | Content container primitive     |
+| `[x] P1.05` | Build `ResponsiveDialog` component using Radix UI Dialog / Drawer with focus trapping       | High     | DONE   | P1.01       | Agent | 2026-11-07  | Accessible modal / bottom sheet |
+| `[x] P1.06` | Build `PickTile` component for binary questions (cold pizza vs lukewarm coffee)             | High     | DONE   | P1.03       | Agent | 2026-11-07  | Question Type 1 UI              |
+| `[x] P1.07` | Build `NumberSlider` component (1–50) with tactile step increments                          | High     | DONE   | P1.01       | Agent | 2026-11-07  | Question Type 2 UI              |
+| `[x] P1.08` | Build `ColourPalettePicker` component (12-colour grid, WCAG AA checkmarks)                  | High     | DONE   | P1.01       | Agent | 2026-11-07  | Question Type 3 UI              |
+| `[x] P1.09` | Build `FourOptionGrid` component (2x2 cards for text/image choices)                         | High     | DONE   | P1.04       | Agent | 2026-11-07  | Question Type 4 UI              |
+| `[x] P1.10` | Build `WordPillPicker` component (6-pill tap selector for mood/intuition)                   | High     | DONE   | P1.03       | Agent | 2026-11-07  | Question Type 5 UI              |
+| `[x] P1.11` | Build `ProgressDots` component (5 dots showing completed/active/upcoming questions)         | Medium   | DONE   | P1.01       | Agent | 2026-11-07  | Question flow header indicator  |
+| `[x] P1.12` | Build `Countdown` split-flap ticker component displaying HH:MM:SS to 07:00 IST              | Medium   | DONE   | P1.01       | Agent | 2026-11-07  | S2 Countdown screen timer       |
+| `[x] P1.13` | Build `Confetti` canvas celebration wrapper using `canvas-confetti`                         | Low      | DONE   | P1.01       | Agent | 2026-11-07  | S6 Twin Reveal celebration      |
+| `[x] P1.14` | Build `Toast` notification primitive for non-blocking feedback                             | Medium   | DONE   | P1.01       | Agent | 2026-11-07  | Ephemeral system messages       |
+| `[x] P1.15` | Author 28 custom SVGs (doors, items, mood glyphs) into `apps/web/public/illustrations/`     | High     | DONE   | P1.01       | Agent | 2026-11-07  | Full vector illustration pack   |
+| `[x] P1.16` | Build `ThemeProvider` and theme toggle supporting System, Dark, and Light modes             | Medium   | DONE   | P1.01       | Agent | 2026-11-07  | Theme management system         |
+| `[x] P1.17` | Create visual design showcase page at `apps/web/src/app/design/page.tsx`                    | High     | DONE   | P1.03-P1.16 | Agent | 2026-11-07  | Component verification gallery  |
+| `[x] P1.18` | Implement haptic vibration and sound effect hooks with user preference toggles              | Low      | DONE   | P1.03       | Agent | 2026-11-07  | Sensory feedback system         |
+| `[x] P1.19` | Run automated accessibility audit with `@axe-core/playwright` on all UI components          | High     | DONE   | P1.17       | Agent | 2026-11-07  | Zero WCAG AA violations         |
+| `[ ] P1.20` | Build status banner component for degradation levels L1–L4 with dynamic copy                | High     | TODO   | P1.01       | Agent | —           | Degradation UI (Section 17.4)   |
+| `[ ] P1.21` | Build "Saved. Finding your twin..." pending screen for Mode B with reduced-motion support   | High     | TODO   | P1.01       | Agent | —           | Async pending screen (17.4)     |
+| `[ ] P1.22` | Build stale-data freshness labels and 429/503 friendly overload screens with countdown      | Medium   | TODO   | P1.01       | Agent | —           | Overload feedback screens       |
+| `[ ] P1.23` | Enforce skeleton minimum display time (200ms) and widget-level error boundary fallbacks     | Medium   | TODO   | P1.01       | Agent | —           | Anti-flicker skeleton rules     |
+
+---
+
+### Phase 2: Database & Shared Core Scoring (Stage 2)
+
+_Status: PARTIAL | Target: PostgreSQL schema, pure scoring algorithms, partitioning, scale tables._
+
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P2.01` | Write complete Prisma schema (`packages/shared/prisma/schema.prisma`) with 18 core tables   | Critical | DONE   | P0.07       | Agent | 2026-11-08  | Authoritative schema definition |
+| `[x] P2.02` | Implement database migrations; verify foreign keys, unique constraints, and indices         | Critical | DONE   | P2.01       | Agent | 2026-11-08  | Database integrity              |
+| `[x] P2.03` | Author database seed script (`packages/shared/prisma/seed.ts`) importing `batch_001.json`   | Critical | DONE   | P2.02       | Agent | 2026-11-08  | Idempotent seed pipeline        |
+| `[x] P2.04` | Implement question validation engine verifying 5-type daily mix and option bounds           | High     | DONE   | P2.01       | Agent | 2026-11-08  | Content integrity guard         |
+| `[x] P2.05` | Implement pair similarity algorithm $S(u, v) = \frac{1}{W} \sum w_q \cdot s_q$ in shared    | Critical | DONE   | P0.07       | Agent | 2026-11-08  | Core matching mathematics       |
+| `[x] P2.06` | Implement information content and Oddness formula $I = \sum -\log_2(p(a))$ in shared        | Critical | DONE   | P0.07       | Agent | 2026-11-08  | Information-theoretic rarity    |
+| `[x] P2.07` | Implement Oddness rarity percentile formula $P(u) = \frac{\text{count}(I_v < I_u)}{N} \times 100$ | Critical | DONE | P2.06 | Agent | 2026-11-08  | Percentile calculation engine   |
+| `[x] P2.08` | Implement dynamic tier classification (Common, Uncommon, Rare, Mythic) from database       | High     | DONE   | P2.07       | Agent | 2026-11-08  | Tier determination engine       |
+| `[x] P2.09` | Implement k-anonymity aggregation filters ($k \ge 20$) for safe coarse demographic display  | High     | DONE   | P2.01       | Agent | 2026-11-08  | Privacy preservation algorithm  |
+| `[x] P2.10` | Implement generic question polymorphic JSON parsers and type guards in `@oddly/shared`      | High     | DONE   | P2.01       | Agent | 2026-11-08  | Polymorphic question support    |
+| `[x] P2.11` | Write deterministic unit tests with worked-example fixtures for all scoring formulas        | Critical | DONE   | P2.05-P2.09 | Agent | 2026-11-08  | Mathematical proof suite        |
+| `[x] P2.12` | Implement Monte Carlo simulation script (`packages/shared/src/sim.ts`) verifying entropy   | Medium   | DONE   | P2.11       | Agent | 2026-11-08  | Statistical verification script |
+| `[ ] P2.13` | Range-partition `submissions`, `answers`, `matches` by `drop_date` with 14-day generator   | Critical | TODO   | P2.01       | Agent | —           | Daily partitioning (Sec 8.1)    |
+| `[ ] P2.14` | Create `batch_runs`, `scheduler_runs`, and `persist_reconciliation` tables for scale        | High     | TODO   | P2.01       | Agent | —           | Scale governance tables (16)    |
+| `[ ] P2.15` | Benchmark submit transaction at 1,000 tx/s on staging to evaluate Prisma vs raw SQL        | High     | TODO   | P2.02       | Agent | —           | ORM decision gate (Sec 8.1)     |
+| `[ ] P2.16` | Configure multi-role Redis key namespaces (`cache`, `counters`, `queues`) and Lua scripts   | Critical | TODO   | P2.01       | Agent | —           | Multi-role Redis setup (8.2)    |
+| `[ ] P2.17` | Implement capacity-model math as CLI command (`pnpm capacity`) and synthetic load generator | High     | TODO   | P2.12       | Agent | —           | Capacity & Loadgen CLI (Sec 2)  |
 
 ---
 
 ### Phase 3: Fastify REST API Core (Stage 3)
 
-_Status: COMPLETE | Target: Working API endpoints with rate limits and Zod validation._
+_Status: PARTIAL | Target: REST routes, Swagger docs, guest identity, load shedding, route policies._
 
-| ID          | Task Description                                                                                          | Priority | Status | Depends On   | Owner | Done Date   | Notes                              |
-| ----------- | --------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------- |
-| `[x] P3.01` | Build Fastify server factory with CORS, Helmet, Cookie, Rate-Limit, and Zod type provider                 | Critical | DONE   | P0.05, P2.03 | Agent | 2026-11-08  | Secure HTTP foundation             |
-| `[x] P3.02` | Configure structured Pino logging with correlation `requestId` propagation                                | High     | DONE   | P3.01        | Agent | 2026-11-08  | Traceable server logs              |
-| `[x] P3.03` | Implement `GET /v1/drop/today`, `GET /v1/content/:locale`, `GET /v1/pages/:slug`, `GET /v1/config/public` | Critical | DONE   | P3.01, P2.11 | Agent | 2026-11-08  | Edge-cached public documents       |
-| `[x] P3.04` | Implement guest identity creation and cookie issuance (`oddly_did`, `oddly_at`)                           | High     | DONE   | P3.01        | Agent | 2026-11-08  | Zero-login guest session           |
-| `[x] P3.05` | Implement `POST /v1/submissions` with Zod validation, idempotency, transaction, and Redis counters        | Critical | DONE   | P3.01, P2.11 | Agent | 2026-11-08  | Core submission engine             |
-| `[x] P3.06` | Integrate instant Stage A matching and oddness scoring inside submission pipeline                         | Critical | DONE   | P3.05, P2.06 | Agent | 2026-11-08  | Returns provisional twin in < 50ms |
-| `[x] P3.07` | Implement `GET /v1/results/:dropId` for viewing current provisional or final match                        | High     | DONE   | P3.05        | Agent | 2026-11-08  | Personal result endpoint           |
-| `[x] P3.08` | Implement `GET /v1/world/:dropId` returning aggregate global stats post-close                             | Medium   | DONE   | P3.03        | Agent | 2026-11-08  | Recap statistics                   |
-| `[x] P3.09` | Implement rate limiting and anti-bot timing anomaly detection (< 3s total duration flagged)               | High     | DONE   | P3.05        | Agent | 2026-11-08  | Bot defenses                       |
-| `[x] P3.10` | Write API integration tests covering happy path, duplicate submit, closed window, and retries             | Critical | DONE   | P3.05-P3.09  | Agent | 2026-11-08  | Comprehensive test suite           |
-| `[x] P3.11` | Generate typed OpenAPI documentation directly from Zod route schemas                                      | Low      | DONE   | P3.01        | Agent | 2026-11-08  | Self-documenting API               |
-| `[x] P3.12` | Generate and export typed `@oddly/api-client` package                                                     | High     | DONE   | P3.10        | Agent | 2026-11-08  | Universal API client library       |
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P3.01` | Scaffold Fastify server with Helmet, CORS, signed cookies, and pino-pretty logging          | Critical | DONE   | P0.05       | Agent | 2026-11-08  | Core server infrastructure      |
+| `[x] P3.02` | Configure `fastify-type-provider-zod` with central error handler for uniform JSON errors    | Critical | DONE   | P3.01       | Agent | 2026-11-08  | Typed validation pipeline       |
+| `[x] P3.03` | Implement `GET /v1/drop/today` endpoint with 5-minute Redis caching and question payload     | Critical | DONE   | P2.03, P3.02| Agent | 2026-11-08  | Daily drop delivery endpoint    |
+| `[x] P3.04` | Implement anonymous guest identity via `oddly_did` cookie and `players` table registration  | Critical | DONE   | P2.01, P3.02| Agent | 2026-11-08  | Zero-signup player identity     |
+| `[x] P3.05` | Implement `POST /v1/submissions` with idempotent `request_id` check and atomic increments   | Critical | DONE   | P2.05, P3.04| Agent | 2026-11-08  | Core submission endpoint        |
+| `[x] P3.06` | Implement instant Stage A provisional twin calculation over Redis answer vectors            | Critical | DONE   | P3.05       | Agent | 2026-11-08  | Real-time matching engine       |
+| `[x] P3.07` | Implement `GET /v1/results/:dropId` returning provisional twin and oddness percentile       | Critical | DONE   | P3.06       | Agent | 2026-11-08  | Player result retrieval         |
+| `[x] P3.08` | Implement `GET /v1/content/:locale` dynamic copy endpoint with content-hash cache header    | High     | DONE   | P2.01, P3.02| Agent | 2026-11-08  | Dynamic UI copy delivery        |
+| `[x] P3.09` | Implement `@fastify/rate-limit` with Redis store (120 req/min general, 30 req/min submit)  | High     | DONE   | P3.01       | Agent | 2026-11-08  | Abuse defense layer             |
+| `[x] P3.10` | Implement Cloudflare Turnstile token validation plugin for anti-bot protection              | High     | DONE   | P3.01       | Agent | 2026-11-08  | Bot challenge verification      |
+| `[x] P3.11` | Configure `@fastify/swagger` and `@fastify/swagger-ui` serving OpenAPI docs at `/docs`      | Medium   | DONE   | P3.02       | Agent | 2026-11-08  | Automated API documentation     |
+| `[x] P3.12` | Implement typed API client in `packages/api-client` wrapping all `/v1` endpoints            | High     | DONE   | P3.03-P3.08 | Agent | 2026-11-08  | Universal typed client library  |
+| `[ ] P3.13` | Implement `@fastify/under-pressure` load shedding on event-loop delay (>20ms) and heap     | Critical | TODO   | P3.01       | Agent | —           | Load shedding (Sec 7.2)         |
+| `[ ] P3.14` | Implement per-route policy table enforcement in code (timeouts, circuit breakers)           | Critical | TODO   | P3.01       | Agent | —           | Route policies (Sec 7.1)        |
+| `[ ] P3.15` | Implement `/ready`, `/v1/stats/today`, `/v1/time`, `/v1/config/public` with degradation     | High     | TODO   | P3.03       | Agent | —           | Edge & health endpoints (5.1)   |
+| `[ ] P3.16` | Implement Mode B asynchronous ingestion behind `PERSIST_MODE=async` with reconciliation     | High     | TODO   | P3.05       | Agent | —           | Dual persistence modes (8.3)    |
 
 ---
 
 ### Phase 4: Play Flow Frontend (Stage 4)
 
-_Status: COMPLETE | Target: Complete play flow playable in browser from landing to submit._
+_Status: PARTIAL | Target: S1 to S4 responsive flow, TanStack Query, offline persistence, budget CI._
 
-| ID          | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                         |
-| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ----------------------------- |
-| `[x] P4.01` | Configure Next.js API rewrites (`/v1/*` -> Fastify) and TanStack Query provider             | Critical | DONE   | P0.04, P3.12 | Agent | 2026-11-08  | Seamless same-origin requests |
-| `[x] P4.02` | Implement S1 Landing / Today screen with live player counter and dynamic copy               | High     | DONE   | P1.05, P4.01 | Agent | 2026-11-08  | Entry landing screen          |
-| `[x] P4.03` | Implement S2 Countdown screen with tabular flip digits and yesterday's recap link           | High     | DONE   | P1.12, P4.01 | Agent | 2026-11-08  | Drop pending view             |
-| `[x] P4.04` | Implement Age Gate bottom sheet and courteous under-18 exclusion screen                     | Critical | DONE   | P1.08, P4.01 | Agent | 2026-11-08  | DPDP Act compliance           |
-| `[x] P4.05` | Implement S3 Question screens (Pick One Text, Number, 12-Colour, Image Grid, Word Chips)    | Critical | DONE   | P1.15, P4.01 | Agent | 2026-11-08  | Polymorphic question engine   |
-| `[x] P4.06` | Implement auto-advance (350ms), back navigation, exit confirmation, and persisted draft     | High     | DONE   | P4.05        | Agent | 2026-11-08  | Smooth mobile ergonomics      |
-| `[x] P4.07` | Implement S4 Review screen with summary chips, editable jumps, and "Find my twin" CTA       | High     | DONE   | P4.05        | Agent | 2026-11-08  | Final review step             |
-| `[x] P4.08` | Implement submission handler with idempotency `request_id`, retry queue, and offline banner | Critical | DONE   | P4.07, P3.05 | Agent | 2026-11-08  | Fault-tolerant submission     |
-| `[x] P4.09` | Add screen-reader announcements (`aria-live`) and full keyboard navigation across play flow | High     | DONE   | P4.05        | Agent | 2026-11-08  | Accessibility compliance      |
-| `[x] P4.10` | Write Playwright E2E test verifying complete guest play flow from S1 to S4                  | Critical | DONE   | P4.08        | Agent | 2026-11-08  | Automated flow verification   |
-| `[x] P4.11` | Verify play flow bundle size is $\le 150 \text{ KB}$ gzipped                                | High     | DONE   | P4.08        | Agent | 2026-11-08  | Performance budget check      |
-
----
-
-### Phase 5: Reveal, Matching UX and Oddness (Stage 5)
-
-_Status: COMPLETE | Target: Animated reveal, count-up match score, oddness card, honesty states._
-
-| ID          | Task Description                                                                                    | Priority | Status | Depends On   | Owner | Done Date   | Notes                    |
-| ----------- | --------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ------------------------ |
-| `[x] P5.01` | Implement S5 Searching screen with 2.0s animated world dot-matrix journey (tap to skip)             | High     | DONE   | P1.13, P4.08 | Agent | 2026-11-08  | Ambient search animation |
-| `[x] P5.02` | Implement S6 Twin Reveal screen with count-up score, sequential pick dots, and confetti             | Critical | DONE   | P1.13, P5.01 | Agent | 2026-11-08  | Core emotional climax    |
-| `[x] P5.03` | Implement S7 Oddness screen with tier badge pop, percentile count-up, and rarest pick card          | Critical | DONE   | P1.13, P5.02 | Agent | 2026-11-08  | Rarity validation screen |
-| `[x] P5.04` | Implement honest state variations: early day (< 200 players), weak match ($\le 2/5$), no exact twin | Critical | DONE   | P5.02, P5.03 | Agent | 2026-11-08  | Transparent messaging    |
-| `[x] P5.05` | Implement background polling for provisional upgrades and "Closest so far" tag                      | High     | DONE   | P5.02        | Agent | 2026-11-08  | Live match refinement    |
-| `[x] P5.06` | Persist completed drop state locally so reopening `/` displays result summary + next countdown      | High     | DONE   | P5.02        | Agent | 2026-11-08  | Returning session UX     |
-| `[x] P5.07` | Wire sound chimes and haptic pulses (`navigator.vibrate`) to reveal beats                           | Medium   | DONE   | P1.16, P5.02 | Agent | 2026-11-08  | Multi-sensory delight    |
-| `[x] P5.08` | Implement reduced-motion alternatives (instant fades, static counters, zero confetti)               | High     | DONE   | P5.02, P5.03 | Agent | 2026-11-08  | Accessibility compliance |
-| `[x] P5.09` | Write Playwright test verifying all reveal variants and honest states                               | High     | DONE   | P5.04        | Agent | 2026-11-08  | Automated UX testing     |
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P4.01` | Build S1 Landing Screen with dynamic copy, active player count, and "Play today's five" CTA | Critical | DONE   | P1.17, P3.12| Agent | 2026-11-08  | Game entrance view              |
+| `[x] P4.02` | Build Age Gate bottom sheet requiring explicit 18+ confirmation before initial play        | Critical | DONE   | P1.05, P3.04| Agent | 2026-11-08  | DPDP legal compliance gate      |
+| `[x] P4.03` | Build S2 Countdown Screen displayed when drop is scheduled or completed today               | High     | DONE   | P1.12, P3.03| Agent | 2026-11-08  | Between-drop waiting screen     |
+| `[x] P4.04` | Build S3 Question Answering Flow dynamically rendering polymorphic questions (Q1 to Q5)     | Critical | DONE   | P1.06-P1.10 | Agent | 2026-11-08  | Core question answering loop    |
+| `[x] P4.05` | Implement question transition animations (horizontal slide with subtle fade, <300ms)        | Medium   | DONE   | P4.04       | Agent | 2026-11-08  | Smooth fluid interactions       |
+| `[x] P4.06` | Build S4 Review Screen displaying player's five choices with tap-to-edit capability        | High     | DONE   | P4.04       | Agent | 2026-11-08  | Pre-submission confirmation     |
+| `[x] P4.07` | Implement local draft persistence in Zustand store so accidental refresh preserves picks   | High     | DONE   | P4.04       | Agent | 2026-11-08  | Pick resilience & draft recovery|
+| `[x] P4.08` | Wire submission flow to `POST /v1/submissions` with idempotent `request_id` handling        | Critical | DONE   | P3.05, P4.06| Agent | 2026-11-08  | Submission integration          |
+| `[x] P4.09` | Implement offline detection banner with automatic retry when network reconnects            | High     | DONE   | P1.14, P4.08| Agent | 2026-11-08  | Flaky network resilience        |
+| `[x] P4.10` | Implement sound and haptic sensory feedback triggers across all question interactions      | Low      | DONE   | P1.18, P4.04| Agent | 2026-11-08  | Delightful sensory experience   |
+| `[x] P4.11` | Write Playwright E2E test verifying complete S1->S4 answering flow on mobile viewport       | Critical | DONE   | P4.01-P4.08 | Agent | 2026-11-08  | End-to-end flow verification    |
+| `[ ] P4.12` | Configure TanStack Query retry policy with exponential backoff and full jitter              | High     | TODO   | P4.08       | Agent | —           | Network discipline (Sec 6.3)    |
+| `[ ] P4.13` | Implement Zustand draft persistence with pending-submission recovery on app open           | High     | TODO   | P4.07       | Agent | —           | Client resilience (Sec 6.3)     |
+| `[ ] P4.14` | Synchronize countdown against server `Date` offset and add 0–4s randomized fetch jitter     | High     | TODO   | P4.03       | Agent | —           | Thundering herd defense (5.2)   |
+| `[ ] P4.15` | Enforce bundle budget check (<150 KB initial JS) in CI with `size-limit`                    | Medium   | TODO   | P4.01       | Agent | —           | Bundle budget gate (Sec 6.2)    |
 
 ---
 
-### Phase 6: Share Cards, Share Pages, and Challenge Links (Stage 6)
+### Phase 5: Reveal, Matching UX & Oddness (Stage 5)
 
-_Status: COMPLETE | Target: Satori PNG card generator, `/c/:shortId` landing page, challenge loops._
+_Status: PARTIAL | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarity, degraded UI._
 
-| ID      | Task Description                                                                               | Priority | Status | Depends On   | Owner | Done Date   | Notes                        |
-| ------- | ---------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------- |
-| `[x] P6.01` | Build Satori card layout templates (Story 9:16, Square 1:1, Link 1.91:1) in 3 themes           | Critical | DONE   | P1.01, P1.02 | Agent | 2026-11-08  | Serverless card layouts      |
-| `[x] P6.02` | Implement BullMQ card rendering job (`renderCard`) with `@resvg/resvg-js` PNG output           | Critical | DONE   | P6.01, P0.06 | Agent | 2026-11-08  | High-resolution image worker |
-| `[x] P6.03` | Configure Cloudflare R2 / local filesystem storage client with content-hash keying             | High     | DONE   | P6.02        | Agent | 2026-11-08  | S3-compatible card storage   |
-| `[x] P6.04` | Implement `GET /v1/results/:dropId/card` polling endpoint and skeleton placeholder in UI       | High     | DONE   | P6.03        | Agent | 2026-11-08  | Async card retrieval         |
-| `[x] P6.05` | Implement S8 Share Sheet (Web Share API with file attachment, copy link, save image)           | High     | DONE   | P6.04        | Agent | 2026-11-08  | Native share integration     |
-| `[x] P6.06` | Build `/c/:shortId` public share landing page with dynamic Open Graph meta tags                | Critical | DONE   | P6.03        | Agent | 2026-11-08  | Viral receiver landing page  |
-| `[x] P6.07` | Implement Challenge Link parameter (`?challenge=1`) and "You vs Sharer" pick comparison        | High     | DONE   | P6.06        | Agent | 2026-11-08  | Compares public picks only   |
-| `[x] P6.08` | Integrate in-memory QR code generator (`qrcode`) onto share card footer                        | Medium   | DONE   | P6.01        | Agent | 2026-11-08  | Scannable card QR code       |
-| `[x] P6.09` | Write visual regression tests for generated share cards across all 3 aspect ratios             | High     | DONE   | P6.02        | Agent | 2026-11-08  | Ensures layout consistency   |
-| `[x] P6.10` | Write privacy audit test asserting zero PII or user IDs appear on share cards or landing pages | Critical | DONE   | P6.06        | Agent | 2026-11-08  | Strict privacy verification  |
-
----
-
-### Phase 7: Authentication and Login Panel (Stage 7)
-
-_Status: COMPLETE | Target: Google OAuth, guest-to-account merge, session cookies._
-
-| ID          | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date  | Notes                          |
-| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ------------------------------ |
-| `[x] P7.01` | Implement JWT token generation, rotating refresh tokens, and CSRF protection                | Critical | DONE   | P3.01        | Agent | 2026-11-09 | Robust token infrastructure    |
-| `[x] P7.02` | Implement `POST /v1/auth/oauth` verifying Google ID tokens                                  | Critical | DONE   | P7.01        | Agent | 2026-11-09 | Google Sign-In endpoint        |
-| `[x] P7.03` | Build Login Panel (Modal on desktop, Bottom Sheet on mobile) and `/login` fallback page     | High     | DONE   | P1.08, P7.02 | Agent | 2026-11-09 | Non-intrusive login sheet      |
-| `[x] P7.04` | Implement `POST /v1/auth/merge-guest` relinking guest submissions and recalculating streaks | Critical | DONE   | P7.02, P2.09 | Agent | 2026-11-09 | Seamless guest history merge   |
-| `[x] P7.05` | Implement `POST /v1/auth/logout` revoking refresh tokens and clearing HTTP-only cookies     | High     | DONE   | P7.01        | Agent | 2026-11-09 | Clean sign-out handler         |
-| `[x] P7.06` | Integrate invisible Cloudflare Turnstile bot verification on sign-in                        | High     | DONE   | P7.02        | Agent | 2026-11-09 | Bot challenge protection       |
-| `[x] P7.07` | Implement duplicate account detection hooks (matching phone hash, device clusters)          | Medium   | DONE   | P7.04        | Agent | 2026-11-09 | Anti-abuse safeguards          |
-| `[x] P7.08` | Write comprehensive integration tests for OAuth authentication and guest merge              | Critical | DONE   | P7.04        | Agent | 2026-11-09 | Full auth test coverage        |
-| `[x] P7.09` | Implement stub interface for Phone OTP behind `FEATURE_PHONE_OTP` feature flag              | Low      | DONE   | P7.01        | Agent | 2026-11-09 | Flagged, ready for SMS gateway |
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P5.01` | Build S5 Searching Animation Screen (pulsing concentric radar, 2.0s duration, skippable)   | High     | DONE   | P1.01, P4.08| Agent | 2026-11-08  | Engaging search transition      |
+| `[x] P5.02` | Build S6 Twin Reveal Screen displaying matched pick count, coarse region, and age band      | Critical | DONE   | P1.04, P3.07| Agent | 2026-11-08  | Core outcome reveal view        |
+| `[x] P5.03` | Implement sequential pick-dot illumination animation (green match / gray mismatch)          | High     | DONE   | P5.02       | Agent | 2026-11-08  | Suspenseful match reveal        |
+| `[x] P5.04` | Wire celebratory confetti burst on reveal (moderate particle count, auto-stops after 2.5s) | Low      | DONE   | P1.13, P5.02| Agent | 2026-11-08  | Delightful celebration          |
+| `[x] P5.05` | Build S7 Oddness Rarity Screen displaying animated count-up percentile and tier badge       | Critical | DONE   | P1.04, P3.07| Agent | 2026-11-08  | Rarity score visualization      |
+| `[x] P5.06` | Implement Rarest Pick highlight card detailing exact percentage of players who chose it     | High     | DONE   | P5.05       | Agent | 2026-11-08  | Statistical highlight feature   |
+| `[x] P5.07` | Implement honest low-density messaging when total players < 200                             | High     | DONE   | P5.02, P5.05| Agent | 2026-11-08  | Ethical honesty standard        |
+| `[x] P5.08` | Implement share trigger buttons opening S8 Share Sheet                                      | High     | DONE   | P5.02, P5.05| Agent | 2026-11-08  | Viral loop entry point          |
+| `[x] P5.09` | Write unit and integration tests verifying reveal animations and percentile formatting      | High     | DONE   | P5.02-P5.07 | Agent | 2026-11-08  | Reveal screen test suite        |
+| `[ ] P5.10` | Implement pending-result polling with ETag 304 backoff and tab visibility pausing           | High     | TODO   | P5.02       | Agent | —           | Polling discipline (Sec 6.3)    |
+| `[ ] P5.11` | Wire degraded UI states (stale labels, status banners) under L1 to L4                       | Medium   | TODO   | P5.02       | Agent | —           | Degraded UI wiring (Sec 12)     |
 
 ---
 
-### Phase 8: Streaks, History, Settings, Privacy, and Reports (Stage 8)
+### Phase 6: Server-Rendered Share Cards & Links (Stage 6)
 
-_Status: DONE | Target: Streak milestones, history calendar, Me settings, export/deletion, reporting._
+_Status: PARTIAL | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId`, worker threads._
 
-| ID          | Task Description                                                                      | Priority | Status | Depends On   | Owner | Done Date  | Notes                           |
-| ----------- | ------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ------------------------------- |
-| `[x] P8.01` | Implement streak verification and `streak_log` transaction logic                      | Critical | DONE   | P2.09, P3.05 | Agent | 2026-11-09 | Daily streak management         |
-| `[x] P8.02` | Build Header Streak Flame and milestone celebration modal (7, 30, 100, 365 days)      | High     | DONE   | P1.13, P8.01 | Agent | 2026-11-09 | Streak gamification             |
-| `[x] P8.03` | Implement `GET /v1/history` API and S10 History screen (calendar strip + past cards)  | High     | DONE   | P3.07, P4.01 | Agent | 2026-11-09 | Historical game archive         |
-| `[x] P8.04` | Implement S14 Me / Settings screen (notification prefs, quiet hours, theme, privacy)  | High     | DONE   | P1.07, P4.01 | Agent | 2026-11-09 | User control panel              |
-| `[x] P8.05` | Build user data export worker job (`POST /v1/me/export`) generating downloadable JSON | High     | DONE   | P0.06, P2.11 | Agent | 2026-11-09 | DPDP data portability           |
-| `[x] P8.06` | Build account deletion flow (`DELETE /v1/me`) with 2-tap confirmation sheet           | Critical | DONE   | P1.08, P2.11 | Agent | 2026-11-09 | DPDP right to erasure           |
-| `[x] P8.07` | Implement Report flow (`POST /v1/reports`) with reason selector and 140-char note     | High     | DONE   | P1.08, P3.01 | Agent | 2026-11-09 | Content moderation intake       |
-| `[x] P8.08` | Build dynamic Privacy Notice and Terms of Service pages rendered from `pages` table   | High     | DONE   | P3.03        | Agent | 2026-11-09 | Marked "lawyer review required" |
-| `[x] P8.09` | Build About Oddly page rendering verbatim brand story from Section 4.1                | Medium   | DONE   | P3.03        | Agent | 2026-11-09 | Brand storytelling              |
-| `[x] P8.10` | Write Playwright tests for settings changes, data export, deletion, and reporting     | High     | DONE   | P8.04-P8.07  | Agent | 2026-11-09 | Automated settings verification |
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P6.01` | Build server-side Satori JSX templates for Story (9:16), Square (1:1), and Link (1.91:1)   | Critical | DONE   | P1.01, P2.08| Agent | 2026-11-08  | Visual card templates           |
+| `[x] P6.02` | Integrate `@resvg/resvg-js` in BullMQ worker compiling SVG to PNG at 2x pixel density       | Critical | DONE   | P0.06, P6.01| Agent | 2026-11-08  | High-resolution PNG compilation |
+| `[x] P6.03` | Implement dynamic QR code generator embedding `/c/:shortId?challenge=1` into cards         | High     | DONE   | P6.01       | Agent | 2026-11-08  | Scannable viral loop            |
+| `[x] P6.04` | Implement content-hash storage key computation and Cloudflare R2 upload pipeline            | Critical | DONE   | P6.02       | Agent | 2026-11-08  | Immutable asset storage         |
+| `[x] P6.05` | Build short link generator (`POST /v1/shares`) creating 8-character nanoid slugs            | High     | DONE   | P2.01, P3.02| Agent | 2026-11-08  | Clean shareable URLs            |
+| `[x] P6.06` | Build S8 Share Sheet bottom sheet with format selector, live preview, and download action   | High     | DONE   | P1.05, P6.04| Agent | 2026-11-08  | In-app sharing interface        |
+| `[x] P6.07` | Implement Web Share API integration falling back to clipboard copy on unsupported browsers  | High     | DONE   | P6.06       | Agent | 2026-11-08  | Native mobile share integration |
+| `[x] P6.08` | Build dynamic challenge landing page at `apps/web/src/app/c/[shortId]/page.tsx`             | Critical | DONE   | P6.05       | Agent | 2026-11-08  | Public viral landing page       |
+| `[x] P6.09` | Inject dynamic Open Graph and Twitter Card metadata into challenge landing pages           | High     | DONE   | P6.08       | Agent | 2026-11-08  | Rich social link previews       |
+| `[x] P6.10` | Write automated tests verifying share card generation, QR code parsing, and OG tags         | High     | DONE   | P6.01-P6.09 | Agent | 2026-11-08  | Share infrastructure test suite |
+| `[ ] P6.11` | Offload Satori/Resvg card rendering to worker threads (`piscina`) capped to CPU cores       | High     | TODO   | P6.02       | Agent | —           | Worker CPU offload (Sec 9)      |
+| `[ ] P6.12` | Implement on-demand card rendering under load and verify CDN edge cache hit ratios (>95%)   | Medium   | TODO   | P6.04       | Agent | —           | Viral share defense (Sec 5)     |
 
 ---
 
-### Phase 9: Scheduler and Daily Pipeline (Stage 9)
+### Phase 7: Authentication & Guest Merge (Stage 7)
 
-_Status: DONE | Target: BullMQ repeatable daily timeline, accelerated staging clock._
+_Status: PARTIAL | Target: Google Identity, soft sign-in modal, guest submission merge, L3 guest mode._
 
-| ID          | Task Description                                                                             | Priority | Status | Depends On   | Owner | Done Date  | Notes                        |
-| ----------- | -------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ---------------------------- |
-| `[x] P9.01` | Implement BullMQ scheduler for daily timeline (06:30 stage, 07:00 open, 06:59 close)         | Critical | DONE   | P0.06, P2.01 | Agent | 2026-11-09 | Core timeline automation     |
-| `[x] P9.02` | Build 5-minute repeatable worker job refreshing provisional pairings                         | High     | DONE   | P2.06, P9.01 | Agent | 2026-11-09 | Background match updates     |
-| `[x] P9.03` | Build 07:00 final batch job: locks $p(a)$, final twins, oddness, streaks, immutable rows     | Critical | DONE   | P2.04, P9.01 | Agent | 2026-11-09 | Definitive recap computation |
-| `[x] P9.04` | Implement world stats calculation job (total players, rarest pick, most popular pick)        | High     | DONE   | P9.03        | Agent | 2026-11-09 | Global community stats       |
-| `[x] P9.05` | Implement share card regeneration job appending immutable "FINAL" badge                      | High     | DONE   | P6.02, P9.03 | Agent | 2026-11-09 | Final card rendering         |
-| `[x] P9.06` | Build S9 Recap screen displaying yesterday's locked twin, world stats, and new drop CTA      | High     | DONE   | P5.02, P9.04 | Agent | 2026-11-09 | Morning recap interface      |
-| `[x] P9.07` | Implement staging accelerated clock (`CLOCK_ACCELERATION=true`) running a Drop every 10 mins | Critical | DONE   | P9.01        | Agent | 2026-11-09 | Rapid pipeline verification  |
-| `[x] P9.08` | Build dead-letter queue, automated job retries, and late-recap fallback UI banner            | High     | DONE   | P9.03        | Agent | 2026-11-09 | Fault tolerance              |
-| `[x] P9.09` | Implement live question-pull recompute pipeline (re-scoring on remaining 4 questions)        | High     | DONE   | P9.03        | Agent | 2026-11-09 | Emergency question pull      |
-| `[x] P9.10` | Implement daily cleanup worker job (purging expired guest records, transient Redis keys)     | Medium   | DONE   | P9.01        | Agent | 2026-11-09 | Data retention hygiene       |
-| `[x] P9.11` | Run automated test suite simulating full 24-hour cycle via accelerated clock                 | Critical | DONE   | P9.07        | Agent | 2026-11-09 | Full lifecycle validation    |
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P7.01` | Scaffold Google Identity Services (GIS) button and credential receiver on client           | High     | DONE   | P4.01       | Agent | 2026-11-09  | Client-side Google SSO          |
+| `[x] P7.02` | Implement `POST /v1/auth/oauth` verifying Google ID tokens with `google-auth-library`       | Critical | DONE   | P3.01       | Agent | 2026-11-09  | Token verification endpoint     |
+| `[x] P7.03` | Issue 15-minute access JWTs and rotating 30-day refresh tokens via secure httpOnly cookies   | Critical | DONE   | P7.02       | Agent | 2026-11-09  | Session cookie architecture     |
+| `[x] P7.04` | Implement `POST /v1/auth/merge-guest` seamlessly linking anonymous guest history to account | Critical | DONE   | P7.02       | Agent | 2026-11-09  | History preservation engine     |
+| `[x] P7.05` | Build soft sign-in modal (Login Panel) triggered contextually from results and streak views | High     | DONE   | P1.05, P7.01| Agent | 2026-11-09  | Non-blocking auth entry point   |
+| `[x] P7.06` | Build `POST /v1/auth/refresh` rotating refresh tokens and issuing fresh access tokens       | High     | DONE   | P7.03       | Agent | 2026-11-09  | Transparent session renewal     |
+| `[x] P7.07` | Implement one-click account deletion and data export under DPDP Act requirements           | Critical | DONE   | P7.04       | Agent | 2026-11-09  | Legal right to erasure          |
+| `[x] P7.08` | Build `POST /v1/auth/logout` clearing all auth cookies and invalidating refresh token       | High     | DONE   | P7.03       | Agent | 2026-11-09  | Clean session termination       |
+| `[x] P7.09` | Write automated tests verifying token verification, cookie rotation, and history merge      | High     | DONE   | P7.02-P7.08 | Agent | 2026-11-09  | Auth integration test suite     |
+| `[ ] P7.10` | Enforce guest-play-only behavior under Level L3 and protect against token refresh storms    | High     | TODO   | P7.04       | Agent | —           | Degradation auth protection (12)|
+| `[ ] P7.11` | Implement Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage  | Medium   | TODO   | P3.10       | Agent | —           | Bot defense resilience (Sec 13) |
+
+---
+
+### Phase 8: Streaks, History, Settings & Privacy (Stage 8)
+
+_Status: PARTIAL | Target: Header Flame, History archive, Settings & Privacy, replica reads, 90d retention._
+
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P8.01` | Build `StreakFlame` component with tier-based SVG flames and milestone celebration          | High     | DONE   | P1.01       | Agent | 2026-11-09  | Visual streak indicator         |
+| `[x] P8.02` | Implement streak calculation algorithm detecting active, broken, and milestone streaks      | Critical | DONE   | P2.01, P3.05| Agent | 2026-11-09  | Streak verification engine      |
+| `[x] P8.03` | Build `GET /v1/history` endpoint with cursor pagination returning player's past submissions | High     | DONE   | P2.01, P3.04| Agent | 2026-11-09  | Archive retrieval endpoint      |
+| `[x] P8.04` | Build S10 History Screen displaying past drops, locked twins, and oddness tiers             | High     | DONE   | P8.03       | Agent | 2026-11-09  | Player history archive view     |
+| `[x] P8.05` | Build S14 Settings Screen with theme selector, audio/haptic toggles, and notification prefs | High     | DONE   | P1.16, P1.18| Agent | 2026-11-09  | User preferences view           |
+| `[x] P8.06` | Implement one-click JSON data export generating downloadable archive under DPDP Act         | High     | DONE   | P7.07       | Agent | 2026-11-09  | Data portability feature        |
+| `[x] P8.07` | Implement complete account erasure workflow purging personal data within 7-day grace period | Critical | DONE   | P7.07       | Agent | 2026-11-09  | DPDP Right to Erasure execution |
+| `[x] P8.08` | Build report submission bottom sheet (`POST /v1/reports`) with 140-character note limit     | High     | DONE   | P1.05, P3.01| Agent | 2026-11-09  | User content moderation intake  |
+| `[x] P8.09` | Implement regional privacy toggle allowing players to conceal coarse geographical region    | High     | DONE   | P2.09       | Agent | 2026-11-09  | Granular privacy control        |
+| `[x] P8.10` | Write automated test suite verifying streak calculations, history pagination, and erasure   | High     | DONE   | P8.01-P8.09 | Agent | 2026-11-09  | Settings & history test suite   |
+| `[ ] P8.11` | Route history archive and world stats queries to database read replicas                     | High     | TODO   | P8.03       | Agent | —           | Read replica routing (Sec 8.1)  |
+| `[ ] P8.12` | Implement 90-day answer data retention compaction and cold archive worker job               | High     | TODO   | P2.01       | Agent | —           | Data retention policy (Sec 8.1) |
+
+---
+
+### Phase 9: Daily Pipeline & BullMQ Scheduler (Stage 9)
+
+_Status: PARTIAL | Target: Staging, live window, final recap batch, S9 Recap screen, final batch isolation._
+
+| ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
+| ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
+| `[x] P9.01` | Configure BullMQ scheduler registering daily crons for 06:30 staging, 07:00 open, and close | Critical | DONE   | P0.06       | Agent | 2026-11-09  | Core daily clock orchestration  |
+| `[x] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | Critical | DONE   | P9.01, P3.03| Agent | 2026-11-09  | Pre-stage cache warmer          |
+| `[x] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | Critical | DONE   | P9.01       | Agent | 2026-11-09  | Drop release worker             |
+| `[x] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | High     | DONE   | P3.06       | Agent | 2026-11-09  | Background match refiner        |
+| `[x] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | Critical | DONE   | P9.01       | Agent | 2026-11-09  | Drop closure enforcement        |
+| `[x] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | Critical | DONE   | P9.05, P2.05| Agent | 2026-11-09  | Final match computation engine  |
+| `[x] P9.07` | Build S9 Morning Recap Screen displaying locked twin, final oddness, and world stats        | Critical | DONE   | P9.06       | Agent | 2026-11-09  | Daily recap experience          |
+| `[x] P9.08` | Implement `GET /v1/world/:dropId` endpoint returning aggregated drop stats                  | High     | DONE   | P9.06       | Agent | 2026-11-09  | Global drop statistics          |
+| `[x] P9.09` | Implement `CLOCK_ACCELERATION=true` staging mode compressing 24-hour cycle to 10 minutes    | High     | DONE   | P9.01-P9.06 | Agent | 2026-11-09  | Accelerated testing harness     |
+| `[x] P9.10` | Implement streak increment and freeze logic executed in final recap batch                   | High     | DONE   | P8.02, P9.06| Agent | 2026-11-09  | Automated streak progression    |
+| `[x] P9.11` | Run automated test suite simulating full 24-hour cycle via accelerated clock                | Critical | DONE   | P9.07       | Agent | 2026-11-09  | Full lifecycle validation       |
+| `[ ] P9.12` | Isolate final batch worker pool with max 25% DB connection limit and separate queue         | Critical | TODO   | P9.06       | Agent | —           | Worker pool bulkhead (Sec 10)   |
+| `[ ] P9.13` | Implement chunked resumable final batch (5,000 users/chunk) with progressive publishing     | Critical | TODO   | P9.06       | Agent | —           | Parallel final batch (Sec 10)   |
+| `[ ] P9.14` | Implement scheduler distributed leader lock and catch-up handler on boot                    | Critical | TODO   | P9.01       | Agent | —           | Leader election & catchup (9)   |
+| `[ ] P9.15` | Build BullMQ dead-letter queue (DLQ) replay tool and alert trigger                          | High     | TODO   | P0.06       | Agent | —           | Poison job quarantine (Sec 9)   |
 
 ---
 
 ### Phase 10: Notifications and PWA (Stage 10)
 
-_Status: COMPLETE | Target: Web Push sender, 2-per-day cap, quiet hours, installable PWA._
+_Status: PARTIAL | Target: Web Push sender, 2-per-day cap, quiet hours, installable PWA, dispatch slicing._
 
-| ID       | Task Description                                                                           | Priority | Status | Depends On     | Owner | Done Date | Notes                         |
-| -------- | ------------------------------------------------------------------------------------------ | -------- | ------ | -------------- | ----- | --------- | ----------------------------- |
-| `[x] P10.01` | Implement service worker and Web App Manifest (standalone display, icons, `/offline`)      | Critical | DONE   | P0.04          | Agent | 2026-11-09 | PWA installability            |
-| `[x] P10.02` | Build Web Push permission request flow and second-visit prompt sheet                       | High     | DONE   | P1.08, P3.01   | Agent | 2026-11-09 | Contextual permission request |
-| `[x] P10.03` | Configure VAPID signing and BullMQ `sendPush` job utilizing `web-push` library             | Critical | DONE   | P0.06          | Agent | 2026-11-09 | Push delivery engine          |
-| `[x] P10.04` | Implement push channels: Drop Live, Smart Nudge, Twin Upgrade, Recap, Streak at Risk       | High     | DONE   | P10.03         | Agent | 2026-11-09 | Template-driven notifications |
-| `[x] P10.05` | Enforce strict delivery constraints: max 2 pushes/user/day, quiet hours (22:00-07:00 IST)  | Critical | DONE   | P10.04         | Agent | 2026-11-09 | Anti-annoyance protection     |
-| `[x] P10.06` | Implement Twin Upgrade push trigger ($\Delta S \ge 0.10$ or jump from 3 to 4/5, max 1/day) | High     | DONE   | P9.02, P10.04  | Agent | 2026-11-09 | High-value retention trigger  |
-| `[x] P10.07` | Implement iOS Safari home-screen installation instruction banner                           | Medium   | DONE   | P10.01         | Agent | 2026-11-09 | Guides iOS push requirement   |
-| `[x] P10.08` | Build in-app PWA install button hooked to `beforeinstallprompt` event                      | Medium   | DONE   | P10.01         | Agent | 2026-11-09 | Streamlined install UX        |
-| `[x] P10.09` | Log push dispatches and track notification open rates in `notifications_log`               | High     | DONE   | P10.04         | Agent | 2026-11-09 | Delivery telemetry            |
-| `[x] P10.10` | Write integration tests verifying push capping, quiet hour silencing, and upgrade triggers | High     | DONE   | P10.05, P10.06 | Agent | 2026-11-09 | Notification test suite       |
+| ID          | Task Description                                                                           | Priority | Status | Depends On     | Owner | Done Date   | Notes                         |
+| ----------- | ------------------------------------------------------------------------------------------ | -------- | ------ | -------------- | ----- | ----------- | ----------------------------- |
+| `[x] P10.01` | Implement service worker and Web App Manifest (standalone display, icons, `/offline`)      | Critical | DONE   | P0.04          | Agent | 2026-11-09  | PWA installability            |
+| `[x] P10.02` | Build Web Push permission request flow and second-visit prompt sheet                       | High     | DONE   | P1.08, P3.01   | Agent | 2026-11-09  | Contextual permission request |
+| `[x] P10.03` | Configure VAPID signing and BullMQ `sendPush` job utilizing `web-push` library             | Critical | DONE   | P0.06          | Agent | 2026-11-09  | Push delivery engine          |
+| `[x] P10.04` | Implement push channels: Drop Live, Smart Nudge, Twin Upgrade, Recap, Streak at Risk       | High     | DONE   | P10.03         | Agent | 2026-11-09  | Template-driven notifications |
+| `[x] P10.05` | Enforce strict delivery constraints: max 2 pushes/user/day, quiet hours (22:00-07:00 IST)  | Critical | DONE   | P10.04         | Agent | 2026-11-09  | Anti-annoyance protection     |
+| `[x] P10.06` | Implement Twin Upgrade push trigger ($\Delta S \ge 0.10$ or jump from 3 to 4/5, max 1/day) | High     | DONE   | P9.02, P10.04  | Agent | 2026-11-09  | High-value retention trigger  |
+| `[x] P10.07` | Implement iOS Safari home-screen installation instruction banner                           | Medium   | DONE   | P10.01         | Agent | 2026-11-09  | Guides iOS push requirement   |
+| `[x] P10.08` | Build in-app PWA install button hooked to `beforeinstallprompt` event                      | Medium   | DONE   | P10.01         | Agent | 2026-11-09  | Streamlined install UX        |
+| `[x] P10.09` | Log push dispatches and track notification open rates in `notifications_log`               | High     | DONE   | P10.04         | Agent | 2026-11-09  | Delivery telemetry            |
+| `[x] P10.10` | Write integration tests verifying push capping, quiet hour silencing, and upgrade triggers | High     | DONE   | P10.05, P10.06 | Agent | 2026-11-09  | Notification test suite       |
+| `[ ] P10.11` | Implement push dispatch slicing (5,000/batch every 20s) and provider circuit breaker       | High     | TODO   | P10.03         | Agent | —           | Staggered push dispatch (5.2) |
 
 ---
 
 ### Phase 11: Admin Tool and Dynamic Importer (Stage 11)
 
-_Status: TODO | Target: Bulk JSON question importer, two-person approval, buffer alerts._
+_Status: TODO | Target: Bulk JSON question importer, two-person approval, buffer alerts, operational controls._
 
-| ID       | Task Description                                                                           | Priority | Status | Depends On    | Owner | Done Date | Notes                        |
-| -------- | ------------------------------------------------------------------------------------------ | -------- | ------ | ------------- | ----- | --------- | ---------------------------- |
-| `P11.01` | Scaffold `apps/admin` Next.js application with Google SSO, allowlist, and role guards      | Critical | TODO   | P0.03, P7.01  | Agent | —         | Internal admin portal        |
-| `P11.02` | Build question library browser and polymorphic editor with live phone-sized preview        | High     | TODO   | P11.01, P2.01 | Agent | —         | Question authoring interface |
-| `P11.03` | Build bulk JSON batch importer supporting `seed/oddly_batch_001_first_14_days.json` format | Critical | TODO   | P11.01, P2.02 | Agent | —         | Core batch ingestion engine  |
-| `P11.04` | Implement batch validation engine: mix of 5 types, option counts, forbidden topics scan    | Critical | TODO   | P11.03        | Agent | —         | Content policy enforcement   |
-| `P11.05` | Implement Drop scheduling calendar with two-person approval workflow and D-2 lock          | Critical | TODO   | P11.01, P2.01 | Agent | —         | Editorial governance         |
-| `P11.06` | Build panel-testing evaluation tool computing `panel_entropy` and flagging skewed options  | High     | TODO   | P11.02        | Agent | —         | Predictive quality scoring   |
-| `P11.07` | Implement live administrative actions: pull question, extend drop window, view audit log   | High     | TODO   | P11.01, P9.09 | Agent | —         | Operational control center   |
-| `P11.08` | Implement buffer tracking dashboard: alert when approved drops remain < 14 days            | High     | TODO   | P11.05        | Agent | —         | Content pipeline health      |
-| `P11.09` | Build dynamic editors for `app_content` copy strings, `pages` markdown, and `app_config`   | High     | TODO   | P11.01, P2.10 | Agent | —         | Content management UI        |
-| `P11.10` | Write automated tests verifying batch validation rejects invalid question structures       | High     | TODO   | P11.04        | Agent | —         | Ingestion safety tests       |
+| ID          | Task Description                                                                           | Priority | Status | Depends On    | Owner | Done Date | Notes                        |
+| ----------- | ------------------------------------------------------------------------------------------ | -------- | ------ | ------------- | ----- | --------- | ---------------------------- |
+| `[ ] P11.01` | Scaffold `apps/admin` Next.js application with Google SSO, allowlist, and role guards      | Critical | TODO   | P0.03, P7.01  | Agent | —         | Internal admin portal        |
+| `[ ] P11.02` | Build question library browser and polymorphic editor with live phone-sized preview        | High     | TODO   | P11.01, P2.01 | Agent | —         | Question authoring interface |
+| `[ ] P11.03` | Build bulk JSON batch importer supporting `seed/batch_001.json` format                     | Critical | TODO   | P11.01, P2.02 | Agent | —         | Core batch ingestion engine  |
+| `[ ] P11.04` | Implement batch validation engine: mix of 5 types, option counts, forbidden topics scan    | Critical | TODO   | P11.03        | Agent | —         | Content policy enforcement   |
+| `[ ] P11.05` | Implement Drop scheduling calendar with two-person approval workflow and D-2 lock          | Critical | TODO   | P11.01, P2.01 | Agent | —         | Editorial governance         |
+| `[ ] P11.06` | Build panel-testing evaluation tool computing `panel_entropy` and flagging skewed options  | High     | TODO   | P11.02        | Agent | —         | Predictive quality scoring   |
+| `[ ] P11.07` | Implement live administrative actions: pull question, extend drop window, view audit log   | High     | TODO   | P11.01, P9.09 | Agent | —         | Operational control center   |
+| `[ ] P11.08` | Implement buffer tracking dashboard: alert when approved drops remain < 14 days            | High     | TODO   | P11.05        | Agent | —         | Content pipeline health      |
+| `[ ] P11.09` | Build dynamic editors for `app_content` copy strings, `pages` markdown, and `app_config`   | High     | TODO   | P11.01, P2.10 | Agent | —         | Content management UI        |
+| `[ ] P11.10` | Write automated tests verifying batch validation rejects invalid question structures       | High     | TODO   | P11.04        | Agent | —         | Ingestion safety tests       |
+| `[ ] P11.11` | Build degradation level control panel, emergency kill switches, and DLQ viewer             | High     | TODO   | P11.07        | Agent | —         | Degradation controls (12)    |
+| `[ ] P11.12` | Build content runway buffer alert dashboard (<14d yellow, <7d red) and window extension    | High     | TODO   | P11.08        | Agent | —         | Buffer management (Sec 18)   |
 
 ---
 
 ### Phase 12: Observability, Telemetry, and Security Hardening (Stage 12)
 
-_Status: TODO | Target: PostHog funnels, Sentry tracing, CSP headers, rate-limit audit._
+_Status: TODO | Target: PostHog funnels, Sentry tracing, Prometheus metrics, CSP headers, rate-limit audit._
 
-| ID       | Task Description                                                                              | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
-| -------- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
-| `P12.01` | Instrument PostHog telemetry across key lifecycle events (drop view, submit, reveal, share)   | High     | TODO   | P4.08, P5.02 | Agent | —         | Privacy-safe product analytics |
-| `P12.02` | Configure PostHog retention and funnel dashboards tracking G0/G1 success metrics              | Medium   | TODO   | P12.01       | Agent | —         | Metrics visualization          |
-| `P12.03` | Integrate Sentry error monitoring and performance tracing in Web, API, and Worker             | Critical | TODO   | P0.04, P0.05 | Agent | —         | Real-time crash monitoring     |
-| `P12.04` | Configure automated alert thresholds (error rate > 1%, submit p95 > 800ms, queue delay > 10m) | High     | TODO   | P12.03       | Agent | —         | Operational alerts             |
-| `P12.05` | Harden HTTP security headers (strict Content-Security-Policy, HSTS, secure cookies)           | Critical | TODO   | P3.01        | Agent | —         | Application defense in depth   |
-| `P12.06` | Verify zero PII leakage across logs, network responses, and client error messages             | Critical | TODO   | P3.02, P6.10 | Agent | —         | Privacy security audit         |
-| `P12.07` | Run automated dependency vulnerability audit (`pnpm audit`) and fix CVEs                      | High     | TODO   | P0.03        | Agent | —         | Supply-chain security          |
-| `P12.08` | Build dynamic cache invalidation test suite ensuring content updates flush instantly          | High     | TODO   | P3.03        | Agent | —         | Cache coherence tests          |
-| `P12.09` | Implement feature flags in API and Web (`FEATURE_PHONE_OTP`, `FEATURE_WAVE`)                  | Medium   | TODO   | P3.01        | Agent | —         | Controlled feature rollouts    |
-
----
-
-### Phase 13: End-to-End Testing, QA, and Performance (Stage 13)
-
-_Status: TODO | Target: 95% test coverage in shared, k6 load test up to 10k players._
-
-| ID       | Task Description                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                           |
-| -------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------- |
-| `P13.01` | Verify test coverage: $\ge 95\%$ on `packages/shared`, $\ge 80\%$ on `services/api`         | Critical | TODO   | P2.05, P3.10 | Agent | —         | Coverage target compliance      |
-| `P13.02` | Execute end-to-end Playwright tests covering all user flows and error paths                 | Critical | TODO   | P4.10, P5.09 | Agent | —         | Full regression test suite      |
-| `P13.03` | Conduct comprehensive accessibility audit with `@axe-core/playwright` (zero AA violations)  | High     | TODO   | P13.02       | Agent | —         | WCAG 2.2 AA certification       |
-| `P13.04` | Validate performance on simulated low-end Android CPU and throttled 4G network              | Critical | TODO   | P4.11        | Agent | —         | Core device compatibility       |
-| `P13.05` | Execute k6 load test simulating 10,000 daily players with 5x burst concurrency at 07:00 IST | Critical | TODO   | P3.05        | Agent | —         | Peak burst capacity test        |
-| `P13.06` | Validate simulation script output matching Master Prompt theoretical match distributions    | High     | TODO   | P2.07        | Agent | —         | Algorithm fidelity verification |
-| `P13.07` | Cross-browser compatibility audit (Chrome, Safari, Firefox, Samsung Internet)               | High     | TODO   | P13.02       | Agent | —         | Browser matrix check            |
-| `P13.08` | Execute batch importer stress tests with deliberately broken, malformed JSON inputs         | High     | TODO   | P11.10       | Agent | —         | Ingestion resilience testing    |
-| `P13.09` | Run comprehensive team Bug Bash and resolve all critical/high priority defects              | High     | TODO   | P13.02       | Agent | —         | Quality polish                  |
-| `P13.10` | Verify Beta Release Acceptance Criteria (Crash-free > 99%, drop completion > 85%)           | Critical | TODO   | P13.09       | Agent | —         | Gate G1 compliance check        |
+| ID          | Task Description                                                                              | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
+| ----------- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
+| `[ ] P12.01` | Instrument PostHog telemetry across key lifecycle events (drop view, submit, reveal, share)   | High     | TODO   | P4.08, P5.02 | Agent | —         | Privacy-safe product analytics |
+| `[ ] P12.02` | Configure PostHog retention and funnel dashboards tracking G0/G1 success metrics              | Medium   | TODO   | P12.01       | Agent | —         | Metrics visualization          |
+| `[ ] P12.03` | Integrate Sentry error monitoring and performance tracing in Web, API, and Worker             | Critical | TODO   | P0.04, P0.05 | Agent | —         | Real-time crash monitoring     |
+| `[ ] P12.04` | Configure automated alert thresholds (error rate > 1%, submit p95 > 800ms, queue delay > 10m) | High     | TODO   | P12.03       | Agent | —         | Operational alerts             |
+| `[ ] P12.05` | Harden HTTP security headers (strict Content-Security-Policy, HSTS, secure cookies)           | Critical | TODO   | P3.01        | Agent | —         | Application defense in depth   |
+| `[ ] P12.06` | Verify zero PII leakage across logs, network responses, and client error messages             | Critical | TODO   | P3.02, P6.10 | Agent | —         | Privacy security audit         |
+| `[ ] P12.07` | Run automated dependency vulnerability audit (`pnpm audit`) and fix CVEs                      | High     | TODO   | P0.03        | Agent | —         | Supply-chain security          |
+| `[ ] P12.08` | Build dynamic cache invalidation test suite ensuring content updates flush instantly          | High     | TODO   | P3.03        | Agent | —         | Cache coherence tests          |
+| `[ ] P12.09` | Instrument `prom-client` golden signals and OpenTelemetry distributed tracing                 | Critical | TODO   | P12.03       | Agent | —         | Distributed tracing (Sec 14)   |
+| `[ ] P12.10` | Configure Prometheus alert rules with links to `docs/runbook.md` and deploy status page       | High     | TODO   | P12.04       | Agent | —         | Alert rules & status page (14) |
+| `[ ] P12.11` | Configure Cloudflare WAF, bot management, and origin IP lockdown                              | Critical | TODO   | P12.05       | Agent | —         | Edge security hardening (5.3)  |
 
 ---
 
-### Phase 14: Cloud Deployment and Infrastructure (Stage 14)
+### Phase 13: End-to-End QA, Load Tests & Audits (Stage 13)
 
-_Status: TODO | Target: Automated staging & production deployments, tested backups._
+_Status: TODO | Target: k6 load test scenarios, breaking-point certification, chaos injection, DR drills._
 
-| ID       | Task Description                                                                       | Priority | Status | Depends On    | Owner   | Done Date | Notes                         |
-| -------- | -------------------------------------------------------------------------------------- | -------- | ------ | ------------- | ------- | --------- | ----------------------------- |
-| `P14.01` | Provision managed PostgreSQL (Neon/Supabase), Redis (Upstash), Cloudflare R2           | Critical | TODO   | None          | Founder | —         | Managed cloud databases       |
-| `P14.02` | Deploy staging environment and execute full accelerated-clock pipeline dry run         | Critical | TODO   | P9.07, P14.01 | Agent   | —         | Staging verification          |
-| `P14.03` | Configure production GitHub Actions CI/CD deployment pipeline                          | Critical | TODO   | P14.02        | Agent   | —         | Zero-downtime CD              |
-| `P14.04` | Configure automated daily PostgreSQL backups and verify point-in-time restore          | Critical | TODO   | P14.01        | Agent   | —         | Disaster recovery validation  |
-| `P14.05` | Configure uptime monitors, synthetic health checks, and alerting integration           | High     | TODO   | P14.02        | Agent   | —         | Infrastructure monitoring     |
-| `P14.06` | Configure Cloudflare CDN caching rules, WAF rate limits, and Turnstile production keys | Critical | TODO   | P14.03        | Agent   | —         | Edge perimeter security       |
-| `P14.07` | Write comprehensive operations incident runbook in `docs/runbook.md`                   | High     | TODO   | P14.03        | Agent   | —         | On-call procedures & runbooks |
-| `P14.08` | Complete pre-launch verification checklist across all services                         | Critical | TODO   | P14.06        | Agent   | —         | Final operational sign-off    |
-| `P14.09` | Audit infrastructure operating costs against ₹2,500/month lean budget target           | Medium   | TODO   | P14.01        | Agent   | —         | Cloud budget verification     |
-
----
-
-### Phase 15: Beta Launch and Decision Gates (Stage 15)
-
-_Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
-
-| ID       | Task Description                                                                             | Priority | Status | Depends On | Owner   | Done Date | Notes                        |
-| -------- | -------------------------------------------------------------------------------------------- | -------- | ------ | ---------- | ------- | --------- | ---------------------------- |
-| `P15.01` | Implement Weekend Prototype Test mode (`WEEKEND_TEST=true`) if G0 is executed first          | High     | TODO   | P14.03     | Agent   | —         | Prototype mode toggle        |
-| `P15.02` | Execute 200-user closed beta onboarding and cohort tracking                                  | Critical | TODO   | P14.03     | Founder | —         | Beta cohort rollout          |
-| `P15.03` | Build automated daily metrics reporting script tracking G0, G1, and G2 thresholds            | High     | TODO   | P12.01     | Agent   | —         | Automated retention metrics  |
-| `P15.04` | Execute 14-day post-launch operational monitoring checklist                                  | High     | TODO   | P15.02     | Both    | —         | Daily drop health monitoring |
-| `P15.05` | Conduct post-beta retrospective and prioritize v1.5 backlog (Friends, Waves, Hindi/Gujarati) | High     | TODO   | P15.04     | Both    | —         | Next cycle planning          |
+| ID          | Task Description                                                                              | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
+| ----------- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
+| `[ ] P13.01` | Build comprehensive Playwright test covering full user loop across mobile/desktop browsers   | Critical | TODO   | P4.11, P5.09 | Agent | —         | End-to-end integration test    |
+| `[ ] P13.02` | Build k6 load test script simulating 07:00 IST morning traffic spike at planned peak          | Critical | TODO   | P3.05        | Agent | —         | High-concurrency load test     |
+| `[ ] P13.03` | Execute k6 stress test verifying graceful degradation under extreme load                      | High     | TODO   | P13.02       | Agent | —         | System resilience test         |
+| `[ ] P13.04` | Execute soak test verifying memory stability over 2 hours of sustained traffic               | High     | TODO   | P13.02       | Agent | —         | Memory leak detection          |
+| `[ ] P13.05` | Run automated accessibility audit with `@axe-core/playwright` across all user-facing views    | High     | TODO   | P4.01, P5.02 | Agent | —         | WCAG 2.2 AA certification      |
+| `[ ] P13.06` | Execute cross-browser verification (Chrome, Safari, Firefox, Edge, iOS Safari, Samsung)      | High     | TODO   | P13.01       | Agent | —         | Cross-platform parity          |
+| `[ ] P13.07` | Conduct DPDP compliance verification: verify 18+ enforcement, data export, and erasure        | Critical | TODO   | P8.06, P8.07 | Agent | —         | Privacy law audit              |
+| `[ ] P13.08` | Run Lighthouse mobile performance audit: verify FCP < 1.8s, LCP < 2.5s, Performance score > 90| High     | TODO   | P4.01        | Agent | —         | Web Vitals verification       |
+| `[ ] P13.09` | Execute chaos testing: simulate Redis and PostgreSQL disconnects; verify recovery             | High     | TODO   | P3.01        | Agent | —         | Fault tolerance testing        |
+| `[ ] P13.10` | Compile final QA audit report with zero P0/P1 defects                                         | Critical | TODO   | P13.01-P13.09| Agent | —         | Quality certification gate     |
+| `[ ] P13.11` | Execute all 15 scale and chaos scenarios from `docs/load-testing.md` and log certified limits | Critical | TODO   | P13.02       | Agent | —         | Scale test matrix (Sec 15)     |
+| `[ ] P13.12` | Execute disaster recovery drill verifying RTO < 30m and RPO < 5m from cold backups           | Critical | TODO   | P13.09       | Agent | —         | DR restore drill (Sec 15)      |
 
 ---
 
-## 4. Founder Verification Checklists (Stage-by-Stage)
+### Phase 14: Cloud Deployment & Infrastructure (Stage 14)
+
+_Status: TODO | Target: Terraform configs, multi-AZ autoscaling, PgBouncer, canary deployment pipeline._
+
+| ID          | Task Description                                                                              | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
+| ----------- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
+| `[ ] P14.01` | Provision production PostgreSQL 16 (Neon / Supabase) with automated PITR daily backups        | Critical | TODO   | P2.01        | Agent | —         | Production database            |
+| `[ ] P14.02` | Provision production Redis 7 (Upstash / managed cluster) with AOF persistence enabled         | Critical | TODO   | P3.01        | Agent | —         | Production cache & queues      |
+| `[ ] P14.03` | Configure Cloudflare R2 bucket for share card storage with custom domain and edge caching     | Critical | TODO   | P6.04        | Agent | —         | Card asset hosting             |
+| `[ ] P14.04` | Deploy Fastify API (`services/api`) to container platform with health checks and autoscaling  | Critical | TODO   | P3.01        | Agent | —         | API production deployment      |
+| `[ ] P14.05` | Deploy BullMQ Worker (`services/worker`) with persistent Redis connection and scheduler crons | Critical | TODO   | P9.01        | Agent | —         | Background worker deployment   |
+| `[ ] P14.06` | Deploy Next.js Web App (`apps/web`) to Cloudflare Pages / Vercel with edge caching            | Critical | TODO   | P4.01        | Agent | —         | Frontend production deployment |
+| `[ ] P14.07` | Configure Cloudflare DNS, SSL/TLS full strict, WAF managed rules, and DDoS protection         | Critical | TODO   | P14.04-P14.06| Agent | —         | Edge security & routing        |
+| `[ ] P14.08` | Execute dynamic database seed in production environment; verify initial 14-day drop schedule  | Critical | TODO   | P2.03, P14.01| Agent | —         | Production data initialization |
+| `[ ] P14.09` | Perform production smoke test: complete anonymous play flow on live domain                    | Critical | TODO   | P14.07, P14.08| Agent | —        | Live smoke test verification   |
+| `[ ] P14.10` | Author Terraform configs for multi-AZ autoscaling compute, PgBouncer, and Redis replicas      | Critical | TODO   | P14.01       | Agent | —         | Infrastructure as Code (16.1)  |
+| `[ ] P14.11` | Configure canary deployment pipeline (5% -> 25% -> 100%) and enforce 06:30–08:30 deploy freeze | Critical | TODO | P14.04       | Agent | —         | Safe delivery pipeline (16.2)  |
+
+---
+
+### Phase 15: Beta Launch & Go/No-Go Decision Gates (Stage 15)
+
+_Status: TODO | Target: Beta rollout, Gate G0/G1 validation, campaign capacity gate._
+
+| ID          | Task Description                                                                              | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
+| ----------- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
+| `[ ] P15.01` | Execute soft launch with initial cohort (Gate G0: 100 organic players over weekend test)       | Critical | TODO   | P14.09       | Agent | —         | Prototype validation           |
+| `[ ] P15.02` | Monitor Day-1 retention and share rate metrics against Gate G0 criteria (D1 ≥ 25%, Share ≥ 15%)| High   | TODO   | P15.01       | Agent | —         | Initial engagement audit       |
+| `[ ] P15.03` | Execute Web MVP Beta rollout with 200 players (Gate G1: 4-week cohort observation)            | Critical | TODO   | P15.02       | Agent | —         | Beta cohort observation        |
+| `[ ] P15.04` | Audit Day-7 retention (≥ 12%), drop completion (≥ 85%), and crash-free sessions (> 99%)       | High     | TODO   | P15.03       | Agent | —         | Gate G1 decision evaluation    |
+| `[ ] P15.05` | Compile comprehensive Beta Launch Report with go/no-go recommendation for public marketing    | Critical | TODO   | P15.04       | Agent | —         | Launch decision milestone      |
+| `[ ] P15.06` | Enforce campaign gate policy: certify load test results for scale tier before marketing push  | High     | TODO   | P15.05       | Agent | —         | Campaign growth gate (Sec 15)  |
+
+---
+
+### Phase 16: Scale Readiness Gate (Stage 16 — New Phase)
+
+_Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measurement, DR game day, Founder sign-off._
+
+| ID          | Task Description                                                                              | Priority | Status | Depends On   | Owner | Done Date | Notes                          |
+| ----------- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ------------------------------ |
+| `[ ] P16.01` | Sub-Gate T1: Certify 10,000 DAU capacity with verified k6 launch spike and 2x peak scenarios   | Critical | TODO   | P13.11       | Agent | —         | T1 promotion certification     |
+| `[ ] P16.02` | Sub-Gate T2: Certify 1,00,000 DAU capacity with partitioned DB, multi-role Redis, Stage B     | Critical | TODO   | P16.01       | Agent | —         | T2 promotion certification     |
+| `[ ] P16.03` | Sub-Gate T3: Certify 10,00,000 DAU capacity with Mode B async persist and 5x stress envelope   | Critical | TODO   | P16.02       | Agent | —         | T3 promotion certification     |
+| `[ ] P16.04` | Disaster Recovery Game Day: Rehearse on-call runbook with Founder across 3 simulated incidents| High     | TODO   | P13.12       | Agent | —         | On-call game day rehearsal     |
+| `[ ] P16.05` | Formal Scale Readiness Sign-Off: SRE & Founder sign-off on cost forecast and certified limits | Critical | TODO   | P16.01-P16.04| Agent | —         | Scale readiness sign-off       |
+
+---
+
+## 4. Stage Checklist & Verification Protocols
 
 - **Stage 0 Checklist:**
-  - [ ] All 6 core markdown files exist, are fully written, detailed, and consistent with no stub headings.
-  - [ ] Monorepo skeleton initialized with valid `pnpm-workspace.yaml`, `turbo.json`, and root scripts.
-  - [ ] `apps/web` displays "oddly — coming soon" with real tokens; `services/api` responds to `GET /health`.
-  - [ ] `pnpm typecheck`, `pnpm lint`, and `pnpm test` run and pass cleanly.
+  - [x] Run `pnpm install`, `pnpm build`, `pnpm typecheck`, `pnpm lint`, `pnpm test`. Zero errors.
+  - [x] Confirm no functional game logic is written.
+- **Stage 0.5 Checklist:**
+  - [x] Authoritative hardening of 6 core markdown files + README per Scale Addendum.
+  - [x] Create 8 operational guides under `docs/` (`scaling-plan`, `capacity-model`, `slo`, `failure-modes`, `load-testing`, `runbook`, `degradation-playbook`, `disaster-recovery`).
+  - [x] Confirm zero `.env` tracking via `git ls-files`; verify `.gitignore` ignores `.env` and `.env.*`.
+  - [x] Update all `.env.example` templates with multi-role Redis, pooler, and observability variables.
+  - [x] Verify `pnpm typecheck`, `pnpm lint`, `pnpm test` pass with zero regressions.
 - **Stage 1 Checklist:**
-  - [ ] Navigate to `/design` in browser; toggle Light/Dark themes and test interactive states for all components.
-  - [ ] Check contrast ratios, mobile touch targets ($\ge 44 \text{px}$), and verify all 28 question SVGs render.
+  - [x] Check contrast ratios, mobile touch targets ($\ge 44 \text{px}$), and verify all 28 question SVGs render.
 - **Stage 2 Checklist:**
-  - [ ] Run `pnpm test` to verify pure scoring math against worked-example fixtures.
-  - [ ] Run `pnpm sim` to verify simulated entropy and match probabilities match theoretical values.
-  - [ ] Run seed script to verify `oddly_batch_001_first_14_days.json` imports cleanly into PostgreSQL.
+  - [x] Run `pnpm test` to verify pure scoring math against worked-example fixtures.
+  - [x] Run `pnpm sim` to verify simulated entropy and match probabilities match theoretical values.
+  - [x] Run seed script to verify `batch_001.json` imports cleanly into PostgreSQL.
 - **Stage 3 Checklist:**
-  - [ ] Execute `curl http://localhost:4000/v1/drop/today` and verify edge-cached JSON structure.
-  - [ ] Execute `POST /v1/submissions` with sample vector; confirm immediate Stage A provisional twin return.
+  - [x] Execute `curl http://localhost:4000/v1/drop/today` and verify edge-cached JSON structure.
+  - [x] Execute `POST /v1/submissions` with sample vector; confirm immediate Stage A provisional twin return.
 - **Stage 4 Checklist:**
-  - [ ] Open web app on mobile viewport; complete all 5 questions from S1 to S4 without logging in.
-  - [ ] Test offline behavior by disconnecting network; confirm answers persist and retry gracefully.
+  - [x] Open web app on mobile viewport; complete all 5 questions from S1 to S4 without logging in.
+  - [x] Test offline behavior by disconnecting network; confirm answers persist and retry gracefully.
 - **Stage 5 Checklist:**
-  - [ ] Inspect reveal sequence: 1.5s search journey, twin card slide-up, pick dot illumination, confetti burst.
-  - [ ] Inspect Oddness card, percentile count-up, and verify honest copy displays for low player counts.
+  - [x] Inspect reveal sequence: 1.5s search journey, twin card slide-up, pick dot illumination, confetti burst.
+  - [x] Inspect Oddness card, percentile count-up, and verify honest copy displays for low player counts.
 - **Stage 6 Checklist:**
   - [x] Generate share cards across Story, Square, and Link formats; verify crisp rendering and QR code.
   - [x] Open `/c/:shortId` in an incognito window; verify dynamic Open Graph tags and "Play" CTA.
 - **Stage 7 Checklist:**
-  - [ ] Sign in with Google from the result sheet; verify guest picks and streaks merge without data loss.
+  - [x] Sign in with Google from the result sheet; verify guest picks and streaks merge without data loss.
 - **Stage 8 Checklist:**
-  - [ ] Inspect History archive, change notification preferences in Settings, test Data Export and Deletion.
+  - [x] Inspect History archive, change notification preferences in Settings, test Data Export and Deletion.
 - **Stage 9 Checklist:**
-  - [ ] Run accelerated staging pipeline (`CLOCK_ACCELERATION=true`); observe automated 10-minute drop cycles.
+  - [x] Run accelerated staging pipeline (`CLOCK_ACCELERATION=true`); observe automated 10-minute drop cycles.
 - **Stage 10 Checklist:**
   - [x] Install PWA to mobile home screen; accept push prompt; receive test notification on drop time.
 - **Stage 11 Checklist:**
@@ -397,11 +460,13 @@ _Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
 - **Stage 12 Checklist:**
   - [ ] Review PostHog dashboard, trigger a deliberate error to verify Sentry alert dispatch.
 - **Stage 13 Checklist:**
-  - [ ] Review k6 load test results and automated accessibility audit reports.
+  - [ ] Review k6 load test results and automated accessibility audit reports across all 15 scenarios.
 - **Stage 14 Checklist:**
   - [ ] Verify production staging URLs, automated backups, and Cloudflare WAF protection.
 - **Stage 15 Checklist:**
   - [ ] Review Day-7 retention metrics against Gate G1 criteria with 200 beta players.
+- **Stage 16 Checklist:**
+  - [ ] Complete formal Scale Readiness certification across T1, T2, and T3; execute DR game day drill.
 
 ---
 
@@ -418,3 +483,8 @@ _Status: TODO | Target: 200 beta cohort live, Gate G1 evaluation._
 | `2026-11-08` | Stage 4 Complete          | Built play flow frontend (S1 Landing, S2 Countdown, Age Gate, S3 Questions, S4 Review).                       | Stage 4 Definition of Done achieved.          |
 | `2026-11-08` | Stage 5 Complete          | Built reveal radar (2.0s), count-up TwinReveal, confetti, and Oddness tiers. Passing 92 tests.              | Stage 5 Definition of Done achieved.          |
 | `2026-11-08` | Stage 6 Complete          | Built Satori share card generator (3 themes, 3 ratios), QR code, S8 Share Sheet, and `/c/:shortId` challenge. | Stage 6 Definition of Done achieved.          |
+| `2026-11-09` | Stage 7 Complete          | Built Google OAuth authentication, session management, and guest history merge.                                | Stage 7 Definition of Done achieved.          |
+| `2026-11-09` | Stage 8 Complete          | Built streaks flame, history archive, settings, DPDP data export & account erasure.                           | Stage 8 Definition of Done achieved.          |
+| `2026-11-09` | Stage 9 Complete          | Built BullMQ daily pipeline, stageDrop, openDrop, closure, and final recap matching worker.                   | Stage 9 Definition of Done achieved.          |
+| `2026-11-09` | Stage 10 Complete         | Built Web Push VAPID delivery, quiet hours capping, PWA manifest, service worker, and install buttons.        | Stage 10 Definition of Done achieved.         |
+| `2026-11-10` | Stage 0.5 Complete        | Hardened scale & reliability architecture: authoring 8 `docs/` files, 52 scale tasks, Phase 16, ADR 009–022.  | Scale and Reliability Addendum integration.   |

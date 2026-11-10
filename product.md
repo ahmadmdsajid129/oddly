@@ -103,8 +103,34 @@ Oddly turns the **result itself into the entire product**. By stripping away cha
 - **Day-7 Retention (D7):** > 12% across initial cohorts.
 - **Share Rate:** > 15% of completing users trigger a share action or copy link.
 - **Viral Coefficient (K-factor):** > 0.3 driven by challenge links (`/c/:shortId?challenge=1`).
+- **Reliability & Availability SLO:** 99.9% monthly play-path uptime; 99.95% during the 07:00–08:00 IST peak window.
+- **Submission Durability:** 100% (zero acknowledged submissions ever lost).
+- **Monthly Error Budget:** Maximum 43.2 minutes of degraded service per month; releases freeze if > 50% burned.
 
-### 4.4 Go/No-Go Decision Gates
+### 4.4 Reliability Promises & Product Operating Principles
+
+1. **Your Picks Are Never Lost:** Once a player completes their five picks and taps Submit, their choices are guaranteed durable persistence. Even under severe backend load or network disruption, picks are stored safely on the device and queued until verified by the server.
+2. **Honest Status When Busy:** We never fake twins, fabricate counts, or pretend everything is normal when overloaded. If the matching engine is running slow, we state it plainly: *"Saved! Finding your twin... This may take a minute."*
+3. **The Drop Is Always Reachable:** The daily five questions are pre-cached across global edge networks so that even if the primary database hiccups, the daily ritual remains accessible.
+4. **Approximate Live Counters:** The header counter (*"3,482 players today"*) is approximate and cached at the edge to protect origin capacity.
+5. **Transparent Provisional Labels:** Early-day matches and results calculated under high load are always clearly labeled *"Provisional Twin"* until the 07:00 IST recap locks the immutable global result.
+6. **Campaign Gate by Scale Tier:** No marketing campaign or influencer push expected to drive traffic beyond the current scale tier (T0: 1k, T1: 10k, T2: 100k, T3: 1M) may be launched until that tier's formal k6 load test scenarios have passed and been certified.
+
+### 4.5 Degraded-Experience Copy and UI Behaviors (L1 to L4)
+
+When traffic surges trigger the Graceful Degradation Ladder, the user experience adapts transparently:
+
+- **Level L1 (Conserve):** Minor latency elevation. Player counters show subtle freshness notice (*"Updated a minute ago"*). Share card pre-rendering switches to on-demand.
+- **Level L2 (Protect Core):** Top brand-voiced status banner appears:
+  > *"Busy right now! Thousands of strangers are playing. Your picks are safe."*
+  Non-essential pages (history, world stats) serve slightly cached data.
+- **Level L3 (Survive):** Mode B asynchronous ingestion active. Submit screen shows a calming, looping twin-dot animation:
+  > *"Saved! Finding your stranger twin... This may take a minute."*
+  Results update automatically with jittered polling.
+- **Level L4 (Static Fallback):** Extreme origin failure. The client shell and Drop JSON are served from CDN edge. If submissions cannot reach the API, picks are encrypted and saved in client storage:
+  > *"We are having trouble reaching our servers. Your picks are safely saved on this device and will send automatically the moment we are back."*
+
+### 4.6 Go/No-Go Decision Gates
 
 1. **Gate G0 (Weekend Prototype Test):** 100 organic players. Day-1 return ≥ 25%, share rate ≥ 15%. If below 15%, iterate on questions and card design.
 2. **Gate G1 (Web MVP Beta — Week 4):** 200 beta users. Day-7 return ≥ 12%, drop completion ≥ 85%, crash-free sessions > 99%.
@@ -506,8 +532,18 @@ Oddly involves zero real-money stakes, zero entry fees, and zero financial payou
    _Mitigation:_ Honest UI messaging (_"Closest so far"_) and emphasis on the personal Oddness rarity score.
 2. **Bot Infiltration & Timing Attacks:** Scripted bots flooding the API to distort probability weights.
    _Mitigation:_ Cloudflare Turnstile bot challenges, rate limiting, and minimum-answer-time thresholds (< 3 seconds flagged).
-3. **Viral Surge Overload:** Sudden spike when an influencer shares a card.
-   _Mitigation:_ Drop JSON served from Cloudflare CDN edge; submissions queued via Redis and Fastify with high throughput.
+3. **Launch-Spike Outage at 07:00 IST:** Simultaneous countdown expiration and push notification openings causing a severe connection storm.
+   _Mitigation:_ Immutable Drop JSON pre-staged at 06:30 IST; Cloudflare origin shielding; client-side randomized jitter (0 to 4 s); staggered push dispatch in 5k slices.
+4. **Viral Surge Overload:** Sudden spike when a prominent influencer shares a card (up to 500,000 visitors in 10 minutes).
+   _Mitigation:_ Static share landing pages (`/c/:shortId`) cached at edge for 24h with > 95% edge hit ratio; origin processing strictly bounded.
+5. **Client Retry Storms:** Network hiccup causing tens of thousands of mobile clients to retry simultaneously in lockstep.
+   _Mitigation:_ Exponential backoff with full jitter on client; `@fastify/under-pressure` load shedding; strict adherence to HTTP `Retry-After`.
+6. **Cost Runaway:** Command-priced cloud services or unmonitored autoscaling generating bill shock.
+   _Mitigation:_ Hard autoscaling instance caps per tier; fixed-price Redis instances; strict telemetry sampling (1–5%); automated budget alerts at 150% of forecast.
+7. **Bad Deploy During Morning Peak:** Uncoordinated release during the 07:00 IST window taking down the live drop.
+   _Mitigation:_ Mandatory **deploy freeze** from 06:30 to 08:30 IST daily and anytime system is at L2+; automated canary analysis with instant rollback.
+8. **Submission Data Loss:** Database crash during high-concurrency ingestion.
+   _Mitigation:_ Strict idempotency via `request_id`; client persistence in localStorage until acknowledged; dual-mode ingestion (Mode B async persist at peak); continuous PITR database backups.
 
 ### 14.2 Open Decisions for the Founder
 
