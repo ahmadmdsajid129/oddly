@@ -87,13 +87,13 @@ Oddly turns the **result itself into the entire product**. By stripping away cha
 
 ### 4.2 Non-Goals for v1.0 (Strictly Out of Scope)
 
-- **NO chat or messaging:** Users cannot message their twin. The result is the final destination.
+- **NO chat, DMs, or handle/contact exchange:** Users cannot message their twin or exchange contact info. Handle swap, DMs, and external contact exchange are **Permanently Not Planned** (preventing abuse and stalking by design).
 - **NO user profiles or avatars:** No profile bios, photos, or public user profiles.
-- **NO public leaderboards:** No ranking players by "popularity" or "oddness".
+- **NO public leaderboards:** No ranking players by "popularity", "oddness", or "sync score".
 - **NO real-money prizes or betting:** Free-to-play, zero gambling mechanics (compliant with 2025 Indian online gaming regulations).
 - **NO native iOS/Android apps in v1.0:** Web-first responsive PWA; native apps slated for v1.1 (Expo).
 - **NO paid subscriptions or ads in v1.0:** Monetisation (streaks freeze, sponsored questions) is strictly deferred.
-- **NO friends groups, waves, or mutual blocks in v1.0:** Schema-ready, but UI/routes deferred to v1.5.
+- **Scope approvals recorded on 2026-11-14:** Founder approved adding F18 (Twin Globe), F19 (Keep this twin & Orbit), F20 (Telepathy), and F21 (Anti-twin) to v1.0. F22 (Oddly Deck) and F23 (Friend-invite Orbit) are approved for documentation only (v1.5). F12 (Wave) is superseded by F19. All other Non-Goals remain strictly immutable.
 
 ### 4.3 Success Metrics
 
@@ -433,15 +433,15 @@ To prevent deanonymisation of players:
 - **In v1?** Yes (Calendar & List view; mind map deferred to v1.5).
 - **Specification:** Paginated archive of past Drops played by the user, showing date, picks, twin match, and rarity badge.
 
-### F11: Friends Compare
+### F11 & F23: Friends Compare & Friend-Invite Orbit
 
-- **In v1?** No (v1.5, schema-ready).
-- **Specification:** Private invite groups (up to 30 people) to compare picks with close friends.
+- **In v1?** No (v1.5, documented only, schema not created).
+- **Specification:** Reuses Orbit tables with a `kind = 'friend'` column added in v1.5 (expand/contract). Allows private invite links to compare picks with close friends and establish an Orbit with a known contact.
 
-### F12: Wave
+### F12: Wave (Superseded by F19)
 
-- **In v1?** No (v1.5, schema-ready).
-- **Specification:** A single, mutual one-tap emoji ping sent between matched twins within 24 hours of Drop close.
+- **In v1?** Superseded.
+- **Specification:** The one-tap expressions inside F19 (Keep this twin and Orbit) ARE the Wave. F12 is no longer tracked as a separate v1.5 item. All wave functionality is fully realized inside F19.
 
 ### F13: Web Push Notifications
 
@@ -483,6 +483,154 @@ To prevent deanonymisation of players:
 | **Question pulled due to emergency/typo**        | Admin triggers pull action. Question is flagged as pulled. Matching engine dynamically re-scores based on the remaining 4 questions.                              |
 | **Account deletion request**                     | User's submissions, device tokens, and PII are irrevocably purged or anonymized within 7 days. Public aggregate counts remain intact.                             |
 | **Server downtime at 07:00 IST drop**            | Static Drop JSON is served directly from Cloudflare CDN edge. Submissions buffer gracefully on the client until API recovers.                                     |
+
+---
+
+## 11A. Connection Features (F18 to F23)
+
+### F18: Twin Globe (Ambient Map of Twins Forming)
+
+- **Purpose:** Provide a calm, ambient visual sense of global scale and shared human instinct by displaying anonymous arcs connecting matched regions as twins form around the world, plus persistent glowing lines for your active Orbits.
+- **Exact Behaviour:**
+  - Flat dotted world map rendered via a lightweight, static SVG loaded on its own dedicated route (`/globe`); **strictly no 3D globe and no external map libraries** to protect bundle budget ($\le 159.5\text{ KB}$ play route) and performance on mid-range Android devices.
+  - Displays arcs between **coarse macro-regions** (e.g. Western Europe to Western India) when twins form. Region precision strictly enforces k-anonymity: a specific country is shown only if at least *(config: `globe.k_anonymity_min`, default: 20)* players from it completed the Drop today; otherwise, coarse continental macro-regions are displayed using `privacy.ts` helpers.
+  - Arcs are batched and delayed (*(config: `globe.batch_window_minutes`, default: 5)* minute batches, *(config: `globe.delay_minutes`, default: 5 to 10)* minute delay). No individual player identification, no exact timestamps, and no counts below $k$.
+  - **Live Mode vs. Replay Mode:**
+    - **Live mode:** Uses real provisional matches from the most recent batch window.
+    - **Replay mode:** Replays yesterday's verified final twins in a continuous loop, honestly labeled on screen: *"Replay of yesterday's twins"*.
+    - The switch occurs automatically when live submission volume drops below *(config: `globe.live_volume_min`, default: 50)* submissions/window, and can be manually toggled by Admin. **Strictly zero synthetic or fake arcs** (Rule 2).
+  - **Your Orbit Lines:** Persistent glowing lines representing your own active Orbits rendered on the map using violet 2.5px strokes (`#6C4CF1` per `design.md` Section 12; animate opacity only, never `stroke-dashoffset`).
+  - **Placement:** Placed on a fourth tab "Globe" in the main navigation (Today, Globe, History, Me).
+  - **Accessibility:** Pins and region touch areas have $\ge 44 \times 44\text{ px}$ hit targets, descriptive screen-reader alternatives, and a static non-animating view under `prefers-reduced-motion`.
+- **Copy and Tone Rules:** Calm, wonder-inducing, never frantic. Static strings from `app_content`. Fallback label when volume is low: *"Twins are forming quietly. Showing replay of yesterday."*
+- **Privacy Rules:** Enforces $k \ge 20$ region aggregation. No player IDs, no exact coordinates, no individual pick values.
+- **Data Touched:** Reads `matches` (provisional/final aggregates) and user's own `orbits`. Cached at edge via `/v1/globe` with `s-maxage=60`.
+- **Degradation Behaviour:**
+  - **L1:** Refresh interval doubled (*(config)* from 60s to 120s).
+  - **L2:** Real-time arcs paused; displays static cached map or switches to Replay mode.
+  - **L3 / L4:** Globe route hidden or returns static offline map notice with honest copy. Priority rank 7 (shed alongside live counters).
+- **Feature Flag:** `feature.globe` (kill switch).
+- **Success Metric:** > 20% of daily active players visit Globe tab; average time spent 15–30 seconds.
+
+---
+
+### F19: Keep This Twin & Orbit
+
+- **Purpose:** Enable matched strangers to mutually opt in to preserve their twin connection across daily Drops, fostering organic long-term kinship through lightweight shared rituals without chat, profiles, or social pressure.
+- **Exact Behaviour:**
+  - **Eligibility:** Available **only after the Drop's final twin is locked** (at recap, 07:05 IST). Provisional matches cannot be kept.
+  - **Request Flow:**
+    1. A player taps *"Keep this twin"* on the flip-card back or recap screen.
+    2. Private request: **each player can send at most 1 Keep per Drop** (their own twin), mathematically eliminating mass-sending or spam.
+    3. The recipient sees an anonymous Orbit request card displaying coarse region, age band, matched pick count (symmetric Dice score), with two buttons: **Accept** or **Not now**.
+    4. Silent decline: A decline is completely silent. The sender only ever sees *"Waiting..."* and then, after expiry (*(config: `orbit.request_expiry_hours`, default: 48)*), *"No orbit this time"*.
+    5. Daily recipient cap: A player sees at most *(config: `orbit.max_incoming_per_day`, default: 3)* incoming requests per day, sorted by highest similarity first; excess requests expire silently.
+  - **Formation & Identity:**
+    - Orbit forms **only when both sides agree**.
+    - Both players see each other solely via an anonymous alias (e.g. *"Twin #482"*), coarse region, and age band. Strictly no names, handles, photos, or messaging.
+  - **Sign-In Gate:** Requires Google sign-in to send or accept a Keep (ensuring the relationship survives a cleared browser cache). Guests clicking Keep see the standard soft sign-in modal with Orbit-specific value copy.
+  - **Caps & Limits:**
+    - Maximum *(config: `orbit.max_active_per_player`, default: 3)* active Orbits per player.
+    - Re-requesting the same partner is blocked for *(config: `orbit.cooldown_days`, default: 30)* days after an Orbit ends.
+  - **Severability:** Either player can end an Orbit at any time with one tap. Zero questions asked, zero exit surveys. The other player sees a neutral notice: *"This orbit has ended."* The identity of who ended it is never revealed.
+  - **Inside an Active Orbit:**
+    - **One-Tap Expressions (The Wave):** Picked from a fixed, curated database set (*(config: `orbit.expression_set`, default: 6 stickers)*, no free text), at most 1 expression per direction per day.
+    - **Co-Streak:** Increments for consecutive Twin Days where both players completed today's Drop. If broken, resets quietly to 0. **Strictly zero guilt copy, zero nagging, and zero "your twin is waiting" pressure** (Rule 3).
+    - **Staged Unlocks (Schedule from `app_content` data):**
+      - *Day 1:* Glowing connection line rendered on Twin Globe.
+      - *Day 3:* Shared pick overlap history across days.
+      - *Day 7:* Telepathy Sync summary.
+      - *Day 14:* Custom Orbit share card.
+      - *Day 30:* Orbit anniversary badge and commemorative share card.
+  - **Push Notifications:** New push channel `"Orbit"` (request received, request accepted). Counts toward the global hard cap of 2 pushes/user/day and strictly honors quiet hours (22:00–07:00 IST).
+- **Copy and Tone Rules:** Kind, quiet, non-possessive, pressure-free. All copy served via `app_content`.
+- **Privacy Rules:** Consent-scoped. Account deletion purges the player's Orbit memberships, expressions, and guesses within the 7-day retention window; partner sees neutral *"ended"* status. Data export includes only the requesting user's own actions. Admin can sever any Orbit.
+- **Data Touched:** `twin_keeps`, `orbits`, `orbit_expressions`.
+- **Degradation Behaviour:**
+  - **L1:** Operational.
+  - **L2:** New Keep requests paused; existing Orbits are read-only.
+  - **L3 / L4:** Orbit tab hidden or read-only with honest banner. Priority rank 5 (shed alongside History and Settings).
+- **Feature Flag:** `feature.orbit` (kill switch).
+- **Success Metric:** > 8% Keep offer rate; > 35% acceptance rate; D30 Orbit retention > 40%.
+
+---
+
+### F20: Telepathy (Instinct Sync Inside Orbits)
+
+- **Purpose:** Provide a playful daily instinct test between active Orbit partners on one shared question, quantifying how often they instinctively align beyond chance without enabling messaging or trivia competition.
+- **Exact Behaviour:**
+  - **Designated Question:** Exactly **one designated question per Drop** serves as the Telepathy question. Eligible questions: low-cardinality questions with 2 to 4 options (Type 1 text pick-one or Type 4 image 4-tile). Default: the Type 1 question. Admin question validation rejects any Drop lacking an eligible Telepathy question.
+  - **Guessing Mechanism:**
+    - Becomes active only after **both players in the Orbit have submitted today's Drop**.
+    - Each player can lock in one guess regarding what their partner picked on the designated question.
+    - A locked guess is permanent and cannot be modified.
+  - **Pick Reveal Exception (Rule 4 Amendment):**
+    - The partner's chosen pick label is revealed to the guesser **only after the guesser has locked their own guess**, and strictly for this single question. Zero other picks or profile data are ever revealed.
+  - **Honest Statistical Scoring (Not Mind Reading):**
+    - Stores the guess, hit/miss boolean, and the **luck baseline** for that Drop.
+    - *Baseline calculation:* Expected agreement by random chance between two independent players = $\sum [p(a)]^2$ across the question's option distribution, computed during the daily final batch.
+    - UI displays: *"Strangers agree X% of the time. You two agree Y%."*
+    - Strictly never marketed or described as "psychic" or "mind reading"—labeled honestly as an instinct alignment / Sync score.
+    - Overall Sync score is surfaced only after *(config: `telepathy.min_rounds_for_sync`, default: 5)* completed rounds to eliminate noisy variance.
+    - Zero leaderboards, zero competitive ranking between Orbits.
+- **Copy and Tone Rules:** Grounded, statistically honest, playful.
+- **Privacy Rules:** Strictly scoped to the single designated question. Revealed only mutually after lock.
+- **Data Touched:** `telepathy_guesses` (partitioned by `drop_date`, 90-day retention).
+- **Degradation Behaviour:**
+  - **L1:** Operational.
+  - **L2 / L3 / L4:** Guess submission paused; displays cached Sync summary. Priority rank 7.
+- **Feature Flag:** `feature.telepathy` (kill switch).
+- **Success Metric:** > 60% of active Orbit pairs play Telepathy daily; median Sync lift > +10% over luck baseline.
+
+---
+
+### F21: Anti-Twin ("Your Opposite Today")
+
+- **Purpose:** Celebrate the opposite end of the spectrum with equal warmth and delight by discovering the player whose instincts differed most from yours today, reinforcing that being "odd" is fun and normal.
+- **Exact Behaviour:**
+  - **Sampling & Computation:**
+    - Computed **strictly off the critical submission path**.
+    - First visit to the Anti-twin view enqueues an asynchronous, idempotent background worker job (`ComputeAntiTwinJob`). The frontend displays a placeholder skeleton and renders the result upon job completion.
+    - Scans a bounded sample of *(config: `antitwin.candidate_sample_size`, default: 2,000)* candidates from today's submissions to locate the player with the lowest similarity score.
+    - Tie-breaking: Prefers a candidate from a different country first, then falls back to the deterministic pseudo-random hash seeded by `drop_date` and both user IDs.
+  - **Display Constraints:**
+    - Displays: *"You differed on N of 5"*, coarse region, age band (k-anonymity applies), and which of **your own** questions differed.
+    - **Strictly does not show the other player's pick labels** (Rule 4).
+    - Honestly labeled: *"From a sample of 2,000 players today."*
+  - **Minimum Threshold:**
+    - Hidden entirely if the total daily player pool is under *(config: `antitwin.min_pool_size`, default: 200)* players. Never fabricates an opposite.
+  - **Share Card:**
+    - Dedicated "Opposite" share card face utilizing the standard flip anatomy (violet sealed back, warm paper front, kind copy: *"My stranger opposite today"*).
+- **Copy and Tone Rules:** Kind, humorous, affirming, never negative or critical.
+- **Privacy Rules:** Zero pick labels of the opposite player exposed. Strict $k \ge 20$ coarse region aggregation.
+- **Data Touched:** `anti_twin_results` (7-day retention).
+- **Degradation Behaviour:**
+  - **L1:** Operational.
+  - **L2 / L3 / L4:** Enqueuing and calculation disabled; card hidden. Priority rank 7.
+- **Feature Flag:** `feature.antitwin` (kill switch).
+- **Success Metric:** > 25% of players view their Anti-twin; > 8% share rate.
+
+---
+
+### F22: Oddly Deck (v1.5 Documented Only)
+
+- **Status:** v1.5, not built, schema not created.
+- **Concept:** A collectible procedural card deck generated from the player's personal pick history. Cards use the token palette only, styled with sticker borders, ink outlines, and foil frames based on rarity tiers (Common, Uncommon, Rare, Epic, Mythic per `design.md` Section 12).
+- **Open Questions:**
+  1. Does card minting occur on every Drop submission or solely upon milestone streaks?
+  2. How will duplicate cards or trade binders work without violating the Non-Goal on user-to-user marketplaces?
+  3. Should physical printing exports (print-ready PDF) be supported in v2.0?
+
+---
+
+### F23: Friend-Invite Orbit (v1.5 Documented Only)
+
+- **Status:** v1.5, not built, schema not created.
+- **Concept:** Enables a player to generate a private challenge link (`/c/:shortId?orbit=1`) to invite an existing real-world friend into an Orbit. Reuses the core `orbits` schema by introducing a `kind` column (`'twin'` vs `'friend'`) via expand-and-contract migration. Overlaps and unifies with F11 (Friends Compare).
+- **Open Questions:**
+  1. Should friend Orbits count against the 3-Orbit limit or have an independent cap (e.g. 5 friends)?
+  2. Does Telepathy behave identically with friends, or should it feature historical instinct tracking across past Drops?
+  3. How should asymmetric friend comparisons handle non-simultaneous Drop completions across different timezones?
 
 ---
 
