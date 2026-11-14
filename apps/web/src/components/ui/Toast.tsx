@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 import { feedback } from "@/lib/feedback";
 
@@ -43,9 +43,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
       setToasts((prev) => [...prev, { id, type, message }]);
 
-      setTimeout(() => {
-        removeToast(id);
-      }, 3500);
+      // Error toasts stay until dismissed; others auto-dismiss in 3000ms
+      if (type !== "error") {
+        setTimeout(() => {
+          removeToast(id);
+        }, 3000);
+      }
     },
     [removeToast]
   );
@@ -57,37 +60,49 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast, success, error, info }}>
       {children}
-      {/* Toast Render Viewport */}
+      {/* Toast Render Viewport - top of screen below safe area */}
       <div
-        className="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4 pt-safe"
         aria-live="polite"
       >
         <AnimatePresence>
           {toasts.map((t) => (
-            <motion.div
+            <m.div
               key={t.id}
               initial={{ opacity: 0, y: -16, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-full bg-surface border border-border shadow-xl text-text text-sm font-medium"
-              role="status"
+              className="pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker text-ink text-sm font-display font-bold"
+              role={t.type === "error" ? "alert" : "status"}
             >
-              <div className="flex items-center gap-2.5">
-                {t.type === "success" && <CheckCircle2 className="w-5 h-5 text-mint shrink-0" />}
-                {t.type === "error" && <AlertCircle className="w-5 h-5 text-danger shrink-0" />}
-                {t.type === "info" && <Info className="w-5 h-5 text-violet shrink-0" />}
-                <span>{t.message}</span>
+              <div className="flex items-center gap-2.5 min-w-0">
+                {t.type === "success" && (
+                  <span className="w-6 h-6 rounded-pill bg-mint text-ink flex items-center justify-center shrink-0 border-[1.5px] border-ink">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </span>
+                )}
+                {t.type === "error" && (
+                  <span className="w-6 h-6 rounded-pill bg-error text-paper flex items-center justify-center shrink-0 border-[1.5px] border-ink">
+                    <AlertCircle className="w-4 h-4" />
+                  </span>
+                )}
+                {t.type === "info" && (
+                  <span className="w-6 h-6 rounded-pill bg-lavender text-ink flex items-center justify-center shrink-0 border-[1.5px] border-ink">
+                    <Info className="w-4 h-4" />
+                  </span>
+                )}
+                <span className="truncate">{t.message}</span>
               </div>
               <button
                 type="button"
                 onClick={() => removeToast(t.id)}
-                className="text-text-muted hover:text-text p-1 cursor-pointer"
-                aria-label="Dismiss toast"
+                className="text-ink hover:text-violet p-1 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
+                aria-label="Dismiss notification"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 stroke-[2.5]" />
               </button>
-            </motion.div>
+            </m.div>
           ))}
         </AnimatePresence>
       </div>

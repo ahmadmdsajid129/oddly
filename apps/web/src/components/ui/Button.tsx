@@ -10,7 +10,17 @@ function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
 }
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive" | "icon" | "close";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "danger"
+  | "destructive"
+  | "success"
+  | "ghost"
+  | "icon"
+  | "close";
+
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -49,31 +59,38 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       onClick?.(e);
     };
 
-    // Base button styling
+    // Base button styling - Section 5: Display 700, 16px, radius-m (14px), outline (2.5px solid ink), min-height 48
+    // All interactive touch targets must be at least 44x44px.
     const baseStyles =
-      "relative inline-flex items-center justify-center font-heading font-semibold transition-all duration-150 select-none cursor-pointer outline-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-mint focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-40";
+      "relative inline-flex items-center justify-center font-display font-bold text-button select-none cursor-pointer outline-none transition-all duration-120 sticker-press disabled:pointer-events-none disabled:bg-lavender disabled:text-muted disabled:border-muted disabled:shadow-none min-h-[48px]";
 
-    // Size variants
+    // Size variants (all satisfy >= 44px min-height)
     const sizeStyles: Record<ButtonSize, string> = {
-      sm: "h-9 px-3.5 text-xs rounded-full gap-1.5",
-      md: "h-11 px-5 text-sm rounded-full gap-2",
-      lg: "h-14 px-8 text-base rounded-full gap-2.5",
+      sm: "min-h-[44px] px-4 text-sm rounded-m gap-1.5",
+      md: "min-h-[48px] px-6 text-button rounded-m gap-2",
+      lg: "min-h-[56px] px-8 text-lg rounded-m gap-2.5",
     };
 
-    // Variant styling
+    // Variant styling - Section 5
     const variantStyles: Record<ButtonVariant, string> = {
       primary:
-        "bg-[#6C4CF1] text-white shadow-lg shadow-[#6C4CF1]/25 hover:bg-[#5538D6] hover:shadow-xl hover:shadow-[#6C4CF1]/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] border-t border-white/20",
+        "bg-violet text-paper border-[2.5px] border-ink shadow-sticker",
       secondary:
-        "bg-transparent border-2 border-violet text-violet dark:text-lavender dark:border-lavender hover:bg-violet/10 active:bg-violet/20 active:scale-[0.97]",
+        "bg-paper text-ink border-[2.5px] border-ink shadow-sticker",
+      tertiary:
+        "bg-transparent text-violet border-none shadow-none hover:underline focus:underline min-h-[44px] px-2",
       ghost:
-        "bg-transparent text-text-muted hover:text-text hover:bg-surface-2/60 active:scale-[0.96]",
+        "bg-transparent text-violet border-none shadow-none hover:underline focus:underline min-h-[44px] px-2",
+      danger:
+        "bg-paper text-error border-[2.5px] border-error shadow-[4px_4px_0_#D92D4B]",
       destructive:
-        "bg-danger text-white hover:bg-danger/90 active:scale-[0.97] shadow-sm",
+        "bg-paper text-error border-[2.5px] border-error shadow-[4px_4px_0_#D92D4B]",
+      success:
+        "bg-mint text-ink border-[2.5px] border-ink shadow-sticker",
       icon:
-        "p-0 w-11 h-11 rounded-full bg-transparent hover:bg-surface-2 text-text active:scale-90",
+        "p-0 min-w-[48px] min-h-[48px] rounded-m bg-paper text-ink border-[2.5px] border-ink shadow-sticker",
       close:
-        "p-0 w-9 h-9 rounded-full bg-surface-2 border border-border text-text-muted hover:text-text hover:border-violet active:scale-90 group",
+        "p-0 min-w-[44px] min-h-[44px] rounded-pill bg-paper text-ink border-[2.5px] border-ink shadow-sticker group",
     };
 
     if (variant === "close") {
@@ -98,11 +115,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(baseStyles, sizeStyles[size], variantStyles[variant], className)}
         onClick={handleClick}
         disabled={isDisabled}
-        aria-busy={isLoading}
+        aria-busy={isLoading ? "true" : undefined}
         {...props}
       >
         {isLoading ? (
-          <span className="flex items-center gap-1.5 py-1">
+          <span className="inline-flex items-center gap-1.5 py-1" aria-hidden="true">
             <span className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:-0.3s]" />
             <span className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:-0.15s]" />
             <span className="w-2 h-2 rounded-full bg-current animate-bounce" />

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 
 export type AtmosphereMode = "hero" | "text" | "number" | "colour" | "image" | "word";
 
@@ -44,7 +44,7 @@ export function Atmosphere({ mode = "hero", className = "", activeColorHex }: At
       aria-hidden="true"
     >
       {/* Drifting Circle 1 (Violet / Accent 1) */}
-      <motion.div
+      <m.div
         animate={{
           x: [0, 24, -16, 0],
           y: [0, -32, 16, 0],
@@ -60,7 +60,7 @@ export function Atmosphere({ mode = "hero", className = "", activeColorHex }: At
       />
 
       {/* Drifting Circle 2 (Coral / Accent 2) */}
-      <motion.div
+      <m.div
         animate={{
           x: [0, -28, 20, 0],
           y: [0, 24, -20, 0],
@@ -77,7 +77,7 @@ export function Atmosphere({ mode = "hero", className = "", activeColorHex }: At
 
       {/* Hero Overlap Mint Luminous Glow (on hero screen) */}
       {mode === "hero" && (
-        <motion.div
+        <m.div
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.15, 0.35, 0.15],

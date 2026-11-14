@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { m, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface TimeRemaining {
   hours: number;
@@ -29,7 +29,7 @@ const Digit = React.memo(function Digit({ digit, shouldReduceMotion }: DigitProp
   return (
     <span className="relative inline-block tabular-nums">
       <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
+        <m.span
           key={digit}
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -38,7 +38,7 @@ const Digit = React.memo(function Digit({ digit, shouldReduceMotion }: DigitProp
           className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text inline-block"
         >
           {digit}
-        </motion.span>
+        </m.span>
       </AnimatePresence>
     </span>
   );
