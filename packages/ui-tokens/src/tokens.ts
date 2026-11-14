@@ -6,6 +6,21 @@
  * Cream-only, no dark mode in v1. No soft shadows. No gradients on UI chrome.
  */
 
+export const palette12 = [
+  { label: "Crimson", hex: "#D7263D" },
+  { label: "Coral", hex: "#FF6B5E" },
+  { label: "Amber", hex: "#F59E0B" },
+  { label: "Sunshine", hex: "#FFD23F" },
+  { label: "Lime", hex: "#8BC34A" },
+  { label: "Mint", hex: "#3DDBB0" },
+  { label: "Teal", hex: "#0F9D9A" },
+  { label: "Sky", hex: "#4CC9F0" },
+  { label: "Indigo", hex: "#3F37C9" },
+  { label: "Violet", hex: "#6C4CF1" },
+  { label: "Pink", hex: "#F472B6" },
+  { label: "Slate", hex: "#64748B" },
+] as const;
+
 export const colors = {
   ink: "#14123A",
   cream: "#FFF8F0",
@@ -18,9 +33,23 @@ export const colors = {
   muted: "#5B5780",
   lilac: "#CDBFFF",
   error: "#D92D4B",
+  palette12,
 } as const;
 
-export type ColorToken = keyof typeof colors;
+export type CoreColorToken =
+  | "ink"
+  | "cream"
+  | "paper"
+  | "violet"
+  | "lavender"
+  | "coral"
+  | "mint"
+  | "sun"
+  | "muted"
+  | "lilac"
+  | "error";
+
+export type ColorToken = CoreColorToken;
 
 export const tiers = {
   common: {

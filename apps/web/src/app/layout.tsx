@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import dynamic from "next/dynamic";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { ToastProvider } from "@/components/ui/Toast";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { PwaProvider } from "@/components/providers/PwaProvider";
-import { LoginModal } from "@/components/auth/LoginModal";
+import { MotionProvider } from "@/components/providers/MotionProvider";
+import { WebVitals } from "@/components/analytics/WebVitals";
 import "../styles/globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const LoginModal = dynamic(
+  () => import("@/components/auth/LoginModal").then((m) => m.LoginModal),
+  { ssr: false }
+);
+
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  weight: ["500", "700"],
+  variable: "--font-bricolage",
+  weight: ["700", "800"],
   display: "swap",
 });
 
@@ -29,19 +35,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`} suppressHydrationWarning>
-      <body className="bg-bg text-text antialiased min-h-screen">
+    <html lang="en" className={`${bricolage.variable} ${inter.variable}`} suppressHydrationWarning>
+      <body className="bg-cream text-ink antialiased min-h-screen">
         <QueryProvider>
-          <ThemeProvider>
-            <ToastProvider>
-              <AuthProvider>
-                <PwaProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <PwaProvider>
+                <MotionProvider>
+                  <WebVitals />
                   {children}
                   <LoginModal />
-                </PwaProvider>
-              </AuthProvider>
-            </ToastProvider>
-          </ThemeProvider>
+                </MotionProvider>
+              </PwaProvider>
+            </AuthProvider>
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>

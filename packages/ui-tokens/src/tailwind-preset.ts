@@ -5,6 +5,7 @@ export const oddlyTailwindPreset: Partial<Config> = {
   theme: {
     extend: {
       colors: {
+        // Canonical 11 Sticker Pop tokens (Section 2.1)
         ink: colors.ink,
         cream: colors.cream,
         paper: colors.paper,
@@ -16,6 +17,19 @@ export const oddlyTailwindPreset: Partial<Config> = {
         muted: colors.muted,
         lilac: colors.lilac,
         error: colors.error,
+
+        // Semantic aliases for Sticker Pop design system
+        bg: colors.cream,
+        surface: colors.paper,
+        "surface-2": colors.lavender,
+        border: colors.ink,
+        text: {
+          DEFAULT: colors.ink,
+          muted: colors.muted,
+        },
+        danger: colors.error,
+        warning: colors.sun,
+        success: colors.mint,
       },
       borderRadius: {
         s: radius.s,
