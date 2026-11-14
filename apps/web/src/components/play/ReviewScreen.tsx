@@ -3,7 +3,6 @@
 import React from "react";
 import { ArrowLeft, Sparkles, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Atmosphere } from "@/components/ui/Atmosphere";
 import type { AnswerPayload } from "@oddly/shared";
 import type { QuestionData } from "./QuestionScreen";
@@ -28,16 +27,16 @@ export function ReviewScreen({
   onBack,
 }: ReviewScreenProps) {
   const getAnswerDisplay = (q: QuestionData, ans?: AnswerPayload) => {
-    if (!ans) return <span className="text-text-muted italic">Unanswered</span>;
+    if (!ans) return <span className="text-muted italic">Unanswered</span>;
 
     if (ans.type === "text") {
       const opt = q.payload.options?.find((o) => o.value === ans.value);
-      return <span className="font-semibold text-text">{opt ? opt.label : ans.value}</span>;
+      return <span className="font-bold text-ink">{opt ? opt.label : ans.value}</span>;
     }
 
     if (ans.type === "number") {
       return (
-        <span className="font-semibold text-text font-heading text-lg">
+        <span className="font-extrabold text-ink font-display text-lg tabular-nums">
           {ans.value} {q.payload.unit ?? ""}
         </span>
       );
@@ -48,17 +47,17 @@ export function ReviewScreen({
       return (
         <div className="flex items-center gap-2">
           <div
-            className="w-5 h-5 rounded-full border border-border/80 shadow-sm shrink-0"
+            className="w-5 h-5 rounded-pill border-[1.5px] border-ink shadow-sm shrink-0"
             style={{ backgroundColor: ans.value }}
           />
-          <span className="font-semibold text-text">{swatch?.label ?? ans.value}</span>
+          <span className="font-bold text-ink">{swatch?.label ?? ans.value}</span>
         </div>
       );
     }
 
     if (ans.type === "image") {
       const ill = q.payload.illustrations?.find((i) => i.value === ans.value);
-      return <span className="font-semibold text-text">{ill ? ill.label : ans.value}</span>;
+      return <span className="font-bold text-ink">{ill ? ill.label : ans.value}</span>;
     }
 
     if (ans.type === "word") {
@@ -69,7 +68,7 @@ export function ReviewScreen({
             return (
               <span
                 key={val}
-                className="px-2 py-0.5 rounded-lg bg-surface-2 border border-border text-xs font-medium text-text"
+                className="px-2 py-0.5 rounded-pill bg-lavender border-[1.5px] border-ink text-xs font-bold font-display text-ink"
               >
                 {chip ? chip.label : val}
               </span>
@@ -85,7 +84,7 @@ export function ReviewScreen({
   const allAnswered = answers.length === questions.length;
 
   return (
-    <div className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none">
+    <div className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none bg-cream">
       <Atmosphere />
 
       {/* Top Bar */}
@@ -94,25 +93,25 @@ export function ReviewScreen({
           type="button"
           onClick={onBack}
           aria-label="Back to questions"
-          className="p-2.5 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer"
+          className="p-2.5 rounded-pill border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
         </button>
 
-        <span className="font-heading text-sm font-semibold tracking-wider uppercase text-text-muted">
+        <span className="font-display text-chip font-bold tracking-wider uppercase text-muted">
           Final Review
         </span>
 
-        <div className="w-10" />
+        <div className="w-11" />
       </header>
 
       {/* Main Review Content */}
       <main className="relative z-20 w-full max-w-lg mx-auto my-auto space-y-6 py-4">
         <div className="text-center space-y-2">
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-text">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-ink">
             Review your five picks
           </h1>
-          <p className="text-sm text-text-secondary">
+          <p className="text-body-s font-body text-muted">
             Make sure you are satisfied before we lock your picks and find your twin.
           </p>
         </div>
@@ -122,19 +121,18 @@ export function ReviewScreen({
           {questions.map((q, idx) => {
             const ans = answers.find((a) => a.question_id === q.id);
             return (
-              <Card
+              <div
                 key={q.id}
-                variant="default"
-                className="p-4 flex items-center justify-between gap-4 hover:border-violet/40 transition-all cursor-pointer group"
+                className="p-4 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker sticker-press flex items-center justify-between gap-4 cursor-pointer"
                 onClick={() => onJumpToQuestion(idx)}
               >
                 <div className="flex flex-col text-left space-y-1 min-w-0 pr-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-heading font-bold uppercase tracking-wider text-violet">
+                    <span className="text-[11px] font-display font-extrabold uppercase tracking-wider text-violet">
                       Pick {idx + 1}
                     </span>
                   </div>
-                  <span className="text-xs text-text-muted truncate max-w-[220px] sm:max-w-[280px]">
+                  <span className="text-xs font-body text-muted truncate max-w-[220px] sm:max-w-[280px]">
                     {q.payload.prompt}
                   </span>
                 </div>
@@ -143,11 +141,11 @@ export function ReviewScreen({
                   <div className="text-right text-sm">
                     {getAnswerDisplay(q, ans)}
                   </div>
-                  <div className="text-text-muted group-hover:text-violet transition-colors">
-                    <Edit3 className="w-4 h-4" />
+                  <div className="text-ink">
+                    <Edit3 className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
@@ -157,7 +155,7 @@ export function ReviewScreen({
           <Button
             variant="primary"
             size="lg"
-            className="w-full flex items-center justify-center gap-2 py-4 text-base font-bold shadow-lg"
+            className="w-full"
             disabled={!allAnswered || !isOnline || isSubmitting}
             onClick={onSubmit}
           >
@@ -165,21 +163,21 @@ export function ReviewScreen({
               <span>Matching with your stranger twin...</span>
             ) : (
               <>
-                <Sparkles className="w-5 h-5 text-midnight" />
+                <Sparkles className="w-5 h-5" />
                 <span>Find my stranger twin</span>
               </>
             )}
           </Button>
 
           {!isOnline && (
-            <p className="text-xs text-center text-amber font-medium">
+            <p className="text-xs text-center text-coral font-bold font-display" role="alert">
               You are offline. Connect to the internet to find your twin.
             </p>
           )}
         </div>
       </main>
 
-      <footer className="relative z-20 text-center pb-2 text-[11px] text-text-muted">
+      <footer className="relative z-20 text-center pb-2 text-caption text-muted">
         Once submitted, picks are sealed for today&apos;s drop.
       </footer>
     </div>

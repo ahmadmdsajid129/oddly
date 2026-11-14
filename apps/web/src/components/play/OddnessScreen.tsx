@@ -1,18 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import {
-  CommonBadge,
-  UncommonBadge,
-  RareBadge,
-  MythicBadge,
-  fireConfetti,
-} from "@/components/icons";
+import { m, useReducedMotion } from "framer-motion";
 import { Atmosphere } from "@/components/ui/Atmosphere";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { TierBadge } from "@/components/ui/Card";
 import { feedback } from "@/lib/feedback";
+import { fireConfetti } from "@/components/icons";
 import { ArrowLeft, Share2, Users, Flame } from "lucide-react";
 
 export interface OddnessData {
@@ -74,20 +68,6 @@ export function OddnessScreen({
     return () => clearInterval(interval);
   }, [targetPercentile, shouldReduceMotion]);
 
-  const renderTierBadge = () => {
-    const tier = oddness.tier.toLowerCase();
-    if (tier === "mythic" || tier === "legendary") {
-      return <MythicBadge percentile={oddness.percentile} />;
-    }
-    if (tier === "rare") {
-      return <RareBadge percentile={oddness.percentile} />;
-    }
-    if (tier === "uncommon") {
-      return <UncommonBadge percentile={oddness.percentile} />;
-    }
-    return <CommonBadge percentile={oddness.percentile} />;
-  };
-
   const rarestPick = oddness.rarest_pick ?? {
     prompt: "Pick the colour that best describes your energy",
     value_label: "Luminous Violet",
@@ -95,8 +75,11 @@ export function OddnessScreen({
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none">
-      <Atmosphere mode="hero" />
+    <div
+      data-testid="oddness-card"
+      className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none bg-cream"
+    >
+      <Atmosphere />
 
       {/* Screen Reader Summary */}
       <div aria-live="polite" className="sr-only">
@@ -109,101 +92,98 @@ export function OddnessScreen({
           type="button"
           onClick={onBackToTwin}
           aria-label="Back to twin match"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer text-xs font-heading font-semibold"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer text-xs font-display font-bold min-h-[44px]"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span>Twin Match</span>
         </button>
 
-        <span className="font-heading text-xs font-bold uppercase tracking-widest text-text-muted">
+        <span className="font-display text-xs font-extrabold uppercase tracking-widest text-muted">
           Oddness Score
         </span>
 
-        {onShare && (
+        {onShare ? (
           <button
             type="button"
             onClick={onShare}
             aria-label="Share card"
-            className="p-2 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer"
+            className="p-2.5 rounded-pill border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-4 h-4 stroke-[2.5]" />
           </button>
+        ) : (
+          <div className="w-11" />
         )}
       </header>
 
       {/* Main Oddness Card Content */}
       <main className="relative z-20 w-full max-w-md mx-auto my-auto flex flex-col items-center text-center space-y-6 py-2">
         {/* Tier Badge with spring pop animation */}
-        <motion.div
-          initial={shouldReduceMotion ? false : { scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.15 }}
-          className="pt-2"
-        >
-          {renderTierBadge()}
-        </motion.div>
+        <div className="pt-2">
+          <TierBadge tier={oddness.tier} />
+        </div>
 
         {/* Big Percentile Display */}
         <div className="space-y-2">
-          <motion.div
-            key={displayPercentile}
-            className="font-heading text-6xl sm:text-7xl font-extrabold text-text tracking-tight tabular-nums"
+          <div
+            className="font-display text-6xl sm:text-7xl font-extrabold text-ink tracking-tight tabular-nums"
           >
             {displayPercentile}%
-          </motion.div>
-          <p className="text-sm sm:text-base font-body text-text-secondary max-w-xs mx-auto">
-            Rarer than <strong className="text-text font-semibold">{targetPercentile}%</strong> of today&apos;s players worldwide.
+          </div>
+          <p className="text-body font-body text-muted max-w-xs mx-auto">
+            Rarer than <strong className="text-ink font-bold">{targetPercentile}%</strong> of today&apos;s players worldwide.
           </p>
         </div>
 
-        {/* Rarest Pick Card */}
-        <Card variant="glass" className="w-full p-5 text-left space-y-3">
+        {/* Rarest Pick Card - Section 4: paper, outline 2.5px solid ink, shadow-sticker */}
+        <div className="w-full p-5 text-left space-y-3 rounded-l bg-paper border-[2.5px] border-ink shadow-sticker">
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-coral" />
-            <span className="text-[11px] font-heading font-bold uppercase tracking-wider text-coral">
+            <Flame className="w-4 h-4 text-coral stroke-[2.5]" />
+            <span className="text-caption font-display font-extrabold uppercase tracking-wider text-coral">
               Your Rarest Pick Today
             </span>
           </div>
 
-          <p className="text-xs text-text-muted leading-tight">
+          <p className="text-body-s font-body text-muted leading-tight">
             {rarestPick.prompt}
           </p>
 
-          <div className="p-3 rounded-xl bg-surface-2 border border-border flex items-center justify-between">
-            <span className="font-heading font-bold text-sm sm:text-base text-text">
+          <div className="p-3.5 rounded-m bg-cream border-[1.5px] border-ink flex items-center justify-between gap-3">
+            <span className="font-display font-extrabold text-sm sm:text-base text-ink truncate">
               {rarestPick.value_label}
             </span>
-            <span className="text-xs font-semibold text-mint bg-mint/10 border border-mint/20 px-2.5 py-1 rounded-full">
-              Only {rarestPick.frequency_pct}% picked this
+            {/* Audit fix: Mint is fill with ink text, never mint text on light! */}
+            <span className="text-caption font-display font-extrabold text-ink bg-mint border-[1.5px] border-ink px-2.5 py-1 rounded-pill shrink-0">
+              Only {rarestPick.frequency_pct}%
             </span>
           </div>
-        </Card>
+        </div>
 
         {/* Share & Challenge CTAs */}
         <div className="w-full space-y-3 pt-2">
           <Button
             variant="primary"
             size="lg"
-            className="w-full flex items-center justify-center gap-2 py-4 text-base font-bold shadow-lg"
+            className="w-full"
             onClick={() => {
               feedback.playSound("tick");
               if (onShare) onShare();
             }}
           >
-            <Share2 className="w-5 h-5 text-midnight" />
+            <Share2 className="w-5 h-5 stroke-[2.5]" />
             <span>Share my card</span>
           </Button>
 
           <Button
             variant="secondary"
             size="lg"
-            className="w-full flex items-center justify-center gap-2"
+            className="w-full"
             onClick={() => {
               feedback.playSound("tick");
               if (onChallenge) onChallenge();
             }}
           >
-            <Users className="w-5 h-5" />
+            <Users className="w-5 h-5 stroke-[2.5]" />
             <span>Challenge a friend</span>
           </Button>
 
@@ -211,7 +191,7 @@ export function OddnessScreen({
             <button
               type="button"
               onClick={onHome}
-              className="text-xs text-text-muted hover:text-text transition-colors pt-1 cursor-pointer"
+              className="text-body-s font-display font-bold text-muted hover:text-ink transition-colors pt-1 cursor-pointer min-h-[44px] flex items-center justify-center"
             >
               Back to Home
             </button>
@@ -219,7 +199,7 @@ export function OddnessScreen({
         </div>
       </main>
 
-      <footer className="relative z-20 text-center pb-2 text-xs text-text-muted">
+      <footer className="relative z-20 text-center pb-2 text-caption text-muted">
         Shannon Entropy Engine • Computed across today&apos;s active player distribution
       </footer>
     </div>

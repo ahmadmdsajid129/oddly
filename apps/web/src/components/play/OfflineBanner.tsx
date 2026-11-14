@@ -2,7 +2,7 @@
 
 import React from "react";
 import { WifiOff } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 
 interface OfflineBannerProps {
   isOnline: boolean;
@@ -12,7 +12,7 @@ export function OfflineBanner({ isOnline }: OfflineBannerProps) {
   return (
     <AnimatePresence>
       {!isOnline && (
-        <motion.div
+        <m.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -23,7 +23,7 @@ export function OfflineBanner({ isOnline }: OfflineBannerProps) {
         >
           <WifiOff className="w-4 h-4 shrink-0" />
           <span>You are offline. Your picks are safely saved on this device.</span>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

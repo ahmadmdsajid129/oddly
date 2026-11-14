@@ -120,11 +120,9 @@ export function QuestionScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [question, onExit, scheduleAutoAdvance]);
 
-  const atmosphereType = question.type;
-
   return (
-    <div className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none">
-      <Atmosphere mode={atmosphereType} />
+    <div className="min-h-screen flex flex-col justify-between p-4 sm:p-6 relative select-none bg-cream">
+      <Atmosphere />
 
       {/* Screen reader announcement */}
       <div aria-live="polite" className="sr-only">
@@ -137,20 +135,19 @@ export function QuestionScreen({
           type="button"
           onClick={onBack}
           aria-label="Previous question"
-          className={`p-2.5 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer ${
+          className={`p-2.5 rounded-pill border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${
             currentIndex === 0 ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
         </button>
 
         {/* 5 Progress Dots */}
         <div className="flex items-center">
           <ProgressDots
             total={totalQuestions}
-            current={currentIndex + 1}
-            onDotClick={(index1Based) => {
-              const targetIdx = index1Based - 1;
+            current={currentIndex}
+            onDotClick={(targetIdx) => {
               if (targetIdx <= answers.length) {
                 onJumpToIndex(targetIdx);
               }
@@ -162,30 +159,33 @@ export function QuestionScreen({
           type="button"
           onClick={onExit}
           aria-label="Exit drop"
-          className="p-2.5 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer"
+          className="p-2.5 rounded-pill border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 stroke-[2.5]" />
         </button>
       </header>
 
       {/* Question Content Body */}
-      <main className="relative z-20 w-full max-w-lg mx-auto my-auto flex flex-col items-center text-center space-y-6 py-4">
-        {/* Type Badge */}
-        <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-heading font-semibold uppercase tracking-wider bg-violet/10 text-violet border border-violet/20">
+      <main className="relative z-20 w-full max-w-lg mx-auto my-auto flex flex-col items-center text-center space-y-5 py-2">
+        {/* Type Badge - Section 7: Chip: Display 700 12, padding 4x10, radius-pill, outline-thin */}
+        <div className="inline-flex items-center px-3 py-1 rounded-pill text-chip font-display font-bold uppercase tracking-wider bg-lavender text-ink border-[1.5px] border-ink">
           {question.type === "text" && "Pick One"}
           {question.type === "number" && "Choose a Number"}
           {question.type === "colour" && "Pick a Colour"}
           {question.type === "image" && "Select an Image"}
-          {question.type === "word" && "Select Three Words"}
+          {question.type === "word" && "Select Words"}
         </div>
 
-        {/* Question Prompt */}
-        <h1 className="font-heading text-2xl sm:text-3xl font-bold text-text leading-tight max-w-md">
+        {/* Question Prompt - Section 3: Display-l clamp(26px, 7vw, 32px), Display 800 */}
+        <h1
+          data-testid="question-prompt"
+          className="font-display text-display-l font-extrabold text-ink leading-tight max-w-md"
+        >
           {question.payload.prompt}
         </h1>
 
         {/* Polymorphic Input Component */}
-        <div className="w-full pt-2">
+        <div className="w-full pt-1">
           {/* 1. Text Question */}
           {question.type === "text" && question.payload.options && (
             <div className="flex flex-col gap-3 w-full">
@@ -209,31 +209,49 @@ export function QuestionScreen({
             </div>
           )}
 
-          {/* 2. Number Question */}
+          {/* 2. Number Question (1 to 50 Grid) */}
           {question.type === "number" && (
-            <NumberPicker
-              value={
-                currentAnswer?.type === "number"
-                  ? currentAnswer.value
-                  : Math.round(((question.payload.min ?? 1) + (question.payload.max ?? 100)) / 2)
-              }
-              min={question.payload.min ?? 1}
-              max={question.payload.max ?? 100}
-              onChange={(val) => {
-                onAnswer({
-                  type: "number",
-                  question_id: question.id,
-                  value: val,
-                });
-              }}
-              onConfirm={() => {
-                feedback.playSound("tick");
-                onNext();
-              }}
-            />
+            <div className="space-y-4 w-full">
+              <NumberPicker
+                value={
+                  currentAnswer?.type === "number"
+                    ? currentAnswer.value
+                    : Math.round(((question.payload.min ?? 1) + (question.payload.max ?? 50)) / 2)
+                }
+                min={question.payload.min ?? 1}
+                max={question.payload.max ?? 50}
+                onChange={(val) => {
+                  onAnswer({
+                    type: "number",
+                    question_id: question.id,
+                    value: val,
+                  });
+                }}
+              />
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  const finalNum =
+                    currentAnswer?.type === "number"
+                      ? currentAnswer.value
+                      : Math.round(((question.payload.min ?? 1) + (question.payload.max ?? 50)) / 2);
+                  onAnswer({
+                    type: "number",
+                    question_id: question.id,
+                    value: finalNum,
+                  });
+                  feedback.playSound("tick");
+                  onNext();
+                }}
+              >
+                Lock in number
+              </Button>
+            </div>
           )}
 
-          {/* 3. Colour Question */}
+          {/* 3. Colour Question (12 Swatches) */}
           {question.type === "colour" && (
             <ColourSwatchGrid
               selectedHex={
@@ -249,7 +267,7 @@ export function QuestionScreen({
             />
           )}
 
-          {/* 4. Image Question */}
+          {/* 4. Image Question (2x2 Grid) */}
           {question.type === "image" && question.payload.illustrations && (
             <ImageTileGrid
               options={question.payload.illustrations.map((ill) => ({
@@ -270,9 +288,9 @@ export function QuestionScreen({
             />
           )}
 
-          {/* 5. Word Question */}
+          {/* 5. Word Question (Wrap Chips) */}
           {question.type === "word" && question.payload.chips && (
-            <div className="space-y-4">
+            <div className="space-y-4 w-full">
               <WordChipsGrid
                 words={question.payload.chips.map((c) => c.label)}
                 selectedWord={
@@ -283,7 +301,7 @@ export function QuestionScreen({
                   const val = chip ? chip.value : wordLabel;
                   const currentWords =
                     currentAnswer?.type === "word" ? currentAnswer.value : [];
-                  
+
                   let nextWords: string[];
                   if (currentWords.includes(val)) {
                     nextWords = currentWords.filter((w) => w !== val);
@@ -310,11 +328,11 @@ export function QuestionScreen({
               />
 
               {currentAnswer?.type === "word" && currentAnswer.value.length > 0 && (
-                <div className="pt-2 flex justify-center">
+                <div className="pt-2 flex justify-center w-full">
                   <Button
                     variant="primary"
                     size="lg"
-                    className="w-full max-w-xs"
+                    className="w-full"
                     onClick={() => {
                       feedback.playSound("tick");
                       onNext();
@@ -331,7 +349,7 @@ export function QuestionScreen({
 
       {/* Subtle keyboard hint on desktop */}
       <footer className="relative z-20 text-center pb-2 hidden sm:block">
-        <span className="text-[11px] text-text-muted">
+        <span className="text-caption font-bold text-muted">
           Press 1-4 for options • Esc to exit
         </span>
       </footer>

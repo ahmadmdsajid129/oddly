@@ -16,11 +16,10 @@ interface DigitProps {
   shouldReduceMotion: boolean | null;
 }
 
-// Individual digit component: only re-renders and animates when this specific digit changes
 const Digit = React.memo(function Digit({ digit, shouldReduceMotion }: DigitProps) {
   if (shouldReduceMotion) {
     return (
-      <span className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text">
+      <span className="font-display text-3xl sm:text-4xl font-extrabold tabular-nums text-ink">
         {digit}
       </span>
     );
@@ -34,8 +33,8 @@ const Digit = React.memo(function Digit({ digit, shouldReduceMotion }: DigitProp
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -16, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="font-heading text-3xl sm:text-4xl font-bold tabular-nums text-text inline-block"
+          transition={{ duration: 0.16, ease: "easeOut" }}
+          className="font-display text-3xl sm:text-4xl font-extrabold tabular-nums text-ink inline-block"
         >
           {digit}
         </m.span>
@@ -50,7 +49,7 @@ interface UnitCardProps {
   shouldReduceMotion: boolean | null;
 }
 
-// Unit card containing tens digit and ones digit independently
+// Unit card: paper fill, 2.5px solid ink outline, shadow-sticker
 const UnitCard = React.memo(function UnitCard({
   value,
   label,
@@ -61,11 +60,11 @@ const UnitCard = React.memo(function UnitCard({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="w-16 sm:w-20 h-20 sm:h-24 rounded-2xl bg-surface-2 border border-border shadow-sm flex items-center justify-center gap-0.5 overflow-hidden relative">
+      <div className="w-16 sm:w-20 h-20 sm:h-24 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker flex items-center justify-center gap-0.5 overflow-hidden relative">
         <Digit digit={tens} shouldReduceMotion={shouldReduceMotion} />
         <Digit digit={ones} shouldReduceMotion={shouldReduceMotion} />
       </div>
-      <span className="text-[11px] font-heading font-semibold text-text-muted mt-2 tracking-widest uppercase">
+      <span className="text-caption font-display font-bold text-muted mt-2 tracking-widest uppercase">
         {label}
       </span>
     </div>
@@ -104,7 +103,6 @@ export function Countdown({
     const target = targetDate || calculateDefaultTarget();
 
     const update = () => {
-      // Adjusted client time using server Date header offset (R1.5)
       const now = new Date(Date.now() + serverDateOffsetMs);
       const diffMs = target.getTime() - now.getTime();
 
@@ -112,7 +110,6 @@ export function Countdown({
         setTimeRemaining({ hours: 0, minutes: 0, seconds: 0 });
         if (!hasTriggeredRef.current) {
           hasTriggeredRef.current = true;
-          // Thundering Herd Defense: randomized 0 to 4-second jitter before firing fetch (R1.5)
           const jitterMs = Math.floor(Math.random() * 4000);
           setTimeout(() => {
             onComplete?.();
@@ -142,20 +139,22 @@ export function Countdown({
           label="HRS"
           shouldReduceMotion={shouldReduceMotion}
         />
-        <span className="font-heading text-2xl font-bold text-text-muted pb-6">:</span>
+        <span className="font-display text-2xl font-bold text-ink pb-6">:</span>
         <UnitCard
           value={pad(timeRemaining.minutes)}
           label="MIN"
           shouldReduceMotion={shouldReduceMotion}
         />
-        <span className="font-heading text-2xl font-bold text-text-muted pb-6">:</span>
+        <span className="font-display text-2xl font-bold text-ink pb-6">:</span>
         <UnitCard
           value={pad(timeRemaining.seconds)}
           label="SEC"
           shouldReduceMotion={shouldReduceMotion}
         />
       </div>
-      <p className="font-body text-xs text-text-muted mt-4">until today&apos;s five drop at 7:00 AM IST</p>
+      <p className="font-body text-body-s text-muted mt-4">
+        Today&apos;s five drop at <strong className="text-ink font-bold">07:00 IST</strong>
+      </p>
     </div>
   );
 }

@@ -30,15 +30,41 @@ import {
   useNetworkStatus,
 } from "@/lib/play-state";
 import { AgeGateModal } from "@/components/play/AgeGateModal";
-import { Under18Screen } from "@/components/play/Under18Screen";
-import { ExitConfirmDialog } from "@/components/play/ExitConfirmDialog";
 import { OfflineBanner } from "@/components/play/OfflineBanner";
 import { QuestionScreen, QuestionData } from "@/components/play/QuestionScreen";
-import { ReviewScreen } from "@/components/play/ReviewScreen";
-import { SearchMapAnimation } from "@/components/play/SearchMapAnimation";
-import { TwinRevealScreen, TwinMatchData } from "@/components/play/TwinRevealScreen";
-import { OddnessScreen, OddnessData } from "@/components/play/OddnessScreen";
-import { ShareSheet } from "@/components/share/ShareSheet";
+import type { TwinMatchData } from "@/components/play/TwinRevealScreen";
+import type { OddnessData } from "@/components/play/OddnessScreen";
+import dynamic from "next/dynamic";
+
+const Under18Screen = dynamic(
+  () => import("@/components/play/Under18Screen").then((m) => m.Under18Screen),
+  { ssr: false }
+);
+const ExitConfirmDialog = dynamic(
+  () => import("@/components/play/ExitConfirmDialog").then((m) => m.ExitConfirmDialog),
+  { ssr: false }
+);
+
+const ReviewScreen = dynamic(
+  () => import("@/components/play/ReviewScreen").then((m) => m.ReviewScreen),
+  { ssr: false }
+);
+const SearchMapAnimation = dynamic(
+  () => import("@/components/play/SearchMapAnimation").then((m) => m.SearchMapAnimation),
+  { ssr: false }
+);
+const TwinRevealScreen = dynamic(
+  () => import("@/components/play/TwinRevealScreen").then((m) => m.TwinRevealScreen),
+  { ssr: false }
+);
+const OddnessScreen = dynamic(
+  () => import("@/components/play/OddnessScreen").then((m) => m.OddnessScreen),
+  { ssr: false }
+);
+const ShareSheet = dynamic(
+  () => import("@/components/share/ShareSheet").then((mod) => mod.ShareSheet),
+  { ssr: false }
+);
 import type { AnswerPayload, ShareFormat } from "@oddly/shared";
 import { Sun, Moon, Sparkles, Trophy, ArrowRight, User, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -548,7 +574,7 @@ export default function HomePage() {
       <header className="relative z-20 flex items-center justify-between w-full max-w-xl mx-auto pt-2">
         <div className="flex items-center gap-2">
           <BrandMark size={32} />
-          <span className="font-heading text-xl font-bold tracking-tight text-text">oddly</span>
+          <span className="font-display text-xl font-extrabold tracking-tight text-ink">oddly</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -560,52 +586,43 @@ export default function HomePage() {
 
           <PwaInstallButton className="hidden sm:inline-flex" />
 
-          <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint/10 border border-mint/20 text-xs font-semibold text-mint">
-            <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
+          <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-paper border-[1.5px] border-ink text-chip font-display font-bold text-ink">
+            <span className="w-2 h-2 rounded-pill bg-mint border border-ink" />
             Live
           </div>
 
           <button
             type="button"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          <button
-            type="button"
             onClick={() => router.push("/me")}
-            className="p-2 rounded-full border border-border bg-surface text-text-muted hover:text-text transition-all cursor-pointer"
+            className="p-2 rounded-m border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Settings"
             title="Settings"
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-4 h-4 stroke-[2.5]" />
           </button>
 
           {auth.isAuthenticated ? (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet/10 border border-violet/30 text-violet max-w-[90px] truncate">
+              <span className="text-chip font-display font-bold px-3 py-1 rounded-pill bg-lavender border-[1.5px] border-ink text-ink max-w-[100px] truncate">
                 {auth.account?.displayName || "Player"}
               </span>
               <button
                 type="button"
                 onClick={() => auth.logout()}
-                className="p-1.5 rounded-full border border-border bg-surface text-text-muted hover:text-flame transition-all cursor-pointer"
+                className="p-2 rounded-m border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
                 aria-label="Sign out"
                 title="Sign out"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
           ) : (
             <button
               type="button"
               onClick={() => auth.openLoginModal()}
-              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border bg-surface text-text hover:bg-surface-2 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+              className="px-3.5 py-1.5 text-chip font-display font-bold rounded-m border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer flex items-center gap-1.5 min-h-[44px]"
             >
-              <User className="w-3.5 h-3.5 text-violet" />
+              <User className="w-4 h-4 stroke-[2.5] text-violet" />
               <span>Sign in</span>
             </button>
           )}
@@ -614,38 +631,38 @@ export default function HomePage() {
 
       {/* Hero Body */}
       <div className="relative z-20 w-full max-w-md mx-auto my-auto text-center space-y-6 py-4">
-        {/* Brand visual motif */}
+        {/* Brand visual sticker motif: three physical overlapping circles with ink outlines */}
         <div className="relative w-28 h-20 mx-auto flex items-center justify-center">
-          <div className="absolute left-2 w-14 h-14 rounded-full bg-violet/80 blur-xs border border-violet/40" />
-          <div className="absolute right-2 w-14 h-14 rounded-full bg-coral/80 blur-xs border border-coral/40" />
-          <div className="relative z-10 w-6 h-6 rounded-full bg-mint shadow-[0_0_16px_rgba(61,219,176,0.6)]" />
+          <div className="absolute left-1 w-14 h-14 rounded-pill bg-violet border-[2.5px] border-ink shadow-sticker" />
+          <div className="absolute right-1 w-14 h-14 rounded-pill bg-coral border-[2.5px] border-ink shadow-sticker" />
+          <div className="relative z-10 w-7 h-7 rounded-pill bg-mint border-[2px] border-ink shadow-sm" />
         </div>
 
         {/* Hero headline & tagline */}
         <div className="space-y-2">
-          <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-text">
+          <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
             Someone out there is oddly like you
           </h1>
-          <p className="font-body text-text-secondary text-sm sm:text-base leading-relaxed max-w-xs mx-auto">
+          <p className="font-body text-muted text-base leading-relaxed max-w-xs mx-auto">
             Five picks. About 30 seconds. One stranger twin anywhere in the world.
           </p>
         </div>
 
         {/* Live Player Counter */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-2 border border-border text-xs font-medium text-text">
-          <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-paper border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
+          <span className="w-2.5 h-2.5 rounded-pill bg-mint border border-ink" />
           <span>3,482 players today</span>
         </div>
 
         {/* Completed Drop Summary or Play CTA */}
         {submissionResult ? (
-          <Card variant="elevated" className="p-6 space-y-4 text-center">
-            <div className="flex items-center justify-center gap-2 text-mint font-heading font-bold text-xs uppercase tracking-wider">
-              <Trophy className="w-4 h-4" />
+          <div className="rounded-l bg-paper border-[2.5px] border-ink shadow-sticker p-6 space-y-4 text-center">
+            <div className="flex items-center justify-center gap-2 font-display font-bold text-xs uppercase tracking-wider text-ink px-3 py-1 bg-mint rounded-pill border-[1.5px] border-ink w-fit mx-auto">
+              <Trophy className="w-4 h-4 stroke-[2.5]" />
               <span>Today&apos;s Picks Sealed</span>
             </div>
 
-            <p className="font-heading text-xl font-bold text-text">
+            <p className="font-display text-xl font-extrabold text-ink">
               Matched {submissionResult.match.matched_picks}/5 with a stranger in {submissionResult.match.twin_location}
             </p>
 
@@ -657,25 +674,25 @@ export default function HomePage() {
                 onClick={() => setStep("reveal")}
               >
                 <span>View Twin & Oddness</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
               </Button>
             </div>
 
-            <div className="pt-2 border-t border-border">
-              <p className="text-xs text-text-muted mb-2 font-heading">
-                Next five drop at 7:00 AM IST
+            <div className="pt-2 border-t-[1.5px] border-ink/20">
+              <p className="text-caption text-muted mb-2 font-display font-bold uppercase tracking-wider">
+                Next five drop at 07:00 IST
               </p>
               <Countdown />
             </div>
-          </Card>
+          </div>
         ) : isLoading ? (
           <div className="space-y-3">
-            <Skeleton className="h-14 w-full rounded-2xl" />
+            <Skeleton className="h-14 w-full" />
           </div>
         ) : dropStatus === "pending" ? (
           <div className="space-y-4">
-            <p className="text-sm font-heading font-semibold text-text-muted">
-              Today&apos;s five drop at 7:00 AM IST
+            <p className="text-body-s font-display font-bold text-muted">
+              Today&apos;s five drop at 07:00 IST
             </p>
             <Countdown />
           </div>
@@ -684,13 +701,14 @@ export default function HomePage() {
             <Button
               variant="primary"
               size="lg"
-              className="w-full py-4 text-base sm:text-lg font-bold flex items-center justify-center gap-2.5 rounded-full"
+              data-testid="play-welcome-start"
+              className="w-full"
               onClick={handleStartPlay}
             >
-              <Sparkles className="w-5 h-5 text-mint" />
+              <Sparkles className="w-5 h-5" />
               <span>{answers.length > 0 ? "Resume today's five" : "Play today's five"}</span>
             </Button>
-            <p className="text-xs text-textMuted font-medium tracking-wide">
+            <p className="text-caption text-muted font-bold font-display tracking-wide">
               18+ only • No account needed • Free forever
             </p>
           </div>
@@ -699,28 +717,28 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="relative z-20 text-center pb-4 space-y-2">
-        <div className="flex items-center justify-center gap-3 text-xs font-medium text-text-muted">
-          <button type="button" onClick={() => router.push("/about")} className="hover:text-text cursor-pointer">
+        <div className="flex items-center justify-center gap-3 text-caption font-bold font-display text-muted">
+          <button type="button" onClick={() => router.push("/about")} className="hover:text-ink cursor-pointer">
             About
           </button>
           <span>•</span>
-          <button type="button" onClick={() => router.push("/history")} className="hover:text-text cursor-pointer">
+          <button type="button" onClick={() => router.push("/history")} className="hover:text-ink cursor-pointer">
             Archive
           </button>
           <span>•</span>
-          <button type="button" onClick={() => router.push("/me")} className="hover:text-text cursor-pointer">
+          <button type="button" onClick={() => router.push("/me")} className="hover:text-ink cursor-pointer">
             Settings
           </button>
           <span>•</span>
-          <button type="button" onClick={() => router.push("/privacy")} className="hover:text-text cursor-pointer">
+          <button type="button" onClick={() => router.push("/privacy")} className="hover:text-ink cursor-pointer">
             Privacy
           </button>
           <span>•</span>
-          <button type="button" onClick={() => router.push("/terms")} className="hover:text-text cursor-pointer">
+          <button type="button" onClick={() => router.push("/terms")} className="hover:text-ink cursor-pointer">
             Terms
           </button>
         </div>
-        <p className="text-[11px] text-text-muted">
+        <p className="text-[11px] font-body text-muted">
           A daily game of coincidences &amp; human connection
         </p>
       </footer>

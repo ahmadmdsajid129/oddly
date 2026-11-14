@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
-import { Check, Minus, Plus } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/Button";
+import React from "react";
+import { Check } from "lucide-react";
 import { DynamicIllustration } from "@/components/illustrations";
-import { colors } from "@oddly/ui-tokens";
+import { palette12 } from "@oddly/ui-tokens";
 import { feedback } from "@/lib/feedback";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -15,7 +13,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 }
 
 // ==============================================================================
-// 1. Text Pick One Tile (Question Type 1)
+// 1. Text Pick One Tile / Stacked Option Row (Question Type 1 & Telepathy)
 // ==============================================================================
 export interface TextOption {
   id: string;
@@ -25,60 +23,53 @@ export interface TextOption {
 export function AnswerTile({
   option,
   selected = false,
+  locked = false,
   onSelect,
   className,
 }: {
   option: TextOption;
   selected?: boolean;
+  locked?: boolean;
   onSelect: (id: string) => void;
   className?: string;
 }) {
   return (
-    <motion.button
+    <button
       type="button"
-      whileTap={{ scale: 0.98 }}
+      data-testid={`answer-option-${option.id}`}
+      aria-pressed={selected}
+      disabled={locked}
       onClick={() => {
+        if (locked) return;
         feedback.triggerHaptic("select");
         feedback.playSound("tick");
         onSelect(option.id);
       }}
       className={cn(
-        "relative w-full min-h-[72px] p-5 rounded-2xl border text-left flex items-center justify-between transition-all duration-150 cursor-pointer select-none outline-none focus-visible:ring-3 focus-visible:ring-mint",
+        "relative w-full min-h-[56px] px-4 py-3 rounded-m border-[2.5px] border-ink text-left flex items-center justify-between gap-3 transition-all duration-120 cursor-pointer select-none outline-none sticker-press",
         selected
-          ? "bg-surface-2 border-violet border-2 shadow-md"
-          : "bg-surface border-border hover:border-violet/60 hover:-translate-y-0.5 hover:shadow-sm",
+          ? "bg-sun text-ink shadow-sticker"
+          : "bg-paper text-ink shadow-sticker",
+        locked && !selected && "opacity-60 pointer-events-none",
         className
       )}
     >
-      <span className="font-heading text-base sm:text-lg font-medium text-text pr-8 leading-snug">
+      <span className="font-display font-bold text-button pr-4 leading-snug">
         {option.text}
       </span>
 
-      <div
-        className={cn(
-          "w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-          selected ? "bg-violet border-violet text-white shadow-sm" : "border-border bg-transparent"
-        )}
-      >
-        <AnimatePresence>
-          {selected && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              transition={{ type: "spring", stiffness: 500, damping: 25 }}
-            >
-              <Check className="w-3.5 h-3.5 stroke-[3] text-mint" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.button>
+      {selected && (
+        <span className="w-6 h-6 rounded-pill bg-ink text-paper flex items-center justify-center shrink-0 border-[1.5px] border-ink">
+          <Check className="w-4 h-4 stroke-[3]" />
+        </span>
+      )}
+    </button>
   );
 }
 
 // ==============================================================================
-// 2. Number Picker with Dial & Controls (Question Type 2)
+// 2. Number 1 to 50 Grid (Question Type 2) - Section 6:
+// Grid of 5 columns x 10 rows of 48px square stickers; selected = sun.
 // ==============================================================================
 export function NumberPicker({
   value = 25,
@@ -93,86 +84,60 @@ export function NumberPicker({
   onChange: (val: number) => void;
   onConfirm?: () => void;
 }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const count = Math.max(1, max - min + 1);
+  const numbers = Array.from({ length: count }, (_, i) => min + i);
 
-  const setNumber = (newVal: number) => {
-    const clamped = Math.max(min, Math.min(max, newVal));
-    if (clamped !== value) {
-      feedback.triggerHaptic("select");
-      feedback.playSound("tick");
-      onChange(clamped);
-    }
+  const selectNumber = (num: number) => {
+    feedback.triggerHaptic("select");
+    feedback.playSound("tick");
+    onChange(num);
   };
 
   return (
-    <div className="w-full flex flex-col items-center select-none py-2">
-      {/* Big Circular Glass Dial */}
-      <div className="relative w-36 h-36 rounded-full bg-surface-2 border-2 border-border/80 flex items-center justify-center shadow-lg mb-6">
-        <span className="font-heading text-6xl font-bold tabular-nums text-text">{value}</span>
-        <div className="absolute inset-0 rounded-full border border-violet/30 pointer-events-none" />
+    <div className="w-full flex flex-col items-center select-none py-2 space-y-4">
+      {/* Active Selected Big Number Display */}
+      <div className="w-full flex items-center justify-between px-2">
+        <span className="font-display text-sm font-bold text-muted">Select number:</span>
+        <span className="font-display text-2xl font-extrabold text-ink tabular-nums px-3 py-1 bg-sun border-[2px] border-ink rounded-m shadow-sm">
+          {value}
+        </span>
       </div>
 
-      {/* Adjuster Touch Buttons */}
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          type="button"
-          onClick={() => setNumber(value - 1)}
-          disabled={value <= min}
-          aria-label="Decrease number"
-          className="w-12 h-12 rounded-full bg-surface-2 border border-border flex items-center justify-center text-text hover:bg-violet/10 hover:border-violet active:scale-95 disabled:opacity-30 cursor-pointer"
-        >
-          <Minus className="w-5 h-5 stroke-[2.5]" />
-        </button>
-
-        {/* Snapping Horizontal Slider Strip */}
-        <div
-          ref={scrollRef}
-          className="flex items-center gap-2 overflow-x-auto py-2 px-3 max-w-[200px] no-scrollbar scroll-smooth"
-        >
-          {Array.from({ length: max - min + 1 }).map((_, i) => {
-            const num = min + i;
-            const isSelected = num === value;
-            return (
-              <button
-                key={num}
-                type="button"
-                onClick={() => setNumber(num)}
-                className={cn(
-                  "w-9 h-9 rounded-full shrink-0 flex items-center justify-center font-heading text-sm font-semibold transition-all cursor-pointer",
-                  isSelected
-                    ? "bg-violet text-white shadow-sm scale-110"
-                    : "bg-surface text-text-muted hover:text-text border border-border"
-                )}
-              >
-                {num}
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setNumber(value + 1)}
-          disabled={value >= max}
-          aria-label="Increase number"
-          className="w-12 h-12 rounded-full bg-surface-2 border border-border flex items-center justify-center text-text hover:bg-violet/10 hover:border-violet active:scale-95 disabled:opacity-30 cursor-pointer"
-        >
-          <Plus className="w-5 h-5 stroke-[2.5]" />
-        </button>
+      {/* 5 columns x 10 rows grid of 48px square sticker cells */}
+      <div
+        className="w-full grid grid-cols-5 gap-2 max-h-[380px] overflow-y-auto p-1 rounded-l bg-cream border-[1.5px] border-ink"
+        role="radiogroup"
+        aria-label="Select a number from 1 to 50"
+      >
+        {numbers.map((num) => {
+          const isSelected = num === value;
+          return (
+            <button
+              key={num}
+              type="button"
+              role="radio"
+              aria-checked={isSelected}
+              aria-label={`Number ${num}`}
+              onClick={() => selectNumber(num)}
+              className={cn(
+                "h-12 w-full rounded-m border-[2.5px] border-ink font-display font-extrabold text-base flex items-center justify-center transition-all duration-120 cursor-pointer outline-none sticker-press",
+                isSelected
+                  ? "bg-sun text-ink shadow-sticker-lift scale-102"
+                  : "bg-paper text-ink shadow-sticker"
+              )}
+            >
+              {num}
+            </button>
+          );
+        })}
       </div>
-
-      {/* Confirm CTA button */}
-      {onConfirm && (
-        <Button variant="primary" size="lg" onClick={onConfirm} className="w-full max-w-xs">
-          Confirm Number
-        </Button>
-      )}
     </div>
   );
 }
 
 // ==============================================================================
-// 3. 12-Colour Swatch Grid (Question Type 3)
+// 3. 12-Colour Swatch Grid (Question Type 3) - Section 6:
+// 4 x 3 grid of 56px swatches with ink outline; selected swatch gets ink check badge and shadow-sticker-lift.
 // ==============================================================================
 export function ColourSwatchGrid({
   selectedHex,
@@ -181,38 +146,49 @@ export function ColourSwatchGrid({
   selectedHex?: string;
   onSelect: (swatch: { label: string; hex: string }) => void;
 }) {
-  const swatches = colors.palette12;
+  const swatches = palette12;
 
   return (
-    <div className="grid grid-cols-4 gap-3 sm:gap-4 py-2 select-none justify-items-center">
+    <div
+      className="grid grid-cols-4 gap-3 sm:gap-4 py-2 select-none justify-items-center w-full"
+      role="radiogroup"
+      aria-label="Select a colour"
+    >
       {swatches.map((swatch) => {
         const isSelected = selectedHex === swatch.hex;
         return (
           <button
             key={swatch.label}
             type="button"
+            role="radio"
+            aria-checked={isSelected}
+            aria-label={`${swatch.label} swatch`}
             onClick={() => {
               feedback.triggerHaptic("select");
               feedback.playSound("tick");
               onSelect(swatch);
             }}
-            className="flex flex-col items-center gap-1.5 group cursor-pointer outline-none"
+            className="flex flex-col items-center gap-1.5 group cursor-pointer outline-none sticker-press"
           >
             <div
               className={cn(
-                "relative w-14 h-14 sm:w-16 sm:h-16 rounded-full transition-transform duration-150 flex items-center justify-center shadow-sm",
+                "relative w-14 h-14 rounded-pill border-[2.5px] border-ink transition-all duration-120 flex items-center justify-center",
                 isSelected
-                  ? "scale-105 ring-4 ring-text ring-offset-3 ring-offset-bg"
-                  : "group-hover:scale-105"
+                  ? "shadow-sticker-lift scale-105"
+                  : "shadow-sticker"
               )}
               style={{ backgroundColor: swatch.hex }}
             >
-              {isSelected && <Check className="w-6 h-6 stroke-[3] text-white drop-shadow-md" />}
+              {isSelected && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-pill bg-ink text-paper flex items-center justify-center border-[1.5px] border-paper">
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+              )}
             </div>
             <span
               className={cn(
-                "text-[10px] font-heading tracking-wider uppercase transition-colors text-center",
-                isSelected ? "font-bold text-text" : "text-text-muted group-hover:text-text"
+                "text-caption font-display font-bold text-center",
+                isSelected ? "text-ink" : "text-muted"
               )}
             >
               {swatch.label}
@@ -225,7 +201,8 @@ export function ColourSwatchGrid({
 }
 
 // ==============================================================================
-// 4. Image Pick One Grid (Question Type 4)
+// 4. Image Pick One Grid (Question Type 4) - Section 6:
+// 2 x 2 grid, 3:2 images, ink outline, selected = sun frame (6px) plus check badge.
 // ==============================================================================
 export interface ImageOption {
   id: string;
@@ -243,38 +220,41 @@ export function ImageTileGrid({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 py-2 select-none">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 py-2 select-none w-full">
       {options.map((opt) => {
         const isSelected = selectedId === opt.id;
         return (
-          <motion.button
+          <button
             key={opt.id}
             type="button"
-            whileTap={{ scale: 0.98 }}
+            data-testid={`answer-option-${opt.id}`}
+            aria-pressed={isSelected}
             onClick={() => {
               feedback.triggerHaptic("select");
               feedback.playSound("tick");
               onSelect(opt.id);
             }}
             className={cn(
-              "relative rounded-2xl p-3 bg-surface border transition-all duration-150 flex flex-col items-center text-center cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-mint",
+              "relative rounded-l p-3.5 bg-paper border-[2.5px] border-ink transition-all duration-120 flex flex-col items-center text-center cursor-pointer outline-none sticker-press min-h-[140px] justify-between",
               isSelected
-                ? "border-violet border-2 shadow-lg ring-2 ring-mint ring-offset-2 ring-offset-bg scale-[1.02]"
-                : "border-border hover:border-violet/60 hover:-translate-y-0.5"
+                ? "ring-4 ring-sun shadow-sticker-lift"
+                : "shadow-sticker"
             )}
           >
-            <DynamicIllustration assetKey={opt.assetKey} size={84} className="mb-2" />
-            <span className="font-heading text-xs sm:text-sm font-semibold text-text line-clamp-1">
+            <div className="w-full aspect-[3/2] flex items-center justify-center mb-2">
+              <DynamicIllustration assetKey={opt.assetKey} size={76} />
+            </div>
+            <span className="font-display text-sm font-bold text-ink line-clamp-1">
               {opt.caption}
             </span>
 
             {/* Check badge top-right */}
             {isSelected && (
-              <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-mint text-midnight flex items-center justify-center shadow-sm">
-                <Check className="w-3.5 h-3.5 stroke-[3]" />
+              <div className="absolute top-2 right-2 w-6 h-6 rounded-pill bg-sun text-ink border-[2px] border-ink flex items-center justify-center shadow-sm">
+                <Check className="w-4 h-4 stroke-[3]" />
               </div>
             )}
-          </motion.button>
+          </button>
         );
       })}
     </div>
@@ -282,7 +262,8 @@ export function ImageTileGrid({
 }
 
 // ==============================================================================
-// 5. Word Chips Grid (Question Type 5)
+// 5. Word Chips Grid (Question Type 5) - Section 6:
+// wrap-flow chips at button size (48 min height), paper to sun selected with check.
 // ==============================================================================
 export function WordChipsGrid({
   words,
@@ -294,28 +275,34 @@ export function WordChipsGrid({
   onSelect: (word: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 py-2 select-none">
+    <div className="flex flex-wrap gap-2.5 py-2 select-none w-full justify-center">
       {words.map((word) => {
         const isSelected = selectedWord === word;
         return (
-          <motion.button
+          <button
             key={word}
             type="button"
-            whileTap={{ scale: 0.97 }}
+            data-testid={`answer-option-${word}`}
+            aria-pressed={isSelected}
             onClick={() => {
               feedback.triggerHaptic("select");
               feedback.playSound("tick");
               onSelect(word);
             }}
             className={cn(
-              "h-14 px-4 rounded-2xl border font-heading text-base font-semibold transition-all duration-150 flex items-center justify-center cursor-pointer select-none outline-none focus-visible:ring-3 focus-visible:ring-mint",
+              "min-h-[48px] px-5 py-2.5 rounded-pill border-[2.5px] border-ink font-display font-bold text-base transition-all duration-120 flex items-center justify-center gap-2 cursor-pointer select-none outline-none sticker-press",
               isSelected
-                ? "bg-violet text-white border-violet shadow-md scale-102"
-                : "bg-surface-2 text-text border-border hover:border-violet/60 hover:text-violet"
+                ? "bg-sun text-ink shadow-sticker"
+                : "bg-paper text-ink shadow-sticker"
             )}
           >
-            {word}
-          </motion.button>
+            <span>{word}</span>
+            {isSelected && (
+              <span className="w-5 h-5 rounded-pill bg-ink text-paper flex items-center justify-center shrink-0">
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
+              </span>
+            )}
+          </button>
         );
       })}
     </div>
