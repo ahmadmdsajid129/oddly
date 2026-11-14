@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
+import { colors, tiers } from "@oddly/ui-tokens";
 import { generateQrCodeDataUrl } from "./qrcode.js";
 import type { ShareFormat, Tier } from "./types.js";
 
@@ -19,7 +20,13 @@ export interface ShareCardData {
   shortId: string; // e.g. "xK9mP2"
   appDomain?: string; // e.g. "oddly.app"
   format?: ShareFormat; // default "story"
-  theme?: ShareTheme; // default "dark"
+  theme?: ShareTheme; // default "light" / cream desk
+  side?: "front" | "back" | "composite";
+  pickMatches?: Array<{
+    question_number: number;
+    label: string;
+    matched: boolean;
+  }>;
 }
 
 export interface CardDimensions {
@@ -27,10 +34,12 @@ export interface CardDimensions {
   height: number;
 }
 
-export const CARD_DIMENSIONS: Record<ShareFormat, CardDimensions> = {
+export const CARD_DIMENSIONS: Record<string, CardDimensions> = {
   story: { width: 1080, height: 1920 },
   square: { width: 1080, height: 1080 },
   link: { width: 1200, height: 630 },
+  front: { width: 1080, height: 1490 },
+  back: { width: 1080, height: 1490 },
 };
 
 // Cached font buffer
@@ -41,7 +50,6 @@ function getFontBuffer(): Buffer {
     return cachedFontBuffer;
   }
 
-  // Resolve font path relative to current module or known assets directory
   const possiblePaths = [
     path.resolve(__dirname, "../assets/fonts/noto-sans-regular.ttf"),
     path.resolve(process.cwd(), "packages/shared/assets/fonts/noto-sans-regular.ttf"),
@@ -59,7 +67,7 @@ function getFontBuffer(): Buffer {
   throw new Error("Embedded font not found for share card generation");
 }
 
-interface ThemePalette {
+export interface ThemePalette {
   bg: string;
   surface: string;
   border: string;
@@ -68,58 +76,38 @@ interface ThemePalette {
   mint: string;
   violet: string;
   coral: string;
+  sun: string;
+  lavender: string;
+  lilac: string;
   pillBg: string;
   pillText: string;
 }
 
-function getThemePalette(theme: ShareTheme, tier: Tier): ThemePalette {
-  if (theme === "light") {
-    return {
-      bg: "#FFF8F0",
-      surface: "#FFFFFF",
-      border: "#DDD6FA",
-      text: "#14123A",
-      textMuted: "#6B6488",
-      mint: "#059669",
-      violet: "#6C4CF1",
-      coral: "#FF6B5E",
-      pillBg: "#EEEAFE",
-      pillText: "#14123A",
-    };
-  }
+export function getThemePalette(_theme?: ShareTheme, tier?: Tier): ThemePalette {
+  // Sticker Pop design: cream desk, physical paper cards, ink outlines
+  const tierKey = (tier?.toLowerCase() || "common") as keyof typeof tiers;
+  const tierConfig = tiers[tierKey] || tiers.common;
 
-  if (theme === "mythic" || tier === "Mythic") {
-    return {
-      bg: "#120E30",
-      surface: "#1D1645",
-      border: "#8B72FF",
-      text: "#FFFFFF",
-      textMuted: "#C7BEF5",
-      mint: "#34D399",
-      violet: "#A78BFA",
-      coral: "#FB7185",
-      pillBg: "#2A1E66",
-      pillText: "#FBBF24",
-    };
-  }
-
-  // Default "dark"
   return {
-    bg: "#14123A",
-    surface: "#1E1B4B",
-    border: "#3A3580",
-    text: "#F4F1FF",
-    textMuted: "#948BB4",
-    mint: "#10B981",
-    violet: "#8B72FF",
-    coral: "#FF6B5E",
-    pillBg: "#28245E",
-    pillText: "#10B981",
+    bg: colors.cream,
+    surface: colors.paper,
+    border: colors.ink,
+    text: colors.ink,
+    textMuted: colors.muted,
+    mint: colors.mint,
+    violet: colors.violet,
+    coral: colors.coral,
+    sun: colors.sun,
+    lavender: colors.lavender,
+    lilac: colors.lilac,
+    pillBg: tier === "Mythic" ? colors.sun : tierConfig.fill.startsWith("#") ? tierConfig.fill : colors.sun,
+    pillText: colors.ink,
   };
 }
 
 /**
- * Builds the virtual DOM tree for Story layout (1080 x 1920)
+ * Builds the virtual DOM tree for Story layout (1080 x 1920) — Instagram Story Composite
+ * Features the Front Card prominent on cream desk with the Back Card peeking beneath.
  */
 function buildStoryTree(
   data: ShareCardData,
@@ -129,6 +117,7 @@ function buildStoryTree(
   const total = data.total ?? 5;
   const shortUrl = `${data.appDomain || "oddly.app"}/c/${data.shortId}`;
   const twinLocation = data.twinCity ? `Stranger in ${data.twinCity}` : "A Stranger nearby";
+  const rarityLine = `Only ${data.percentile}% of players matched you today`;
 
   return {
     type: "div",
@@ -141,11 +130,11 @@ function buildStoryTree(
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: "100px 80px",
+        padding: "80px 60px",
         fontFamily: "Noto Sans, sans-serif",
       },
       children: [
-        // Top Bar: Wordmark + Brand mark
+        // Top Bar: Wordmark + Brand mark + Streak/Date
         {
           type: "div",
           props: {
@@ -165,53 +154,24 @@ function buildStoryTree(
                     gap: "16px",
                   },
                   children: [
-                    // Brand mark circles
                     {
                       type: "div",
                       props: {
                         style: {
-                          display: "flex",
-                          position: "relative",
-                          width: "56px",
+                          width: "36px",
                           height: "36px",
+                          borderRadius: "18px",
+                          backgroundColor: palette.violet,
+                          border: `4px solid ${palette.border}`,
                         },
-                        children: [
-                          {
-                            type: "div",
-                            props: {
-                              style: {
-                                width: "36px",
-                                height: "36px",
-                                borderRadius: "18px",
-                                backgroundColor: palette.violet,
-                                position: "absolute",
-                                left: "0",
-                              },
-                            },
-                          },
-                          {
-                            type: "div",
-                            props: {
-                              style: {
-                                width: "36px",
-                                height: "36px",
-                                borderRadius: "18px",
-                                backgroundColor: palette.coral,
-                                position: "absolute",
-                                left: "20px",
-                                opacity: 0.85,
-                              },
-                            },
-                          },
-                        ],
                       },
                     },
                     {
                       type: "div",
                       props: {
                         style: {
-                          fontSize: "44px",
-                          fontWeight: 700,
+                          fontSize: "48px",
+                          fontWeight: 800,
                           letterSpacing: "-0.03em",
                           color: palette.text,
                         },
@@ -221,7 +181,7 @@ function buildStoryTree(
                   ],
                 },
               },
-              // Streak badge if >= 3
+              // Streak badge or drop date
               data.streak && data.streak >= 3
                 ? {
                     type: "div",
@@ -230,13 +190,14 @@ function buildStoryTree(
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
-                        backgroundColor: palette.surface,
-                        border: `2px solid ${palette.coral}`,
-                        padding: "12px 24px",
+                        backgroundColor: palette.coral,
+                        border: `4px solid ${palette.border}`,
+                        boxShadow: `4px 4px 0px ${palette.border}`,
+                        padding: "12px 28px",
                         borderRadius: "9999px",
                         fontSize: "26px",
-                        fontWeight: 600,
-                        color: palette.coral,
+                        fontWeight: 700,
+                        color: palette.text,
                       },
                       children: `🔥 ${data.streak}-Day Streak`,
                     },
@@ -245,8 +206,14 @@ function buildStoryTree(
                     type: "div",
                     props: {
                       style: {
+                        backgroundColor: palette.lavender,
+                        border: `3px solid ${palette.border}`,
+                        boxShadow: `3px 3px 0px ${palette.border}`,
+                        padding: "10px 24px",
+                        borderRadius: "9999px",
                         fontSize: "24px",
-                        color: palette.textMuted,
+                        fontWeight: 700,
+                        color: palette.text,
                       },
                       children: data.dateStr || "Daily Drop",
                     },
@@ -255,62 +222,120 @@ function buildStoryTree(
           },
         },
 
-        // Center Hero Block
+        // Center: Peeking Composite Card Stack
         {
           type: "div",
           props: {
             style: {
               display: "flex",
-              flexDirection: "column",
+              position: "relative",
+              width: "960px",
+              height: "1380px",
+              margin: "auto auto",
               alignItems: "center",
               justifyContent: "center",
-              width: "100%",
-              padding: "40px 0",
             },
             children: [
-              // Intersecting Venn diagram with glowing Mint center
+              // Peeking Back Card (Sealed Violet underneath, tilted offset)
               {
                 type: "div",
                 props: {
                   style: {
+                    position: "absolute",
+                    top: "20px",
+                    left: "20px",
+                    width: "880px",
+                    height: "1260px",
+                    backgroundColor: palette.violet,
+                    border: `8px solid ${palette.border}`,
+                    borderRadius: "40px",
+                    boxShadow: `16px 16px 0px ${palette.border}`,
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    position: "relative",
-                    width: "480px",
-                    height: "320px",
-                    marginBottom: "40px",
+                    gap: "20px",
                   },
                   children: [
                     {
                       type: "div",
                       props: {
                         style: {
-                          width: "280px",
-                          height: "280px",
-                          borderRadius: "140px",
-                          backgroundColor: palette.violet,
-                          opacity: 0.65,
-                          position: "absolute",
-                          left: "20px",
+                          fontSize: "36px",
+                          fontWeight: 800,
+                          color: colors.paper,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.1em",
                         },
+                        children: "Your Twin Card",
                       },
                     },
+                  ],
+                },
+              },
+
+              // Main Front Card (Foreground, crisp ink outline & hard shadow)
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    top: "60px",
+                    left: "60px",
+                    width: "880px",
+                    height: "1260px",
+                    backgroundColor: palette.surface,
+                    border: `10px solid ${palette.border}`,
+                    borderRadius: "40px",
+                    boxShadow: `20px 20px 0px ${palette.border}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    padding: "64px 54px",
+                  },
+                  children: [
+                    // Top: Tier pill + oddly wordmark
                     {
                       type: "div",
                       props: {
                         style: {
-                          width: "280px",
-                          height: "280px",
-                          borderRadius: "140px",
-                          backgroundColor: palette.coral,
-                          opacity: 0.65,
-                          position: "absolute",
-                          right: "20px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
                         },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                backgroundColor: palette.pillBg,
+                                border: `4px solid ${palette.border}`,
+                                borderRadius: "9999px",
+                                padding: "14px 32px",
+                                fontSize: "28px",
+                                fontWeight: 700,
+                                color: palette.pillText,
+                              },
+                              children: `★ ${data.tier.toUpperCase()} TIER`,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "36px",
+                                fontWeight: 800,
+                                color: palette.text,
+                              },
+                              children: "oddly",
+                            },
+                          },
+                        ],
                       },
                     },
-                    // Center overlap pill with big score
+
+                    // Center: Big Score
                     {
                       type: "div",
                       props: {
@@ -319,38 +344,95 @@ function buildStoryTree(
                           flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
-                          width: "200px",
-                          height: "200px",
-                          borderRadius: "100px",
-                          backgroundColor: palette.surface,
-                          border: `4px solid ${palette.mint}`,
-                          zIndex: 10,
-                          boxShadow: "0 12px 36px rgba(16, 185, 129, 0.35)",
+                          textAlign: "center",
+                          margin: "auto 0",
                         },
                         children: [
                           {
                             type: "div",
                             props: {
                               style: {
-                                fontSize: "76px",
+                                fontSize: "144px",
                                 fontWeight: 800,
-                                color: palette.mint,
+                                color: palette.text,
                                 lineHeight: 1,
+                                letterSpacing: "-0.04em",
                               },
-                              children: `${data.score}/${total}`,
+                              children: `${data.score} of ${total}`,
                             },
                           },
                           {
                             type: "div",
                             props: {
                               style: {
-                                fontSize: "20px",
-                                fontWeight: 600,
+                                fontSize: "30px",
+                                fontWeight: 700,
                                 color: palette.textMuted,
                                 textTransform: "uppercase",
-                                marginTop: "6px",
+                                letterSpacing: "0.1em",
+                                marginTop: "14px",
                               },
-                              children: "MATCH",
+                              children: "Shared Answers",
+                            },
+                          },
+                        ],
+                      },
+                    },
+
+                    // Bottom: Location & Rarity
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          borderTop: `4px solid ${palette.border}`,
+                          paddingTop: "32px",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "36px",
+                                fontWeight: 700,
+                                color: palette.text,
+                              },
+                              children: twinLocation,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              },
+                              children: [
+                                {
+                                  type: "div",
+                                  props: {
+                                    style: {
+                                      fontSize: "26px",
+                                      color: palette.textMuted,
+                                    },
+                                    children: rarityLine,
+                                  },
+                                },
+                                {
+                                  type: "div",
+                                  props: {
+                                    style: {
+                                      fontSize: "26px",
+                                      fontWeight: 700,
+                                      color: palette.violet,
+                                    },
+                                    children: "oddly.fun",
+                                  },
+                                },
+                              ],
                             },
                           },
                         ],
@@ -359,90 +441,7 @@ function buildStoryTree(
                   ],
                 },
               },
-
-              // Match Persona Line
-              {
-                type: "div",
-                props: {
-                  style: {
-                    fontSize: "36px",
-                    fontWeight: 600,
-                    color: palette.text,
-                    marginBottom: "24px",
-                    textAlign: "center",
-                  },
-                  children: `Matched with ${twinLocation}`,
-                },
-              },
-
-              // Rarity Tier Pill
-              {
-                type: "div",
-                props: {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    backgroundColor: palette.pillBg,
-                    border: `2px solid ${palette.mint}`,
-                    padding: "16px 36px",
-                    borderRadius: "9999px",
-                    fontSize: "32px",
-                    fontWeight: 700,
-                    color: palette.mint,
-                    marginBottom: "32px",
-                  },
-                  children: `★ ${data.tier.toUpperCase()} TIER · ${data.percentile}% ODD`,
-                },
-              },
-
-              // Rarest pick highlight card
-              data.rarestPickTitle
-                ? {
-                    type: "div",
-                    props: {
-                      style: {
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        backgroundColor: palette.surface,
-                        border: `1px solid ${palette.border}`,
-                        borderRadius: "24px",
-                        padding: "24px 40px",
-                        maxWidth: "760px",
-                      },
-                      children: [
-                        {
-                          type: "div",
-                          props: {
-                            style: {
-                              fontSize: "20px",
-                              fontWeight: 600,
-                              color: palette.mint,
-                              textTransform: "uppercase",
-                              letterSpacing: "0.08em",
-                              marginBottom: "8px",
-                            },
-                            children: "RAREST SHARED PICK",
-                          },
-                        },
-                        {
-                          type: "div",
-                          props: {
-                            style: {
-                              fontSize: "28px",
-                              fontWeight: 600,
-                              color: palette.text,
-                              textAlign: "center",
-                            },
-                            children: `"${data.rarestPickTitle}"`,
-                          },
-                        },
-                      ],
-                    },
-                  }
-                : null,
-            ].filter(Boolean),
+            ],
           },
         },
 
@@ -456,9 +455,10 @@ function buildStoryTree(
               alignItems: "center",
               width: "100%",
               backgroundColor: palette.surface,
-              border: `1px solid ${palette.border}`,
+              border: `6px solid ${palette.border}`,
               borderRadius: "32px",
-              padding: "36px 48px",
+              boxShadow: `10px 10px 0px ${palette.border}`,
+              padding: "32px 48px",
             },
             children: [
               {
@@ -473,7 +473,7 @@ function buildStoryTree(
                       type: "div",
                       props: {
                         style: {
-                          fontSize: "36px",
+                          fontSize: "34px",
                           fontWeight: 700,
                           color: palette.text,
                           marginBottom: "8px",
@@ -486,7 +486,7 @@ function buildStoryTree(
                       props: {
                         style: {
                           fontSize: "26px",
-                          fontWeight: 600,
+                          fontWeight: 700,
                           color: palette.violet,
                         },
                         children: shortUrl,
@@ -501,8 +501,8 @@ function buildStoryTree(
                 props: {
                   src: qrDataUrl,
                   style: {
-                    width: "140px",
-                    height: "140px",
+                    width: "130px",
+                    height: "130px",
                     borderRadius: "16px",
                   },
                 },
@@ -536,30 +536,37 @@ function buildSquareTree(
         backgroundColor: palette.bg,
         color: palette.text,
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        padding: "70px 70px",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "50px",
         fontFamily: "Noto Sans, sans-serif",
       },
       children: [
-        // Top bar
         {
           type: "div",
           props: {
             style: {
+              width: "980px",
+              height: "980px",
+              backgroundColor: palette.surface,
+              border: `8px solid ${palette.border}`,
+              borderRadius: "40px",
+              boxShadow: `16px 16px 0px ${palette.border}`,
               display: "flex",
+              flexDirection: "column",
               justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
+              padding: "54px 60px",
             },
             children: [
+              // Top bar
               {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
-                    gap: "14px",
+                    width: "100%",
                   },
                   children: [
                     {
@@ -567,21 +574,19 @@ function buildSquareTree(
                       props: {
                         style: {
                           display: "flex",
-                          position: "relative",
-                          width: "48px",
-                          height: "30px",
+                          alignItems: "center",
+                          gap: "14px",
                         },
                         children: [
                           {
                             type: "div",
                             props: {
                               style: {
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "15px",
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "16px",
                                 backgroundColor: palette.violet,
-                                position: "absolute",
-                                left: "0",
+                                border: `3.5px solid ${palette.border}`,
                               },
                             },
                           },
@@ -589,14 +594,11 @@ function buildSquareTree(
                             type: "div",
                             props: {
                               style: {
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "15px",
-                                backgroundColor: palette.coral,
-                                position: "absolute",
-                                left: "18px",
-                                opacity: 0.85,
+                                fontSize: "40px",
+                                fontWeight: 800,
+                                color: palette.text,
                               },
+                              children: "oddly",
                             },
                           },
                         ],
@@ -606,183 +608,171 @@ function buildSquareTree(
                       type: "div",
                       props: {
                         style: {
-                          fontSize: "36px",
+                          backgroundColor: palette.pillBg,
+                          border: `4px solid ${palette.border}`,
+                          padding: "10px 24px",
+                          borderRadius: "9999px",
+                          fontSize: "24px",
                           fontWeight: 700,
-                          color: palette.text,
+                          color: palette.pillText,
                         },
-                        children: "oddly",
+                        children: `★ ${data.tier.toUpperCase()} · ${data.percentile}%`,
                       },
                     },
                   ],
                 },
               },
+
+              // Middle Row: Score + Info
               {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
                     alignItems: "center",
-                    gap: "10px",
-                    backgroundColor: palette.pillBg,
-                    border: `1.5px solid ${palette.mint}`,
-                    padding: "10px 22px",
-                    borderRadius: "9999px",
-                    fontSize: "22px",
-                    fontWeight: 700,
-                    color: palette.mint,
+                    justifyContent: "space-between",
+                    width: "100%",
                   },
-                  children: `★ ${data.tier.toUpperCase()} · ${data.percentile}%`,
+                  children: [
+                    // Left Column
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          flexDirection: "column",
+                          width: "520px",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "42px",
+                                fontWeight: 700,
+                                lineHeight: 1.2,
+                                color: palette.text,
+                                marginBottom: "16px",
+                              },
+                              children: `Matched with ${twinLocation}`,
+                            },
+                          },
+                          data.rarestPickTitle
+                            ? {
+                                type: "div",
+                                props: {
+                                  style: {
+                                    fontSize: "24px",
+                                    color: palette.textMuted,
+                                    marginBottom: "16px",
+                                  },
+                                  children: `Rarest pick: "${data.rarestPickTitle}"`,
+                                },
+                              }
+                            : null,
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "26px",
+                                fontWeight: 700,
+                                color: palette.violet,
+                              },
+                              children: "Beat my match on oddly.app",
+                            },
+                          },
+                        ].filter(Boolean),
+                      },
+                    },
+
+                    // Right Column: Big Match Badge
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "250px",
+                          height: "250px",
+                          borderRadius: "32px",
+                          backgroundColor: palette.bg,
+                          border: `6px solid ${palette.border}`,
+                          boxShadow: `8px 8px 0px ${palette.border}`,
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "88px",
+                                fontWeight: 800,
+                                color: palette.text,
+                                lineHeight: 1,
+                              },
+                              children: `${data.score}/${total}`,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "20px",
+                                fontWeight: 700,
+                                color: palette.textMuted,
+                                marginTop: "8px",
+                                letterSpacing: "0.08em",
+                              },
+                              children: "MATCH",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
                 },
               },
-            ],
-          },
-        },
 
-        // Middle Row: Score + Info
-        {
-          type: "div",
-          props: {
-            style: {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            },
-            children: [
-              // Left Column
+              // Bottom Bar
               {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
-                    flexDirection: "column",
-                    width: "560px",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    backgroundColor: palette.bg,
+                    borderRadius: "24px",
+                    padding: "20px 32px",
+                    border: `4px solid ${palette.border}`,
+                    boxShadow: `6px 6px 0px ${palette.border}`,
                   },
                   children: [
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          fontSize: "44px",
-                          fontWeight: 700,
-                          lineHeight: 1.2,
-                          color: palette.text,
-                          marginBottom: "16px",
-                        },
-                        children: `Matched with ${twinLocation}`,
-                      },
-                    },
-                    data.rarestPickTitle
-                      ? {
-                          type: "div",
-                          props: {
-                            style: {
-                              fontSize: "24px",
-                              color: palette.textMuted,
-                              marginBottom: "20px",
-                            },
-                            children: `Rarest pick: "${data.rarestPickTitle}"`,
-                          },
-                        }
-                      : null,
                     {
                       type: "div",
                       props: {
                         style: {
                           fontSize: "26px",
-                          fontWeight: 600,
-                          color: palette.violet,
+                          fontWeight: 700,
+                          color: palette.text,
                         },
-                        children: "Beat my match on oddly.app",
-                      },
-                    },
-                  ].filter(Boolean),
-                },
-              },
-
-              // Right Column: Big Match Badge
-              {
-                type: "div",
-                props: {
-                  style: {
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "260px",
-                    height: "260px",
-                    borderRadius: "130px",
-                    backgroundColor: palette.surface,
-                    border: `5px solid ${palette.mint}`,
-                    boxShadow: "0 10px 30px rgba(16, 185, 129, 0.3)",
-                  },
-                  children: [
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          fontSize: "92px",
-                          fontWeight: 800,
-                          color: palette.mint,
-                          lineHeight: 1,
-                        },
-                        children: `${data.score}/${total}`,
+                        children: shortUrl,
                       },
                     },
                     {
-                      type: "div",
+                      type: "img",
                       props: {
+                        src: qrDataUrl,
                         style: {
-                          fontSize: "22px",
-                          fontWeight: 600,
-                          color: palette.textMuted,
-                          marginTop: "8px",
+                          width: "80px",
+                          height: "80px",
+                          borderRadius: "10px",
                         },
-                        children: "MATCH",
                       },
                     },
                   ],
-                },
-              },
-            ],
-          },
-        },
-
-        // Bottom Bar
-        {
-          type: "div",
-          props: {
-            style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-              backgroundColor: palette.surface,
-              borderRadius: "24px",
-              padding: "24px 36px",
-              border: `1px solid ${palette.border}`,
-            },
-            children: [
-              {
-                type: "div",
-                props: {
-                  style: {
-                    fontSize: "28px",
-                    fontWeight: 600,
-                    color: palette.text,
-                  },
-                  children: shortUrl,
-                },
-              },
-              {
-                type: "img",
-                props: {
-                  src: qrDataUrl,
-                  style: {
-                    width: "90px",
-                    height: "90px",
-                    borderRadius: "12px",
-                  },
                 },
               },
             ],
@@ -814,78 +804,60 @@ function buildLinkTree(
         backgroundColor: palette.bg,
         color: palette.text,
         display: "flex",
-        flexDirection: "column",
+        alignItems: "center",
         justifyContent: "space-between",
         padding: "50px 60px",
         fontFamily: "Noto Sans, sans-serif",
       },
       children: [
-        // Top Header
+        // Left Column: Front Card Sticker
         {
           type: "div",
           props: {
             style: {
+              width: "420px",
+              height: "530px",
+              backgroundColor: palette.surface,
+              border: `6px solid ${palette.border}`,
+              borderRadius: "28px",
+              boxShadow: `12px 12px 0px ${palette.border}`,
               display: "flex",
+              flexDirection: "column",
               justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
+              padding: "36px 32px",
             },
             children: [
+              // Top
               {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
-                    gap: "12px",
                   },
                   children: [
                     {
                       type: "div",
                       props: {
                         style: {
-                          display: "flex",
-                          position: "relative",
-                          width: "44px",
-                          height: "28px",
+                          backgroundColor: palette.pillBg,
+                          border: `3px solid ${palette.border}`,
+                          borderRadius: "9999px",
+                          padding: "6px 18px",
+                          fontSize: "18px",
+                          fontWeight: 700,
+                          color: palette.pillText,
                         },
-                        children: [
-                          {
-                            type: "div",
-                            props: {
-                              style: {
-                                width: "28px",
-                                height: "28px",
-                                borderRadius: "14px",
-                                backgroundColor: palette.violet,
-                                position: "absolute",
-                                left: "0",
-                              },
-                            },
-                          },
-                          {
-                            type: "div",
-                            props: {
-                              style: {
-                                width: "28px",
-                                height: "28px",
-                                borderRadius: "14px",
-                                backgroundColor: palette.coral,
-                                position: "absolute",
-                                left: "16px",
-                                opacity: 0.85,
-                              },
-                            },
-                          },
-                        ],
+                        children: `★ ${data.tier.toUpperCase()}`,
                       },
                     },
                     {
                       type: "div",
                       props: {
                         style: {
-                          fontSize: "32px",
-                          fontWeight: 700,
+                          fontSize: "24px",
+                          fontWeight: 800,
                           color: palette.text,
                         },
                         children: "oddly",
@@ -894,37 +866,87 @@ function buildLinkTree(
                   ],
                 },
               },
+
+              // Center
               {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
-                    gap: "10px",
-                    backgroundColor: palette.pillBg,
-                    border: `1.5px solid ${palette.mint}`,
-                    padding: "8px 20px",
-                    borderRadius: "9999px",
-                    fontSize: "20px",
-                    fontWeight: 700,
-                    color: palette.mint,
+                    justifyContent: "center",
+                    textAlign: "center",
                   },
-                  children: `★ ${data.tier.toUpperCase()} TIER · ${data.percentile}%`,
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "80px",
+                          fontWeight: 800,
+                          color: palette.text,
+                          lineHeight: 1,
+                        },
+                        children: `${data.score} of ${total}`,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "18px",
+                          fontWeight: 700,
+                          color: palette.textMuted,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          marginTop: "8px",
+                        },
+                        children: "Shared Answers",
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Bottom
+              {
+                type: "div",
+                props: {
+                  style: {
+                    borderTop: `3px solid ${palette.border}`,
+                    paddingTop: "16px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "20px",
+                          fontWeight: 700,
+                          color: palette.text,
+                        },
+                        children: twinLocation,
+                      },
+                    },
+                  ],
                 },
               },
             ],
           },
         },
 
-        // Middle Row
+        // Right Column: Inviting Callout & QR Code
         {
           type: "div",
           props: {
             style: {
+              width: "600px",
+              height: "530px",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
               justifyContent: "space-between",
-              width: "100%",
+              padding: "20px 0",
             },
             children: [
               {
@@ -933,57 +955,48 @@ function buildLinkTree(
                   style: {
                     display: "flex",
                     flexDirection: "column",
-                    width: "720px",
+                    gap: "16px",
                   },
                   children: [
                     {
                       type: "div",
                       props: {
                         style: {
-                          fontSize: "42px",
-                          fontWeight: 700,
+                          fontSize: "52px",
+                          fontWeight: 800,
                           color: palette.text,
-                          marginBottom: "10px",
+                          lineHeight: 1.15,
                         },
-                        children: `Matched with ${twinLocation}`,
+                        children: "Can you beat my stranger twin match?",
                       },
                     },
                     {
                       type: "div",
                       props: {
                         style: {
-                          fontSize: "24px",
+                          fontSize: "26px",
                           color: palette.textMuted,
-                          marginBottom: "16px",
                         },
-                        children: data.rarestPickTitle
-                          ? `Rarest pick: "${data.rarestPickTitle}"`
-                          : "Find your stranger twin today",
-                      },
-                    },
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          fontSize: "24px",
-                          fontWeight: 600,
-                          color: palette.violet,
-                        },
-                        children: shortUrl,
+                        children: "Answer today's 5 questions to see how our picks align.",
                       },
                     },
                   ],
                 },
               },
 
-              // Right Score & QR
+              // Bottom row with QR code and URL
               {
                 type: "div",
                 props: {
                   style: {
                     display: "flex",
                     alignItems: "center",
-                    gap: "24px",
+                    justifyContent: "space-between",
+                    backgroundColor: palette.surface,
+                    border: `5px solid ${palette.border}`,
+                    boxShadow: `8px 8px 0px ${palette.border}`,
+                    borderRadius: "24px",
+                    padding: "20px 32px",
                   },
                   children: [
                     {
@@ -992,37 +1005,28 @@ function buildLinkTree(
                         style: {
                           display: "flex",
                           flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "180px",
-                          height: "180px",
-                          borderRadius: "90px",
-                          backgroundColor: palette.surface,
-                          border: `4px solid ${palette.mint}`,
                         },
                         children: [
                           {
                             type: "div",
                             props: {
                               style: {
-                                fontSize: "64px",
-                                fontWeight: 800,
-                                color: palette.mint,
-                                lineHeight: 1,
+                                fontSize: "28px",
+                                fontWeight: 700,
+                                color: palette.violet,
                               },
-                              children: `${data.score}/${total}`,
+                              children: shortUrl,
                             },
                           },
                           {
                             type: "div",
                             props: {
                               style: {
-                                fontSize: "16px",
+                                fontSize: "18px",
                                 fontWeight: 600,
                                 color: palette.textMuted,
-                                marginTop: "6px",
                               },
-                              children: "MATCH",
+                              children: "Play free on web & mobile",
                             },
                           },
                         ],
@@ -1033,9 +1037,9 @@ function buildLinkTree(
                       props: {
                         src: qrDataUrl,
                         style: {
-                          width: "110px",
-                          height: "110px",
-                          borderRadius: "14px",
+                          width: "90px",
+                          height: "90px",
+                          borderRadius: "12px",
                         },
                       },
                     },
@@ -1045,30 +1049,403 @@ function buildLinkTree(
             ],
           },
         },
+      ],
+    },
+  };
+}
 
-        // Bottom CTA
+/**
+ * Builds the virtual DOM tree for the Card Front face (1080 x 1490)
+ */
+export function buildFrontTree(
+  data: ShareCardData,
+  palette: ThemePalette,
+  _qrDataUrl?: string
+): Record<string, unknown> {
+  const total = data.total ?? 5;
+  const twinLocation = data.twinCity ? `Stranger in ${data.twinCity}` : "A Stranger nearby";
+  const rarityLine = `Only ${data.percentile}% of players matched you today`;
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: palette.bg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
         {
           type: "div",
           props: {
             style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: palette.surface,
+              border: `10px solid ${palette.border}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${palette.border}`,
               display: "flex",
+              flexDirection: "column",
               justifyContent: "space-between",
-              alignItems: "center",
-              fontSize: "20px",
-              color: palette.textMuted,
+              padding: "70px 60px",
             },
             children: [
+              // Top Bar: Tier chip + Brandmark
               {
                 type: "div",
                 props: {
-                  children: "Can you beat my match? Answer today's 5 questions.",
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: palette.pillBg,
+                          border: `5px solid ${palette.border}`,
+                          borderRadius: "9999px",
+                          padding: "16px 36px",
+                          fontSize: "30px",
+                          fontWeight: 700,
+                          color: palette.pillText,
+                        },
+                        children: `★ ${data.tier.toUpperCase()} TIER`,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "14px",
+                          fontSize: "40px",
+                          fontWeight: 800,
+                          color: palette.text,
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "16px",
+                                backgroundColor: palette.violet,
+                                border: `4px solid ${palette.border}`,
+                              },
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              children: "oddly",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
                 },
               },
+
+              // Center: Big Hero Score
               {
                 type: "div",
                 props: {
-                  style: { color: palette.mint, fontWeight: 600 },
-                  children: "oddly.app",
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    margin: "auto 0",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "150px",
+                          fontWeight: 800,
+                          color: palette.text,
+                          lineHeight: 1,
+                          letterSpacing: "-0.04em",
+                        },
+                        children: `${data.score} of ${total}`,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: palette.textMuted,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.1em",
+                          marginTop: "16px",
+                        },
+                        children: "Shared Answers",
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Bottom Section: Location & Rarity
+              {
+                type: "div",
+                props: {
+                  style: {
+                    borderTop: `5px solid ${palette.border}`,
+                    paddingTop: "36px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "40px",
+                          fontWeight: 700,
+                          color: palette.text,
+                        },
+                        children: twinLocation,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "28px",
+                                color: palette.textMuted,
+                              },
+                              children: rarityLine,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "28px",
+                                fontWeight: 700,
+                                color: palette.violet,
+                              },
+                              children: "oddly.fun",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+/**
+ * Builds the virtual DOM tree for the Card Back face (1080 x 1490)
+ */
+export function buildBackTree(
+  data: ShareCardData,
+  palette: ThemePalette
+): Record<string, unknown> {
+  const defaultPicks = [
+    { question_number: 1, label: "Pick 1", matched: data.score >= 1 },
+    { question_number: 2, label: "Pick 2", matched: data.score >= 2 },
+    { question_number: 3, label: "Pick 3", matched: data.score >= 3 },
+    { question_number: 4, label: "Pick 4", matched: data.score >= 4 },
+    { question_number: 5, label: "Pick 5", matched: data.score >= 5 },
+  ];
+  const picks = data.pickMatches && data.pickMatches.length === 5 ? data.pickMatches : defaultPicks;
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: palette.bg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: palette.surface,
+              border: `10px solid ${palette.border}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${palette.border}`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "70px 60px",
+            },
+            children: [
+              // Header
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderBottom: `5px solid ${palette.border}`,
+                    paddingBottom: "32px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "36px",
+                          fontWeight: 800,
+                          color: palette.text,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                        },
+                        children: "Pick Overlap",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: palette.violet,
+                        },
+                        children: "oddly.fun",
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // 5 Questions list
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "24px",
+                    margin: "auto 0",
+                  },
+                  children: picks.map((p) => ({
+                    type: "div",
+                    props: {
+                      style: {
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        backgroundColor: palette.bg,
+                        border: `5px solid ${palette.border}`,
+                        borderRadius: "24px",
+                        padding: "28px 36px",
+                      },
+                      children: [
+                        {
+                          type: "div",
+                          props: {
+                            style: {
+                              fontSize: "32px",
+                              fontWeight: 700,
+                              color: palette.text,
+                            },
+                            children: `Question ${p.question_number}`,
+                          },
+                        },
+                        {
+                          type: "div",
+                          props: {
+                            style: {
+                              backgroundColor: p.matched ? palette.mint : palette.coral,
+                              border: `4px solid ${palette.border}`,
+                              borderRadius: "9999px",
+                              padding: "10px 28px",
+                              fontSize: "26px",
+                              fontWeight: 700,
+                              color: palette.text,
+                            },
+                            children: p.matched ? "✓ Matched" : "✕ Differs",
+                          },
+                        },
+                      ],
+                    },
+                  })),
+                },
+              },
+
+              // Footer
+              {
+                type: "div",
+                props: {
+                  style: {
+                    borderTop: `5px solid ${palette.border}`,
+                    paddingTop: "32px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "26px",
+                          fontWeight: 600,
+                          color: palette.textMuted,
+                        },
+                        children: `Can you beat my match? oddly.fun/c/${data.shortId}`,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "26px",
+                          fontWeight: 700,
+                          color: palette.violet,
+                        },
+                        children: "oddly",
+                      },
+                    },
+                  ],
                 },
               },
             ],
@@ -1084,8 +1461,8 @@ function buildLinkTree(
  */
 export async function generateShareCardSvg(data: ShareCardData): Promise<string> {
   const format = data.format || "story";
-  const theme = data.theme || "dark";
-  const dimensions = CARD_DIMENSIONS[format];
+  const theme = data.theme || "light";
+  const dimensions = CARD_DIMENSIONS[data.side === "front" || data.side === "back" ? data.side : format] || CARD_DIMENSIONS.story;
   const palette = getThemePalette(theme, data.tier);
   const fontBuffer = getFontBuffer();
 
@@ -1099,7 +1476,11 @@ export async function generateShareCardSvg(data: ShareCardData): Promise<string>
   });
 
   let vdom: Record<string, unknown>;
-  if (format === "square") {
+  if (data.side === "front") {
+    vdom = buildFrontTree(data, palette, qrDataUrl);
+  } else if (data.side === "back") {
+    vdom = buildBackTree(data, palette);
+  } else if (format === "square") {
     vdom = buildSquareTree(data, palette, qrDataUrl);
   } else if (format === "link") {
     vdom = buildLinkTree(data, palette, qrDataUrl);
@@ -1128,7 +1509,7 @@ export async function generateShareCardSvg(data: ShareCardData): Promise<string>
  */
 export async function renderShareCardPng(data: ShareCardData): Promise<Buffer> {
   const format = data.format || "story";
-  const dimensions = CARD_DIMENSIONS[format];
+  const dimensions = CARD_DIMENSIONS[data.side === "front" || data.side === "back" ? data.side : format] || CARD_DIMENSIONS.story;
   const svg = await generateShareCardSvg(data);
 
   const resvg = new Resvg(svg, {
@@ -1142,4 +1523,25 @@ export async function renderShareCardPng(data: ShareCardData): Promise<Buffer> {
   const pngBuffer = pngData.asPng();
 
   return pngBuffer;
+}
+
+/**
+ * Renders front face PNG
+ */
+export async function renderFrontCardPng(data: ShareCardData): Promise<Buffer> {
+  return renderShareCardPng({ ...data, side: "front" });
+}
+
+/**
+ * Renders back face PNG
+ */
+export async function renderBackCardPng(data: ShareCardData): Promise<Buffer> {
+  return renderShareCardPng({ ...data, side: "back" });
+}
+
+/**
+ * Renders story composite PNG
+ */
+export async function renderCompositeStoryPng(data: ShareCardData): Promise<Buffer> {
+  return renderShareCardPng({ ...data, format: "story", side: "composite" });
 }

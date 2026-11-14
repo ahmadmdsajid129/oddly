@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { useToast } from "../ui/Toast";
 import { BrandMark } from "../icons";
 import { oddlyApi } from "@/lib/api";
+import { colors } from "@oddly/ui-tokens";
 import type { ShareFormat, ShareTheme } from "@oddly/shared";
 
 interface ShareSheetProps {
@@ -14,28 +15,29 @@ interface ShareSheetProps {
   defaultFormat?: ShareFormat;
 }
 
-function getFallbackCardSvg(format: ShareFormat, theme: ShareTheme): string {
-  const bg = theme === "light" ? "#FFF8F0" : theme === "mythic" ? "#120E30" : "#14123A";
-  const surface = theme === "light" ? "#FFFFFF" : theme === "mythic" ? "#1D1645" : "#1E1B4B";
-  const text = theme === "light" ? "#14123A" : "#F4F1FF";
-  const mint = theme === "light" ? "#059669" : "#10B981";
-  const violet = "#6C4CF1";
-  const coral = "#FF6B5E";
+function getFallbackCardSvg(format: ShareFormat): string {
+  const bg = colors.cream;
+  const surface = colors.paper;
+  const border = colors.ink;
+  const text = colors.ink;
+  const muted = colors.muted;
+  const violet = colors.violet;
+  const sun = colors.sun;
 
   const w = format === "story" ? 1080 : format === "square" ? 1080 : 1200;
   const h = format === "story" ? 1920 : format === "square" ? 1080 : 630;
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <rect width="${w}" height="${h}" fill="${bg}"/>
-    <circle cx="${w / 2 - 70}" cy="${h / 2 - 80}" r="140" fill="${violet}" opacity="0.65"/>
-    <circle cx="${w / 2 + 70}" cy="${h / 2 - 80}" r="140" fill="${coral}" opacity="0.65"/>
-    <circle cx="${w / 2}" cy="${h / 2 - 80}" r="100" fill="${surface}" stroke="${mint}" stroke-width="4"/>
-    <text x="${w / 2}" y="${h / 2 - 70}" font-family="sans-serif" font-size="72" font-weight="bold" fill="${mint}" text-anchor="middle">4/5</text>
-    <text x="${w / 2}" y="${h / 2 - 25}" font-family="sans-serif" font-size="18" font-weight="600" fill="#948BB4" text-anchor="middle">MATCH</text>
-    <text x="${w / 2}" y="${h / 2 + 80}" font-family="sans-serif" font-size="32" font-weight="600" fill="${text}" text-anchor="middle">Matched with Stranger in Berlin, Germany</text>
-    <rect x="${w / 2 - 170}" y="${h / 2 + 120}" width="340" height="52" rx="26" fill="${surface}" stroke="${mint}" stroke-width="2"/>
-    <text x="${w / 2}" y="${h / 2 + 155}" font-family="sans-serif" font-size="22" font-weight="bold" fill="${mint}" text-anchor="middle">★ RARE TIER · 84% ODD</text>
-    <text x="${w / 2}" y="${h - 80}" font-family="sans-serif" font-size="24" font-weight="600" fill="${violet}" text-anchor="middle">oddly.app</text>
+    <rect x="${w / 2 - 360}" y="${h / 2 - 400}" width="720" height="800" rx="40" fill="${surface}" stroke="${border}" stroke-width="8"/>
+    <rect x="${w / 2 - 160}" y="${h / 2 - 340}" width="320" height="52" rx="26" fill="${sun}" stroke="${border}" stroke-width="4"/>
+    <text x="${w / 2}" y="${h / 2 - 305}" font-family="sans-serif" font-size="24" font-weight="bold" fill="${text}" text-anchor="middle">★ RARE TIER · 84% ODD</text>
+    <text x="${w / 2}" y="${h / 2 - 120}" font-family="sans-serif" font-size="120" font-weight="bold" fill="${text}" text-anchor="middle">4 of 5</text>
+    <text x="${w / 2}" y="${h / 2 - 50}" font-family="sans-serif" font-size="28" font-weight="bold" fill="${muted}" text-anchor="middle">SHARED ANSWERS</text>
+    <line x1="${w / 2 - 300}" y1="${h / 2 + 50}" x2="${w / 2 + 300}" y2="${h / 2 + 50}" stroke="${border}" stroke-width="4"/>
+    <text x="${w / 2}" y="${h / 2 + 130}" font-family="sans-serif" font-size="34" font-weight="bold" fill="${text}" text-anchor="middle">Stranger in Berlin, Germany</text>
+    <text x="${w / 2}" y="${h / 2 + 190}" font-family="sans-serif" font-size="24" fill="${muted}" text-anchor="middle">Only 0.4% of players matched you today</text>
+    <text x="${w / 2}" y="${h - 80}" font-family="sans-serif" font-size="28" font-weight="bold" fill="${violet}" text-anchor="middle">oddly.app</text>
   </svg>`;
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -49,7 +51,8 @@ export function ShareSheet({
 }: ShareSheetProps) {
   const { toast } = useToast();
   const [format, setFormat] = useState<ShareFormat>(defaultFormat);
-  const [theme, setTheme] = useState<ShareTheme>("dark");
+  const [shareMode, setShareMode] = useState<"front" | "both">("front");
+  const [theme] = useState<ShareTheme>("light");
   const [loading, setLoading] = useState(true);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
   const [shortId, setShortId] = useState<string>("");
@@ -71,8 +74,7 @@ export function ShareSheet({
         }
       } catch {
         if (!isCancelled) {
-          // Fallback to client-side SVG card preview
-          setCardUrl(getFallbackCardSvg(format, theme));
+          setCardUrl(getFallbackCardSvg(format));
           setShortId("daily");
         }
       } finally {
@@ -87,13 +89,14 @@ export function ShareSheet({
     return () => {
       isCancelled = true;
     };
-  }, [isOpen, dropId, format, theme, toast]);
+  }, [isOpen, dropId, format, theme]);
 
   if (!isOpen) return null;
 
-  const challengeUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/c/${shortId || "daily"}?challenge=1`
-    : `https://oddly.app/c/${shortId || "daily"}?challenge=1`;
+  const challengeUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/c/${shortId || "daily"}?challenge=1`
+      : `https://oddly.app/c/${shortId || "daily"}?challenge=1`;
 
   const handleCopyChallengeLink = async () => {
     try {
@@ -113,7 +116,6 @@ export function ShareSheet({
     setIsSharing(true);
 
     try {
-      // Attempt Web Share API with image file if possible
       let sharedWithFile = false;
       if (navigator.share) {
         try {
@@ -141,7 +143,6 @@ export function ShareSheet({
           }
         } catch (err: any) {
           if (err.name !== "AbortError") {
-            // Non-user cancellation error, fall back to download
             console.warn("Native file share fallback:", err);
           } else {
             setIsSharing(false);
@@ -151,7 +152,6 @@ export function ShareSheet({
       }
 
       if (!sharedWithFile) {
-        // Desktop / Unsupported browser fallback: Download image + copy link
         const link = document.createElement("a");
         link.href = cardUrl;
         link.download = `oddly-match-${format}.png`;
@@ -172,28 +172,28 @@ export function ShareSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-midnight/80 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-ink/40 transition-opacity"
       role="dialog"
       aria-modal="true"
       aria-labelledby="share-sheet-title"
     >
       <div
-        className="w-full sm:max-w-md bg-surface border border-border sm:rounded-3xl rounded-t-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-in slide-in-from-bottom duration-300"
+        className="w-full sm:max-w-md bg-paper border-[2.5px] border-ink sm:rounded-l rounded-t-l shadow-card flex flex-col max-h-[92vh] overflow-hidden animate-in slide-in-from-bottom duration-240"
       >
         {/* Header with drag handle and close */}
-        <div className="flex flex-col px-6 pt-4 pb-2 border-b border-border/40">
-          <div className="w-12 h-1.5 bg-border rounded-full mx-auto mb-3 sm:hidden" />
+        <div className="flex flex-col px-6 pt-4 pb-3 border-b-[1.5px] border-ink/20">
+          <div className="w-10 h-1.5 bg-ink rounded-pill mx-auto mb-3 sm:hidden" />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BrandMark size={24} />
-              <h2 id="share-sheet-title" className="text-xl font-bold text-text">
+              <h2 id="share-sheet-title" className="font-display text-display-m font-extrabold text-ink">
                 Share your match
               </h2>
             </div>
             <button
               onClick={onClose}
               aria-label="Close share sheet"
-              className="p-2 text-textMuted hover:text-text rounded-full hover:bg-surface-2 transition-colors"
+              className="w-11 h-11 flex items-center justify-center text-ink rounded-pill border-[2px] border-ink bg-paper hover:bg-cream transition-colors text-base font-bold"
             >
               ✕
             </button>
@@ -201,17 +201,43 @@ export function ShareSheet({
         </div>
 
         {/* Body content */}
-        <div className="p-6 flex flex-col gap-5 overflow-y-auto">
+        <div className="p-6 flex flex-col gap-4 overflow-y-auto">
+          {/* Share Content Option: "Share front" (default) or "Share both" */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShareMode("front")}
+              className={`flex-1 py-2 px-3 rounded-m border-[2px] border-ink font-display text-xs font-bold transition-all ${
+                shareMode === "front"
+                  ? "bg-violet text-paper shadow-sticker"
+                  : "bg-paper text-ink hover:bg-cream"
+              }`}
+            >
+              Share front (default)
+            </button>
+            <button
+              type="button"
+              onClick={() => setShareMode("both")}
+              className={`flex-1 py-2 px-3 rounded-m border-[2px] border-ink font-display text-xs font-bold transition-all ${
+                shareMode === "both"
+                  ? "bg-violet text-paper shadow-sticker"
+                  : "bg-paper text-ink hover:bg-cream"
+              }`}
+            >
+              Share both (front + back)
+            </button>
+          </div>
+
           {/* Format Selector Tabs */}
-          <div className="flex p-1 bg-surface-2 rounded-xl border border-border/60">
+          <div className="flex p-1 bg-cream rounded-m border-[2px] border-ink gap-1">
             {(["story", "square", "link"] as ShareFormat[]).map((fmt) => (
               <button
                 key={fmt}
                 onClick={() => setFormat(fmt)}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg capitalize transition-all ${
+                className={`flex-1 py-2 text-xs font-display font-bold rounded-s capitalize transition-all ${
                   format === fmt
-                    ? "bg-violet text-white shadow-sm"
-                    : "text-textMuted hover:text-text"
+                    ? "bg-paper text-ink border-[1.5px] border-ink shadow-sm"
+                    : "text-muted hover:text-ink"
                 }`}
               >
                 {fmt === "story" ? "Story (9:16)" : fmt === "square" ? "Square (1:1)" : "Link (1.9:1)"}
@@ -219,33 +245,13 @@ export function ShareSheet({
             ))}
           </div>
 
-          {/* Theme Selector */}
-          <div className="flex items-center justify-between text-xs text-textMuted px-1">
-            <span>Card Theme:</span>
-            <div className="flex gap-2">
-              {(["dark", "light", "mythic"] as ShareTheme[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTheme(t)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium capitalize border transition-all ${
-                    theme === t
-                      ? "border-mint text-mint bg-mint/10"
-                      : "border-border text-textMuted hover:text-text"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Card Preview Area */}
-          <div className="relative w-full aspect-[4/5] bg-surface-2 rounded-2xl border border-border flex items-center justify-center overflow-hidden shadow-inner">
+          <div className="relative w-full aspect-[4/5] bg-cream rounded-m border-[2px] border-ink flex items-center justify-center overflow-hidden p-2">
             {loading ? (
               <div className="flex flex-col items-center gap-3">
                 <div className="w-10 h-10 border-4 border-violet border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs text-textMuted font-medium">
-                  Rendering high-res card...
+                <span className="font-display text-xs font-bold text-muted">
+                  Rendering Sticker Pop card...
                 </span>
               </div>
             ) : cardUrl ? (
@@ -253,17 +259,17 @@ export function ShareSheet({
               <img
                 src={cardUrl}
                 alt="Oddly match share card preview"
-                className="w-full h-full object-contain p-2 animate-in fade-in duration-300"
+                className="w-full h-full object-contain drop-shadow-md animate-in fade-in duration-200"
               />
             ) : (
-              <div className="text-sm text-textMuted text-center px-4">
+              <div className="font-display text-sm font-bold text-muted text-center px-4">
                 Failed to load card preview.
               </div>
             )}
           </div>
 
           {/* Action CTAs */}
-          <div className="flex flex-col gap-3 pt-2">
+          <div className="flex flex-col gap-2.5 pt-1">
             <Button
               variant="primary"
               size="lg"
@@ -271,7 +277,7 @@ export function ShareSheet({
               onClick={handleNativeShare}
               disabled={loading || isSharing}
             >
-              {isSharing ? "Sharing..." : "Share via..."}
+              {isSharing ? "Sharing..." : "Share card image"}
             </Button>
 
             <Button
