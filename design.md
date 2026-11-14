@@ -1,581 +1,374 @@
-# Design Specification — Oddly v1
+# Oddly: design.md (design system and UI redesign prompt)
 
-Project: Oddly v1 | Last updated: 2026-11-07 | Owner: Founder + AI agent
-Purpose of this file: Complete visual language, tokens, typography, component states, motion specs, accessibility guidelines, and screen-by-screen UI blueprints.
+Direction: **Sticker pop**, with a subtle holographic sheen on the share card front.
+Status: this file is the single source of truth for how Oddly looks and moves. It is also the prompt for Stage D1 (full UI redesign).
 
----
-
-## 1. Design Concept and Core Principles
-
-### 1.1 The Concept: "Two Circles, One Overlap"
-
-Oddly's visual identity is anchored on two luminous, overlapping circles:
-
-- **Circle 1 (Violet):** Represents you—your idiosyncratic, personal choices.
-- **Circle 2 (Coral):** Represents the world—the vast sea of global strangers.
-- **The Overlap (Mint):** The magical point of convergence where two strangers are in sync.
-
-> **The Mint Rule:** The color **Mint** is strictly reserved for _matches, shared picks, success states, and rarity celebrations_. Whenever a user sees Mint in the interface, it unambiguously communicates: _"You and someone out there are in sync."_ Mint is never used for generic decorations or ordinary primary buttons.
-
-### 1.2 Core Principles
-
-1. **One Decision Per Screen:** Eliminate cognitive overload. Each screen presents a single clear choice.
-2. **The Result is the Reward:** No sign-up walls, banner ads, or newsletter popups interrupt the core journey from landing to the twin reveal.
-3. **Thumb-Driven Zone:** All primary tap targets reside in the lower 60% of the mobile viewport, comfortably reachable on modern 6-inch smartphones.
-4. **Tactile & Bouncy:** Tiles feel physical—subtle scale springs on press, crisp border highlights on selection, and gentle haptic ticks.
-5. **Honest & Grounded:** Weak matches are presented warmly without inflated celebratory confetti.
-6. **Delight is Fast:** Micro-interactions execute in $\le 200 \text{ ms}$; the longest ambient animation (searching) is strictly capped at $1.5 \text{ s}$ and is instantly skippable.
-7. **Zero Dark Patterns:** No countdown countdown guilt, no fake urgency counters, and no hidden subscriptions.
+> Rule for every future stage: before touching any UI, read this file. After touching UI, confirm in your stage report that you followed it. If a request conflicts with this file, say so and stop; do not silently drift.
 
 ---
 
-## 2. Color Tokens and System
+## 0. How to use this file
 
-### 2.1 Palette Tokens
-
-| Token            | Light Theme | Dark Theme (Default) | Role / Usage                                                                                       | WCAG Contrast vs Background            |
-| ---------------- | ----------- | -------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `--midnight`     | `#14123A`   | `#14123A`            | Dark canvas background, primary dark surface, share card base                                      | > 14:1 vs white/cream                  |
-| `--violet`       | `#6C4CF1`   | `#8B72FF`            | Primary brand accent, primary CTA buttons, links, Circle 1                                         | 4.8:1 (Dark) / 5.2:1 (Light)           |
-| `--violet-press` | `#5538D6`   | `#6C4CF1`            | Pressed state for primary buttons                                                                  | Passed (> 4.5:1)                       |
-| `--coral`        | `#FF6B5E`   | `#FF8176`            | Accent color, streak flame, Circle 2, soft destructive alerts                                      | Passed (> 3.5:1 graphical)             |
-| `--mint`         | `#1FBF93`   | `#3DDBB0`            | Reserved for matches, success, rarity tags. In light mode: `#1FBF93` for text; `#3DDBB0` for fills | 4.6:1 (Light text) / 8.9:1 (Dark fill) |
-| `--cream`        | `#FFF8F0`   | n/a                  | Warm paper light theme background                                                                  | Base surface                           |
-| `--lavender`     | `#EEEAFE`   | n/a                  | Light theme card background and subtle fill                                                        | Base card fill                         |
-| `--bg`           | `#FFF8F0`   | `#14123A`            | Dynamic root application background                                                                | Canvas                                 |
-| `--surface`      | `#FFFFFF`   | `#1E1B4B`            | Standard card container surface                                                                    | Layer 1 surface                        |
-| `--surface-2`    | `#EEEAFE`   | `#28245E`            | Raised surfaces, selected answer tiles, tab bar                                                    | Layer 2 surface                        |
-| `--border`       | `#DDD6FA`   | `#3A3580`            | Subtle hairline dividers and unselected tile outlines                                              | 1.8:1 non-text boundary                |
-| `--text`         | `#14123A`   | `#F4F1FF`            | High-emphasis primary headings and body copy                                                       | 13.5:1 (Dark) / 14.1:1 (Light)         |
-| `--text-muted`   | `#5B5780`   | `#B3AEE0`            | Secondary subtitles, helper copy, captions                                                         | 5.1:1 (Dark) / 4.7:1 (Light)           |
-| `--danger`       | `#D93C4B`   | `#FF6B7A`            | Form validation errors and destructive actions                                                     | 4.9:1 (Dark) / 4.6:1 (Light)           |
-| `--warning`      | `#E69A1A`   | `#FFC857`            | Skewed question warnings in admin, status alerts                                                   | 4.5:1                                  |
-| `--success`      | `#1FBF93`   | `#3DDBB0`            | Success banners, confirmations, toast indicators                                                   | 4.6:1 (Light) / 8.9:1 (Dark)           |
-
-### 2.2 Gradients and Glows
-
-> **Stage 1 Verification Note:** All color tokens, typography scales, interactive states, and component primitives were implemented, verified, and rendered on the live `/design` showcase route. Contrast ratios satisfy WCAG 2.2 AA standards across both themes with zero violations. All 28 vector question tiles, 4 tier badges, brand mark, and multi-sensory feedback helpers (haptics + audio synthesizer) are active.
-
-- `--grad-hero`: `radial-gradient(ellipse at 20% 0%, rgba(108, 76, 241, 0.25) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(255, 107, 94, 0.20) 0%, transparent 60%), #14123A`
-- `--grad-match`: `linear-gradient(135deg, #6C4CF1 0%, #3DDBB0 100%)`
-- `--grad-mythic`: `conic-gradient(from 180deg at 50% 50%, #6C4CF1, #FF6B5E, #FFD23F, #3DDBB0, #6C4CF1)`
-- `--glow-mint`: `0 0 32px rgba(61, 219, 176, 0.45)`
-- `--glow-violet`: `0 0 32px rgba(108, 76, 241, 0.50)`
-
-### 2.3 The Accessible 12-Colour Palette (Question Type 3)
-
-Each swatch tile displays a crisp circular color swatch alongside its human-readable text label, guaranteeing full accessibility for color-blind users:
-
-| Label        | Hex Value | Color Blindness Distinction       |
-| ------------ | --------- | --------------------------------- |
-| **Crimson**  | `#D7263D` | Vivid red, high contrast vs green |
-| **Coral**    | `#FF6B5E` | Warm pinkish orange               |
-| **Amber**    | `#F59E0B` | Deep golden amber                 |
-| **Sunshine** | `#FFD23F` | Bright warm yellow                |
-| **Lime**     | `#8BC34A` | Distinct yellow-green             |
-| **Mint**     | `#3DDBB0` | Cool cyan-green (brand accent)    |
-| **Teal**     | `#0F9D9A` | Deep ocean teal                   |
-| **Sky**      | `#4CC9F0` | Vivid cerulean light blue         |
-| **Indigo**   | `#3F37C9` | Deep saturated blue               |
-| **Violet**   | `#8E5CF6` | Rich royal purple                 |
-| **Pink**     | `#F472B6` | Soft vibrant magenta              |
-| **Slate**    | `#64748B` | Neutral steel blue-grey           |
-
-### 2.4 Tier Visual Styles
-
-- **Common (0–49.9%):** Flat slate/lavender badge, no glow, subtle border.
-- **Uncommon (50–79.9%):** Crisp mint outline badge with bold tabular percentage.
-- **Rare (80–94.9%):** Violet-to-mint gradient fill with soft ambient glow (`--glow-mint`).
-- **Mythic (95–100%):** Conic gradient badge with subtle animated border shimmer and particle sparkles (disabled if reduced motion is requested).
+1. **Part A (sections 1 to 12)** is the permanent design pattern. Never delete it. Update it only when the owner approves a change, and add a dated line to the change log (section 22).
+2. **Part B (sections 13 to 21)** is the Stage D1 redesign prompt: what to change now, in what order, with acceptance checks.
+3. Do not invent new colours, radii, shadows, fonts or motion. If something is missing, propose an addition in the stage report; do not add it silently.
 
 ---
 
-## 3. Typography Scale
+# PART A: THE DESIGN PATTERN
 
-Oddly pairs **Space Grotesk** (geometric, quirky, high-character headings and numbers) with **Inter** (ultra-legible, neutral, accessible body text). Both are self-hosted via `next/font` with zero third-party runtime requests.
+## 1. Personality in one paragraph
 
-| Style         | Mobile (Size / Line Height) | Desktop (Size / Line Height) | Font Family & Weight      | Tracking              | Purpose                               |
-| ------------- | --------------------------- | ---------------------------- | ------------------------- | --------------------- | ------------------------------------- |
-| **Display**   | `44px / 48px`               | `64px / 68px`                | Space Grotesk 700         | `-0.02em`             | Landing headline, massive match score |
-| **H1**        | `32px / 38px`               | `44px / 50px`                | Space Grotesk 700         | `-0.01em`             | Screen titles, question prompts       |
-| **H2**        | `24px / 30px`               | `30px / 36px`                | Space Grotesk 500         | `0`                   | Card headers, section dividers        |
-| **H3**        | `20px / 26px`               | `22px / 28px`                | Space Grotesk 500         | `0`                   | Answer tile text, option labels       |
-| **Body L**    | `18px / 28px`               | `18px / 28px`                | Inter 400                 | `0`                   | Lead paragraphs, brand story text     |
-| **Body**      | `16px / 24px`               | `16px / 24px`                | Inter 400                 | `0`                   | Default body copy, explanations       |
-| **Small**     | `14px / 20px`               | `14px / 20px`                | Inter 500                 | `+0.01em`             | Form labels, captions, metadata       |
-| **Micro**     | `12px / 16px`               | `12px / 16px`                | Inter 600                 | `+0.04em` (Uppercase) | Category pills, tier badges           |
-| **Number XL** | `72px / 72px`               | `96px / 96px`                | Space Grotesk 700 Tabular | `-0.03em`             | Oddness percentile, countdown clock   |
+Oddly feels like a stack of physical stickers on a cream desk. Everything tappable has an ink outline and a hard offset shadow. It is playful and confident, never childish and never corporate. Tapping physically presses a sticker flat. The share card is the hero: it arrives face-down, flips, and is the thing people screenshot and post. Rarity is celebrated; being "odd" is the brand.
+
+Do: flat colour, thick ink outlines, hard shadows, big friendly display type, short copy.
+Do not: soft blurry shadows, gradients on UI chrome (the only gradient allowed is the Mythic chip and the share-card sheen), glassmorphism, neon glow, thin grey hairlines, drop-shadow on text.
+
+## 2. Colour tokens
+
+All colours live in `@oddly/ui-tokens`. Components and share-card renderers must import from it. **No hex literals anywhere else** (lint rule, see 19).
+
+### 2.1 Core palette
+
+| Token | Hex | Role |
+|---|---|---|
+| `ink` | `#14123A` | All text on light, all outlines, all hard shadows |
+| `cream` | `#FFF8F0` | Page background, `manifest.json` `background_color` |
+| `paper` | `#FFFFFF` | Cards, option rows, sheets |
+| `violet` | `#6C4CF1` | Primary action, brand, focus ring |
+| `lavender` | `#EEEAFE` | Soft fills, Common tier chip, progress track |
+| `coral` | `#FF6B5E` | Streak chip, warnings that are not errors, "different" accents |
+| `mint` | `#3DDBB0` | Success, "match", answered dot |
+| `sun` | `#FFD23F` | Selected state, Rare tier chip, highlights |
+| `muted` | `#5B5780` | Secondary text only (never on coloured fills) |
+| `lilac` | `#CDBFFF` | Uncommon tier chip |
+| `error` | `#D92D4B` | Errors only, always paired with an icon and text |
+
+### 2.2 Verified contrast (WCAG)
+
+| Pair | Ratio | Use |
+|---|---|---|
+| ink on cream | 16.93 | body text |
+| ink on paper | 17.84 | body text |
+| paper (white) on violet | 5.33 | primary button label (passes AA for normal text) |
+| ink on sun | 12.35 | selected option, Rare chip |
+| ink on coral | 6.38 | streak chip |
+| ink on mint | 10.16 | success chip |
+| ink on lavender | 15.15 | Common chip |
+| ink on lilac | 10.61 | Uncommon chip |
+| muted on cream | 6.39 | secondary text |
+| muted on paper | 6.73 | secondary text |
+| violet on cream | 5.06 | links, focus ring, icons (not small body text on dark) |
+
+**Hard rules from the audit:**
+- **Never** put text or icons in mint or coral onto cream. Both failed contrast before. Mint and coral are *fills* with ink on top, never text colour.
+- Never use `muted` on a coloured fill. Use `ink`.
+- Every new colour pair must be run through the contrast script and added to this table before use.
+
+### 2.3 Tier colours (oddness)
+
+| Tier | Percentile | Chip fill | Chip text |
+|---|---|---|---|
+| Common | 0 to 50 | `lavender` | `ink` |
+| Uncommon | 50 to 80 | `lilac` | `ink` |
+| Rare | 80 to 95 | `sun` | `ink` |
+| Mythic | 95 to 100 | rainbow strip `coral → sun → mint → violet` (45° linear) | `ink` |
+
+Tier is always shown as **text plus colour**, never colour alone.
+
+### 2.4 Dark mode
+
+Not in v1. Do not build it. The system is cream-only. Respect `prefers-color-scheme` by ignoring it for now. (Revisit after the first 10k users; a dark variant would be the "Holo night" palette from the design review.)
+
+## 3. Typography
+
+Fonts (self-host with `next/font`, no runtime Google requests; subset to Latin + Devanagari fallback to system):
+
+| Role | Font | Weights | Used for |
+|---|---|---|---|
+| Display | **Bricolage Grotesque** | 700, 800 | Questions, headings, buttons, chips, numbers, share-card text |
+| Body | **Inter** | 400, 500, 600 | Paragraphs, helper text, legal, admin tables |
+
+Type scale (mobile-first; use `clamp` where noted). Sizes in px, line-height in parentheses:
+
+| Token | Size | Font | Use |
+|---|---|---|---|
+| `display-xl` | `clamp(40, 12vw, 56)` (1.0) | Display 800 | Share-card hero number ("4 of 5") |
+| `display-l` | `clamp(26, 7vw, 32)` (1.1) | Display 800 | Question text |
+| `display-m` | 20 (1.2) | Display 700 | Screen titles |
+| `button` | 16 (1) | Display 700 | All buttons and option rows |
+| `chip` | 12 (1) | Display 700 | Chips, badges |
+| `body` | 16 (1.5) | Inter 400 | Paragraphs |
+| `body-s` | 14 (1.5) | Inter 400/500 | Helper text |
+| `caption` | 12 (1.4) | Inter 500 | Footnotes, never below 12 |
+
+Rules: sentence case everywhere, no ALL CAPS except the wordmark logic. Numbers use `font-variant-numeric: tabular-nums` in counters and streaks. Minimum body size 16 on mobile inputs (prevents iOS zoom).
+
+## 4. Shape, outline, shadow, spacing
+
+| Token | Value |
+|---|---|
+| `outline` | `2.5px solid ink` (tappable things) |
+| `outline-thin` | `1.5px solid ink` (non-tappable cards, dividers inside cards) |
+| `radius-s` | 10px (chips, small inputs) |
+| `radius-m` | 14px (buttons, option rows, inputs) |
+| `radius-l` | 20px (cards, sheets) |
+| `radius-pill` | 999px (chips, progress dots) |
+| `shadow-sticker` | `4px 4px 0 ink` |
+| `shadow-sticker-lift` | `6px 6px 0 ink` |
+| `shadow-sticker-flat` | `0 0 0 ink` (pressed) |
+| `shadow-card` | `4px 4px 0 ink` (same as sticker; no soft shadows exist) |
+
+**Offset shadow only goes on tappable things and on the share card.** Static layout containers use `outline-thin` with no shadow. This keeps screens from getting noisy.
+
+Spacing scale (px): 4, 8, 12, 16, 24, 32, 48. Screen gutter 16 (mobile), 24 (tablet+). Max content width 480 for play flow, 960 for admin and marketing.
+
+**Touch targets: minimum 44 x 44 px for every interactive element** (audit fix). Option rows 56 min height, buttons 48 min height. If an icon is visually smaller, add padding or `::after` hit-slop.
+
+## 5. Buttons
+
+All buttons: Display 700, 16px, `radius-m`, `outline`, min-height 48, full-width on mobile in the play flow.
+
+| Variant | Fill | Label | Outline | Shadow | Use |
+|---|---|---|---|---|---|
+| **Primary** | `violet` | `paper` | `ink` | `shadow-sticker` | One per screen: Lock in, Reveal, Keep this twin |
+| **Secondary** | `paper` | `ink` | `ink` | `shadow-sticker` | Back, Skip, Share another way |
+| **Tertiary (text)** | none | `violet` | none, underline on focus | none | Inline links, "Why this?" |
+| **Danger** | `paper` | `error` plus icon | `error` | `4px 4px 0 error` | Delete account, Remove twin |
+| **Success chip-button** | `mint` | `ink` | `ink` | `shadow-sticker` | Only for confirmed states, e.g. "Kept" |
+
+States (mouse and touch):
+
+| State | Behaviour |
+|---|---|
+| Rest | As above |
+| Hover (only inside `@media (hover:hover) and (pointer:fine)`) | `transform: translate(-2px,-2px)`; shadow becomes `shadow-sticker-lift` |
+| Pressed / `:active` (touch and mouse) | `transform: translate(4px,4px)`; shadow becomes `shadow-sticker-flat`. This is the signature feel. Must not depend on hover. |
+| Focus-visible | Keep the outline, add `outline: 3px solid violet; outline-offset: 3px` (a second ring outside the ink outline). Never remove focus styles. |
+| Loading | Label replaced by 3 bouncing dots (CSS only); width locked; `aria-busy="true"`; keep enabled but ignore repeat taps |
+| Disabled | **Avoid disabling.** If unavoidable: fill `lavender`, label `muted`, no shadow, outline `muted`, `aria-disabled` and a visible reason line |
+| Success flash | After a successful action, shadow flashes `mint` for 300 ms (optional) |
+
+Transition: `transform 120ms ease-out, box-shadow 120ms ease-out`. Under `prefers-reduced-motion: reduce` remove the translate and show only the shadow change.
+
+## 6. Answer option rows (the core play control)
+
+An option is a full-width button row: `paper` fill, `outline`, `radius-m`, `shadow-sticker`, min-height 56, padding 12 x 16, Display 700 16.
+
+| State | Look |
+|---|---|
+| Rest | paper |
+| Hover (fine pointers only) | lift as buttons |
+| Pressed | flat as buttons |
+| **Selected** | fill `sun`, check icon on the right (24px, ink), `aria-pressed="true"`. Selection never relies on colour alone: the check icon is required. |
+| After lock | other rows fade to 60% opacity; selected stays |
+
+**Question types** (keep the existing API shapes; only the visuals change):
+- Binary and 2 to 4 option questions: stacked rows (Telepathy questions use these).
+- Number 1 to 50: grid of 5 columns x 10 rows of 48px square stickers; selected = sun. (Replaces the slider whose thumb failed hit-slop.) Provide a number-pad style keyboard fallback for screen readers: each cell is a button with `aria-label="Number 7"`.
+- Colour (12 swatches): 4 x 3 grid of 56px swatches, each with ink outline; selected swatch gets a ink check badge in the corner and `shadow-sticker-lift`. Swatch names exposed as `aria-label` (colour must not be the only identifier).
+- Photo pick (4 images): 2 x 2 grid, 3:2 images, ink outline, selected = sun frame (6px) plus check badge.
+- One-word pick (6 to 8 words): wrap-flow chips at button size (48 min height), same selected style.
+
+Progress dots above the question: 5 dots, 10px; answered = `mint` with ink outline, current = 28px wide pill in `violet`, upcoming = `lavender`. Add `aria-label="Question 3 of 5"`.
+
+## 7. Chips, badges, inputs, sheets, toasts
+
+- **Chip**: Display 700 12, padding 4 x 10, `radius-pill`, `outline-thin`, ink text on its fill. Streak chip = coral with a flame icon.
+- **Tier badge**: see 2.3.
+- **Input**: paper fill, `outline`, `radius-m`, min-height 48, Inter 16; focus = violet focus ring (same double ring as buttons); error = `error` outline plus an icon plus text below (never colour only). Labels always visible above (no placeholder-only labels).
+- **Bottom sheet**: paper, `radius-l` top corners only, `outline`, grab handle 40 x 5 ink, slides up 240ms ease-out with the first focusable element focused; trap focus; Esc and backdrop tap close. Backdrop `ink` at 40% (the only translucent colour allowed).
+- **Toast**: paper, `outline`, `shadow-sticker`, top of screen below the safe area, 3s auto-dismiss, `role="status"`. Error toasts use `role="alert"` and stay until dismissed.
+- **Empty states**: an illustration made of three overlapping circles (the logo motif), one line of invitation copy, one primary button.
+- **Skeletons**: lavender blocks with `outline-thin`, a gentle opacity pulse (not shimmer gradients).
+
+## 8. Iconography
+
+Outline icons only (use one set, 24px grid, 2px stroke, ink). Icons are never the sole label of a control: add `aria-label`. Decorative icons get `aria-hidden`.
+
+## 9. Brand mark and PWA assets (audit fix: icons were missing)
+
+- Logo motif: three overlapping circles (violet, coral, with a mint lens where they overlap) plus the lowercase wordmark "oddly" in Display 800.
+- Create and ship: `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` (motif centred inside the 80% safe zone on a violet background), `apple-touch-icon.png` (180), `favicon.svg`, `favicon-32.png`, `og-default.png` (1200 x 630).
+- `manifest.json`: `background_color: #FFF8F0`, `theme_color: #6C4CF1`, `display: standalone`, icons list incl. maskable, `start_url` carries no PII.
+- All generated from the tokens (script in `packages/ui-tokens/scripts/make-icons`), so colours never diverge.
+
+## 10. Motion
+
+Principles: motion explains cause and effect, is quick, and is never required to understand a screen. Animate **only `transform` and `opacity`** (plus `box-shadow` on the 120ms sticker press, which is cheap at this size). No animated `filter`, `blur`, `clip-path` or layout properties.
+
+| Token | Value |
+|---|---|
+| `dur-press` | 120 ms |
+| `dur-ui` | 200 ms |
+| `dur-sheet` | 240 ms |
+| `dur-flip` | 750 ms |
+| `ease-out` | `cubic-bezier(.2,.8,.2,1)` |
+| `ease-snap` | `cubic-bezier(.3,1.4,.5,1)` (use sparingly, small overshoot) |
+
+Standard moments:
+- Screen change: new screen slides 16px and fades in, 200ms.
+- Answer lock: row presses flat, check pops in with `ease-snap` 160ms.
+- Progress dot fill: scale 0.6 to 1 and colour swap, 200ms.
+- Streak increment: number rolls up (translateY), chip does one small bounce.
+- Mythic reveal: add 600ms of confetti (max 24 CSS-animated particles, transform only) after the flip lands. Rare gets a single burst of 8.
+
+**Reduced motion** (`prefers-reduced-motion: reduce`): no translate, no flip (cross-fade 200ms instead), no confetti, no bounces. Everything still works.
+
+## 11. The flip share card (hero component)
+
+### 11.1 Behaviour
+
+1. **Arrival**: the card appears **face-down** showing the sealed back (violet fill, wordmark, caption "Your twin card").
+2. After ~550 ms it **flips to the front** (`rotateY(180deg)` to `0`, 750 ms, `ease-out`). Haptic tick on mobile where supported (`navigator.vibrate(10)`).
+3. The front shows the reveal: tier chip, big number ("4 of 5"), one-line location or descriptor, rarity line ("Only 0.4% of players matched you today"), "Tap to flip" hint.
+4. **Tap or Enter/Space flips to the back**: the overlap details (what matched, what differed, mini overlap graphic, optional Telepathy/Orbit prompt). Tap again flips back.
+5. On the public share link page the card runs steps 1 and 2 automatically on load, so viewers get the same reveal. It is not interactive beyond tap-to-flip.
+
+### 11.2 Implementation notes (CSS only, no JS animation library)
+
+```css
+.card-scene { perspective: 900px; }
+.card { position: relative; transform-style: preserve-3d;
+        transition: transform var(--dur-flip) var(--ease-out); }
+.card[data-side="back"] { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; backface-visibility: hidden;
+        -webkit-backface-visibility: hidden; }
+.face--back { transform: rotateY(180deg); }
+```
+
+- Card is a single `<button>` wrapper with `aria-pressed` and `aria-label="Twin card. Press to see details"`; the hidden face gets `aria-hidden="true"` and `inert`.
+- Aspect ratio 210:290 (about 0.72), width `min(86vw, 320px)`.
+- Both faces: `paper` (front) / `violet` sealed (initial back state) then details-back is `paper`; `outline`, `radius-l`, `shadow-card`.
+- **Holographic sheen on the front only**: a pseudo-element with a 115° linear gradient (coral, sun, mint, lilac at about 18 to 22% opacity). On pointer devices the gradient position follows the pointer via a single CSS variable, transform-only (`translateX` of the pseudo-element). On touch, it drifts slowly via a one-time 1.2s sweep after the flip lands. The sheen never covers text contrast (keep opacity at or below 22%).
+- Do not use `will-change` permanently; set it only during the flip.
+- The Mythic front adds the rainbow edge strip and the confetti.
+
+### 11.3 Export (what people actually post)
+
+The shared image must work without the flip:
+- Generate **two PNGs** with the existing Satori + Resvg pipeline: `front` and `back`, plus an Instagram-story-size (1080 x 1920) composite with the front large and the back peeking beneath. Offer "Share front" (default) and "Share both" (a 2-slide carousel on platforms that accept it).
+- Satori cannot import CSS tokens, so the renderer imports the **same** `@oddly/ui-tokens` TypeScript constants (audit fix: share-card hex divergence). A unit test asserts that every colour used in the card renderer exists in the token list.
+- The link page `og:image` is the front PNG. A short looping WebM or animated preview of the flip is a post-v1 nice-to-have; do not build it now.
+
+## 12. Surfaces for the new features (style only; behaviour is in the product spec)
+
+- **Twin Globe**: page background `cream`; globe fill `lavender`; land dots `ink` at 2px; your pin `violet` with ink outline; kept twins `coral` pins; Orbit lines are 2.5px `violet` strokes with a slow dash animation (transform-only via an animated `stroke-dashoffset` is not allowed; use a pulsing opacity on a duplicated line instead). Pins are 44px hit targets with a smaller visible dot. Pause all globe motion when off-screen or reduced-motion is on. Replace the old repaint-heavy radar (audit finding) with a static SVG plus the single pulsing pin.
+- **Orbit**: each kept twin is a sticker row: avatar circle (procedural from their picks), handle or "Twin #", day-count chip, next-unlock chip (`lavender`). Unlock milestones (day 1, 3, 7, 14, 30) show as 5 dots on a track.
+- **Telepathy**: question shown in Display, 2 to 4 option rows; after guessing, show two stickers side by side: "You guessed" and "They picked", match = `mint` check, miss = `coral` with a different-shape icon (not colour alone). Show the luck baseline as a small caption ("2 options: chance is 50%").
+- **Anti-twin**: same card pattern, `coral` accent chip "Opposite", never shown as negative or hostile.
+- **Oddly Deck (v1.5)**: collectible cards use the share-card anatomy at small size (140px wide); art is procedural from the user's picks, limited to the token palette. Rarity border: Common ink, Uncommon lilac inner frame, Rare sun inner frame, Mythic rainbow inner frame.
 
 ---
 
-## 4. Spacing, Elevation, and Layout Grid
+# PART B: STAGE D1: UI REDESIGN PROMPT
 
-### 4.1 Spacing Scale (4px Base Unit)
+## 13. Instructions to the agent
 
-- `4px` (`space-1`), `8px` (`space-2`), `12px` (`space-3`), `16px` (`space-4`), `20px` (`space-5`), `24px` (`space-6`), `32px` (`space-8`), `40px` (`space-10`), `48px` (`space-12`), `64px` (`space-16`).
-- **Screen Margins:** `20px` on mobile (< 640px), `32px` on tablet/desktop.
-- **Max Content Width:** Centered container capped at `480px` for play and result flows; `960px` for marketing and historical archives.
+You are redesigning the Oddly UI to match Part A. **Change presentation only.** Do not change game logic, scoring, API response shapes, database schema, routes, copy that comes from the database, or `data-testid` attributes. Report at the end and STOP. Do not start any other stage.
 
-### 4.2 Breakpoints
+Read first, in this order: `DESIGN_AUDIT.md` (from stage D0), `packages/ui-tokens`, this `design.md`, then the components you will touch.
 
-- **sm:** `360px` (Minimum target: Android phone)
-- **md:** `640px` (Phablet / small tablet)
-- **lg:** `1024px` (Desktop / tablet landscape)
-- **xl:** `1280px` (Large display)
+## 14. Constraints (do not break)
 
-### 4.3 Corner Radii
+1. All existing `data-testid` attributes stay on the same logical elements. Existing tests must still pass.
+2. API shapes unchanged. Frontend still renders whatever the API returns.
+3. Copy from the database stays database-driven. In particular, **remove the hardcoded "Daily drop at 09:00 UTC"** string; the Drop time shown to users must come from the server config and must show **07:00 IST** (it is also shown in the user's local time when it differs). Report if you cannot find the source.
+4. Play-route JS stays within the approved **159.5 KB** budget. Do not add UI libraries. CSS-only for the sticker and flip effects. framer-motion stays as it is (LazyMotion), and is not extended to new screens unless needed for something CSS cannot do.
+5. 18+ gate, consent and legal copy are not reworded.
+6. No dark mode, no new fonts, no new colours beyond the tokens.
 
-- `xs`: `6px` | `sm`: `10px` | `md`: `16px` (Tiles, inputs) | `lg`: `24px` (Cards) | `xl`: `32px` (Bottom sheets, modals) | `full`: `9999px` (Pills, circular buttons)
+## 15. Work breakdown (do it in this order, one commit per step)
 
-### 4.4 Elevation and Shadows
+**D1.1 Tokens.** Rewrite `@oddly/ui-tokens` to the values in sections 2 to 4 and 10 (colour, type scale, radius, outline, shadow, spacing, motion). Export TypeScript constants and a generated CSS variables file. Make Tailwind consume the tokens (extend `theme`, remove duplicate or conflicting definitions; the audit found conflicting token sets: resolve to one). Add the contrast table as a test that computes ratios from the tokens and fails if any listed pair drops below 4.5 (normal text) or 3 (large text and UI components).
 
-- **Shadow 1 (Subtle):** `0 1px 2px rgba(20, 18, 58, 0.08)`
-- **Shadow 2 (Card Lift):** `0 8px 24px rgba(20, 18, 58, 0.12)`
-- **Shadow 3 (Floating):** `0 20px 48px rgba(108, 76, 241, 0.25)`
-- **Dark Mode Elevation:** Dark mode replaces heavy dropped shadows with surface brightening (`--surface-2`) and ambient radial glows (`--glow-mint`, `--glow-violet`).
+**D1.2 Fonts and global styles.** Add Bricolage Grotesque and Inter via `next/font` (self-hosted, `display: swap`, subset). Set base styles, focus-visible double ring, `prefers-reduced-motion` global fallback, `html { background: cream }`. Remove hardcoded hex values from CSS and TSX.
 
----
+**D1.3 Primitives.** Build or restyle: `Button` (primary, secondary, tertiary, danger, success), `OptionRow`, `Chip`, `TierBadge`, `ProgressDots`, `Input`, `BottomSheet`, `Toast`, `EmptyState`, `Skeleton`. Each with the states in section 5 to 7. Hover only under `@media (hover:hover) and (pointer:fine)`. Enforce 44 x 44 minimum hit area (fix the audit's sub-44px targets).
 
-## 5. Atmosphere and Ambient Backgrounds
+**D1.4 Play flow.** Restyle welcome, 18+ gate, Drop intro, the five question screens, lock-in, waiting, and results entry using the primitives. Replace the number slider with the 5 x 10 grid (section 6). Colour, photo and word questions per section 6. Keep the answer submission payloads identical.
 
-### 5.1 Dynamic Question Atmospheres
+**D1.5 Flip share card.** Implement section 11 as a `FlipCard` component used on the results screen and the public link page. Include the sealed back, auto-flip on arrival, tap to flip, the sheen, reduced-motion cross-fade, haptic tick, a11y wiring. Update the Satori renderer to use tokens and produce front and back PNGs plus the story composite. Add the unit test that every renderer colour is a token.
 
-To convey a sensation of progression across the five picks, the ambient background glow shifts hue according to the active question type:
+**D1.6 PWA assets.** Generate the icon set and fix `manifest.json` per section 9 (the audit found missing icons and a wrong manifest background).
 
-- **Type 1 (Text Pick One):** Royal Violet glow (`rgba(108, 76, 241, 0.15)`)
-- **Type 2 (Number):** Warm Coral glow (`rgba(255, 107, 94, 0.15)`)
-- **Type 3 (Colour):** Crisp Mint glow (`rgba(61, 219, 176, 0.15)`)
-- **Type 4 (Image):** Sky Blue glow (`rgba(76, 201, 240, 0.15)`)
-- **Type 5 (Word):** Golden Amber glow (`rgba(245, 158, 11, 0.15)`)
+**D1.7 Secondary screens.** Streak, history, settings, delete account, legal pages, error and 404 pages, offline page. Same primitives.
 
----
+**D1.8 New-feature shells (style only).** If Globe, Orbit, Telepathy, Anti-twin or Deck components already exist, restyle per section 12. If they do not exist yet, create only a Storybook-free `/dev/ui` route listing the primitives and card states for review; do **not** build their logic.
 
-## 6. Iconography and Asset Library
+**D1.9 Admin.** Out of scope for D1. Admin uses Inter plus the same tokens but is restyled in its own stage.
 
-### 6.1 Lucide Icon Mappings
+## 16. Audit findings that must be fixed (map to the D0 audit)
 
-Standard UI actions use `lucide-react` at `24px` (or `20px` inside buttons), stroke width `2px`:
+| # | Problem | Fix location |
+|---|---|---|
+| 1 | Contrast failures (mint and coral text on cream) | D1.1, 2.2 rules |
+| 2 | Missing PWA icons | D1.6 |
+| 3 | Touch targets under 44px | D1.3 |
+| 4 | Hardcoded hex values in components | D1.1, D1.2, lint rule |
+| 5 | Conflicting token definitions | D1.1 |
+| 6 | Slider hit-slop and small thumb | D1.4, number grid |
+| 7 | Inconsistent border radii | section 4, only 4 radii allowed |
+| 8 | Share-card hex colours diverge from the app | D1.5 |
+| 9 | Repaint-heavy radar animation | section 12, Globe |
+| 10 | `manifest.json` background mismatch | D1.6 |
+| 11 | Hover-dependent effects on touch | D1.3, media query rule |
+| 12 | Colour-only state indicators | sections 2.3, 6, 12 |
+| 13 | Missing focus-visible styles | D1.2, D1.3 |
+| 14 | Drop-time copy (09:00 UTC vs 07:00 IST) | constraint 3 |
+| 15 | No reduced-motion handling | section 10, D1.2 |
 
-- Close: `X` | Back: `ChevronLeft` | Forward: `ChevronRight`
-- Share: `Share2` | Copy Link: `Link2` | Download: `Download`
-- Settings: `Settings` | History: `CalendarDays` | Today: `Sparkles`
-- Profile / Me: `UserRound` | Notifications: `Bell` | Sound: `Volume2` / `VolumeX`
-- Theme: `Sun` / `Moon` | Report: `Flag` | Verified / Success: `Check`
-- Warning: `AlertTriangle` | Delete / Clear: `Trash2` | Menu: `MoreHorizontal`
-- Challenge: `Users` | External Link: `ExternalLink` | PWA Install: `Smartphone`
+If the D0 audit's numbering differs from this table, match by description and note the mapping in the report.
 
-### 6.2 Custom SVG Assets (Public Directory & React Components)
+## 17. Accessibility requirements
 
-- `BrandMark`: Two overlapping translucent circles (Violet and Coral) with Mint intersection.
-- `StreakFlame`: Stylized multi-tone flame icon (Coral to Amber gradient).
-- `TierBadges`: 4 custom SVG vector badges (Common, Uncommon, Rare, Mythic).
-- `SearchGlobe`: Minimal dark world dot-matrix map for the 1.5s search animation.
-- `ImageQuestionTiles (28 Illustrated SVGs):` Curated flat vector illustrations utilizing brand palette tones:
-  - 4 Sky conditions: Sunrise, Thunderstorm, Starry Night, Overcast
-  - 4 Doors: Red door, Carved wooden door, Glass modern door, Tiny garden door
-  - 4 Urban pathways: Mumbai Chai lane, Quiet green park path, Tokyo neon alleyway, Coastal beach promenade
-  - 4 Desert island essentials: Vintage book, Acoustic guitar, Heavy-duty torch, Blank notebook
-  - 4 Weekend plans: Indie cinema, Open highway road trip, Long afternoon nap, Bustling street food crawl
-  - 4 Market stalls: Fresh fruit mound, Old book stack, Glass bangles, Traditional sweets
-  - 4 Horizon vistas: Golden dawn, Mist mountain sunrise, Ocean sunset, Twilight horizon
+- WCAG 2.2 AA for all play-flow screens.
+- Everything operable by keyboard; visible focus; logical focus order; sheets trap focus and restore it on close.
+- Flip card: operable via Enter/Space, announces the new side, hidden face is `inert`.
+- No information by colour alone (icon or text always accompanies).
+- Live regions: lock-in confirmation `role="status"`; errors `role="alert"`.
+- Text can scale to 200% without clipping; layouts use `min-height`, not fixed heights, for text containers.
+- Test with iOS VoiceOver and Android TalkBack where possible, otherwise state that this was not tested.
 
----
+## 18. Performance requirements
 
-## 7. Interactive Components and States
+- No layout-affecting animation. Transform and opacity only (box-shadow only for the 120ms sticker press).
+- Confetti is CSS-only, at most 24 elements, removed from the DOM 1.5s after it ends.
+- Sheen is one pseudo-element, no per-frame JS; pointer-follow updates a CSS variable at most once per animation frame.
+- Report the play-route bundle size before and after; it must stay at or under 159.5 KB.
+- Lighthouse mobile on the welcome and results screens: report Performance, Accessibility and Best Practices scores (target 90+ for Accessibility and Best Practices; report honestly if Performance is lower).
 
-Every interactive element defines 8 consistent states: `default`, `hover`, `focus-visible`, `active/pressed`, `disabled`, `loading`, `error`, `success`.
+## 19. Guard rails to keep the pattern from drifting
 
-### 7.1 Primary Button
+1. ESLint or a custom check: **fail the build on any hex colour literal** outside `packages/ui-tokens`, and on any `border-radius` value not in the token set.
+2. Stylelint (or an equivalent): forbid `box-shadow` values with blur greater than 0 outside an allow-list (focus ring, sheet backdrop).
+3. A `/dev/ui` page (dev only) rendering every primitive in every state, used for visual review and for Playwright screenshots (one baseline image per state).
+4. A short `DESIGN_RULES.md` snippet at the top of the UI package README that points here.
+5. Add to the repository's agent instructions file (for example `CLAUDE.md` or `AGENTS.md`): "Before any UI change read `design.md`; use only `@oddly/ui-tokens`; follow the sticker rules; do not add colours, fonts, radii or shadows."
 
-- **Dimensions:** Height `52px` (Large) / `44px` (Medium) / `36px` (Small). Full width on mobile flow steps. Radius: `9999px` (Pill).
-- **Default:** Background `--violet`, text Inter 600 `16px` white, subtle inset top highlight.
-- **Hover:** Background lifts (`--violet` + 8% white), `transform: translateY(-1px)`, `--shadow-3`.
-- **Focus-Visible:** `outline: 3px solid var(--mint); outline-offset: 3px`.
-- **Active / Pressed:** `transform: scale(0.97)`, background `--violet-press`, shadow collapsed.
-- **Disabled:** `opacity: 0.4`, `pointer-events: none`, `aria-disabled="true"`.
-- **Loading:** Label replaced with two orbiting mint/violet dots (`20px`), width locked to prevent layout shifting.
+## 20. Acceptance checklist (report each as PASS / FAIL / NOT TESTED with evidence)
 
-### 7.2 Secondary Button
+- [ ] Tokens package matches sections 2 to 4 and 10; one source of truth; contrast test passes.
+- [ ] Fonts self-hosted; no third-party font requests in the network log.
+- [ ] No hex literals outside tokens (lint passes).
+- [ ] Primary and secondary buttons match section 5 in all states; hover only on fine pointers; press-flat works on touch.
+- [ ] All interactive elements at least 44 x 44 px (report any exception).
+- [ ] Number question uses the grid; colour, photo, word questions restyled; payloads unchanged.
+- [ ] Share card: arrives face-down, auto-flips, taps to the back and back again; reduced-motion shows a cross-fade; front and back PNG exports render and match tokens; link page auto-flips.
+- [ ] Mythic confetti and sheen present, within limits.
+- [ ] PWA icons present (192, 512, maskable, apple-touch); manifest `background_color` is `#FFF8F0`; installability check passes.
+- [ ] Drop time text comes from config and reads 07:00 IST.
+- [ ] Existing tests pass; `data-testid` list unchanged (attach a diff of the list).
+- [ ] Play-route bundle at or under 159.5 KB (before and after numbers).
+- [ ] Screenshots: welcome, a question of each type, locked state, results flip (3 frames: sealed, mid-flip, front), card back, link page, 375 px and 768 px widths.
+- [ ] Known gaps and anything deferred listed honestly.
 
-- **Default:** Transparent background, `2px` solid `--violet` border, text `--violet` (Dark: `--lavender`).
-- **Hover:** Filled with 10% opacity `--violet`.
-- **Active:** Filled with 16% opacity `--violet`, `transform: scale(0.97)`.
-- **Focus-Visible:** 3px Mint outline ring.
+## 21. Final report format, then STOP
 
-### 7.3 Ghost / Tertiary Button
-
-- **Default:** No border, transparent background, text `--text-muted`.
-- **Hover:** Text `--text`, underline, 8% violet background tint.
-- **Active:** `transform: scale(0.96)`.
-
-### 7.4 Destructive Button
-
-- **Default:** Background `--danger`, text white.
-- **Confirmation Requirement:** Used solely for account deletion; triggered through a two-tap modal sheet confirmation.
-
-### 7.5 Answer Tile (Text Pick One)
-
-- **Dimensions:** Width 100%, Min-height `72px`, radius `16px` (`--radius-md`), padding `16px 20px`.
-- **Default:** Surface `--surface`, `1px` border `--border`, text H3 Space Grotesk.
-- **Hover:** Border `--violet`, `transform: translateY(-2px)`, `--shadow-2`.
-- **Selected:** `2px` solid `--violet` border, background `--surface-2`, scale-in check badge (Mint) in top-right corner.
-- **Pressed:** `transform: scale(0.98)`.
-
-### 7.6 Number Picker (Dial & Strip)
-
-- **Hero Display:** Centered `96px` tabular Space Grotesk number in a circular glass dial.
-- **Snapping Strip:** Horizontal scroll strip of numbers 1 to 50 with magnetic snap points.
-- **Manual Adjusters:** Dedicated `-` and `+` touch buttons (`44x44px`) and keyboard arrow support.
-- **Haptic:** `navigator.vibrate(5)` fires on every integer tick.
-- **Confirm CTA:** Sticky "Confirm Number" primary button below dial.
-
-### 7.7 Colour Swatch Grid
-
-- **Layout:** 4 columns x 3 rows grid of `64px` circular swatches.
-- **Label:** Micro uppercase font directly under each circle (e.g., "CRIMSON", "MINT").
-- **Selected:** `3px` solid `--text` ring around circle, internal checkmark icon, bold text label, and ambient background glow shifts to the chosen color for 600ms.
-
-### 7.8 Progress Dots
-
-- **Structure:** Five indicator pills centered at top of screen.
-- **States:** Completed: filled Violet circle (`10px`). Active: expanded animated pill (`28px` wide). Upcoming: subtle outline circle (`10px`).
-- **Interaction:** Tapping any completed dot navigates back to that question before final submission.
-
-### 7.9 Bottom Sheet & Modal
-
-- **Mobile (< 640px):** Slides up from bottom edge, top corners radius `32px`, drag handle bar (`40x4px`), swipe-down to dismiss.
-- **Desktop (≥ 640px):** Centered floating dialog, radius `24px`, backdrop blur `8px` with dark overlay (`rgba(20, 18, 58, 0.6)`).
-- **Accessibility:** Radix Dialog primitive with trapped focus and `Escape` key listener.
+Write `design-d1/REPORT.md` containing: what changed per step D1.1 to D1.8, the acceptance checklist with evidence, bundle and Lighthouse numbers, the `data-testid` diff, any deviations from this file with reasons, and open questions. End with the line **"Stage D1 complete."** and stop. Do not begin any other stage.
 
 ---
 
-## 8. Motion, Sound, and Haptic Specs
+## 22. Change log
 
-### 8.1 Motion Durations & Easings
-
-- **Micro Interactions:** `140ms – 180ms` (Button press, hover transitions) — `ease-out`.
-- **Standard Transitions:** `220ms – 260ms` (Sheet entry, tile selection).
-- **Emphasis / Reveal:** `400ms – 600ms` (Card entry, score reveal).
-- **Searching Animation:** `1500ms` (Map dot journey) — tap to skip.
-- **Spring Physics (Framer Motion):** `stiffness: 380, damping: 28`.
-
-### 8.2 Reveal Choreography
-
-1. **0.0s – 1.5s:** Searching animation runs (glowing dots travel across dot matrix; brand circles converge).
-2. **1.5s:** Twin card springs upward (`24px` translate, fade in).
-3. **1.8s:** Matched pick dots ignite sequentially with Mint illumination (`120ms` stagger).
-4. **2.2s:** Big score counts up from 0 to final score over `900ms`.
-5. **2.8s:** Confetti bursts once if score is 4/5 or 5/5.
-6. **3.2s:** Oddness card cascades in from below with percentile count-up and tier badge pop.
-
-### 8.3 Prefers-Reduced-Motion Override
-
-When `prefers-reduced-motion: reduce` is detected or toggled in Settings:
-
-- All transform animations and sliding sheets become instant opacity fades (`80ms`).
-- Count-up numbers render immediately at final value.
-- Particle confetti and drifting background hero circles are completely disabled.
-
-### 8.4 Sound and Haptics
-
-- **Sound (Off by Default):** Soft, harmonic chime on reveal; subtle tick on tile select. Toggled via Settings.
-- **Haptics:** `navigator.vibrate(5)` on answer selection; `navigator.vibrate(20)` on successful twin reveal.
-
----
-
-## 9. Share-Card Templates (Server-Rendered via Satori)
-
-All share cards are generated on the server using `satori` and rendered to PNG via `@resvg/resvg-js`. Three aspect ratios:
-
-### 9.1 Story Format (1080 x 1920 px — 9:16)
-
-- **Top Safe Zone (140px):** Wordmark "oddly" and two-circle brand mark in top-left.
-- **Center Hero:** Two large intersecting circles (Violet & Coral) with glowing Mint overlap containing large score `"4/5"`.
-- **Main Headline:** Space Grotesk 700: _"You matched 4 of 5 with someone in Lagos."_
-- **Subline:** Inter 400: _"Only 0.4% of today's players did."_
-- **Rarity Pill:** Tier badge centered with Mint highlight (e.g., `RARE TIER · 84%`).
-- **Shared Pick Tag:** _"Matched on: Violet for Monday Morning"_.
-- **Streak Callout:** If streak $\ge 3$, displays Coral flame icon and `"12-Day Streak"`.
-- **Bottom Safe Zone (200px):** Date stamp, _"Beat my match today"_, shortened URL (`oddly.app/c/xyz123`), and high-contrast rounded QR code.
-
-### 9.2 Square Format (1080 x 1080 px — 1:1)
-
-- Rebalanced for Instagram feed and WhatsApp status.
-- Left column: Wordmark, Headline, Rarity details, QR code.
-- Right column: Large intersecting circles with score and streak flame.
-
-### 9.3 Link Preview / Twitter Card (1200 x 630 px — 1.91:1)
-
-- Horizontal presentation optimized for Open Graph metadata.
-- Score and brand mark prominently positioned on right; dynamic social title on left.
-
----
-
-## 10. Screen-by-Screen Layout Blueprints
-
-### S1: Landing / Today (Drop Live, Not Played)
-
-```
-┌──────────────────────────────────────────┐
-│ [Brand Mark] oddly         [Flame 12] [☼]│
-│                                          │
-│                                          │
-│      Someone out there is                │
-│         oddly like you.                  │
-│                                          │
-│    Five picks. About 30 seconds.         │
-│               One twin.                  │
-│                                          │
-│      ┌────────────────────────────┐      │
-│      │  ● 3,482 players today     │      │
-│      └────────────────────────────┘      │
-│                                          │
-│      ┌────────────────────────────┐      │
-│      │   ★  Play today's five     │      │
-│      └────────────────────────────┘      │
-│                                          │
-│          18+ only. No account needed.    │
-│                  About Oddly             │
-└──────────────────────────────────────────┘
-```
-
-- **Tap "Play today's five":** Checks for stored adult confirmation. If not found, opens Age Gate bottom sheet. If found, navigates directly to Question 1.
-
-### S2: Countdown (Drop Not Yet Live)
-
-```
-┌──────────────────────────────────────────┐
-│ [Brand Mark] oddly                    [☼]│
-│                                          │
-│          Today's five drop at            │
-│               7:00 AM IST                │
-│                                          │
-│         ┌────┐ ┌────┐ ┌────┐             │
-│         │ 04 │:│ 22 │:│ 18 │             │
-│         └────┘ └────┘ └────┘             │
-│          HRS    MIN    SEC               │
-│                                          │
-│      ┌────────────────────────────┐      │
-│      │    See yesterday's recap   │      │
-│      └────────────────────────────┘      │
-│                                          │
-│      ┌────────────────────────────┐      │
-│      │  Install Oddly for alerts  │      │
-│      └────────────────────────────┘      │
-└──────────────────────────────────────────┘
-```
-
-### S3: Question Screen (Generic Framework for All 5 Types)
-
-```
-┌──────────────────────────────────────────┐
-│ [←]         ● ── ● ── ○ ── ○ ── ○     [✕]│
-│                                          │
-│ PICK ONE                                 │
-│ A pizza that is always cold, or a        │
-│ coffee that is always lukewarm?          │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │ A pizza that is always cold          │ │
-│ └──────────────────────────────────────┘ │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │ A coffee that is always lukewarm     │ │
-│ └──────────────────────────────────────┘ │
-│                                          │
-└──────────────────────────────────────────┘
-```
-
-- **Tap an answer tile:** Highlights with 2px Violet border, pops checkmark, vibrates 5ms, and auto-advances to next question after 350ms.
-- **Tap [←]:** Navigates back to previous question.
-- **Tap [✕]:** Opens exit confirmation dialog (_"Leave? Your progress will be saved on this device."_).
-
-### S4: Review Screen
-
-```
-┌──────────────────────────────────────────┐
-│ [←]                                      │
-│                                          │
-│ Ready?                                   │
-│ Your picks are locked once you submit.   │
-│                                          │
-│ 1. Pizza cold                  [Edit] ──>│
-│ 2. Number: 27                  [Edit] ──>│
-│ 3. Colour: Violet              [Edit] ──>│
-│ 4. Sky: Starry Night           [Edit] ──>│
-│ 5. Word: Cozy                  [Edit] ──>│
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │          Find my twin                │ │
-│ └──────────────────────────────────────┘ │
-└──────────────────────────────────────────┘
-```
-
-### S5: Searching Animation Screen
-
-```
-┌──────────────────────────────────────────┐
-│                                          │
-│             ·   ·   ·   ·                │
-│           ·   (🟣)───→ ·   ·             │
-│             ·   ·    ↖                   │
-│           ·   ·   ·   (🟠)  ·            │
-│                                          │
-│      Looking across the world            │
-│          for your twin...                │
-│                                          │
-│              [Tap to skip]               │
-└──────────────────────────────────────────┘
-```
-
-### S6: Twin Reveal Screen
-
-```
-┌──────────────────────────────────────────┐
-│ [Brand Mark]                  [Share] [✕]│
-│                                          │
-│              (🟣 🟢 🟠)                  │
-│                 4 / 5                    │
-│                                          │
-│         Closest so far:                  │
-│  Someone in Lagos, age 18 to 24          │
-│                                          │
-│       ●      ●      ●      ●      ○      │
-│     Pizza   #27   Violet  Night  Word    │
-│     (Mint) (Mint) (Mint)  (Mint) (Grey)  │
-│                                          │
-│ ℹ️ More people are still playing. Final  │
-│    twin locks tomorrow at 7:00 AM.       │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │         See how odd you are          │ │
-│ └──────────────────────────────────────┘ │
-└──────────────────────────────────────────┘
-```
-
-### S7: Oddness Rarity Screen
-
-```
-┌──────────────────────────────────────────┐
-│ [← Back to Twin]                  [Share]│
-│                                          │
-│             [ RARE TIER ]                │
-│                                          │
-│                 84%                      │
-│                                          │
-│      Rarer than 84% of today's players.  │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │ Your rarest pick:                    │ │
-│ │ Violet for Monday morning            │ │
-│ │ Only 3.1% chose this today.          │ │
-│ └──────────────────────────────────────┘ │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │           Share my card              │ │
-│ └──────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────┐ │
-│ │         Challenge a friend           │ │
-│ └──────────────────────────────────────┘ │
-└──────────────────────────────────────────┘
-```
-
-### S8: Share Sheet (Bottom Sheet)
-
-```
-┌──────────────────────────────────────────┐
-│ ─── (Drag Handle) ────────────────────── │
-│ Share your match                    [✕]  │
-│                                          │
-│   [ Story ]     [ Square ]    [ Link ]   │
-│                                          │
-│        ┌────────────────────────┐        │
-│        │ [Preview of Card Image]│        │
-│        └────────────────────────┘        │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │         Share via...                 │ │
-│ └──────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────┐ │
-│ │         Copy challenge link          │ │
-│ └──────────────────────────────────────┘ │
-│                 Save image               │
-└──────────────────────────────────────────┘
-```
-
-### Login Panel (Soft Sign-In Sheet)
-
-```
-┌──────────────────────────────────────────┐
-│ ─── (Drag Handle) ────────────────────── │
-│ [Brand Mark]                             │
-│                                          │
-│ Save your streak                         │
-│ Your picks and streak stay with you on   │
-│ any device.                              │
-│                                          │
-│ ┌──────────────────────────────────────┐ │
-│ │  [G]  Continue with Google           │ │
-│ └──────────────────────────────────────┘ │
-│                                          │
-│                Not now                   │
-│                                          │
-│ By continuing, you agree to our Terms.   │
-└──────────────────────────────────────────┘
-```
-
----
-
-## 13. Resilience and Degraded-State UI Specifications
-
-### 13.1 Status Banner Component (Levels L1 to L4 & Maintenance)
-- **Position & Layout:** Affixed to top of viewport (`z-50`), spanning 100% width. Padding `py-2 px-4`.
-- **Accessibility:** `role="status"`, `aria-live="polite"` (for L1/L2) and `role="alert"`, `aria-live="assertive"` (for L3/L4).
-- **Behavior:** Dismissible only on informational Level L1; sticky and non-dismissible on L2, L3, and L4.
-- **Copy Source:** Text is loaded dynamically from database `app_content` (`banner.degradation.L1` to `L4`).
-- **Styling Tokens:**
-  - *L1 (Conserve):* Subtle dark violet tint (`bg-surface-elevated text-text-muted border-b border-border`).
-  - *L2 (Protect Core):* Amber warning accent (`bg-amber-950/40 text-amber-200 border-b border-amber-800/40`).
-  - *L3 (Survive):* Coral notification accent (`bg-coral/20 text-coral border-b border-coral/30`).
-  - *L4 (Static Fallback):* Deep urgent coral background with white text (`bg-coral text-white font-medium`).
-
-### 13.2 "Saved. Finding Your Twin..." Pending Screen (Mode B & Slow Matching)
-- **Context:** Rendered upon HTTP `202 Accepted` when asynchronous ingestion is active or pairwise search is completing in background.
-- **Visuals:** Two luminous dots (Mint `#4ECCA3` and Violet `#9B5DE5`) orbiting one another in a calming, continuous 2-second circular loop (`animate-spin-slow`).
-- **Reduced Motion:** If `prefers-reduced-motion: reduce`, the looping orbit is replaced with a gentle opacity pulse (1.0 to 0.4 over 2.5s).
-- **Polling & Refresh:** Automatically polls `GET /v1/results/:dropId` with exponential backoff and full jitter (5s, 10s, 30s). Includes a prominent manual *"Check now"* button.
-- **Copy:**
-  - Title: *"Saved! Finding your twin..."*
-  - Subtitle: *"Thousands of people are playing right now. We're searching for your closest match."*
-
-### 13.3 Stale-Data Labels & Freshness Timestamps
-- **Context:** Rendered adjacent to live player counters or world statistics when served from edge cache under Level L1/L2.
-- **Visuals:** Small badge (`text-[11px] font-mono text-text-muted bg-surface/60 px-2 py-0.5 rounded-full`).
-- **Copy:** *"Updated 2 minutes ago"* or *"Refreshed at 07:15 AM"*.
-
-### 13.4 Offline & Queued-Submission States
-- **Context:** Cellular connection lost mid-play or during submission.
-- **Visuals:** Top pill indicator: Wi-Fi off icon + *"Saved offline. Will send automatically when you're back."*
-- **Action:** Manual *"Retry now"* primary action button. Picks remain in `localStorage` until confirmed.
-
-### 13.5 HTTP 429 and 503 Friendly Overload Screens
-- **Context:** API rate limiting or `@fastify/under-pressure` load shedding.
-- **Visuals:** Calm geometric illustration of two waiting cups with steam.
-- **Copy:**
-  - 429: *"Easy there! Lots of players are here. Retrying in [N] seconds..."*
-  - 503: *"Lots of people are here right now. Taking a quick breather. Trying again in [N] seconds..."*
-- **Behavior:** Live countdown timer decrementing based on the HTTP `Retry-After` header value (default 5s to 15s), with a manual *"Retry now"* button.
-
-### 13.6 Skeleton Loading Rules
-- **Skeleton Primitives:** Use smooth shimmer pulse (`bg-surface-elevated animate-pulse rounded-2xl`).
-- **Minimum Display Threshold:** Minimum skeleton presentation time is **200 ms** to eliminate jarring visual flickers on ultra-fast cache hits.
-- **Zero Layout Shift:** Skeletons must precisely mirror the pixel height and aspect ratio of loaded components.
-
-### 13.7 Error Boundary Fallbacks per Area
-- **Route Level:** Top-level Next.js `error.tsx` boundary catches uncaught routing crashes; provides *"Return to today's drop"* button.
-- **Widget Level:** Independent error boundaries isolate non-essential widgets (Live Counter, Streak Flame, History Chart). If the Live Counter fails, it quietly collapses without breaking the play flow.
-
-### 13.8 Performance & Rendering Budgets
-- **Explicit Image Dimensions:** All raster assets specify `width`, `height`, and `sizes` to guarantee zero Cumulative Layout Shift (CLS = 0).
-- **Typography Budget:** Self-hosted Space Grotesk and Inter subsetted with `font-display: swap`.
-- **Motion Budget:** Heavy particle animations (confetti) are dynamically imported and deferred until after result paint. Zero animation runs during critical question loading.
+- 2026-11-14: v1.0. Sticker pop direction chosen by the owner. Palette, type, buttons, flip card, and D1 redesign stage defined.

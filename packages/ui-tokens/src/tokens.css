@@ -1,0 +1,39 @@
+/**
+ * @oddly/ui-tokens — Auto-generated CSS variables
+ * Source of truth: design.md (v1.0)
+ */
+
+:root {
+  --color-ink: #14123A;
+  --color-cream: #FFF8F0;
+  --color-paper: #FFFFFF;
+  --color-violet: #6C4CF1;
+  --color-lavender: #EEEAFE;
+  --color-coral: #FF6B5E;
+  --color-mint: #3DDBB0;
+  --color-sun: #FFD23F;
+  --color-muted: #5B5780;
+  --color-lilac: #CDBFFF;
+  --color-error: #D92D4B;
+
+  --outline: 2.5px solid #14123A;
+  --outline-thin: 1.5px solid #14123A;
+
+  --radius-s: 10px;
+  --radius-m: 14px;
+  --radius-l: 20px;
+  --radius-pill: 999px;
+
+  --shadow-sticker: 4px 4px 0 #14123A;
+  --shadow-sticker-lift: 6px 6px 0 #14123A;
+  --shadow-sticker-flat: 0 0 0 #14123A;
+  --shadow-card: 4px 4px 0 #14123A;
+
+  --dur-press: 120ms;
+  --dur-ui: 200ms;
+  --dur-sheet: 240ms;
+  --dur-flip: 750ms;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-snap: cubic-bezier(0.3, 1.4, 0.5, 1);
+}

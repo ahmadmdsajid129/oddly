@@ -1,43 +1,53 @@
 import type { Config } from "tailwindcss";
-import { colors, radius, spacing, typography } from "./tokens";
+import { colors, radius, spacing, shadows } from "./tokens";
 
 export const oddlyTailwindPreset: Partial<Config> = {
-  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        midnight: "var(--color-midnight)",
-        violet: {
-          DEFAULT: "var(--color-violet)",
-          press: "var(--color-violet-press)",
-        },
-        coral: "var(--color-coral)",
-        mint: "var(--color-mint)",
-        cream: "var(--color-cream)",
-        lavender: "var(--color-lavender)",
-        bg: "var(--color-bg)",
-        surface: {
-          DEFAULT: "var(--color-surface)",
-          2: "var(--color-surface-2)",
-        },
-        border: "var(--color-border)",
-        text: {
-          DEFAULT: "var(--color-text)",
-          muted: "var(--color-text-muted)",
-        },
-        danger: "var(--color-danger)",
-        warning: "var(--color-warning)",
-        success: "var(--color-success)",
+        ink: colors.ink,
+        cream: colors.cream,
+        paper: colors.paper,
+        violet: colors.violet,
+        lavender: colors.lavender,
+        coral: colors.coral,
+        mint: colors.mint,
+        sun: colors.sun,
+        muted: colors.muted,
+        lilac: colors.lilac,
+        error: colors.error,
       },
-      borderRadius: radius,
+      borderRadius: {
+        s: radius.s,
+        m: radius.m,
+        l: radius.l,
+        pill: radius.pill,
+        full: radius.pill,
+      },
+      boxShadow: {
+        sticker: shadows.sticker,
+        "sticker-lift": shadows["sticker-lift"],
+        "sticker-flat": shadows["sticker-flat"],
+        card: shadows.card,
+      },
       spacing: spacing,
       fontFamily: {
-        heading: [typography.fontHeading],
-        body: [typography.fontBody],
+        display: ["var(--font-bricolage)", "sans-serif"],
+        heading: ["var(--font-bricolage)", "sans-serif"],
+        body: ["var(--font-inter)", "sans-serif"],
+      },
+      fontSize: {
+        "display-xl": ["clamp(40px, 12vw, 56px)", { lineHeight: "1.0", fontWeight: "800" }],
+        "display-l": ["clamp(26px, 7vw, 32px)", { lineHeight: "1.1", fontWeight: "800" }],
+        "display-m": ["20px", { lineHeight: "1.2", fontWeight: "700" }],
+        button: ["16px", { lineHeight: "1.0", fontWeight: "700" }],
+        chip: ["12px", { lineHeight: "1.0", fontWeight: "700" }],
+        body: ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+        "body-s": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+        caption: ["12px", { lineHeight: "1.4", fontWeight: "500" }],
       },
     },
   },
 };
 
-export { colors, radius, spacing, typography };
-
+export * from "./tokens";
