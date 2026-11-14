@@ -10,9 +10,9 @@ Purpose of this file: Immutable operational rules, coding standards, error-handl
 1. **Stop After Every Stage:** You must NEVER build multiple stages in one turn. Complete the assigned stage, update `task.md` and `memory.md`, emit the Stage Report, and immediately STOP. Wait for the Founder's explicit instruction (e.g., _"proceed to Stage N"_).
 2. **Never Fake Data or Matches:** Never synthesize fake players, simulated twins, fabricated odds, or deceptive countdown timers in production code. If data is sparse (< 200 players), declare it openly (_"Closest so far: N of 5. More people are playing."_).
 3. **No Free-Text User Input:** Prevent abuse architecturally. Users choose exclusively from structured options (tiles, numbers, colours, words, images). The only allowed user-submitted text is the optional 140-character report note on `/v1/reports`, strictly accessible to administrators.
-4. **Never Expose Identifiers or Vectors:** Never expose another user's user ID, IP address, device ID, push subscription, raw answer vector, or exact GPS coordinates via any API route, card, or public view. Twin views display only coarse region (k-anonymity $\ge 20$), age band ($\ge 20$), and the matched pick labels.
+4. **Never Expose Identifiers or Vectors:** Never expose another user's user ID, IP address, device ID, push subscription, raw answer vector, or exact GPS coordinates via any API route, card, or public view. Twin views display only coarse region (k-anonymity $\ge 20$), age band ($\ge 20$), and the matched pick labels. *Exception:* Within an active Orbit, and only for the single designated Telepathy question after the viewer's own guess is locked, the partner's pick label may be shown to the viewer. No other pick, identifier or vector is ever exposed.
 5. **Never Commit Secrets:** API keys, database credentials, VAPID private keys, and Turnstile secrets must strictly reside in `.env` (gitignored). Provide dummy placeholder values in `.env.example` only.
-6. **Strict MVP Scope Boundaries:** Never build features in the OUT OF SCOPE list (chat, user profiles, leaderboards, real-money betting, native mobile apps, friends groups, wave, premium billing) without explicit written Founder approval.
+6. **Strict MVP Scope Boundaries:** Never build features in the OUT OF SCOPE list (chat, user profiles, leaderboards, real-money betting, native mobile apps, friends groups, wave, premium billing) without explicit written Founder approval. *(Founder approval recorded 2026-11-14: F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin approved for v1; F22 Oddly Deck and F23 Friend-invite Orbit documented for v1.5; handle swap, DMs, contact exchange permanently Not Planned; F12 Wave superseded by F19).*
 7. **Never Hide Failing Tests or Lint Errors:** All tests, typechecks, and lints must pass cleanly. If a test fails, report it honestly in the Stage Report; do not comment it out, skip it, or alter assertions to mask bugs.
 8. **Never Overwrite or Rewrite History in `memory.md`:** `memory.md` logs are append-only. Record fixes, adjustments, and decisions sequentially. Never delete tasks from `task.md` without an explicit changelog explanation.
 9. **No Unrecorded Dependencies:** Before installing any package not listed in `architecture.md`, document it first (name, pinned version, purpose, features using it, alternative evaluated) and announce it in the Stage Report.
@@ -37,10 +37,11 @@ Purpose of this file: Immutable operational rules, coding standards, error-handl
 ## 3. Never Do
 
 - Never make client-side calculations the source of truth for matches, streaks, or rarity scores. The server is the sole arbiter of state and time.
-- Never use runtime CDNs for typography or icon assets. Self-host Space Grotesk, Inter, and local SVGs.
+- Never use runtime CDNs for typography or icon assets. Self-host Bricolage Grotesque, Inter, and local SVGs.
 - Never introduce heavy component libraries or CSS frameworks outside of Tailwind CSS and Radix UI primitives.
 - Never tie daily game resets to midnight user-local time. The Twin Day is strictly bounded by 07:00 IST to 06:59:59 IST globally.
 - Never show dark patterns, guilt copy, or artificial countdown urgency (_"Hurry, only 3 spots left!"_).
+- Never pressure a player about an Orbit partner (no guilt, nagging or 'your twin is waiting' copy).
 - Never allow a single user to submit multiple entries for the same Drop on different devices or accounts (detect and exclude duplicate submissions).
 
 ---
@@ -215,3 +216,14 @@ The question curation tool and JSON importer reject or flag questions touching:
    - Error Title: _"Something went wrong."_
    - Error Subtitle: _"Your picks are safe. Let's give it another shot."_
    - Error Button: _"Retry"_
+
+---
+
+## 11. Change Log
+
+- **2026-11-14:** Stage F0 rule amendments approved by Founder:
+  - Rule 4: Added consent-scoped exception for active Orbit Telepathy question (partner's pick label shown to viewer after own guess locked).
+  - Rule 6: Recorded approval of F18 (Twin Globe), F19 (Keep & Orbit), F20 (Telepathy), and F21 (Anti-twin) for v1; F22 and F23 as v1.5 documented only; handle swap/DMs/contact exchange permanently Not Planned; F12 Wave superseded by F19.
+  - Section 3: Added prohibition against pressuring an Orbit partner (no guilt, nagging, or "your twin is waiting" copy).
+  - Section 3: Corrected font reference from Space Grotesk to shipped Bricolage Grotesque and Inter.
+- **2026-11-07:** Initial rules established for Oddly v1.
