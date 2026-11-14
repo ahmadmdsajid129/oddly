@@ -177,6 +177,17 @@ Cloudflare sits in front of all services. Over 95% of requests never reach the o
 | `/v1/auth/*` | POST | 5 s | 10/min/IP | No-store | None | Medium | Guest play only at L3 |
 | `/v1/me/*` | GET/PUT | 4 s | 30/min/IP | Private no-store | None | Medium | Shed at L2/L3 |
 | `/v1/reports` | POST | 4 s | 10/min/IP | No-store | None | Medium | Queued in BullMQ |
+| `/v1/keeps` | POST | 4 s | 10/min/device | No-store | `request_id` | Medium | Paused at L2+ |
+| `/v1/keeps/incoming` | GET | 3 s | 30/min/device | Private no-store | None | Medium | Shed at L2+ |
+| `/v1/keeps/:id/respond` | POST | 4 s | 10/min/device | No-store | `request_id` | Medium | Paused at L2+ |
+| `/v1/orbits` | GET | 3 s | 30/min/device | Private no-store | None | Medium | Read-only at L2, shed at L3+ |
+| `/v1/orbits/:id` | GET | 3 s | 30/min/device | Private ETag | None | Medium | Read-only at L2, shed at L3+ |
+| `/v1/orbits/:id/expressions` | POST | 3 s | 20/min/device | No-store | `request_id` | Low | Paused at L2+ |
+| `/v1/orbits/:id/end` | POST | 3 s | 10/min/device | No-store | `request_id` | Medium | Never paused (safety invariant) |
+| `/v1/orbits/:id/telepathy` | GET | 3 s | 30/min/device | Private no-store | None | Low | Hidden at L2+ |
+| `/v1/orbits/:id/telepathy/guess` | POST | 3 s | 10/min/device | No-store | `request_id` | Low | Paused at L2+ |
+| `/v1/globe` | GET | 3 s | 60/min/IP | Edge s-maxage=60 | None | Low | Stale up to 10m at L1, hidden at L2+ |
+| `/v1/results/:dropId/anti-twin` | GET | 3 s | 20/min/device | Private no-store | None | Low | Hidden at L2+ |
 | `/admin/*` | ALL | 10 s | 120/min/IP | No-store | None | Low | Block writes at L2/L3 |
 
 ### 7.2 Layered Rate Limiting and Indian CGNAT Cellular Architecture (R1-PATCH Item 5)
@@ -250,11 +261,18 @@ Controlled dynamically via database `app_config.degradation_level` (L0 to L4). S
 
 | Level | Name | Automated Trigger | System Adjustments | User Experience |
 |---|---|---|---|---|
-| **L0** | Normal | Healthy | All features active | Standard UI |
-| **L1** | Conserve | submit p95 > 400 ms or CPU > 70% | Live count cached 60 s; matching refresh interval doubled; analytics sampled 50%; card pre-render on-demand | Live count shows subtle freshness label |
-| **L2** | Protect Core | submit p95 > 800 ms or queue lag > 2m | Twin upgrade push paused; history/settings served stale; sign-up queued; admin writes locked | Banner: *"Busy right now. Your picks are safe."* |
-| **L3** | Survive | Error rate > 2% or DB write saturation | **Mode B async persist active**; matching deferred; guest play only; push paused except Drop Live | Screen: *"Saved! Finding your twin... This may take a minute."* |
-| **L4** | Static | Origin down / catastrophic | CDN serves cached shell and Drop JSON; client stores picks locally and retries for 6h | Banner: *"Picks saved safely on device. Will send automatically when reconnected."* |
+| **L0** | Normal | Healthy | All features active (including Globe live arcs, Keep/Orbit, Telepathy, Anti-twin) | Standard UI |
+| **L1** | Conserve | submit p95 > 400 ms or CPU > 70% | Live count cached 60 s; matching refresh interval doubled; analytics sampled 50%; card pre-render on-demand; **Globe refresh interval doubled** (60s to 120s); Anti-twin, Orbit, Telepathy normal | Live count shows subtle freshness label |
+| **L2** | Protect Core | submit p95 > 800 ms or queue lag > 2m | Twin upgrade push paused; history/settings served stale; sign-up queued; admin writes locked; **Globe real-time arcs paused (switches to Replay loop); new Keep requests paused; existing Orbits read-only; Telepathy & Anti-twin paused** | Banner: *"Busy right now. Your picks are safe."* |
+| **L3** | Survive | Error rate > 2% or DB write saturation | **Mode B async persist active**; matching deferred; guest play only; push paused except Drop Live; **all connection features (Globe, Orbit, Telepathy, Anti-twin) read-only or hidden with honest copy** | Screen: *"Saved! Finding your twin... This may take a minute."* |
+| **L4** | Static | Origin down / catastrophic | CDN serves cached shell and Drop JSON; client stores picks locally and retries for 6h; **all connection features hidden** | Banner: *"Picks saved safely on device. Will send automatically when reconnected."* |
+
+*Load Shedding Priority Order:*  
+1. Priority 1 (Core): Drop JSON, Submissions (Mode A -> Mode B), `/health`.  
+2. Priority 3: Results, Twin Reveal, Oddness.  
+3. Priority 5: User History, Settings, Me Drawer, **Keep requests & Orbit status**.  
+4. Priority 7: Share Card Pre-render, Analytics, Live Counters, **Twin Globe Arcs, Telepathy Guesses, Anti-twin calculation**.  
+5. Priority 9: Non-essential pushes, background audits, admin exports.
 
 *Hysteresis Rule:* Stepping down to a lower level requires **5 consecutive minutes** of healthy metrics below threshold.
 
@@ -331,15 +349,16 @@ oddly/
 | **Load Shedding** | `@fastify/under-pressure` | `^8.x` | Event-loop and memory overload protection | API Core | Stage 3 |
 | **Compression** | `@fastify/compress` | `^7.x` | Brotli & Gzip payload compression | API Core | Stage 3 |
 | **Conditional Requests** | `@fastify/etag` | `^5.x` | ETag computation for 304 Not Modified | API Core | Stage 3 |
-| **Circuit Breakers** | `opossum` | `^8.x` | Outbound dependency failure isolation | API & Worker | Stage 3 |
+| **Circuit Breakers** | `opossum` | `^10.0.0` | Outbound dependency failure isolation (Redis, R2, Turnstile, Push, Google OAuth) | API & Worker | Stage R2 |
 | **HTTP Client** | `undici` | `^6.x` | High-performance HTTP client with connection pooling | Outbound HTTP | Stage 3 |
 | **Retries & Limits** | `p-retry`, `p-limit` | `^6.x` / `^5.x`| Exponential backoff with full jitter and concurrency caps | API & Worker | Stage 3 |
-| **Metrics** | `prom-client` | `^15.x` | Prometheus metrics exporter for golden signals | Observability | Stage 3 |
+| **Metrics** | `prom-client` | `^15.1.3` | Prometheus metrics exporter for golden signals (RED, queues, DB pool, breakers) | Observability | Stage R2 |
 | **Tracing** | `@opentelemetry/sdk-node` | `^0.52.x`| Distributed OpenTelemetry request tracing | Observability | Stage 12 |
 | **Thread Pools** | `piscina` | `^4.x` | Worker threads for CPU tasks (Satori, matching) | Worker | Stages 6, 9 |
 | **Cluster Redis** | `ioredis` | `^5.x` | Atomic multi-key updates and cluster routing | Data layer | Stage 3 |
 | **Connection Pooler** | PgBouncer | `1.22+` | Transaction-mode database connection pooling | PostgreSQL | Stages 2, 14 |
-| **Performance Budgets** | `size-limit`, `@next/bundle-analyzer` | Latest | Enforce initial JS < 150 KB budget in CI | Web CI | Stages 4, 13 |
+| **Performance Budgets** | `size-limit`, `@size-limit/file` | `^14.3.0` | Enforce initial JS < 150 KB and 500 KB total load budget in CI | Web CI | Stage R2 |
+| **Accessibility Tests** | `@axe-core/playwright` | `^4.14.0` | Automated a11y testing for WCAG AA compliance across core views | Web CI | Stage R2 |
 | **Load & Chaos** | k6, Toxiproxy, `clinic.js` | Latest | Synthetic player generator, load, chaos, profiling | Testing | Stage 13 |
 | **Infrastructure as Code** | Terraform | `1.9+` | Reproducible declarative cloud infrastructure | Hosting | Stage 14 |
 | **Synthetic Probes** | Better Stack / UptimeRobot | SaaS | Multi-region synthetic play-flow probes & status page | Operations | Stage 14 |
@@ -356,6 +375,50 @@ In addition to core tables (`users`, `drops`, `questions`, `submissions`, `answe
    - Columns: `id` (UUID, PK), `job_name` (TEXT), `run_for_date` (DATE), `executed_at` (TIMESTAMPTZ), `instance_id` (TEXT). Unique: `(job_name, run_for_date)`.
 3. **`persist_reconciliation`:** Mode B audit log reconciling acknowledged `request_id`s with persisted database rows.
    - Columns: `id` (UUID, PK), `request_id` (UUID, unique), `player_id` (UUID), `drop_id` (UUID), `persisted_at` (TIMESTAMPTZ, nullable), `status` (ENUM: acknowledged, persisted, missing).
+
+### 16.1 Connection Features Schema Additions (F18 to F21)
+
+All daily tables are range-partitioned by `drop_date` from day one, matching existing partitioning patterns:
+
+1. **`twin_keeps`:** Private, symmetric requests to establish an Orbit after final batch locks at 07:05 IST.
+   - Columns: `id` (UUID, PK), `drop_date` (DATE, NOT NULL), `from_player_id` (UUID, NOT NULL, FK to `users`), `to_player_id` (UUID, NOT NULL, FK to `users`), `status` (ENUM: `pending`, `accepted`, `declined`, `expired`), `similarity_snapshot` (FLOAT, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL), `decided_at` (TIMESTAMPTZ, nullable).
+   - Constraints: Range-partitioned by `drop_date`. Unique index on `(drop_date, from_player_id)`.
+   - Privacy Invariant: Neither `from_player_id` nor `to_player_id` is ever returned to clients through the API.
+2. **`orbits`:** Long-running mutual relationships established between two players.
+   - Columns: `id` (UUID, PK), `player_a_id` (UUID, NOT NULL, FK to `users`), `player_b_id` (UUID, NOT NULL, FK to `users`), `status` (ENUM: `active`, `ended`), `started_on` (DATE, NOT NULL), `ended_on` (DATE, nullable), `co_streak_current` (INT, default 0), `co_streak_best` (INT, default 0), `last_co_date` (DATE, nullable), `ended_by` (UUID, nullable).
+   - Constraints: `player_a_id < player_b_id` (lexicographically sorted order to prevent dual-row duplicates). Partial unique index on `(player_a_id, player_b_id)` WHERE `status = 'active'`.
+   - Security Invariant: `ended_by` is stored strictly for internal admin investigation and is never exposed via public API.
+3. **`orbit_expressions`:** Lightweight daily one-tap non-verbal sticker interactions (The Wave).
+   - Columns: `id` (UUID, PK), `orbit_id` (UUID, NOT NULL, FK to `orbits`), `from_player_id` (UUID, NOT NULL, FK to `users`), `drop_date` (DATE, NOT NULL), `expression_key` (TEXT, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL).
+   - Constraints: Unique index on `(orbit_id, from_player_id, drop_date)`. Expression set is validated against `app_content`.
+4. **`telepathy_guesses`:** Mutual daily instinct guessing on the single designated question.
+   - Columns: `id` (UUID, PK), `orbit_id` (UUID, NOT NULL, FK to `orbits`), `drop_date` (DATE, NOT NULL), `guesser_player_id` (UUID, NOT NULL, FK to `users`), `question_id` (UUID, NOT NULL, FK to `questions`), `guessed_option_key` (TEXT, NOT NULL), `partner_option_key` (TEXT, nullable), `hit` (BOOLEAN, nullable), `baseline_p` (FLOAT, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL).
+   - Constraints: Range-partitioned by `drop_date`. Unique index on `(orbit_id, drop_date, guesser_player_id)`. 90-day retention.
+5. **`anti_twin_results`:** Asynchronously computed opposite match result per user per drop.
+   - Columns: `drop_date` (DATE, NOT NULL), `player_id` (UUID, NOT NULL, FK to `users`), `opposite_submission_ref` (UUID, NOT NULL), `differed_count` (INT, NOT NULL), `sample_size` (INT, NOT NULL), `computed_at` (TIMESTAMPTZ, NOT NULL).
+   - Constraints: Primary Key `(drop_date, player_id)`. Retention: 7 days.
+   - Privacy Invariant: Zero pick labels of the opposite player are stored in this table or returned to the client.
+
+### 16.2 Additional Configuration & Content Additions
+
+- **Table `drops` Column Addition:** `telepathy_question_id` (UUID, nullable, FK to `questions`), defaulting to the Type 1 question.
+- **`app_config` Keys Added:**
+  - `globe.batch_window_minutes` (default: 5)
+  - `globe.delay_minutes` (default: 7)
+  - `globe.k_anonymity_min` (default: 20)
+  - `globe.live_volume_min` (default: 50)
+  - `orbit.request_expiry_hours` (default: 48)
+  - `orbit.max_incoming_per_day` (default: 3)
+  - `orbit.max_active_per_player` (default: 3)
+  - `orbit.cooldown_days` (default: 30)
+  - `telepathy.min_rounds_for_sync` (default: 5)
+  - `antitwin.candidate_sample_size` (default: 2000)
+  - `antitwin.min_pool_size` (default: 200)
+- **Feature Flags Added:** `feature.globe`, `feature.orbit`, `feature.telepathy`, `feature.antitwin`.
+- **Seed Content Added in `seed/` & `app_content`:** Orbit unlock schedule (`orbit.unlock.schedule`), sticker expression set (`orbit.expressions.v1`), and Telepathy copy keys.
+- **Redis Key Role Prefixes (ADR-029 Alignment):**
+  - Cache Role (`allkeys-lru`): `cache:globe:arcs:latest`, `cache:antitwin:{dropId}:{userId}` (TTL 24h).
+  - Counters Role (`noeviction`): `counters:orbit:active:{userId}`, `counters:keeps:incoming:{userId}:{dropDate}` (TTL 48h).
 
 ---
 
@@ -405,3 +468,39 @@ In addition to core tables (`users`, `drops`, `questions`, `submissions`, `answe
 - **Context:** Finalizing 10 lakh players at 07:00 IST overlaps with the live morning drop, risking database connection starvation.
 - **Decision:** Partition the final batch into 5,000-user idempotent chunks running in a dedicated worker pool capped at 25% DB connections, publishing results progressively.
 - **Consequence:** Yesterday's recap finishes reliably by 07:10 IST without impacting today's live drop.
+
+### ADR 016: Frontend Performance & Initial Route Bundle Budget Exception
+- **Date:** 2026-11-11
+- **Owner:** Senior System Designer & SRE
+- **Context:** Play route requires React 18, Next.js 14 App Router, and Framer Motion animation engine. Together, the baseline vendor runtime is 134.2 KB gzip (React+ReactDOM 52.5 KB, Next Router 31.0 KB, Framer Motion 50.7 KB). Play UI + Radix primitives add 54.4 KB, resulting in 188.6 KB total compressed JS.
+- **Decision:** Retain the official 150 KB target budget for the play route. Formally approve a documented exception with a hard ceiling of 200 KB in `scripts/check-bundle-budget.mjs`. Future optimization will evaluate Motion `LazyMotion` / `domMax` dynamic loading to reach the 150 KB target.
+- **Consequence:** CI strictly enforces the 200 KB ceiling with zero silent increases; preserves tactile spring animations on mid-range devices while maintaining automated bundle guardrails.
+
+### ADR 037: Twin Globe Map Architecture & k-Anonymity Regional Aggregation
+- **Date:** 2026-11-14
+- **Context:** Visualizing global connections must strictly adhere to the play-route bundle budget ($\le 159.5\text{ KB}$ approved exception) and perform smoothly on mid-range Android hardware without leaking precise user locations.
+- **Decision:** Use a lightweight, static SVG world map loaded on a dedicated `/globe` route. Strictly reject 3D WebGL globes (Three.js/Cesium) and runtime tile map libraries. Enforce $k \ge 20$ aggregation before rendering country names; fall back to coarse continental macro-regions via `privacy.ts`. Arcs are batched into 5-minute windows and delayed by 5–10 minutes. Implement automatic fallback to yesterday's real replay buffer when live volume is under 50 submissions/window.
+- **Consequence:** Zero bundle impact on `/play`, 60 FPS rendering on budget mobile devices, mathematical protection against geolocation deanonymization, and zero synthetic arcs.
+
+### ADR 038: Keep & Orbit State Machine, Lexicographical Sorting & Asymmetric Privacy
+- **Date:** 2026-11-14
+- **Context:** Retaining twin connections requires durable relationship state while preserving anonymity, preventing duplicate relationship rows, and eliminating harassment or stalking vectors.
+- **Decision:** 
+  1. Mandate Google OAuth authentication prior to sending or accepting a Keep.
+  2. Enforce 1 Keep per player per Drop, available only after final batch locks (07:05 IST).
+  3. Store active Orbits in `orbits` with invariant `player_a_id < player_b_id` and a partial unique index where `status = 'active'`.
+  4. Declines are completely silent: the sender only sees "Waiting..." then "No orbit this time" after 48h expiry.
+  5. One-tap unprovoked dissolution: either party can end the Orbit immediately; partner sees neutral "This orbit has ended" with zero blame or identity attribution.
+- **Consequence:** Eliminates spam, duplicate pairs, and asymmetric stalking. Guarantees DPDP compliance and psychological safety.
+
+### ADR 039: Telepathy Mechanism, Consent-Scoped Pick Reveal & Statistical Luck Baselines
+- **Date:** 2026-11-14
+- **Context:** An instinct alignment game between Orbit partners requires revealing one pick without violating Rule 4, and scoring agreement without deceptively marketing it as "mind reading".
+- **Decision:** Exactly one designated question per Drop (low cardinality, $\le 4$ options) is selected. Each player locks in a guess only after both have completed today's Drop. Amend Rule 4: the partner's pick label for this single question is revealed to the guesser *only after their own guess is permanently locked*. Compute the true random luck baseline ($\sum [p(a)]^2$) during the final batch and display agreement honestly alongside chance. Surface the composite Sync score only after 5 completed rounds.
+- **Consequence:** Transparent, scientifically honest UX that delights users without misleading statistical claims or compromising broader privacy invariants.
+
+### ADR 040: Anti-Twin Asynchronous Bounded Sampling & Zero-Pick Exposure
+- **Date:** 2026-11-14
+- **Context:** Computing an opposite twin ("your opposite today") must not degrade the core submission hot path and must not reveal the opposite user's answer choices.
+- **Decision:** Decouple Anti-twin calculation from the submit path. Enqueue an idempotent background worker job (`ComputeAntiTwinJob`) on first visit to the Anti-twin view. Scan a bounded sample of 2,000 candidates from today's pool. Display only the number of differed questions ("You differed on N of 5"), coarse region ($k \ge 20$), and age band. Strictly never display the opposite player's pick labels.
+- **Consequence:** Core submission path latency is untouched; zero database locks on live pools; absolute adherence to zero-vector privacy standards.
