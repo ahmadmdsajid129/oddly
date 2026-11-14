@@ -12,3 +12,7 @@ Before any UI change read `design.md`; use only `@oddly/ui-tokens`; follow the s
 - **Strict Token Imports:** No hex literals outside `packages/ui-tokens`.
 - **Minimum Touch Targets:** $\ge 44 \times 44\text{ px}$ for all interactive elements.
 
+## Admin Panel Engineering Rule
+
+Admin work: read `docs/admin-panel-spec.md` first. It is the authoritative description of what to build in Phase 11.
+
