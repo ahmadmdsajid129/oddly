@@ -261,6 +261,123 @@ The shared image must work without the flip:
 
 ---
 
+## 12A. Detailed Design Specifications for Connection Features (F18 to F21)
+
+All components strictly use existing `@oddly/ui-tokens` constants, 4 approved radii (`sm: 8px`, `m: 14px`, `l: 20px`, `pill: 9999px`), hard sticker shadows (`shadow-sticker`: `4px 4px 0 #14123A`), and Bricolage Grotesque / Inter typography. No new colors or blur shadows.
+
+### 12A.1 Keep & Orbit Surfaces
+
+1. **"Keep this twin" Button:**
+   - **Placements:** Card back (below pick matches) and Recap Screen (`/recap`).
+   - **Styling:** Secondary sticker button (`bg-paper text-ink border-[2.5px] border-ink shadow-sticker rounded-m min-h-[48px] px-6 font-display font-extrabold text-button`). Hover: `shadow-sticker-lift -translate-x-[2px] -translate-y-[2px]`. Active: `shadow-sticker-flat translate-x-[4px] translate-y-[4px]`.
+   - **States:**
+     - *Default:* `app_content: "orbit.action.keep"` ("Keep this twin") with small violet heart icon (`stroke-[2.5]`).
+     - *Pending / Sent:* `bg-lavender text-ink opacity-90` ("Waiting for twin...") with clock icon.
+     - *Accepted / Active:* `bg-mint text-ink` ("In Orbit") with check badge.
+     - *Disabled (Expired / Already at Cap):* `bg-paper text-muted border-ink/40 opacity-60 cursor-not-allowed`.
+
+2. **Orbit Request Card (Incoming Sheet / Notification):**
+   - **Layout:** Paper sticker card (`bg-paper border-[2.5px] border-ink shadow-sticker rounded-l p-5 space-y-4 max-w-sm mx-auto`).
+   - **Header:** Chip badge (`bg-lavender text-ink border-[1.5px] border-ink rounded-pill px-3 py-0.5 text-chip font-bold`) reading "Orbit Request".
+   - **Body:** Coarse location pill (e.g. "Someone in Western Europe"), age band (e.g. "25 to 34"), and match summary ("Matched 4 of 5 picks with you today").
+   - **Actions:** Two buttons side-by-side:
+     - Primary: "Accept" (`Button variant="primary" bg-violet text-paper flex-1 min-h-[44px]`).
+     - Secondary: "Not now" (`Button variant="secondary" bg-paper text-ink flex-1 min-h-[44px]`).
+
+3. **Orbit List Row (`/me` and Orbit Drawer):**
+   - **Structure:** 64px tall sticker row (`bg-paper border-[2.5px] border-ink shadow-sticker rounded-m p-3 flex items-center justify-between gap-3`).
+   - **Avatar:** 44px circle with ink border (`bg-lavender border-[2px] border-ink flex items-center justify-center`). Renders a procedural 2-color geometric glyph derived from the pair's shared picks.
+   - **Identity:** Anonymous title (`font-display font-bold text-base text-ink`: "Twin #382") and subtitle (`text-caption text-muted`: "Western Germany • 25-34").
+   - **Badges:**
+     - Co-streak chip (`bg-coral text-ink border-[1.5px] border-ink rounded-pill px-2.5 py-0.5 text-chip font-bold flex items-center gap-1`): flame icon + tabular number ("5d").
+     - Next unlock chip (`bg-lavender text-ink border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-caption font-bold`): "Next: Day 7".
+
+4. **Orbit Detail Screen (`/orbit/:id`):**
+   - **Header:** Sticky cream bar with back arrow button ($\ge 44\text{px}$) and "End Orbit" quiet kebab option.
+   - **Milestone Progress Track:** 5-dot horizontal progress bar:
+     - Day 1 (Globe Line), Day 3 (Pick Overlap), Day 7 (Telepathy Sync), Day 14 (Orbit Card), Day 30 (Anniversary Badge).
+     - Completed dots: `w-6 h-6 rounded-pill bg-mint border-[2px] border-ink text-ink flex items-center justify-center text-xs font-bold` with check icon.
+     - Current dot: `w-7 h-7 rounded-pill bg-sun border-[2.5px] border-ink shadow-sticker-sm`.
+     - Future dots: `w-5 h-5 rounded-pill bg-paper border-[1.5px] border-ink/40`.
+   - **Co-Streak Display:** Central paper sticker card displaying current streak with celebratory flame graphic and honest zero-pressure subtitle: "Picks aligned for 4 consecutive drops".
+   - **Expression Sticker Picker (The Wave):**
+     - Horizontal sticker tray of 6 curated stickers: Wave (`👋`), Sparkles (`✨`), Heart (`💜`), High-Five (`🙌`), Coffee (`☕`), Thinking (`🤔`).
+     - 48px square buttons with `shadow-sticker` that press flat on tap.
+     - If already sent today: Tray shows "Sent today • Refreshes at 07:00 IST" with countdown.
+
+5. **End Orbit Modal:**
+   - Neutral dialog (`ResponsiveDialog`): Title "End this orbit?", Body "You and Twin #382 will be disconnected. Neither of you will see each other's updates.", Primary destructive button "End Orbit" (`bg-error text-paper min-h-[44px]`), Cancel button (`min-h-[44px]`).
+
+---
+
+### 12A.2 Twin Globe Screen (`/globe`)
+
+1. **Map Canvas:**
+   - Background: `bg-cream`.
+   - World Vector: Flat dotted SVG map rendered with `bg-lavender` landmass outlines and `ink` coordinate grid dots at 2px. Strictly zero WebGL or canvas dependencies.
+   - Arcs: 2.5px SVG quadratic bezier curves connecting macro-regions. Normal arcs: `stroke-mint opacity-70` with stroke-width 2px. Your Orbit arcs: `stroke-violet opacity-100` with 2.5px ink outline stroke.
+   - Pins: 44px circular hit targets with centered 8px visible dot (`bg-violet border-[2px] border-ink` for user, `bg-coral border-[2px] border-ink` for active Orbit partner).
+
+2. **Live / Replay Status Pill:**
+   - Placed top-center:
+     - *Live:* `bg-paper border-[1.5px] border-ink rounded-pill px-3 py-1 flex items-center gap-2 shadow-sm text-chip font-bold text-ink`. Includes pulsing 8px green dot (`bg-mint rounded-pill border border-ink animate-pulse`). Text: "Live matches".
+     - *Replay:* `bg-lavender border-[1.5px] border-ink rounded-pill px-3 py-1 flex items-center gap-2 shadow-sm text-chip font-bold text-ink`. Text: "Replay of yesterday's twins".
+
+3. **Empty & Degraded States:**
+   - *Low volume (< 50/window):* Smoothly fades in the replay buffer with subtle status transition: "Quiet right now. Replaying yesterday's twins."
+   - *Level L2/L3:* Arcs freeze into static dot network with badge: "Globe paused while servers are busy. Your game is active."
+
+---
+
+### 12A.3 Telepathy Surfaces
+
+1. **Guess Screen:**
+   - Rendered inside the Orbit detail view once both players have completed today's Drop.
+   - Question Prompt: Display font (`text-xl font-extrabold text-ink tracking-tight`).
+   - Options: 2 to 4 `OptionRow` stickers (`bg-paper border-[2.5px] border-ink shadow-sticker min-h-[56px] rounded-m`).
+   - Action: "Lock in guess" button (`Button variant="primary" w-full min-h-[48px]`).
+
+2. **Result Pair of Stickers:**
+   - Once locked, reveals two side-by-side sticker cards:
+     - Card A: "Your Guess" (`bg-paper border-[2px] border-ink rounded-m p-3 text-center`).
+     - Card B: "Their Pick" (`bg-paper border-[2px] border-ink rounded-m p-3 text-center`).
+   - Match Indicator:
+     - *Match:* `bg-mint text-ink border-[2px] border-ink rounded-pill px-3 py-1 font-bold text-sm flex items-center justify-center gap-1.5`. Icon: Checkmark (`✓`).
+     - *Miss:* `bg-coral text-ink border-[2px] border-ink rounded-pill px-3 py-1 font-bold text-sm flex items-center justify-center gap-1.5`. Icon: Circle with slash (`⊘`). (Different shape and icon; never differentiated by color alone).
+   - Baseline Caption: Displayed below stickers in `text-caption font-medium text-muted`: "Strangers agree 32% of the time on this question. You two agreed today!"
+   - Sync Score: Appears after 5 rounds as a radial pill badge (`bg-sun text-ink border-[2px] border-ink rounded-pill px-4 py-1.5 font-display font-bold text-base`).
+
+---
+
+### 12A.4 Anti-Twin Surfaces
+
+1. **Anti-Twin Result Card:**
+   - Follows the identical 210:290 aspect ratio as the Twin share card.
+   - Header: Coral accent badge (`bg-coral text-ink border-[1.5px] border-ink rounded-pill px-3 py-1 text-chip font-bold`): "Your Opposite Today".
+   - Hero Number: Large Bricolage Grotesque display: "Differed on 4 of 5" (`display-xl` font size).
+   - Location: Coarse region and age band pill (`bg-paper border-[1.5px] border-ink text-ink font-bold text-sm px-3 py-1 rounded-pill`).
+   - Breakdown: Displays which of **your own** questions differed (e.g. "Q1, Q2, Q4, Q5"), accompanied by kind copy: "Picks completely in sync on question 3. Different instincts make the world interesting." Strictly zero pick labels of the other user are exposed.
+   - Sampling note: `text-caption text-muted text-center`: "Sampled from 2,000 players today."
+
+2. **Anti-Twin Share Card Export (Satori):**
+   - Same flip card anatomy.
+   - Front: Coral accent header ("Opposite Today"), large display text, coarse location, warm cream desk background.
+   - Back: Sealed coral back with brand mark.
+
+---
+
+### 12A.5 Accessibility & Motion Standards
+
+1. **Touch Targets:** Every interactive element (pins, buttons, sticker cells, expression icons, close buttons) is strictly $\ge 44 \times 44\text{ px}$.
+2. **Focus Rings:** Double-ring focus visible utility (`2px solid #FFF8F0` inner offset + `2px solid #6C4CF1` outer) applied to all keyboard focus states.
+3. **Reduced Motion:** When `prefers-reduced-motion: reduce` is detected:
+   - Globe arcs do not animate; rendered as static lines.
+   - Glowing Orbit lines use a static solid stroke rather than opacity pulsing.
+   - Card flip uses instant cross-fade instead of 3D rotation.
+4. **ARIA Live Regions:** Screen reader announcements via `aria-live="polite"` for Orbit request status updates, expression receipts, and Telepathy guess reveals.
+
+---
+
 # PART B: STAGE D1: UI REDESIGN PROMPT
 
 ## 13. Instructions to the agent
@@ -371,4 +488,5 @@ Write `design-d1/REPORT.md` containing: what changed per step D1.1 to D1.8, the 
 
 ## 22. Change log
 
+- 2026-11-14: v1.1. Added Section 12A (detailed design specifications for F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin, touch targets, accessibility, and Satori share faces). Reconciled core color tokens: verified `packages/ui-tokens` matches Section 2.1 WCAG AA palette (`#3DDBB0` mint, `#FF6B5E` coral, `#FFD23F` sun, `#EEEAFE` lavender).
 - 2026-11-14: v1.0. Sticker pop direction chosen by the owner. Palette, type, buttons, flip card, and D1 redesign stage defined.
