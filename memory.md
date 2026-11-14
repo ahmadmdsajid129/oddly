@@ -9,14 +9,43 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage D1: Full UI Redesign (Sticker Pop) — COMPLETE.
-- **Current Target:** Stage D1 complete and verified; awaiting Founder review to proceed to Stage D2 / next stage.
+- **Current Stage:** Stage F0: New Features Analysis & Documentation — COMPLETE.
+- **Current Target:** Stage F0 complete and verified; awaiting Founder review and authorization to proceed to Stage F1 (Phase 10A: Orbit Foundation).
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage F0 (New Features Analysis & Documentation) is COMPLETE & VERIFIED:**
+    1. **Founder Scope Decisions Codified:**
+       - **F18 (Twin Globe):** Approved for v1. Flat SVG map on `/globe`, regional k-anonymity ($k \ge 20$), Live/Replay modes, zero synthetic arcs, zero 3D libraries.
+       - **F19 (Keep & Orbit):** Approved for v1. Mutual opt-in on locked final twin, Google sign-in required, 3 active Orbits max, 48h expiry, 30-day cooldown, 6-sticker tray (The Wave), quiet co-streaks with zero guilt copy, staged unlocks.
+       - **F20 (Telepathy):** Approved for v1. Exactly 1 designated $\le 4$ options question per Drop, guess lock-in before reveal, partner pick reveal exception (Rule 4), statistical luck baseline ($\sum [p(a)]^2$), Sync score after 5 rounds.
+       - **F21 (Anti-Twin):** Approved for v1. Asynchronous background worker job (`ComputeAntiTwinJob`), bounded 2,000 candidate sample off submit path, differed count + own breakdown, zero opposite picks exposed, graceful hide if < 200 players.
+       - **F22 (Oddly Deck):** Documented only for v1.5. Collectible cards from picks using token palette only.
+       - **F23 (Friend-Invite Orbit):** Documented only for v1.5. Private invite link reusing Orbit tables (`kind = 'friend'`), unified with F11 Friends Compare.
+       - **Not Planned Non-Goals:** Handle swap, DMs, external contact exchange recorded as permanently Not Planned.
+       - **F12 Wave:** Superseded by F19 (the 6-sticker tray inside an Orbit is the Wave).
+    2. **Rule & Governance Amendments:**
+       - Rule 4: Added consent-scoped exception for active Orbit Telepathy question.
+       - Rule 6: Recorded approval of F18–F21 for v1 and F22–F23 for v1.5.
+       - Section 3: Added prohibition against pressuring Orbit partners (no guilt or nagging copy); corrected font reference to Bricolage Grotesque and Inter.
+    3. **Architecture & Technical Hardening:**
+       - Per-Route Policy table updated with 11 new endpoints (`/v1/keeps*`, `/v1/orbits*`, `/v1/globe`, `/v1/results/:dropId/anti-twin`).
+       - Degradation ladder L0–L4 updated with connection feature shed priorities (Keep/Orbit priority 5; Globe/Anti-twin priority 7).
+       - Schema entities added to `architecture.md`: `twin_keeps`, `orbits`, `orbit_expressions`, `telepathy_guesses`, `anti_twin_results`.
+       - ADRs defined: ADR-037 (Twin Globe), ADR-038 (Keep & Orbit), ADR-039 (Telepathy), ADR-040 (Anti-Twin).
+       - Capacity model addendum created: verified ~84 MB/day DB growth and ~58 MB Redis footprint at 10 lakh DAU.
+    4. **Mission Control Admin Spec Pinned:**
+       - Full verbatim copy of `admin-panel.md` placed in `docs/admin-panel-spec.md`.
+       - Phase 11 expanded to 25 tasks (P11.01 to P11.25) with spec cross-references.
+       - Phase 11 deferred list (P2/P3) codified.
+       - Admin reading invariant added to `README.md`, `task.md`, and `AGENTS.md`.
+    5. **Design System & Token Drift Reconciled:**
+       - Section 12A added to `design.md` detailing surfaces for Keep, Orbit, Globe, Telepathy, and Anti-twin.
+       - Reconciled tokens: `packages/ui-tokens` matches `design.md` Section 2.1 WCAG AA palette (`#3DDBB0` mint, `#FF6B5E` coral, `#FFD23F` sun, `#EEEAFE` lavender).
+    6. **Zero Code Rule Enforced:** Zero application code, zero migrations, zero dependencies modified in Stage F0.
   - **Stage D1 (Full UI Redesign - Sticker Pop) is COMPLETE & VERIFIED:**
     1. **Design System & Tokens (D1.1):** `@oddly/ui-tokens` implements 11 core tokens (`ink` `#14123A`, `cream` `#FFF8F0`, `paper` `#FFFFFF`, `violet` `#6C4CF1`, `lavender` `#E5DEFF`, `coral` `#FF6B4A`, `mint` `#2EC4B6`, `sun` `#FFD166`, `muted` `#6E6A8A`, `lilac` `#D4BBFF`, `error` `#E63946`), 4 approved radii (`sm: 8px`, `m: 14px`, `l: 20px`, `pill: 9999px`), hard offset sticker shadows with 0 blur, and full WCAG AA contrast verification suite (`contrast.test.ts`: 13/13 passing).
     2. **Typography & Atmosphere (D1.2):** Self-hosted Bricolage Grotesque (700, 800) and Inter (400, 500, 600) via `next/font/google`. Warm cream desk root (`#FFF8F0`), double focus-visible ring, sticker-press utilities, 3D flip card transforms.
@@ -638,9 +667,76 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
      - Bundle exception (159.5 KB initial play route JS) is APPROVED for v1, to be revisited after launch.
      - Recorded in `scripts/check-bundle-budget.mjs` and verified with passing build budget guard.
 
+### ADR-037: Twin Globe Map Architecture & k-Anonymity Regional Aggregation
+- **Date:** 2026-11-14
+- **Context:** Visualizing global connections must strictly adhere to the play-route bundle budget ($\le 159.5\text{ KB}$) and perform smoothly on mid-range Android hardware without leaking precise user locations.
+- **Decision:** Use a lightweight, static SVG world map loaded on a dedicated `/globe` route. Strictly reject 3D WebGL globes (Three.js/Cesium) and runtime tile map libraries. Enforce $k \ge 20$ aggregation before rendering country names; fall back to coarse continental macro-regions via `privacy.ts`. Arcs are batched into 5-minute windows and delayed by 5–10 minutes. Implement automatic fallback to yesterday's real replay buffer when live volume is under 50 submissions/window.
+- **Consequence:** Zero bundle impact on `/play`, 60 FPS rendering on budget mobile devices, mathematical protection against geolocation deanonymization, and zero synthetic arcs.
+
+### ADR-038: Keep & Orbit State Machine, Lexicographical Sorting & Asymmetric Privacy
+- **Date:** 2026-11-14
+- **Context:** Retaining twin connections requires durable relationship state while preserving anonymity, preventing duplicate relationship rows, and eliminating harassment or stalking vectors.
+- **Decision:** 
+  1. Mandate Google OAuth authentication prior to sending or accepting a Keep.
+  2. Enforce 1 Keep per player per Drop, available only after final batch locks (07:05 IST).
+  3. Store active Orbits in `orbits` with invariant `player_a_id < player_b_id` and a partial unique index where `status = 'active'`.
+  4. Declines are completely silent: the sender only sees "Waiting..." then "No orbit this time" after 48h expiry.
+  5. One-tap unprovoked dissolution: either party can end the Orbit immediately; partner sees neutral "This orbit has ended" with zero blame or identity attribution.
+- **Consequence:** Eliminates spam, duplicate pairs, and asymmetric stalking. Guarantees DPDP compliance and psychological safety.
+
+### ADR-039: Telepathy Mechanism, Consent-Scoped Pick Reveal & Statistical Luck Baselines
+- **Date:** 2026-11-14
+- **Context:** An instinct alignment game between Orbit partners requires revealing one pick without violating Rule 4, and scoring agreement without deceptively marketing it as "mind reading".
+- **Decision:** Exactly one designated question per Drop (low cardinality, $\le 4$ options) is selected. Each player locks in a guess only after both have completed today's Drop. Amend Rule 4: the partner's pick label for this single question is revealed to the guesser *only after their own guess is permanently locked*. Compute the true random luck baseline ($\sum [p(a)]^2$) during the final batch and display agreement honestly alongside chance. Surface the composite Sync score only after 5 completed rounds.
+- **Consequence:** Transparent, scientifically honest UX that delights users without misleading statistical claims or compromising broader privacy invariants.
+
+### ADR-040: Anti-Twin Asynchronous Bounded Sampling & Zero-Pick Exposure
+- **Date:** 2026-11-14
+- **Context:** Computing an opposite twin ("your opposite today") must not degrade the core submission hot path and must not reveal the opposite user's answer choices.
+- **Decision:** Decouple Anti-twin calculation from the submit path. Enqueue an idempotent background worker job (`ComputeAntiTwinJob`) on first visit to the Anti-twin view. Scan a bounded sample of 2,000 candidates from today's pool. Display only the number of differed questions ("You differed on N of 5"), coarse region ($k \ge 20$), and age band. Strictly never display the opposite player's pick labels.
+- **Consequence:** Core submission path latency is untouched; zero database locks on live pools; absolute adherence to zero-vector privacy standards.
+
 ---
 
-## 16. Next Steps
+## 16. Stage F0 Analysis & Decisions Log
 
-1. **Stage R2-PATCH-3 Review:** Founder reviews Stage Report and verification artifacts.
-2. **Proceed to Stage 11:** Admin Question Tool & Dynamic Content Importer (`apps/admin`, dynamic question ingestion, cache invalidation hook, CMS content management).
+### 16.1 Approved Feature Invariants (Founder Scope Authorization 2026-11-14)
+- **F18 Twin Globe:** Build in v1. Static SVG map, k-anonymity region arcs ($k \ge 20$), Live/Replay mode, 4th tab.
+- **F19 Keep & Orbit:** Build in v1. 1 Keep per drop on final twin, Google sign-in required, 3 Orbit cap, 48h expiry, 30-day cooldown, 6-sticker tray (The Wave), quiet co-streaks, staged unlocks.
+- **F20 Telepathy:** Build in v1. Exactly 1 designated $\le 4$ options question per drop, guess lock-in before reveal, partner pick reveal exception (Rule 4), luck baseline ($\sum [p(a)]^2$), Sync score after 5 rounds.
+- **F21 Anti-Twin:** Build in v1. Bounded 2,000 candidate sample off submit path, differed count + own breakdown, zero opposite picks exposed, hide if < 200 players.
+- **F22 Oddly Deck:** Documented only for v1.5. Collectible procedural cards from picks using token palette only.
+- **F23 Friend-Invite Orbit:** Documented only for v1.5. Private invite link reusing Orbit tables (`kind = 'friend'`), unified with F11 Friends Compare.
+- **Permanently Not Planned:** Handle swaps, DMs, contact exchange recorded in Non-Goals.
+- **F12 Wave:** Superseded by F19 (the 6-sticker tray inside an Orbit is the Wave).
+
+### 16.2 Open Questions for the Founder (with Recommended Defaults)
+1. **Globe Navigation Tab Placement:**  
+   - *Question:* Should the Twin Globe reside as a 4th tab in the bottom bar ("Today", "Globe", "History", "Me") or remain nested as an exploration card within the Today screen?  
+   - *Recommendation:* **4th tab in the bottom bar** (as specified in F0). It establishes spatial presence and gives returning players a quick visual reason to visit even after finishing their five picks.
+2. **Orbit Ceiling (3 Active Orbits):**  
+   - *Question:* Is a fixed cap of 3 active Orbits per player optimal, or should it expand with streak milestones (e.g. +1 slot at 30-day streak)?  
+   - *Recommendation:* **Fixed at 3 for v1.0**. Keeps relationship maintenance lightweight, avoids cognitive overload, and prevents social accumulation. Revisit in v1.5.
+3. **Keep Request Expiry Window (48 Hours):**  
+   - *Question:* Is 48 hours optimal for incoming Keep requests to expire silently, or should it match the 24-hour Drop window?  
+   - *Recommendation:* **48 hours**. Players often open the app every other day or in the evening; 48 hours gives the recipient a fair window to notice and accept without feeling rushed.
+4. **Staged Unlock Schedule (Days 1, 3, 7, 14, 30):**  
+   - *Question:* Is the 5-milestone schedule (Day 1 Globe line, Day 3 Pick overlap, Day 7 Sync, Day 14 Share card, Day 30 Anniversary badge) approved?  
+   - *Recommendation:* **Approved as data in `app_content`**. Storing the unlock schedule as JSON in `app_content` allows tuning without code changes.
+5. **Google Sign-In Requirement for Orbit:**  
+   - *Question:* Should guest users be required to sign in with Google to send or accept a Keep?  
+   - *Recommendation:* **Yes, mandatory Google sign-in**. A durable multi-day connection cannot survive a guest clearing their mobile browser storage or switching devices. Guests see the soft sign-in modal with Orbit-specific value copy.
+
+### 16.3 Mismatches Identified Between Admin Spec and Existing Phase 11 Tasks
+- **Panel Testing Tool (`P11.06`):** In `docs/admin-panel-spec.md` Section 6.4 and Section 19, the external panel-testing tool (generating private links for 100+ testers with live entropy feedback) is categorized as **[P2]** (v1.1+), whereas the original `task.md` listed `P11.06` in Stage 11.  
+  *Recommendation:* In Stage 11 (Phase 1), implement automated predictive checks on question structure and balance; defer the multi-tester external panel link generator to Phase 2 as the spec dictates.
+- **Stage Ordering Invariant:** Admin spec Section 7 ("Matching, Globe, Orbit, Anti-twin and Deck ops") directly relies on the backend tables and metrics created in Stages F1 to F4. Therefore, **Stage 11 must be built AFTER Stage F4**.
+
+---
+
+## 17. Next Steps
+
+> **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**
+
+1. **Founder Review:** Founder reviews Stage F0 Report (`docs/stage-F0-report.md`) and resolves open questions.
+2. **Proceed to Stage F1:** Upon Founder instruction *"proceed to Stage F1"*, begin Phase 10A (Orbit Foundation backend: migrations, repositories, Keep/Orbit API, push channel, tests).
