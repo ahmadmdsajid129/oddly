@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { OptionRow } from "@/components/ui/OptionRow";
+import { colors } from "@oddly/ui-tokens";
 import { Chip, TierBadge } from "@/components/ui/Card";
 import { Input, Checkbox, Toggle } from "@/components/ui/FormControls";
 import { ProgressDots, Skeleton } from "@/components/ui/FeedbackPrimitives";
@@ -25,7 +26,7 @@ export default function DevUiGallery() {
   // State for interactive gallery controls
   const [selectedOption, setSelectedOption] = useState<string>("opt-2");
   const [pickedNumber, setPickedNumber] = useState<number>(27);
-  const [selectedColor, setSelectedColor] = useState<string>("#3DDBB0");
+  const [selectedColor, setSelectedColor] = useState<string>(colors.mint);
   const [selectedImage, setSelectedImage] = useState<string>("img-1");
   const [selectedWord, setSelectedWord] = useState<string>("Cozy");
   const [activeProgress, setActiveProgress] = useState<number>(3);

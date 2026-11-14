@@ -11,7 +11,6 @@ import { Countdown } from "@/components/ui/Countdown";
 import { Skeleton } from "@/components/ui/FeedbackPrimitives";
 import { StreakFlame } from "@/components/ui/StreakFlame";
 import { PwaInstallButton } from "@/components/ui/PwaInstallButton";
-import { useTheme } from "@/components/ui/ThemeProvider";
 import { useToast } from "@/components/ui/Toast";
 import { feedback } from "@/lib/feedback";
 import { api } from "@/lib/api";
@@ -157,7 +156,6 @@ interface StoredPlayResult {
 
 export default function HomePage() {
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const auth = useAuth();
   const isOnline = useNetworkStatus();

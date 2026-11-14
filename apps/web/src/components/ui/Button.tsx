@@ -82,9 +82,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost:
         "bg-transparent text-violet border-none shadow-none hover:underline focus:underline min-h-[44px] px-2",
       danger:
-        "bg-paper text-error border-[2.5px] border-error shadow-[4px_4px_0_#D92D4B]",
+        "bg-paper text-error border-[2.5px] border-error shadow-[4px_4px_0_var(--color-error)]",
       destructive:
-        "bg-paper text-error border-[2.5px] border-error shadow-[4px_4px_0_#D92D4B]",
+        "bg-paper text-error border-[2.5px] border-error shadow-[4px_4px_0_var(--color-error)]",
       success:
         "bg-mint text-ink border-[2.5px] border-ink shadow-sticker",
       icon:

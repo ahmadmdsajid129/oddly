@@ -23,7 +23,7 @@ describe("Stage 8: Web Frontend Settings, Streaks & Privacy (P8.02, P8.04, P8.08
       );
 
       expect(html).toContain("7");
-      expect(html).toContain("text-flame");
+      expect(html).toContain("bg-coral");
       expect(html).toContain("7 day streak");
     });
 
@@ -35,7 +35,7 @@ describe("Stage 8: Web Frontend Settings, Streaks & Privacy (P8.02, P8.04, P8.08
       );
 
       expect(html).toContain("0");
-      expect(html).toContain("text-text-muted");
+      expect(html).toContain("text-muted");
     });
   });
 

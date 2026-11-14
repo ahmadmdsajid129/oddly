@@ -55,7 +55,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
   };
 
   return (
-    <ResponsiveDialog open={isOpen} onOpenChange={handleOpenChange}>
+    <ResponsiveDialog open={isOpen} onOpenChange={handleOpenChange} title="Sign in to Oddly">
       <div className="flex flex-col items-center text-center px-2 py-4">
         {/* Brand Rings */}
         <div className="flex items-center justify-center -space-x-3 mb-5">

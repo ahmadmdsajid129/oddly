@@ -232,6 +232,7 @@ export function QuestionScreen({
                 variant="primary"
                 size="lg"
                 className="w-full"
+                aria-label="Confirm Number"
                 onClick={() => {
                   const finalNum =
                     currentAnswer?.type === "number"

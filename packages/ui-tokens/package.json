@@ -7,7 +7,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "node --import ../../packages/shared/node_modules/tsx/dist/loader.mjs --test src/contrast.test.ts",
+    "test": "node --import ../../packages/shared/node_modules/tsx/dist/loader.mjs --test src/contrast.test.ts src/guard-rails.test.ts",
     "test:integration": "echo \"ui-tokens: no tests\"",
     "make-icons": "node --import ../../packages/shared/node_modules/tsx/dist/loader.mjs scripts/make-icons.ts"
   },
