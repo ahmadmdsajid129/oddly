@@ -2,11 +2,14 @@
  * @file sw.js
  * @package @oddly/web
  *
- * Oddly Service Worker (P10.01, P10.03, P10.04).
- * Provides offline caching, network fallbacks to /offline, and handles Web Push notifications.
+ * Oddly Service Worker (P10.01, P10.03, P10.04, R2.7).
+ * Provides versioned offline caching, network fallbacks to /offline,
+ * cache busting on activation, and Web Push notifications.
+ * Explicitly bypasses caching for any personalized API responses.
  */
 
-const CACHE_NAME = "oddly-v1-static";
+const BUILD_VERSION = "oddly-v1.0.0-20261111";
+const CACHE_NAME = `oddly-static-${BUILD_VERSION}`;
 const PRECACHE_ASSETS = ["/", "/offline", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -26,6 +29,7 @@ self.addEventListener("activate", (event) => {
       Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log("[SW] Deleting stale cache bucket:", key);
             return caches.delete(key);
           }
         })
@@ -36,7 +40,22 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Navigation requests: Network-first with /offline fallback
+  const url = new URL(event.request.url);
+
+  // 1. Strictly bypass service worker caching for personalised/sensitive APIs (R2.7)
+  if (
+    url.pathname.startsWith("/v1/results") ||
+    url.pathname.startsWith("/v1/me") ||
+    url.pathname.startsWith("/v1/history") ||
+    url.pathname.startsWith("/v1/submissions") ||
+    url.pathname.startsWith("/v1/identity") ||
+    url.pathname.startsWith("/v1/auth") ||
+    url.pathname.startsWith("/v1/push")
+  ) {
+    return; // Pass through to network directly, never cache in SW
+  }
+
+  // 2. Navigation requests: Network-first with /offline fallback
   if (event.request.mode === "navigate") {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -46,9 +65,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets: Cache-first / Stale-While-Revalidate
-  const url = new URL(event.request.url);
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.match(/\.(png|jpg|svg|css|woff2)$/)) {
+  // 3. Static assets & question illustrations: Cache-first / Stale-While-Revalidate
+  if (
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname.startsWith("/illustrations/") ||
+    url.pathname.match(/\.(png|jpg|jpeg|svg|webp|css|woff2)$/)
+  ) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached;

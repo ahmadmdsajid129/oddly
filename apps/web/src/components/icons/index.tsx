@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
-import confetti from "canvas-confetti";
+import { colors } from "@oddly/ui-tokens";
 
 /**
  * BrandMark: "Two circles, one overlap"
  * Violet circle left, Coral circle right, luminous Mint overlap center.
+ * Tactile Sticker Pop: Ink outlines, pure token fills.
  */
 export function BrandMark({ size = 32, className = "" }: { size?: number; className?: string }) {
   const height = Math.round((size * 24) / 36);
@@ -19,11 +20,13 @@ export function BrandMark({ size = 32, className = "" }: { size?: number; classN
       className={className}
       aria-label="Oddly brand mark"
     >
-      <circle cx="12" cy="12" r="10" fill="#8B72FF" fillOpacity="0.85" />
-      <circle cx="24" cy="12" r="10" fill="#FF8176" fillOpacity="0.85" />
+      <circle cx="12" cy="12" r="10" fill={colors.violet} stroke={colors.ink} strokeWidth="1.5" />
+      <circle cx="24" cy="12" r="10" fill={colors.coral} fillOpacity="0.9" stroke={colors.ink} strokeWidth="1.5" />
       <path
         d="M18 4.2C15.9 6.2 14.6 8.9 14.6 12C14.6 15.1 15.9 17.8 18 19.8C20.1 17.8 21.4 15.1 21.4 12C21.4 8.9 20.1 6.2 18 4.2Z"
-        fill="#3DDBB0"
+        fill={colors.mint}
+        stroke={colors.ink}
+        strokeWidth="1.5"
       />
     </svg>
   );
@@ -45,18 +48,20 @@ export function StreakFlame({ size = 24, className = "" }: { size?: number; clas
     >
       <defs>
         <linearGradient id="oddly-flame-grad" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#FFD23F" />
-          <stop offset="50%" stopColor="#FF8176" />
-          <stop offset="100%" stopColor="#6C4CF1" />
+          <stop offset="0%" stopColor={colors.sun} />
+          <stop offset="50%" stopColor={colors.coral} />
+          <stop offset="100%" stopColor={colors.violet} />
         </linearGradient>
       </defs>
       <path
         d="M12 2C10.5 5 7.5 7.5 7.5 11C7.5 8.5 6 9.5 5 11C4 12.5 3 14.5 3 17C3 20.3 6 22 12 22C18 22 21 20.3 21 17C21 13 18.5 9 14.5 7C14.5 9 13.5 10 12 10C12 7.5 13 4.5 12 2Z"
         fill="url(#oddly-flame-grad)"
+        stroke={colors.ink}
+        strokeWidth="1.5"
       />
       <path
         d="M12 13C10.5 14.5 10 16 10 17.5C10 19.4 11.1 20.5 12 20.5C12.9 20.5 14 19.4 14 17.5C14 16 13.5 14.5 12 13Z"
-        fill="#FFF8F0"
+        fill={colors.cream}
         fillOpacity="0.8"
       />
     </svg>
@@ -106,38 +111,12 @@ export function MythicBadge({ percentile }: { percentile?: number }) {
   return (
     <span className="relative inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider shadow-[0_0_28px_rgba(139,114,255,0.6)] overflow-hidden border border-white/40">
       <span className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,#8B72FF,#FF8176,#FFD23F,#3DDBB0,#8B72FF)] opacity-90 animate-spin [animation-duration:8s]" />
-      <span className="relative z-10 flex items-center gap-1.5 text-midnight font-extrabold drop-shadow-sm">
+      <span className="relative z-10 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-midnight/90 text-white font-bold">
         <span>✦ Mythic</span>
-        {typeof percentile === "number" && <span className="font-mono">{percentile.toFixed(1)}%</span>}
+        {typeof percentile === "number" && <span className="font-mono text-mint font-semibold">{percentile.toFixed(1)}%</span>}
       </span>
     </span>
   );
 }
 
-/**
- * Trigger celebration confetti for high match scores (4/5, 5/5) and streak milestones
- */
-export function fireConfetti() {
-  if (typeof window === "undefined") return;
-
-  const count = 120;
-  const defaults = {
-    origin: { y: 0.65 },
-    colors: ["#6C4CF1", "#FF6B5E", "#3DDBB0", "#FFD23F", "#FFFFFF"],
-    disableForReducedMotion: true,
-  };
-
-  confetti({
-    ...defaults,
-    particleCount: Math.floor(count * 0.6),
-    spread: 60,
-  });
-
-  confetti({
-    ...defaults,
-    particleCount: Math.floor(count * 0.4),
-    spread: 100,
-    decay: 0.91,
-    scalar: 1.2,
-  });
-}
+export { fireConfetti } from "@/lib/confetti";

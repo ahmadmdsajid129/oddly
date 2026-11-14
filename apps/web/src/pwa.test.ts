@@ -61,18 +61,38 @@ describe("Stage 10: PWA & Push Client (P10.01, P10.02, P10.08, P10.10)", () => {
       expect(config.short_name?.toLowerCase()).toBe("oddly");
       expect(config.start_url).toBe("/");
       expect(config.display).toBe("standalone");
-      expect(config.background_color).toBe("#0E0C28");
-      expect(config.theme_color).toBe("#14123A");
+      expect(config.background_color).toBe("#FFF8F0");
+      expect(config.theme_color).toBe("#6C4CF1");
     });
 
-    it("should include 192x192 and 512x512 icons", () => {
+    it("should include 192x192, 512x512, and maskable icons, and all files exist on disk", () => {
       const config = manifest();
       expect(config.icons).toBeDefined();
-      expect(config.icons?.length).toBeGreaterThanOrEqual(2);
+      expect(config.icons?.length).toBeGreaterThanOrEqual(3);
 
       const sizes = config.icons?.map((i) => i.sizes);
       expect(sizes).toContain("192x192");
       expect(sizes).toContain("512x512");
+
+      const purposes = config.icons?.map((i) => i.purpose);
+      expect(purposes).toContain("maskable");
+
+      const fs = require("node:fs");
+      const path = require("node:path");
+      const publicDir = path.resolve(__dirname, "../public");
+      const requiredFiles = [
+        "icon-192.png",
+        "icon-512.png",
+        "icon-512-maskable.png",
+        "apple-touch-icon.png",
+        "favicon.svg",
+        "favicon-32.png",
+        "og-default.png",
+      ];
+
+      for (const file of requiredFiles) {
+        expect(fs.existsSync(path.join(publicDir, file)), `${file} must exist in public/`).toBe(true);
+      }
     });
   });
 
@@ -126,6 +146,48 @@ describe("Stage 10: PWA & Push Client (P10.01, P10.02, P10.08, P10.10)", () => {
       // @ts-ignore
       Notification.permission = "denied";
       expect(shouldShowPushPrompt()).toBe(false);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // 4. Service Worker Cache Versioning & Personalization Protection (R2.7)
+  // -------------------------------------------------------------------------
+  describe("Service Worker Policy & Cache Hygiene (R2.7)", () => {
+    it("service worker script contains build-hash versioned cache name", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const swCode = fs.readFileSync(path.resolve(process.cwd(), "public/sw.js"), "utf8");
+
+      expect(swCode).toMatch(/const BUILD_VERSION = "oddly-v1\.\d+\.\d+-\d+";/);
+      expect(swCode).toContain("const CACHE_NAME = `oddly-static-${BUILD_VERSION}`;");
+    });
+
+    it("service worker purges stale cache buckets during activation", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const swCode = fs.readFileSync(path.resolve(process.cwd(), "public/sw.js"), "utf8");
+
+      expect(swCode).toContain("caches.delete(key)");
+      expect(swCode).toContain("self.clients.claim()");
+    });
+
+    it("strictly bypasses service worker cache for personalized and sensitive endpoints", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const swCode = fs.readFileSync(path.resolve(process.cwd(), "public/sw.js"), "utf8");
+
+      const sensitiveRoutes = [
+        "/v1/results",
+        "/v1/me",
+        "/v1/history",
+        "/v1/submissions",
+        "/v1/identity",
+        "/v1/auth",
+      ];
+
+      for (const route of sensitiveRoutes) {
+        expect(swCode).toContain(`url.pathname.startsWith("${route}")`);
+      }
     });
   });
 });
