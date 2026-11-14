@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[██████████████░░░░░░] 72%`                                                     |
-| **Current Active Stage**        | **Stage D1: Full UI Redesign (Sticker Pop) (COMPLETE)**                          |
-| **Total Tasks Tracked**         | 223 tasks                                                                        |
+| **Overall Project Progress**    | `[████████████░░░░░░░░] 59%`                                                     |
+| **Current Active Stage**        | **Stage F0: New Features Analysis & Documentation (COMPLETE)**                   |
+| **Total Tasks Tracked**         | 274 tasks                                                                        |
 | **Completed Tasks (`DONE`)**    | 161 tasks (Proven by code, tests & design report)                               |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 62 tasks                                                                         |
+| **Pending (`TODO`)**            | 113 tasks                                                                        |
 
 ---
 
@@ -37,7 +37,11 @@
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | PARTIAL   | `[#########-] 92%` | 11 / 12            | Stage 8 & Stage R2    |
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#########-] 93%` | 14 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 10 & Stage R2   |
-| **Phase 11** | Admin Question Tool & Dynamic Importer      | High     | TODO      | `[----------] 0%`  | 0 / 12             | Stage 11              |
+| **Phase 10A**| Orbit Foundation (Backend)                  | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage F1              |
+| **Phase 10B**| Orbit and Globe UI                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage F2              |
+| **Phase 10C**| Telepathy (Instinct Sync)                   | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F3              |
+| **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F4              |
+| **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 25             | Stage 11 (after F4)   |
 | **Phase 12** | Observability, Telemetry & Security         | High     | PARTIAL   | `[#---------] 9%`  | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | TODO      | `[----------] 0%`  | 0 / 12             | Stage 13              |
 | **Phase 14** | Cloud Deployment & Infrastructure           | Critical | TODO      | `[----------] 0%`  | 0 / 11             | Stage 14              |
@@ -307,24 +311,127 @@ _Status: PARTIAL | Target: Web Push sender, 2-per-day cap, quiet hours, installa
 
 ---
 
-### Phase 11: Admin Tool and Dynamic Importer (Stage 11)
+### Phase 10A: Orbit Foundation (Backend) (Stage F1)
 
-_Status: TODO | Target: Bulk JSON question importer, two-person approval, buffer alerts, operational controls._
+_Status: TODO | Target: Database entities, partitions, repositories, Keep/Orbit API, state machine, co-streak pipeline, Orbit push channel, tests._
 
-| ID          | Task Description                                                                           | Priority | Status | Depends On    | Owner | Done Date | Notes                        |
-| ----------- | ------------------------------------------------------------------------------------------ | -------- | ------ | ------------- | ----- | --------- | ---------------------------- |
-| `[ ] P11.01` | Scaffold `apps/admin` Next.js application with Google SSO, allowlist, and role guards      | Critical | TODO   | P0.03, P7.01  | Agent | —         | Internal admin portal        |
-| `[ ] P11.02` | Build question library browser and polymorphic editor with live phone-sized preview        | High     | TODO   | P11.01, P2.01 | Agent | —         | Question authoring interface |
-| `[ ] P11.03` | Build bulk JSON batch importer supporting `seed/batch_001.json` format                     | Critical | TODO   | P11.01, P2.02 | Agent | —         | Core batch ingestion engine  |
-| `[ ] P11.04` | Implement batch validation engine: mix of 5 types, option counts, forbidden topics scan    | Critical | TODO   | P11.03        | Agent | —         | Content policy enforcement   |
-| `[ ] P11.05` | Implement Drop scheduling calendar with two-person approval workflow and D-2 lock          | Critical | TODO   | P11.01, P2.01 | Agent | —         | Editorial governance         |
-| `[ ] P11.06` | Build panel-testing evaluation tool computing `panel_entropy` and flagging skewed options  | High     | TODO   | P11.02        | Agent | —         | Predictive quality scoring   |
-| `[ ] P11.07` | Implement live administrative actions: pull question, extend drop window, view audit log   | High     | TODO   | P11.01, P9.09 | Agent | —         | Operational control center   |
-| `[ ] P11.08` | Implement buffer tracking dashboard: alert when approved drops remain < 14 days            | High     | TODO   | P11.05        | Agent | —         | Content pipeline health      |
-| `[ ] P11.09` | Build dynamic editors for `app_content` copy strings, `pages` markdown, and `app_config`   | High     | TODO   | P11.01, P2.10 | Agent | —         | Content management UI        |
-| `[ ] P11.10` | Write automated tests verifying batch validation rejects invalid question structures       | High     | TODO   | P11.04        | Agent | —         | Ingestion safety tests       |
-| `[ ] P11.11` | Build degradation level control panel, emergency kill switches, and DLQ viewer             | High     | TODO   | P11.07        | Agent | —         | Degradation controls (12)    |
-| `[ ] P11.12` | Build content runway buffer alert dashboard (<14d yellow, <7d red) and window extension    | High     | TODO   | P11.08        | Agent | —         | Buffer management (Sec 18)   |
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
+| `[ ] P10A.01` | Expand migrations: `twin_keeps` (partitioned by `drop_date`), `orbits`, `orbit_expressions` (partitioned)   | Critical | TODO   | P2.01, P2.02 | Agent | —         | Expand-and-contract, range partitions    |
+| `[ ] P10A.02` | Implement repositories and entity queries for Keeps, Orbits, and Expressions                                 | Critical | TODO   | P10A.01      | Agent | —         | Strict isolation; sorted pair indexing   |
+| `[ ] P10A.03` | Add `app_config` keys and feature flag `feature.orbit` with cached loader fallback                          | High     | TODO   | P3.02        | Agent | —         | Configurable caps and TTLs               |
+| `[ ] P10A.04` | Implement Keep API: `POST /v1/keeps`, `GET /v1/keeps/incoming`, `POST /v1/keeps/:id/respond`                 | Critical | TODO   | P10A.02      | Agent | —         | Single Keep/drop cap, Google Auth guard  |
+| `[ ] P10A.05` | Implement Orbit state machine: mutual acceptance, silent decline, 48h expiry, 30-day cooldown, 3-orbit cap  | Critical | TODO   | P10A.04      | Agent | —         | Anti-stalking & anti-spam invariants     |
+| `[ ] P10A.06` | Integrate co-streak computation into daily pipeline worker (consecutive Drop completions)                   | High     | TODO   | P9.01, P10A.02| Agent | —        | Quiet resets; zero guilt/nagging copy    |
+| `[ ] P10A.07` | Implement "Orbit" push notification channel (request received, accepted) respecting 2/day quiet-hour caps    | High     | TODO   | P10.04, P10A.05| Agent| —         | Templates stored in database             |
+| `[ ] P10A.08` | Implement instant unprovoked dissolution: `POST /v1/orbits/:id/end` and admin sever tool                     | Critical | TODO   | P10A.05      | Agent | —         | Safety invariant; zero blame attribution |
+| `[ ] P10A.09` | Implement DPDP deletion and export hooks purging Orbit linkages within 7 days                                | High     | TODO   | P10A.02      | Agent | —         | Compliant with DPDP Section 12           |
+| `[ ] P10A.10` | Author automated unit and integration tests for Orbit state machine, concurrency, and route policies        | High     | TODO   | P10A.05      | Agent | —         | Verified against real Docker PostgreSQL  |
+
+---
+
+### Phase 10B: Orbit and Globe UI (Stage F2)
+
+_Status: TODO | Target: "Keep this twin" UX, Orbit list/detail screens, expression sticker picker, SVG Twin Globe map, 4th tab._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
+| `[ ] P10B.01` | Add "Keep this twin" button on flip-card back and recap screen with guest soft sign-in modal                 | High     | TODO   | P10A.04, P1.01 | Agent | —       | Only available on locked final twin      |
+| `[ ] P10B.02` | Build Orbit incoming request card component with anonymous coarse region, age band, Accept / Not now       | High     | TODO   | P10B.01      | Agent | —         | Accessible touch targets $\ge 44\text{px}$|
+| `[ ] P10B.03` | Build Orbit list row and detail screen (`/orbit/:id`) with procedural geometric pick avatars and co-streaks | High     | TODO   | P10A.05, P1.01 | Agent | —       | Anonymous title "Twin #N"                |
+| `[ ] P10B.04` | Implement expression sticker picker (The Wave) with 6 curated database stickers and 1/day direction limit   | High     | TODO   | P10B.03      | Agent | —         | Tactile sticker-press interaction        |
+| `[ ] P10B.05` | Build staged unlocks visual track (5 milestone dots: Day 1, 3, 7, 14, 30) driven by `app_content` data      | Medium   | TODO   | P10B.03      | Agent | —         | Content-driven progression               |
+| `[ ] P10B.06` | Build Twin Globe 5-minute batch aggregation worker and edge-cached endpoint `/v1/globe` (`s-maxage=60`)     | High     | TODO   | P9.01, P3.02 | Agent | —         | Regional k-anonymity aggregation         |
+| `[ ] P10B.07` | Build Twin Globe screen (`/globe`) with static SVG map, k-anonymity arcs ($k \ge 20$), and Orbit lines      | High     | TODO   | P10B.06      | Agent | —         | Zero WebGL; violet glowing Orbit strokes |
+| `[ ] P10B.08` | Implement Twin Globe Live / Replay loop toggle with automatic fallback when volume < 50 submissions/window   | High     | TODO   | P10B.07      | Agent | —         | Transparent labeling; zero fake arcs     |
+| `[ ] P10B.09` | Mount "Globe" as 4th tab in main navigation bar (Today, Globe, History, Me) with keyboard focus rings       | High     | TODO   | P10B.07      | Agent | —         | Preserves initial route bundle           |
+| `[ ] P10B.10` | Implement degradation handling (L1-L4): doubled refresh interval, replay loop switch, and read-only banners | High     | TODO   | P10B.07, P10B.03 | Agent | —     | Dynamic copy from `app_content`          |
+
+---
+
+### Phase 10C: Telepathy (Instinct Sync) (Stage F3)
+
+_Status: TODO | Target: Designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
+| `[ ] P10C.01` | Add `telepathy_question_id` to `drops` table schema and implement question selection logic (Type 1 or 4)   | High     | TODO   | P2.01        | Agent | —         | Eligible low-cardinality questions ($\le 4$) |
+| `[ ] P10C.02` | Add admin validation rule rejecting Drops lacking an eligible Telepathy question                            | High     | TODO   | P10C.01      | Agent | —         | Content safety gate                      |
+| `[ ] P10C.03` | Expand migration: `telepathy_guesses` range-partitioned by `drop_date` with 90-day retention                | Critical | TODO   | P10A.01      | Agent | —         | Zero-downtime expand migration           |
+| `[ ] P10C.04` | Implement Telepathy endpoints: `GET /v1/orbits/:id/telepathy`, `POST /v1/orbits/:id/telepathy/guess`        | Critical | TODO   | P10C.03      | Agent | —         | Active only after both players submit    |
+| `[ ] P10C.05` | Implement permanent guess lock-in and Rule 4 scoped reveal exception (partner pick shown only after lock)   | Critical | TODO   | P10C.04      | Agent | —         | Single question; zero other picks exposed|
+| `[ ] P10C.06` | Implement final batch random luck baseline calculation ($\sum [p(a)]^2$) in closure worker                  | High     | TODO   | P9.01, P10C.04 | Agent | —       | Mathematical chance baseline             |
+| `[ ] P10C.07` | Build Telepathy UI: option rows, side-by-side sticker pair, check/slash icons, baseline comparison caption  | High     | TODO   | P10C.04, P1.01 | Agent | —       | Shape + icon indicators (not color alone)|
+| `[ ] P10C.08` | Implement composite Sync summary calculation and display after 5 completed rounds                           | Medium   | TODO   | P10C.07      | Agent | —         | Eliminates early sample noise            |
+| `[ ] P10C.09` | Author automated tests for Telepathy guessing lifecycle, baseline math correctness, and Sync aggregation   | High     | TODO   | P10C.06      | Agent | —         | Unit and route integration test suite    |
+
+---
+
+### Phase 10D: Anti-Twin, Share Faces & Verification Gate (Stage F4)
+
+_Status: TODO | Target: Asynchronous Anti-twin worker, candidate scan, result card, Satori share cards, a11y & bundle audit._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
+| `[ ] P10D.01` | Expand migration: `anti_twin_results` table with 7-day rolling retention                                    | High     | TODO   | P2.01        | Agent | —         | Lightweight relational cache             |
+| `[ ] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | Critical | TODO   | P9.01, P10D.01 | Agent | —       | Completely decoupled from submit path    |
+| `[ ] P10D.03` | Implement endpoint `GET /v1/results/:dropId/anti-twin` and low-pool (< 200 players) graceful hide logic     | High     | TODO   | P10D.02      | Agent | —         | Honest notice when pool is sparse        |
+| `[ ] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | High     | TODO   | P10D.03, P1.01 | Agent | —       | Coral accent chip, kind playful tone     |
+| `[ ] P10D.05` | Build Anti-twin Satori share card PNG exports (`renderAntiTwinCardPng`) matching token constants            | High     | TODO   | P6.01, P10D.04 | Agent | —       | Flip card anatomy with coral face        |
+| `[ ] P10D.06` | Build Orbit milestone & anniversary Satori share card PNG exports (`renderOrbitCardPng`)                    | High     | TODO   | P6.01, P10B.05 | Agent | —       | Day 14 and Day 30 commemorative cards    |
+| `[ ] P10D.07` | Run automated axe-core accessibility suite across all new screens (Globe, Orbit, Telepathy, Anti-twin)      | High     | TODO   | P10B.07, P10D.04| Agent | —      | WCAG 2.1 AA compliance; $\ge 44\text{px}$|
+| `[ ] P10D.08` | Run bundle budget verification confirming initial play route remains $\le 159.5\text{ KB}$ gzipped          | Critical | TODO   | P10B.09      | Agent | —         | Verifies lazy code-splitting isolation   |
+| `[ ] P10D.09` | Author complete Playwright E2E test suite covering Keep -> Orbit -> Telepathy -> Anti-twin journeys        | High     | TODO   | P10B.01, P10D.04| Agent | —      | Full connection loop verification        |
+
+---
+
+### Phase 11: Admin Tool: "Mission Control" (Stage 11)
+
+> **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**  
+> *Prerequisite: Stage 11 builds after Stage F4. Task P11.23 depends on completion of Stages F1 to F4.*
+
+_Status: TODO | Target: Independent admin host, SSO + TOTP 2FA, immutable audit log, question bank checks, Command Center, Ops controls._
+
+| ID           | Task Description                                                                                           | Priority | Status | Depends On    | Owner | Done Date | Notes (Admin Spec Reference)         |
+| ------------ | ---------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- | ----- | --------- | ------------------------------------ |
+| `[ ] P11.01` | Scaffold `apps/admin` Next.js application with Google SSO, allowlist, and role guards                      | Critical | TODO   | P0.03, P7.01  | Agent | —         | spec section 2 [P1]                  |
+| `[ ] P11.02` | Build question library browser and polymorphic editor with live phone-sized preview                        | High     | TODO   | P11.01, P2.01 | Agent | —         | spec section 6.1, 6.2 [P1]           |
+| `[ ] P11.03` | Build bulk JSON batch importer supporting `seed/batch_001.json` format                                     | Critical | TODO   | P11.01, P2.02 | Agent | —         | spec section 6.7 [P1]                |
+| `[ ] P11.04` | Implement batch validation engine: mix of 5 types, option counts, forbidden topics scan                    | Critical | TODO   | P11.03        | Agent | —         | spec section 6.3 [P1]                |
+| `[ ] P11.05` | Implement Drop scheduling calendar with two-person approval workflow and D-2 lock                          | Critical | TODO   | P11.01, P2.01 | Agent | —         | spec section 6.5 [P1]                |
+| `[ ] P11.06` | Build panel-testing evaluation tool computing `panel_entropy` and flagging skewed options                  | High     | TODO   | P11.02        | Agent | —         | spec section 6.4 (tagged P2 in spec) |
+| `[ ] P11.07` | Implement live administrative actions: pull question, extend drop window, view audit log                   | High     | TODO   | P11.01, P9.09 | Agent | —         | spec section 6.6, 16 [P1]            |
+| `[ ] P11.08` | Implement buffer tracking dashboard: alert when approved drops remain < 14 days                            | High     | TODO   | P11.05        | Agent | —         | spec section 6.5 [P1]                |
+| `[ ] P11.09` | Build dynamic editors for `app_content` copy strings, `pages` markdown, and `app_config`                   | High     | TODO   | P11.01, P2.10 | Agent | —         | spec section 11 [P1]                 |
+| `[ ] P11.10` | Write automated tests verifying batch validation rejects invalid question structures                       | High     | TODO   | P11.04        | Agent | —         | spec section 6.3, 20 [P1]            |
+| `[ ] P11.11` | Build degradation level control panel, emergency kill switches, and DLQ viewer                             | High     | TODO   | P11.07        | Agent | —         | spec section 11, 13.2 [P1]           |
+| `[ ] P11.12` | Build content runway buffer alert dashboard (<14d yellow, <7d red) and window extension                    | High     | TODO   | P11.08        | Agent | —         | spec section 6.5 [P1]                |
+| `[ ] P11.13` | Separate admin host, SSO, TOTP 2FA, roles and permissions matrix, admin sessions                           | Critical | TODO   | P11.01        | Agent | —         | spec section 2 [P1]                  |
+| `[ ] P11.14` | Immutable audit log; every write takes a `reason` and idempotency key and returns audit entry ID           | Critical | TODO   | P11.01, P11.13| Agent | —         | spec sections 16, 18 [P1]            |
+| `[ ] P11.15` | Command Center tiles (P1 set) reading only from `metrics_minute/hour/day` and Redis, "as of" & stale-amber | Critical | TODO   | P11.01        | Agent | —         | spec sections 3, 17 [P1]             |
+| `[ ] P11.16` | Live Ops basic (stream, funnel, map); low live count shows "players today"                                 | High     | TODO   | P11.15        | Agent | —         | spec section 4 [P1]                  |
+| `[ ] P11.17` | Users list and drawer (masked), flag, suspend, logged reveal of sensitive fields                           | High     | TODO   | P11.13        | Agent | —         | spec section 5 [P1]                  |
+| `[ ] P11.18` | Reports queue with SLA, case actions and templates                                                         | High     | TODO   | P11.13        | Agent | —         | spec section 10 [P1]                 |
+| `[ ] P11.19` | Question bank automatic checks (all 8, including Telepathy-eligible rule), two-person rule enforcement     | Critical | TODO   | P11.04        | Agent | —         | spec section 6 [P1]                  |
+| `[ ] P11.20` | Announcements, "we're busy" and maintenance toggles, notifications tools                                   | High     | TODO   | P11.09        | Agent | —         | spec section 9 [P1]                  |
+| `[ ] P11.21` | Incident mode with timeline (one big red button, hold to confirm)                                          | Critical | TODO   | P11.11        | Agent | —         | spec section 13 [P1]                 |
+| `[ ] P11.22` | Config, copy and feature flags with versioning and one-click rollback (extends P11.09)                     | High     | TODO   | P11.09        | Agent | —         | spec section 11 [P1]                 |
+| `[ ] P11.23` | Matching ops, Twin Globe live/replay toggle, Orbit stats/sever, Telepathy baseline, Anti-twin panel        | High     | TODO   | P10D.09, P11.15| Agent | —        | spec section 7 [P1] (after F4)       |
+| `[ ] P11.24` | DPDP data-requests queue and retention runs view                                                           | High     | TODO   | P11.13        | Agent | —         | spec section 14 [P1]                 |
+| `[ ] P11.25` | Run the admin acceptance checklist (spec section 20) and attach verification evidence                      | Critical | TODO   | P11.13-P11.24 | Agent | —         | spec section 20 [P1]                 |
+
+#### Phase 11 Deferred (P2 & P3 Features — Visible in Backlog but Not in Stage 11)
+- **Full Command Center [P2]:** Milestone confetti/chimes, count-up animations, custom density toggle, saved views (spec section 3.4).
+- **Boss Brief [P2]:** Automated daily summary card at 08:00 via email or push (spec section 3.3).
+- **Live Ops Deep Dive [P2]:** Device mix, network connection telemetry, queue monitor graphs (spec section 4).
+- **User Segments & Bulk Actions [P2]:** Cohort segmentation (power users, dormant, bots), background bulk jobs with undo window (spec section 5.4, 5.5).
+- **Question Translations & Submissions [P2]:** Hindi/Gujarati translation tabs, public question suggestion queue (spec section 6.2, 6.9).
+- **Panel Testing Tool [P2]:** Private test link generator for 100+ external testers with entropy curves (spec section 6.4).
+- **Growth & Campaign Ops [P2]:** Campus ambassador UTM codes, QR generator, weekly data stories generator (spec section 8).
+- **Moderation Appeals [P2]:** Suspended user appeals form and queue (spec section 10.4).
+- **Analytics & Retention Cohorts [P2]:** D1-D30 cohort grid, multi-step funnels, DAU/MAU stickiness, A/B test analysis (spec section 12).
+- **Oddly Deck Operations [P2]:** Minting statistics, binder completion rates, foil render failure monitoring (spec section 7).
+- **Monetisation & Money [P3]:** Subscriptions, MRR, churn, sponsored question briefs, invoicing, GST records (spec section 15).
 
 ---
 
@@ -455,8 +562,54 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Run accelerated staging pipeline (`CLOCK_ACCELERATION=true`); observe automated 10-minute drop cycles.
 - **Stage 10 Checklist:**
   - [x] Install PWA to mobile home screen; accept push prompt; receive test notification on drop time.
-- **Stage 11 Checklist:**
-  - [ ] Log into Admin portal; import a new batch JSON; verify validation report and approve drops.
+- **Stage F1 Checklist (Phase 10A: Orbit Foundation):**
+  - [ ] Run expand migrations for `twin_keeps`, `orbits`, `orbit_expressions` against PostgreSQL 16 (Docker).
+  - [ ] Verify `twin_keeps` range partition exists for today's drop date.
+  - [ ] Verify Keep request creation, 48h expiration cron, and 30-day cooldown logic.
+  - [ ] Verify co-streak daily pipeline increments on mutual completions and resets quietly on breaks.
+  - [ ] Verify DPDP deletion purges Orbit linkages within 7 days.
+  - [ ] Run `pnpm test` verifying 100% pass on Orbit state machine.
+- **Stage F2 Checklist (Phase 10B: Orbit & Globe UI):**
+  - [ ] Verify "Keep this twin" button renders on locked final twin card back and `/recap`.
+  - [ ] Test soft sign-in prompt for guest users attempting to Keep.
+  - [ ] Verify Orbit incoming request card with Accept / Not now actions.
+  - [ ] Verify Orbit list row renders procedural geometric avatar and co-streak chip.
+  - [ ] Verify 6-sticker expression tray (The Wave) sends 1 sticker per direction per day.
+  - [ ] Test `/globe` static SVG map: verify $k \ge 20$ region aggregation, live arcs, and violet glowing Orbit lines.
+  - [ ] Test automatic switch to Replay loop when live volume < 50 submissions/window.
+  - [ ] Verify Globe as 4th tab with $\ge 44\text{px}$ touch targets.
+- **Stage F3 Checklist (Phase 10C: Telepathy):**
+  - [ ] Verify admin question check rejects Drops lacking an eligible $\le 4$ option question.
+  - [ ] Run expand migration for `telepathy_guesses` with range partitioning and 90-day retention.
+  - [ ] Test guess lock-in: verify guesser cannot modify guess once submitted.
+  - [ ] Verify Rule 4 exception: partner pick label is displayed *only after* guesser locks their own guess.
+  - [ ] Verify closure worker computes mathematically honest luck baseline ($\sum [p(a)]^2$).
+  - [ ] Verify UI displays check/slash indicators (different shapes) and baseline comparison caption.
+  - [ ] Verify composite Sync summary renders only after 5 completed rounds.
+- **Stage F4 Checklist (Phase 10D: Anti-Twin, Share Faces & Verification Gate):**
+  - [ ] Run expand migration for `anti_twin_results` with 7-day retention.
+  - [ ] Verify asynchronous `ComputeAntiTwinJob` computes opposite across 2,000 candidate sample off submit path.
+  - [ ] Test low-pool (< 200 players) graceful hide logic.
+  - [ ] Verify Anti-twin result card shows differed count and own breakdown with zero opposite picks exposed.
+  - [ ] Verify Satori PNG generation for Anti-twin and Orbit anniversary cards matches `@oddly/ui-tokens`.
+  - [ ] Run axe-core accessibility audit across all connection screens (zero critical/serious violations).
+  - [ ] Run bundle budget check: verify initial play route remains $\le 159.5\text{ KB}$ gzipped.
+  - [ ] Run complete Playwright E2E test suite covering full connection user loop.
+- **Stage 11 Checklist ("Mission Control" per docs/admin-panel-spec.md Section 20):**
+  - [ ] No admin route is reachable without SSO and 2FA, and none is served on the public host.
+  - [ ] Every write action creates an audit entry with a reason and idempotency key.
+  - [ ] Phone numbers and individual answers are never shown without a logged reveal.
+  - [ ] A Drop cannot be scheduled without two different people (writer and approver).
+  - [ ] All eight automatic question checks block approval when they fail (including Telepathy rule).
+  - [ ] The 14-day gap warning fires, and a gap within 3 days alerts the Owner.
+  - [ ] Pulling a question recomputes matching on the other four and shows a recap note.
+  - [ ] Each tile shows "as of" time and turns amber when stale.
+  - [ ] Live count below the configured minimum shows "players today" instead.
+  - [ ] Incident mode toggles each action and writes a timeline.
+  - [ ] Config rollback restores the previous version and logs it.
+  - [ ] Dashboards load in under 2 seconds with 10 lakh players of data (tiles read only from aggregates).
+  - [ ] The panel is usable at 390 px width (phone).
+  - [ ] Reduced-motion setting is respected by all count-up and confetti effects.
 - **Stage 12 Checklist:**
   - [ ] Review PostHog dashboard, trigger a deliberate error to verify Sentry alert dispatch.
 - **Stage 13 Checklist:**
@@ -474,6 +627,8 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-14` | Phase 10A–10D, Phase 11   | Added Phases 10A, 10B, 10C, 10D (Stages F1–F4) for F18–F21 connection features. Expanded Phase 11 to 25 tasks matching `docs/admin-panel-spec.md`. Dashboard updated to 274 tasks. | Stage F0 Founder approval & scope decisions.  |
+| `2026-11-14` | Stage D1 Complete         | Completed full UI redesign to Sticker Pop (tokens, primitives, play flow, 3D flip card, dev UI showcase).     | Stage D1 verification and completion.         |
 | `2026-11-07` | Architecture / Section 12 | Integrated Override Addendum: all content, questions, palettes, copy, and configs are dynamic from PostgreSQL. | Founder requirement: zero hard-coded content. |
 | `2026-11-07` | Phase 0 to 15             | Established initial 16-phase roadmap containing 165 granular, tracked engineering tasks.                       | Comprehensive project initialisation.         |
 | `2026-11-07` | Stage 0 Complete          | Verified monorepo skeleton, 6 core markdown documents, and base scripts (typecheck, lint, test, build, dev).    | Stage 0 Definition of Done achieved.          |
