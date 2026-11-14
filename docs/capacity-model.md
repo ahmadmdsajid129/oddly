@@ -41,7 +41,13 @@
   - Negligible memory footprint (< 100 KB).
 - **Idempotency Keys (`idemp:{requestId}` with 24h TTL):**
   - $10^6 \times 120\text{ bytes} \approx 120\text{ MB}$.
-- **Total Redis Ephemeral Memory per Drop:** **~350 MB to 500 MB**.  
+- **Answer-Hash Buckets & Candidate Sets (R2.9):**
+  - Submissions add up to 16 sub-hashes (1x exact 5-of-5, 5x 4-of-5, 10x 3-of-5).
+  - Uncapped naive UUID storage for 100k players = 91.6 MB (extrapolated to 10 lakh: ~916 MB).
+  - **Capped with Reservoir Sampling (R2.9):** Each bucket capped at `DEFAULT_BUCKET_MEMBER_CAP = 200` using reservoir sampling and compact member indexing.
+  - Measured 100k players capped memory: **12.2 MB**.
+  - Extrapolated 10 lakh players capped memory: **18.3 MB** (popular buckets saturate at 200 members).
+- **Total Redis Ephemeral Memory per Drop:** **~370 MB to 520 MB**.  
   *(A standard 2 GB to 4 GB Redis instance provides substantial safety headroom).*
 
 ### 2.2 PostgreSQL Storage Growth & Retention Budget
@@ -86,4 +92,41 @@
 | Max Sustainable Submissions / sec (T3) | 2,200 req/s | *[Pending Stage 13]* | — | |
 | Event Loop Delay under 1,100 req/s | < 20 ms | *[Pending Stage 13]* | — | |
 | Final Batch Duration (10 Lakh Players) | < 10 minutes | *[Pending Stage 13]* | — | |
+
+---
+
+## 5. Capacity Addendum: Connection Features (F18 to F21)
+
+*Added: 2026-11-14 (Stage F0 Analysis)*
+
+### 5.1 Connection Volumes by DAU Tier
+
+| Connection Parameter | 10,000 DAU | 100,000 DAU | 1,000,000 DAU (10 Lakh) |
+|---|---|---|---|
+| **Daily Keep Requests (`twin_keeps`)** | 800 | 8,000 | 80,000 |
+| **New Orbits Formed/Day (`orbits`)** | 280 | 2,800 | 28,000 |
+| **Cumulative Active Orbits (30d avg)** | ~1,200 | ~12,000 | ~120,000 |
+| **Daily Expressions (`orbit_expressions`)** | ~960 | ~9,600 | ~96,000 |
+| **Daily Telepathy Guesses (`telepathy_guesses`)** | ~1,440 | ~14,400 | ~144,000 |
+| **Anti-Twin Computations (`anti_twin_results`)** | 2,500 | 25,000 | 250,000 |
+
+### 5.2 Storage & Memory Impact
+
+1. **PostgreSQL Relational Storage:**
+   - `twin_keeps` (partitioned): ~180 bytes/row $\rightarrow$ 14.4 MB/day at 10 lakh.
+   - `orbit_expressions` (partitioned): ~120 bytes/row $\rightarrow$ 11.5 MB/day at 10 lakh.
+   - `telepathy_guesses` (partitioned, 90d retention): ~160 bytes/row $\rightarrow$ 23.0 MB/day at 10 lakh.
+   - `anti_twin_results` (7d retention): ~140 bytes/row $\rightarrow$ 35.0 MB/day at 10 lakh (rolling 7d window = ~245 MB total).
+   - **Total Additional Relational Storage:** **~84 MB / day** at 10 lakh DAU (~8.4% overhead over baseline 1.0 GB/day).
+2. **Redis Ephemeral & Counter Memory:**
+   - Active Orbit membership counters (`counters:orbit:active:{userId}`): 120,000 x 40 bytes $\approx$ 4.8 MB.
+   - Incoming Keep counters (`counters:keeps:incoming:{userId}:{dropDate}`): ~80,000 x 40 bytes $\approx$ 3.2 MB.
+   - Anti-twin cached result (24h TTL): 250,000 x 200 bytes $\approx$ 50 MB.
+   - Globe arc aggregation buffer: ~100 KB.
+   - **Total Additional Redis Footprint:** **~58 MB** at 10 lakh DAU. Easily accommodated in standard 2 GB – 4 GB Redis tier.
+3. **Worker Processing Load:**
+   - Anti-twin bounded scan (2,000 candidates): ~1.2 ms CPU per job. With 250,000 on-demand runs spread across evening hours (average 5.8 runs/sec), worker CPU utilization is under **0.7% of a single vCPU core**.
+   - Globe arc batch aggregation: runs once every 5 minutes in worker; execution time < 80 ms per batch.
+   - Co-streak daily pipeline step: executes during the 07:00 IST final batch via single set-based SQL update (`UPDATE orbits SET co_streak_current = co_streak_current + 1 WHERE ...`), adding < 400 ms to the batch.
+
 
