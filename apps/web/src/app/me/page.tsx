@@ -2,11 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Atmosphere } from "@/components/ui/Atmosphere";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { useTheme } from "@/components/ui/ThemeProvider";
 import { useToast } from "@/components/ui/Toast";
 import { ReportModal } from "@/components/ui/ReportModal";
 import { api } from "@/lib/api";
@@ -14,7 +11,6 @@ import {
   ArrowLeft,
   Bell,
   Moon,
-  Sun,
   Shield,
   Download,
   Trash2,
@@ -29,7 +25,6 @@ import {
 export default function MePage() {
   const router = useRouter();
   const auth = useAuth();
-  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
 
   const [notifications, setNotifications] = useState(true);
@@ -76,45 +71,43 @@ export default function MePage() {
   };
 
   return (
-    <main className="min-h-screen relative flex flex-col p-4 sm:p-6 max-w-xl mx-auto pb-16">
-      <Atmosphere />
-
+    <main className="min-h-screen bg-cream text-ink flex flex-col p-4 sm:p-6 max-w-xl mx-auto pb-16">
       {/* Header */}
-      <header className="relative z-20 flex items-center justify-between py-2 mb-6">
+      <header className="flex items-center justify-between py-2 mb-6">
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
           onClick={() => router.push("/")}
-          className="flex items-center gap-1.5 text-text-muted hover:text-text pl-0"
+          className="flex items-center gap-1.5"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span>Home</span>
         </Button>
 
-        <h1 className="font-heading text-lg font-bold text-text">
+        <h1 className="font-display text-display-m font-extrabold text-ink">
           Me &amp; Settings
         </h1>
 
         <div className="w-12" />
       </header>
 
-      <div className="relative z-20 space-y-6">
+      <div className="space-y-6">
         {/* Account Profile Card */}
-        <Card variant="elevated" className="p-5 space-y-4">
+        <div className="p-5 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-violet/20 border border-violet/40 flex items-center justify-center text-violet font-heading font-bold text-lg">
+              <div className="w-12 h-12 rounded-m bg-lavender border-[2px] border-ink flex items-center justify-center text-ink font-display font-extrabold text-lg">
                 {auth.isAuthenticated
                   ? auth.account?.displayName?.charAt(0).toUpperCase() || "P"
                   : "?"}
               </div>
               <div>
-                <h3 className="font-heading text-base font-bold text-text">
+                <h3 className="font-display text-base font-extrabold text-ink">
                   {auth.isAuthenticated
                     ? auth.account?.displayName
                     : "Guest Player"}
                 </h3>
-                <p className="text-xs text-text-muted">
+                <p className="font-body text-caption text-muted">
                   {auth.isAuthenticated
                     ? "Signed in with Google"
                     : "Picks stored on this device"}
@@ -124,17 +117,17 @@ export default function MePage() {
 
             {auth.isAuthenticated ? (
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="sm"
                 onClick={() => auth.logout()}
-                className="text-text-muted hover:text-flame flex items-center gap-1.5"
+                className="flex items-center gap-1.5 text-xs text-error"
               >
-                <LogOut className="w-4 h-4" />
-                <span className="text-xs">Sign out</span>
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign out</span>
               </Button>
             ) : (
               <Button
-                variant="secondary"
+                variant="primary"
                 size="sm"
                 onClick={() => auth.openLoginModal()}
                 className="flex items-center gap-1.5 text-xs"
@@ -146,106 +139,100 @@ export default function MePage() {
           </div>
 
           {auth.isAuthenticated && (
-            <div className="pt-3 border-t border-border flex items-center justify-between text-xs text-text-muted">
+            <div className="pt-3 border-t-[1.5px] border-ink/20 flex items-center justify-between text-caption font-display font-bold text-muted">
               <span>DPDP Identity Protection</span>
-              <span className="font-mono text-[11px] text-mint flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="text-[11px] text-ink bg-mint px-2 py-0.5 rounded-pill border border-ink flex items-center gap-1 font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Zero Plaintext Email</span>
               </span>
             </div>
           )}
-        </Card>
+        </div>
 
         {/* Rituals & Notification Preferences */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted px-1">
+        <div className="space-y-2">
+          <h2 className="font-display text-caption font-bold uppercase tracking-wider text-muted px-1">
             Rituals &amp; Reminders
           </h2>
 
-          <Card variant="default" className="p-4 space-y-4">
+          <div className="p-4 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <div className="text-sm font-semibold text-text flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-violet" />
+                <div className="font-display text-sm font-bold text-ink flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-violet stroke-[2.5]" />
                   <span>Daily Drop at 07:00 IST</span>
                 </div>
-                <p className="text-xs text-text-muted">
+                <p className="font-body text-caption text-muted">
                   Get notified when the daily five picks open
                 </p>
               </div>
               <input
                 type="checkbox"
+                aria-label="Daily Drop at 07:00 IST notifications"
                 checked={notifications}
                 onChange={(e) => setNotifications(e.target.checked)}
-                className="w-5 h-5 rounded accent-violet cursor-pointer"
+                className="w-5 h-5 rounded border-[2px] border-ink accent-violet cursor-pointer"
               />
             </div>
 
-            <div className="pt-3 border-t border-border flex items-center justify-between">
+            <div className="pt-3 border-t-[1.5px] border-ink/20 flex items-center justify-between">
               <div className="space-y-0.5">
-                <div className="text-sm font-semibold text-text flex items-center gap-2">
-                  <Moon className="w-4 h-4 text-indigo-400" />
-                  <span>Quiet Hours (22:00 – 07:00)</span>
+                <div className="font-display text-sm font-bold text-ink flex items-center gap-2">
+                  <Moon className="w-4 h-4 text-violet stroke-[2.5]" />
+                  <span>Quiet Hours (22:00 – 07:00 IST)</span>
                 </div>
-                <p className="text-xs text-text-muted">
+                <p className="font-body text-caption text-muted">
                   Mute all game alerts during sleeping hours
                 </p>
               </div>
               <input
                 type="checkbox"
+                aria-label="Quiet Hours (22:00 to 07:00 IST)"
                 checked={quietHours}
                 onChange={(e) => setQuietHours(e.target.checked)}
-                className="w-5 h-5 rounded accent-violet cursor-pointer"
+                className="w-5 h-5 rounded border-[2px] border-ink accent-violet cursor-pointer"
               />
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Display Theme */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted px-1">
+        <div className="space-y-2">
+          <h2 className="font-display text-caption font-bold uppercase tracking-wider text-muted px-1">
             Appearance
           </h2>
 
-          <Card variant="default" className="p-4 flex items-center justify-between">
+          <div className="p-4 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker flex items-center justify-between">
             <div className="space-y-0.5">
-              <div className="text-sm font-semibold text-text flex items-center gap-2">
-                {theme === "dark" ? (
-                  <Moon className="w-4 h-4 text-text" />
-                ) : (
-                  <Sun className="w-4 h-4 text-amber-500" />
-                )}
-                <span>Color Theme</span>
+              <div className="font-display text-sm font-bold text-ink flex items-center gap-2">
+                <span className="w-4 h-4 rounded-pill bg-cream border border-ink inline-block" />
+                <span>Visual Theme</span>
               </div>
-              <p className="text-xs text-text-muted">
-                {theme === "dark" ? "Atmosphere Midnight Dark" : "Daylight Clean"}
+              <p className="font-body text-caption text-muted">
+                Sticker Pop (Cream Desk, v1 single source of truth)
               </p>
             </div>
 
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              Switch to {theme === "dark" ? "Light" : "Dark"}
-            </Button>
-          </Card>
+            <span className="font-display text-xs font-bold text-ink bg-sun px-3 py-1 rounded-pill border-[1.5px] border-ink">
+              Default
+            </span>
+          </div>
         </div>
 
         {/* DPDP Privacy & Legal Rights */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted px-1">
+        <div className="space-y-2">
+          <h2 className="font-display text-caption font-bold uppercase tracking-wider text-muted px-1">
             Privacy &amp; Data Rights (DPDP)
           </h2>
 
-          <Card variant="default" className="p-4 space-y-3">
+          <div className="p-4 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker space-y-3">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <div className="text-sm font-semibold text-text flex items-center gap-2">
-                  <Download className="w-4 h-4 text-mint" />
+                <div className="font-display text-sm font-bold text-ink flex items-center gap-2">
+                  <Download className="w-4 h-4 text-violet stroke-[2.5]" />
                   <span>Download My Data (Portability)</span>
                 </div>
-                <p className="text-xs text-text-muted">
+                <p className="font-body text-caption text-muted">
                   Export all picks, sealed twins, and streaks as JSON
                 </p>
               </div>
@@ -259,41 +246,41 @@ export default function MePage() {
               </Button>
             </div>
 
-            <div className="pt-3 border-t border-border flex items-center justify-between">
+            <div className="pt-3 border-t-[1.5px] border-ink/20 flex items-center justify-between">
               <div className="space-y-0.5">
-                <div className="text-sm font-semibold text-flame flex items-center gap-2">
-                  <Trash2 className="w-4 h-4 text-flame" />
+                <div className="font-display text-sm font-bold text-error flex items-center gap-2">
+                  <Trash2 className="w-4 h-4 text-error stroke-[2.5]" />
                   <span>Erase Account (Right to Erasure)</span>
                 </div>
-                <p className="text-xs text-text-muted">
+                <p className="font-body text-caption text-muted">
                   Permanently disassociate all history and remove account
                 </p>
               </div>
               <Button
-                variant="destructive"
+                variant="danger"
                 size="sm"
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 Erase
               </Button>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Transparency & Community Guidelines */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted px-1">
+        <div className="space-y-2">
+          <h2 className="font-display text-caption font-bold uppercase tracking-wider text-muted px-1">
             About &amp; Safety
           </h2>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             <Button
               variant="secondary"
               size="md"
               onClick={() => router.push("/about")}
               className="flex items-center justify-start gap-2 text-xs"
             >
-              <Info className="w-4 h-4 text-text-muted" />
+              <Info className="w-4 h-4 text-muted stroke-[2]" />
               <span>About Oddly</span>
             </Button>
 
@@ -303,7 +290,7 @@ export default function MePage() {
               onClick={() => router.push("/privacy")}
               className="flex items-center justify-start gap-2 text-xs"
             >
-              <Shield className="w-4 h-4 text-text-muted" />
+              <Shield className="w-4 h-4 text-muted stroke-[2]" />
               <span>Privacy Notice</span>
             </Button>
 
@@ -313,7 +300,7 @@ export default function MePage() {
               onClick={() => router.push("/terms")}
               className="flex items-center justify-start gap-2 text-xs"
             >
-              <FileText className="w-4 h-4 text-text-muted" />
+              <FileText className="w-4 h-4 text-muted stroke-[2]" />
               <span>Terms of Service</span>
             </Button>
 
@@ -323,7 +310,7 @@ export default function MePage() {
               onClick={() => setShowReportModal(true)}
               className="flex items-center justify-start gap-2 text-xs"
             >
-              <Flag className="w-4 h-4 text-flame" />
+              <Flag className="w-4 h-4 text-coral stroke-[2]" />
               <span>Report an Issue</span>
             </Button>
           </div>
@@ -332,30 +319,30 @@ export default function MePage() {
 
       {/* Delete Confirmation Sheet */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 bg-midnight/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-surface p-6 border border-border shadow-2xl space-y-4 text-center">
-            <div className="w-12 h-12 rounded-full bg-flame/15 mx-auto flex items-center justify-center text-flame">
-              <Trash2 className="w-6 h-6" />
+        <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
+          <div className="w-full max-w-sm rounded-l bg-paper p-6 border-[2.5px] border-ink shadow-card space-y-4 text-center animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-pill bg-coral/20 border-[2px] border-ink mx-auto flex items-center justify-center text-error">
+              <Trash2 className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-heading text-lg font-bold text-text">
+              <h3 className="font-display text-display-m font-extrabold text-ink">
                 Permanently erase your account?
               </h3>
-              <p className="text-xs text-text-muted leading-relaxed">
+              <p className="font-body text-caption text-muted leading-relaxed">
                 This will disassociate all your daily picks, twin pairings, and streaks under the DPDP Right to Erasure. This action cannot be undone.
               </p>
             </div>
             <div className="flex gap-2 pt-2">
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="md"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="w-1/2 text-text-muted hover:text-text"
+                className="w-1/2"
               >
                 Keep Account
               </Button>
               <Button
-                variant="destructive"
+                variant="danger"
                 size="md"
                 onClick={handleDeleteAccount}
                 isLoading={isDeleting}
