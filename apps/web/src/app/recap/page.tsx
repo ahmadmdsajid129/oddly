@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { TierBadge } from "@/components/ui/Card";
 import { BrandMark } from "@/components/icons";
 import { ShareSheet } from "@/components/share/ShareSheet";
+import { KeepButton } from "@/components/orbit/KeepButton";
 import {
   Sparkles,
   Share2,
@@ -186,16 +187,19 @@ export default function MorningRecapPage() {
             ))}
           </div>
 
-          {/* Share Button */}
-          <Button
-            variant="secondary"
-            size="md"
-            className="w-full flex items-center justify-center gap-2"
-            onClick={() => setIsShareOpen(true)}
-          >
-            <Share2 className="w-4 h-4 stroke-[2.5]" />
-            <span>Share Yesterday&apos;s Card</span>
-          </Button>
+          {/* Keep Twin & Share Actions */}
+          <div className="space-y-2 pt-2">
+            <KeepButton dropId={data.dropId} isProvisional={false} />
+            <Button
+              variant="secondary"
+              size="md"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={() => setIsShareOpen(true)}
+            >
+              <Share2 className="w-4 h-4 stroke-[2.5]" />
+              <span>Share Yesterday&apos;s Card</span>
+            </Button>
+          </div>
         </div>
 
         {/* Seamless Forward CTA to Today's Drop */}

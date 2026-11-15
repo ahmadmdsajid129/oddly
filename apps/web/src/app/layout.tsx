@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { PwaProvider } from "@/components/providers/PwaProvider";
 import { MotionProvider } from "@/components/providers/MotionProvider";
 import { WebVitals } from "@/components/analytics/WebVitals";
+import { BottomNav } from "@/components/ui/BottomNav";
 import "../styles/globals.css";
 
 const LoginModal = dynamic(
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <MotionProvider>
                   <WebVitals />
                   {children}
+                  <BottomNav />
                   <LoginModal />
                 </MotionProvider>
               </PwaProvider>

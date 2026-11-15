@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Check, X, Sparkles } from "lucide-react";
 import { BrandMark } from "@/components/icons";
 import { TierBadge } from "@/components/ui/Card";
+import { KeepButton } from "@/components/orbit/KeepButton";
 import { feedback } from "@/lib/feedback";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -18,6 +19,8 @@ export interface FlipCardProps {
   tier?: string;
   location?: string;
   rarityText?: string;
+  dropId?: string;
+  isProvisional?: boolean;
   pickMatches?: Array<{
     question_number: number;
     label: string;
@@ -34,6 +37,8 @@ export function FlipCard({
   tier = "Rare",
   location = "Stranger in Berlin, Germany",
   rarityText = "Only 0.4% of players matched you today",
+  dropId,
+  isProvisional = false,
   pickMatches,
   autoFlip = true,
   className,
@@ -243,6 +248,13 @@ export function FlipCard({
                   </div>
                 ))}
               </div>
+
+              {/* Keep this twin action (P10B.01) */}
+              {dropId && (
+                <div className="py-2">
+                  <KeepButton dropId={dropId} isProvisional={isProvisional} />
+                </div>
+              )}
 
               {/* Tap to flip back hint */}
               <div className="pt-2 border-t-[1.5px] border-ink/20 flex items-center justify-between text-caption font-display font-bold text-muted">
