@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[█████████████░░░░░░░] 62%`                                                     |
-| **Current Active Stage**        | **Stage F1: Orbit Foundation (Backend) (COMPLETE)**                              |
-| **Total Tasks Tracked**         | 274 tasks                                                                        |
+| **Overall Project Progress**    | `[██████████░░░░░░░░░░] 51%`                                                     |
+| **Current Active Stage**        | **Stage M0: Memes, Signals & Insights Engine (Documentation COMPLETE)**          |
+| **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
 | **Completed Tasks (`DONE`)**    | 171 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 103 tasks                                                                        |
+| **Pending (`TODO`)**            | 165 tasks                                                                        |
 
 ---
 
@@ -41,7 +41,14 @@
 | **Phase 10B**| Orbit and Globe UI                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage F2              |
 | **Phase 10C**| Telepathy (Instinct Sync)                   | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F3              |
 | **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F4              |
-| **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 25             | Stage 11 (after F4)   |
+| **Phase 10E**| Meme Questions & Themed Drops               | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage M1 (after F4)   |
+| **Phase 10F**| Signals Foundation                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage M2 (after M1)   |
+| **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M3 (Deferred)   |
+| **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M4 (Deferred)   |
+| **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | TODO      | `[----------] 0%`  | 0 / 8              | Stage M5/M6 (Deferred)|
+| **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M7 (Documented) |
+| **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M8 (Documented) |
+| **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 32             | Stage 11 (after F4)   |
 | **Phase 12** | Observability, Telemetry & Security         | High     | PARTIAL   | `[#---------] 9%`  | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | TODO      | `[----------] 0%`  | 0 / 12             | Stage 13              |
 | **Phase 14** | Cloud Deployment & Infrastructure           | Critical | TODO      | `[----------] 0%`  | 0 / 11             | Stage 14              |
@@ -385,6 +392,126 @@ _Status: TODO | Target: Asynchronous Anti-twin worker, candidate scan, result ca
 
 ---
 
+### Phase 10E: Meme Questions & Themed Drops (Stage M1)
+
+_Status: TODO | Target: Taxonomy and template migrations, question schema & validation engine extensions, meme render variant, importer format, 12 sample questions, regression test._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10E.01` | Expand migrations: `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key` | Critical | TODO | P2.01, P10D.01 | Agent | — | Zero-downtime expand migration |
+| `[ ] P10E.02` | Seed neutral subject taxonomy (14 tags) and vector meme template library with licenses and alt text         | High     | TODO   | P10E.01        | Agent | —         | Extends D-015 registry                   |
+| `[ ] P10E.03` | Extend question Zod schemas and validation engine: require >= 1 tag and valid template for meme variant    | Critical | TODO   | P10E.01        | Agent | —         | Strict boundary validation               |
+| `[ ] P10E.04` | Extend JSON batch importer to parse `tags`, `render_variant`, and `template_key` with dry run validation   | High     | TODO   | P10E.03        | Agent | —         | Pre-admin panel authoring path           |
+| `[ ] P10E.05` | Implement `meme` render variant in polymorphic question renderer using Type 1 / Type 4 components & tokens  | High     | TODO   | P10E.02        | Agent | —         | DOM live text captions; token imports    |
+| `[ ] P10E.06` | Author 12 sample meme questions across neutral tags in a verified seed batch                                | Medium   | TODO   | P10E.04        | Agent | —         | Original-to-Oddly policy                 |
+| `[ ] P10E.07` | Automated regression test proving matching math, similarity, and oddness remain 100% identical              | Critical | TODO   | P2.04, P10E.05 | Agent | —         | Mathematical parity invariant            |
+| `[ ] P10E.08` | Automated build-fail linter verifying zero tag keys match Section 9.1 forbidden topics                      | Critical | TODO   | P10E.02        | Agent | —         | Strict safety invariant                  |
+| `[ ] P10E.09` | Accessibility (a11y) verification, >= 44px touch targets, and play route bundle check (<= 159.5 KB)         | High     | TODO   | P10E.05        | Agent | —         | WCAG AA compliance                       |
+
+---
+
+### Phase 10F: Signals Foundation (Stage M2)
+
+_Status: TODO | Target: Consents table, Settings toggles, `/v1/events` endpoint, client batcher, partition manager, daily aggregations, retention job, DPDP deletion._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10F.01` | Database migrations: `consents`, `analytics_ids`, `events_raw` (day-partitioned), `question_stats_daily`, `tag_stats_daily` | Critical | TODO | P2.01, P10E.01 | Agent | — | 90-day retention schema |
+| `[ ] P10F.02` | Build client-side event batcher (< 450 bytes) using `navigator.sendBeacon` and memory flush                 | High     | TODO   | P10F.01        | Agent | —         | Zero external analytics SDKs             |
+| `[ ] P10F.03` | Implement Fastify `POST /v1/events` ingestion handler (202 Accepted, Low priority lane, allowlist Zod)     | Critical | TODO   | P10F.01        | Agent | —         | Resource rank 7 load shedding            |
+| `[ ] P10F.04` | Build Settings consent toggles UI (`analytics` and `personalisation`) and first-run notice banner           | High     | TODO   | P10F.01        | Agent | —         | DPDP default OFF compliance              |
+| `[ ] P10F.05` | Partition manager integration: pre-create `events_raw` partitions 14 days in advance                       | High     | TODO   | P10F.01        | Agent | —         | Buffer guarantee                         |
+| `[ ] P10F.06` | Daily worker aggregation job: roll `events_raw` into `question_stats_daily` and `tag_stats_daily`           | High     | TODO   | P10F.01        | Agent | —         | Runs at 07:15 IST off-peak               |
+| `[ ] P10F.07` | Retention worker job: drop `events_raw` partitions older than 90 days                                       | High     | TODO   | P10F.05        | Agent | —         | DDL metadata drop < 15ms                 |
+| `[ ] P10F.08` | Implement DPDP deletion and export hooks: purge raw events, `analytics_id`, and `player_taste` on erasure  | Critical | TODO   | P8.06, P10F.01 | Agent | —         | DPDP Section 12 compliance               |
+| `[ ] P10F.09` | Implement graceful degradation logic: deterministic 50% sampling at L1, 100% load shed at L2+              | High     | TODO   | P10F.03        | Agent | —         | Play-path protection                     |
+| `[ ] P10F.10` | Author integration tests proving zero events sent without consent, zero PII ingested, and kill switch      | Critical | TODO   | P10F.03, P10F.04| Agent | —        | Privacy & compliance suite               |
+
+---
+
+### Phase 10G: Meme Lab (User Captions & Moderation Queue) (Stage M3 — Deferred)
+
+_Status: TODO | Target: User caption submissions, moderation queue API, Meme Corner rating, Wilson scoring, exposure engine, candidate promotion._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10G.01` | Database migrations: `meme_submissions`, `meme_ratings`, `meme_stats`, `meme_exposures`, `moderation_actions` | High | TODO | P10F.01 | Agent | — | Deferred until Founder command |
+| `[ ] P10G.02` | Implement Meme Lab submission API: `POST /v1/memes/submissions` (Turnstile, duplicate check, 100 char limit) | High | TODO | P10G.01 | Agent | — | Rule 18 free-text exception |
+| `[ ] P10G.03` | Build caption composer UI (`/memes/new`) with template carousel and live character counter                 | High     | TODO   | P10G.02        | Agent | —         | >= 44px touch targets                    |
+| `[ ] P10G.04` | Build post-drop Meme Corner card with "Funny" and "Not for me" reaction buttons                             | Medium   | TODO   | P10G.01        | Agent | —         | Non-Drop surface                         |
+| `[ ] P10G.05` | Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker      | High     | TODO   | P10G.04        | Agent | —         | Min 200 raters threshold                 |
+| `[ ] P10G.06` | Build exposure engine: 20% exploration traffic, freshness retirement, and diversity caps                    | High     | TODO   | P10G.05        | Agent | —         | Balanced impression distribution         |
+| `[ ] P10G.07` | Implement Drop candidate list generation in Mission Control with two-person approval workflow               | High     | TODO   | P10G.05, P11.05| Agent | —         | Never auto-published                     |
+| `[ ] P10G.08` | Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions                     | Critical | TODO   | P10G.01        | Agent | —         | Instant takedown capability              |
+| `[ ] P10G.09` | Author automated abuse-case tests: rating brigading, sockpuppets, rate limits, and Turnstile bypass        | Critical | TODO   | P10G.02, P10G.05| Agent| —         | Anti-abuse test suite                    |
+
+---
+
+### Phase 10H: Insights Engine (Statistics Only) (Stage M4 — Deferred)
+
+_Status: TODO | Target: Consented tag affinity (`player_taste`), category performance, question quality flags, cohort notification timing, editor suggestions._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10H.01` | Database migrations: `player_taste`, `notification_timing_stats`, `editor_suggestions`                      | Medium   | TODO   | P10F.01        | Agent | —         | Deferred until Founder command           |
+| `[ ] P10H.02` | Nightly worker job: compute smoothed `player_taste` affinity scores with recency weighting (min 20 ratings) | Medium   | TODO   | P10H.01        | Agent | —         | Consent-gated derivation                 |
+| `[ ] P10H.03` | Implement instant hard deletion hook for `player_taste` upon `'personalisation'` consent withdrawal         | Critical | TODO   | P10H.01        | Agent | —         | Rule 13 compliance                       |
+| `[ ] P10H.04` | Build category performance analytics calculation (completion, share lift, dwell by subject tag)             | Medium   | TODO   | P10F.06        | Agent | —         | Aggregate metrics only                   |
+| `[ ] P10H.05` | Build question quality flagging engine (detect high dwell, high option changes, high abandon rate)          | High     | TODO   | P10F.06        | Agent | —         | Mission Control alert triggers           |
+| `[ ] P10H.06` | Build cohort notification timing optimization model (hourly open bucket clustering)                         | Medium   | TODO   | P10H.01        | Agent | —         | No individual profiling                  |
+| `[ ] P10H.07` | Build Drop planning advisory engine: generate `editor_suggestions` for Mission Control with fatigue warnings | Medium | TODO   | P10H.04        | Agent | —         | Advisory suggestions only                |
+| `[ ] P10H.08` | Implement personalised ranking for optional Meme Corner card and suggested share card themes                | Medium   | TODO   | P10H.02        | Agent | —         | Non-Drop surfaces only                   |
+| `[ ] P10H.09` | Unit and integration tests with synthetic fixtures proving zero sensitive inference and zero Drop variation | Critical | TODO   | P10H.02, P10H.08| Agent| —         | Invariant verification                   |
+
+---
+
+### Phase 10I: Taste Dimension & Recognition (Stage M5 & M6 — Deferred)
+
+_Status: TODO | Target: Orbit Subject Sync, creator badges, Satori achievement cards, featured memes showcase._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10I.01` | Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold)          | High     | TODO   | P10A.04, P10E.01| Agent| —         | Rule 19 agreement percentage             |
+| `[ ] P10I.02` | Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view             | Medium   | TODO   | P10I.01        | Agent | —         | Warm, celebratory microcopy              |
+| `[ ] P10I.03` | Database migrations: `badge_definitions`, `creator_badges`, `featured_memes`                               | Medium   | TODO   | P10G.01        | Agent | —         | Recognition schema                       |
+| `[ ] P10I.04` | Creator badge award worker: evaluate Wilson scores and rater benchmarks (e.g. 500 raters, 70% Funny)       | Medium   | TODO   | P10I.03        | Agent | —         | Automated benchmark awards               |
+| `[ ] P10I.05` | Build achievement card renderer: Satori 3D flip card with alias + macro-region ($k \ge 20$)                 | High     | TODO   | P10I.04, P6.01 | Agent | —         | Token palette; flip anatomy              |
+| `[ ] P10I.06` | Build featured meme showcase surface (`/featured`): curated "Meme of the Week"                              | Medium   | TODO   | P10I.03        | Agent | —         | Editorial showcase; no leaderboards      |
+| `[ ] P10I.07` | Build opt-in achievement sharing sheet and creator deletion revocation flow                                 | High     | TODO   | P10I.05        | Agent | —         | Opt-in sharing only                      |
+| `[ ] P10I.08` | Author integration tests proving zero raw answer vector exposure and zero public leaderboard rankings       | Critical | TODO   | P10I.01, P10I.06| Agent| —         | Privacy & brand invariant suite          |
+
+---
+
+### Phase 10J: ML Ranker for Optional Surfaces (Stage M7 — Documented Only)
+
+_Status: TODO | Target: Offline training harness, shadow-mode inference, bias/drift audit, kill switch._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10J.01` | Build offline dataset extraction harness: generate pseudonymous training pairs from consented ratings       | Low      | TODO   | P10H.02        | Agent | —         | Gated by data scale thresholds           |
+| `[ ] P10J.02` | Train baseline statistical model benchmark (logistic regression / GBDT) to beat M4 heuristics               | Low      | TODO   | P10J.01        | Agent | —         | Explainable model; no LLMs               |
+| `[ ] P10J.03` | Build shadow-mode inference pipeline for non-Drop surfaces                                                  | Low      | TODO   | P10J.02        | Agent | —         | Zero production impact                   |
+| `[ ] P10J.04` | Author automated bias, drift, and sensitive-inference audit suite                                           | Medium   | TODO   | P10J.03        | Agent | —         | Rule 14 compliance                       |
+| `[ ] P10J.05` | Build Mission Control model performance dashboard with instant kill switch                                  | Low      | TODO   | P10J.03, P11.01| Agent | —         | One-click fallback to Wilson scores      |
+
+---
+
+### Phase 10K: Premium Groundwork (Stage M8 — Documented Only, After Gate G3)
+
+_Status: TODO | Target: Provider-agnostic entitlements, feature flags for perks, paywall experiments, guardrail monitor._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10K.01` | Scaffold provider-agnostic entitlements data model: `plans`, `entitlements`, `subscriptions`               | Low      | TODO   | P8.01          | Agent | —         | Gated by Gate G3                         |
+| `[ ] P10K.02` | Build feature flag entitlements engine gating streak freezes, archive access, and bespoke themes           | Low      | TODO   | P10K.01        | Agent | —         | Oddly Plus feature gates                 |
+| `[ ] P10K.03` | Build paywall experiment framework restricted to non-Drop surfaces                                          | Low      | TODO   | P10K.02        | Agent | —         | Non-Drop surfaces only                   |
+| `[ ] P10K.04` | Implement guardrail monitor: frequency cap (max 1 offer/14d) and dismissal halt (90d freeze after 2)       | Medium   | TODO   | P10K.03        | Agent | —         | Rule 17 compliance                       |
+| `[ ] P10K.05` | Build self-service single-tap subscription cancellation API and webhook listener                            | Medium   | TODO   | P10K.01        | Agent | —         | Zero dark patterns                       |
+
+---
+
+---
+
 ### Phase 11: Admin Tool: "Mission Control" (Stage 11)
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**  
@@ -419,6 +546,13 @@ _Status: TODO | Target: Independent admin host, SSO + TOTP 2FA, immutable audit 
 | `[ ] P11.23` | Matching ops, Twin Globe live/replay toggle, Orbit stats/sever, Telepathy baseline, Anti-twin panel        | High     | TODO   | P10D.09, P11.15| Agent | —        | spec section 7 [P1] (after F4)       |
 | `[ ] P11.24` | DPDP data-requests queue and retention runs view                                                           | High     | TODO   | P11.13        | Agent | —         | spec section 14 [P1]                 |
 | `[ ] P11.25` | Run the admin acceptance checklist (spec section 20) and attach verification evidence                      | Critical | TODO   | P11.13-P11.24 | Agent | —         | spec section 20 [P1]                 |
+| `[ ] P11.26` | Tag and template manager: taxonomy grid, retire tag, vector template library, license/alt text             | High     | TODO   | P11.01, P10E.01| Agent | —        | spec Addendum A1 [P1]                |
+| `[ ] P11.27` | Question quality panel: aggregate dwell, change, abandon, entropy, flags, k >= 20 drill-down               | High     | TODO   | P11.01, P10F.06| Agent | —        | spec Addendum A2 [P1]                |
+| `[ ] P11.28` | Signals and consent admin: event dictionary viewer, consent rates, retention runs, kill switch, slider     | High     | TODO   | P11.01, P10F.03| Agent | —        | spec Addendum A4 [P1]                |
+| `[ ] P11.29` | Meme Lab moderation queue: SLA timers, bulk review, appeals, takedown, candidate promotion                 | High     | TODO   | P11.01, P10G.01| Agent | —        | spec Addendum A5 [P2, Deferred]      |
+| `[ ] P11.30` | Category performance and next-Drop suggestions with fatigue linting                                        | High     | TODO   | P11.01, P10H.04| Agent | —        | spec Addendum A3 [P2]                |
+| `[ ] P11.31` | Recognition tooling: badge definitions, benchmark settings, featured-meme curator                         | High     | TODO   | P11.01, P10I.03| Agent | —        | spec Addendum A6 [P2]                |
+| `[ ] P11.32` | Premium groundwork admin: plans, entitlements, paywall experiments, guardrail monitor                      | High     | TODO   | P11.01, P10K.01| Agent | —        | spec Addendum A7 [P3, Deferred]      |
 
 #### Phase 11 Deferred (P2 & P3 Features — Visible in Backlog but Not in Stage 11)
 - **Full Command Center [P2]:** Milestone confetti/chimes, count-up animations, custom density toggle, saved views (spec section 3.4).
@@ -595,12 +729,12 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [ ] Run axe-core accessibility audit across all connection screens (zero critical/serious violations).
   - [ ] Run bundle budget check: verify initial play route remains $\le 159.5\text{ KB}$ gzipped.
   - [ ] Run complete Playwright E2E test suite covering full connection user loop.
-- **Stage 11 Checklist ("Mission Control" per docs/admin-panel-spec.md Section 20):**
+- **Stage 11 Checklist ("Mission Control" per docs/admin-panel-spec.md Section 20 & Addendum A):**
   - [ ] No admin route is reachable without SSO and 2FA, and none is served on the public host.
   - [ ] Every write action creates an audit entry with a reason and idempotency key.
   - [ ] Phone numbers and individual answers are never shown without a logged reveal.
   - [ ] A Drop cannot be scheduled without two different people (writer and approver).
-  - [ ] All eight automatic question checks block approval when they fail (including Telepathy rule).
+  - [ ] All 12 automatic question checks block approval when they fail (including Telepathy rule, subject tag present, licensed template, forbidden topics in captions/alt text, originality note).
   - [ ] The 14-day gap warning fires, and a gap within 3 days alerts the Owner.
   - [ ] Pulling a question recomputes matching on the other four and shows a recap note.
   - [ ] Each tile shows "as of" time and turns amber when stale.
@@ -608,8 +742,54 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [ ] Incident mode toggles each action and writes a timeline.
   - [ ] Config rollback restores the previous version and logs it.
   - [ ] Dashboards load in under 2 seconds with 10 lakh players of data (tiles read only from aggregates).
+  - [ ] Question quality panel drill-down strictly enforces $k \ge 20$ group reporting; zero individual vectors.
+  - [ ] Signals telemetry kill switch immediately stops `/v1/events` processing without server restart.
+  - [ ] Community meme promotion into Drop candidate queue enforces mandatory two-person approval.
   - [ ] The panel is usable at 390 px width (phone).
   - [ ] Reduced-motion setting is respected by all count-up and confetti effects.
+- **Stage M1 Checklist (Phase 10E: Meme Questions & Themed Drops):**
+  - [ ] Run expand migrations for `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key`.
+  - [ ] Seed 14 neutral subject tags and vector meme template library.
+  - [ ] Verify validation engine requires >= 1 subject tag for meme variant and validates template key.
+  - [ ] Verify JSON batch importer parses `tags`, `render_variant`, and `template_key` with dry run.
+  - [ ] Verify polymorphic renderer displays `meme` variant with live DOM captions and token imports.
+  - [ ] Verify 12 sample meme questions in seed batch pass all automatic checks.
+  - [ ] Run regression suite proving pure scoring math, similarity, and oddness remain 100% identical.
+  - [ ] Run automated test verifying zero tag keys match Section 9.1 forbidden topics.
+  - [ ] Verify >= 44px touch targets and play-route bundle remains <= 159.5 KB gzipped.
+- **Stage M2 Checklist (Phase 10F: Signals Foundation):**
+  - [ ] Run expand migrations for `consents`, `analytics_ids`, `events_raw`, `question_stats_daily`, `tag_stats_daily`.
+  - [ ] Verify client event batcher (< 450 bytes) dispatches allowlisted events via `navigator.sendBeacon`.
+  - [ ] Test `POST /v1/events` ingestion on Low priority lane (202 Accepted, allowlist Zod validation).
+  - [ ] Verify Settings screen consent toggles (`analytics` and `personalisation`) default to OFF.
+  - [ ] Verify partition manager pre-creates `events_raw` partitions 14 days in advance.
+  - [ ] Verify nightly worker rolls `events_raw` into `question_stats_daily` and `tag_stats_daily`.
+  - [ ] Verify retention worker drops `events_raw` partitions older than 90 days.
+  - [ ] Test DPDP account erasure purges raw events, `analytics_id`, and `player_taste`.
+  - [ ] Test graceful degradation: 50% deterministic sampling at L1, 100% shed at L2+.
+  - [ ] Author integration tests verifying zero events collected without consent and zero PII leakage.
+- **Stage M3 Checklist (Phase 10G: Meme Lab — Deferred):**
+  - [ ] Run migrations for `meme_submissions`, `meme_ratings`, `meme_stats`, `meme_exposures`, `moderation_actions`.
+  - [ ] Verify `POST /v1/memes/submissions` enforces Turnstile, 100 char limit, and originality attestation.
+  - [ ] Test caption composer UI at 360px viewport.
+  - [ ] Verify Meme Corner card renders on post-drop recap sheet with "Funny" / "Not for me" buttons.
+  - [ ] Test Wilson score lower-bound computation ($N \ge 200$) and 20% exploration traffic share.
+  - [ ] Verify candidate promotion requires two-person approval and D-2 lock before Drop scheduling.
+  - [ ] Test creator deletion and moderation takedown actions.
+- **Stage M4 Checklist (Phase 10H: Insights Engine — Deferred):**
+  - [ ] Run migrations for `player_taste`, `notification_timing_stats`, `editor_suggestions`.
+  - [ ] Verify nightly worker computes smoothed `player_taste` affinity scores with recency weighting ($n \ge 20$).
+  - [ ] Test instant hard deletion of `player_taste` upon `'personalisation'` consent withdrawal.
+  - [ ] Verify question quality flagging engine detects high dwell, option changes, and abandon spikes.
+  - [ ] Test Drop planning advisory engine fatigue warnings on repeated subject tags.
+  - [ ] Verify zero personalising changes to daily Drop questions (Rule 12).
+- **Stage M5/M6 Checklist (Phase 10I: Taste Dimension & Recognition — Deferred):**
+  - [ ] Test Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` enforcing 5 shared questions threshold.
+  - [ ] Verify Subject Sync UI renders agreement progress row inside Orbit detail view.
+  - [ ] Run migrations for `badge_definitions`, `creator_badges`, `featured_memes`.
+  - [ ] Verify creator badge awards trigger on verified Wilson benchmarks.
+  - [ ] Verify Satori achievement flip card exports alias and macro-region ($k \ge 20$) only.
+  - [ ] Test "Meme of the Week" showcase surface without public leaderboard rankings.
 - **Stage 12 Checklist:**
   - [ ] Review PostHog dashboard, trigger a deliberate error to verify Sentry alert dispatch.
 - **Stage 13 Checklist:**
@@ -627,6 +807,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-15` | Phase 10E–10K, Phase 11   | Added Phases 10E to 10K (Stages M1 to M8) for F24–F31 Memes, Signals, and Insights. Expanded Phase 11 with tasks P11.26–P11.32 per Addendum A. Dashboard updated to 336 tasks. | Stage M0 Founder approval & scope decisions.  |
 | `2026-11-15` | Phase 10A (Stage F1)      | Completed Phase 10A Orbit Foundation backend: migrations, repositories, APIs, co-streaks, push, DPDP, 13/13 integration tests. | Stage F1 verification and completion.         |
 | `2026-11-14` | Phase 10A–10D, Phase 11   | Added Phases 10A, 10B, 10C, 10D (Stages F1–F4) for F18–F21 connection features. Expanded Phase 11 to 25 tasks matching `docs/admin-panel-spec.md`. Dashboard updated to 274 tasks. | Stage F0 Founder approval & scope decisions.  |
 | `2026-11-14` | Stage D1 Complete         | Completed full UI redesign to Sticker Pop (tokens, primitives, play flow, 3D flip card, dev UI showcase).     | Stage D1 verification and completion.         |
