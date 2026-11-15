@@ -95,3 +95,4 @@
 4. **Accessible Indicators Invariant:**
    - Uses distinct shape icons (Check $\checkmark$ vs Slash $\times$) and textual microcopy, strictly avoiding relying on color alone for state.
    - All interactive touch targets are $\ge 44 \times 44\text{px}$.
+

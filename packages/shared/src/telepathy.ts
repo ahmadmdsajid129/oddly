@@ -171,3 +171,4 @@ export function calculateSyncScore(
     min_rounds: minRounds,
   };
 }
+
