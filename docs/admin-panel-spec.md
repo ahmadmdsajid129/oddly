@@ -157,6 +157,10 @@ Filters by type, category, status, health.
 6. Readability: question text under two lines at 360 px.
 7. Same type not in the same slot two days in a row.
 8. Cooldown: a question cannot repeat within 180 days.
+9. **Subject tag present (M0):** Every question (and specifically meme variants) must carry at least one valid neutral subject tag from the database taxonomy.
+10. **Template licensed & registered (M0):** Any meme variant question must reference an active `meme_templates` record in the illustration registry with complete alt text and license attribution.
+11. **Forbidden-topic scan covers captions & alt text (M0):** The automated topic filter scans prompt, option captions, and image alt text.
+12. **Originality note present (M0):** Editorial meme questions must include an attestation note confirming they were authored for Oddly.
 
 ### 6.4 Panel testing
 Generate a private test link for 100+ testers. The tool collects answers and shows distribution, entropy and abandon points before the question can move to review.
@@ -406,4 +410,157 @@ All write endpoints take a `reason` and an idempotency key, and return the audit
 - [ ] Dashboards load in under 2 seconds with 10 lakh players of data (tiles read only from aggregates).
 - [ ] The panel is usable at 390 px width (phone).
 - [ ] Reduced-motion setting is respected by all count-up and confetti effects.
+
+---
+
+# Addendum A: Memes, Signals and Insights (Mission Control Extensions)
+
+> Spec Extension v1.0 | 15 Nov 2026 | Audience: The Founder and AI Build Agent  
+> Companion to: `docs/admin-panel-spec.md` (P1 ships with v1 / Stage 11; P2 ships with v1.1+; P3 ships later).
+
+---
+
+## A1. Tag Taxonomy Manager and Meme Template Library [P1]
+
+### A1.1 Tag Taxonomy Manager
+- **View & Edit:** Searchable, groupable grid of all subject tags (`tags` table).
+- **Columns:** Key, Default Label (English), Hindi Label, Gujarati Label, Tag Group (`lifestyle`, `humour`, `quirks`, `habits`), Usage Count in Questions, Status (`active`, `retired`).
+- **Actions:**
+  - Create new neutral subject tag with multilingual labels.
+  - Retire tag (soft delete: preserves historical metrics, removes from question editor selector).
+- **Safety Gate:** Instant automated check against Section 9.1 Forbidden Topic List on key entry and label edit; blocks saving if matching words are detected.
+
+### A1.2 Meme Template Library
+- **Visual Grid:** Visual gallery of vector SVG templates registered in the illustration registry (`D-015`).
+- **Card Contents:** SVG visual preview, Template Key, Aspect Ratio (`1:1` or `16:9`), Alt Text preview, License Source & Attribution Note, Active Status toggle, Number of Questions using template.
+- **Form Actions:** Register new template, edit alt text and licensing attribution, preview with sample live captions in light cream mode.
+
+---
+
+## A2. Question Quality Panel [P1]
+
+### A2.1 Aggregate Quality Dashboard
+- Replaces guess-work with hard aggregate metrics per question per Drop (`question_stats_daily`):
+  - **Dwell Time:** Median (p50) and 90th percentile (p90) in milliseconds (time from question shown to option lock).
+  - **Toggling & Back Rate:** Percentage of players who changed their pick before locking (`change_rate`), and percentage who hit Back (`back_rate`).
+  - **Abandon Rate:** Percentage of players who exited the flow while viewing this specific question.
+  - **Realised Entropy:** Information-theoretic entropy $H = -\sum p(a) \log_2 p(a)$ compared against predicted balance.
+  - **Flag Triggers (Automated):**
+    - 🔴 **High Friction:** Dwell p50 > 12 s or Change Rate > 35% ("Confusing prompt or ambiguous options").
+    - 🔴 **High Abandonment:** Abandon rate > 3.0% on this question position.
+    - 🔴 **Lopsided Split:** Realised top-option share > 65% ("Unbalanced instinct distribution").
+    - 🔴 **Spike in Reports:** $\ge 3$ user reports.
+
+### A2.2 Group Drill-Down Only ($k \ge 20$)
+- In full compliance with Rule 15 (No identity-joined profiling): clicking a question quality flag drills down strictly into macro-cohort groupings (e.g., age band, coarse region, platform class).
+- **Strict Prohibition:** Zero individual answer vectors or user identities are ever rendered in this panel.
+
+---
+
+## A3. Category Performance and Next-Drop Suggestions [P2]
+
+### A3.1 Category Performance Analytics
+- Aggregated performance trends across subject tags (`tag_stats_daily`):
+  - 14-day completion rate index by tag.
+  - Viral share lift by tag (which topics drive the highest Instagram Story / Square card downloads).
+  - Average dwell and completion speed per subject group.
+
+### A3.2 Next-Drop Advisory & Fatigue Warning Engine
+- **Calendar Suggestions:** When planning the next Drop on the Drops Calendar, the engine surfaces an advisory candidate list:
+  - Highlights underused neutral tags that haven't appeared in the past 14 days.
+  - Flags high-share tags suitable for weekend Drops.
+- **Fatigue Lint:** Automatically warns if the same subject tag is scheduled $> 2$ times within 4 consecutive days.
+
+---
+
+## A4. Signals, Telemetry & Consent Administration [P1]
+
+### A4.1 Event Dictionary Viewer
+- Live, read-only reference of the strict Allowlisted Event Dictionary (`docs/event-dictionary.md`).
+- Displays event name, allowed payload properties, validation status, and ingestion priority lane.
+
+### A4.2 Consent & Compliance Monitoring
+- Real-time aggregate consent adoption metrics:
+  - Active `'analytics'` consent rate (% granted vs. default OFF).
+  - Active `'personalisation'` consent rate (% granted vs. default OFF).
+  - Withdrawal counts and compliance status (verifies `player_taste` rows deleted within SLA).
+
+### A4.3 Telemetry Operations & Controls
+- **Sampling Slider:** Dynamic runtime slider adjusting `signals.sample_rate_l1` (0% to 100%) during high-traffic load states.
+- **Global Kill Switch:** One-click kill switch for `/v1/events` ingestion (pushes instant update to edge config without code deployment).
+- **Retention Job Monitor:** Status and execution log of the daily `events_raw` partition drop job (confirming 90-day compaction).
+
+---
+
+## A5. Meme Lab Moderation Queue [P2 — Required Before Stage M3]
+
+### A5.1 Moderation Desk
+- Inbound queue for community-authored meme captions (`meme_submissions`).
+- **Tile Metrics:** Pending queue count, median review SLA (target: < 2 hours), 24h approval rate, 24h rejection rate.
+- **Review Card Layout:**
+  - Vector Template preview.
+  - Submitted live caption text (max 100 characters).
+  - Pre-computed checks: Turnstile score, duplicate caption similarity score, automated forbidden-topic filter status.
+  - One-click actions: **Approve**, **Reject with Preset Reason** (*"Guidelines"*, *"Duplicate"*, *"Unbalanced"*), **Escalate to Legal**.
+  - Bulk actions: Select multiple -> Bulk approve / Bulk reject.
+
+### A5.2 Live Meme Corner Ops & Drop Candidate Promotion
+- Exposure and Wilson score monitor for active community memes:
+  - Total raters, "Funny" percentage, Wilson lower-bound score, retirement countdown.
+- **Candidate List for Drops:** Tab listing memes with Wilson lower-bound score > 0.70 and $\ge 200$ raters.
+- **Promotion Workflow:** Clicking "Promote to Drop" converts the meme submission into a draft Question in the Question Bank. Requires formal two-person approval and D-2 lock before release.
+
+---
+
+## A6. Recognition & Badges Tooling [P2]
+
+- **Badge Catalogue Editor:** Create and edit badge definitions (`badge_definitions`), benchmark rules (e.g. raters $\ge 500$, funny $\ge 70\%$), and SVG icon assets.
+- **Featured Meme Curator:** Weekly curation desk for the "Meme of the Week" showcase surface (`/featured`). Shows top 10 Wilson-scored memes of the week; editor selects 1 and logs curator notes.
+
+---
+
+## A7. Premium Groundwork & Guardrail Monitor [P3 — Gated by Gate G3]
+
+- **Plans & Entitlements Manager:** View and manage subscription tiers (plans, pricing, duration, feature entitlement flags).
+- **Guardrail & Dark Pattern Monitor:**
+  - Tracks frequency capping: confirms no user receives more than 1 offer per 14 days.
+  - Monitors dismissal rates: verifies that 2 dismissals trigger the mandatory 90-day cooling halt.
+  - Alert trigger: flags any conversion copy that uses countdown urgency, guilt copy, or streak threat phrases.
+
+---
+
+## A8. Data-Model Additions for Mission Control
+
+- Reads: `tags`, `meme_templates`, `question_stats_daily`, `tag_stats_daily`, `events_raw`, `consents`, `meme_submissions`, `meme_ratings`, `meme_stats`, `badge_definitions`, `creator_badges`, `featured_memes`.
+- Writes: `tags`, `meme_templates`, `moderation_actions`, `editor_suggestions`, `featured_memes`, `badge_definitions`.
+- Invariant: Zero direct read access to raw user IP addresses, raw answers, or PII.
+
+---
+
+## A9. Admin API Additions
+
+| Endpoint | Method | Role | Description |
+|---|---|---|---|
+| `/v1/admin/tags` | GET/POST | Editor, Admin | List and create subject taxonomy tags |
+| `/v1/admin/tags/:id/retire` | POST | Admin | Soft-retire a taxonomy tag |
+| `/v1/admin/templates` | GET/POST | Editor, Admin | List and register meme illustration templates |
+| `/v1/admin/question-quality/:dropDate` | GET | Analyst, Approver, Admin | Group question quality statistics and flags |
+| `/v1/admin/signals/status` | GET | Developer, Admin | Event dictionary, consent rates, and ingestion metrics |
+| `/v1/admin/signals/sampling` | PUT | Developer, Admin | Adjust L1 sampling rate or toggle kill switch |
+| `/v1/admin/memes/queue` | GET | Moderator, Admin | Inbound Meme Lab moderation queue |
+| `/v1/admin/memes/:id/moderate` | POST | Moderator, Admin | Approve, reject, or escalate meme submission |
+| `/v1/admin/memes/candidates` | GET | Editor, Approver, Admin | Top Wilson-scored memes eligible for Drop promotion |
+| `/v1/admin/badges` | GET/POST | Admin | Manage creator badge definitions and benchmarks |
+| `/v1/admin/featured-memes` | POST | Editor, Admin | Publish weekly curated featured meme |
+
+---
+
+## A10. Addendum A Acceptance Checklist
+
+- [ ] All question quality drill-downs enforce $k \ge 20$ group reporting; zero individual vectors displayed.
+- [ ] Every moderation action (approve, reject, takedown) logs an immutable audit row with reviewer ID and reason.
+- [ ] Automated tag taxonomy linter fails immediately if any tag key matches the Section 9.1 forbidden list.
+- [ ] Telemetry kill switch immediately stops `/v1/events` processing without requiring an API server restart.
+- [ ] No community meme can be promoted into a live Drop without passing through the two-person approval workflow.
+- [ ] All admin routes strictly require SSO + mandatory 2FA and operate on an isolated admin origin.
 
