@@ -59,16 +59,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       onClick?.(e);
     };
 
-    // Base button styling - Section 5: Display 700, 16px, radius-m (14px), outline (2.5px solid ink), min-height 48
-    // All interactive touch targets must be at least 44x44px.
+    // Base button styling - Section 5: Display 700, 16px, radius-m (14px), outline (2.5px solid ink), min-height 44px
+    // All interactive touch targets must be at least 44x44px. Button width hugs content.
     const baseStyles =
-      "relative inline-flex items-center justify-center font-display font-bold text-button select-none cursor-pointer outline-none transition-all duration-120 sticker-press disabled:pointer-events-none disabled:bg-lavender disabled:text-muted disabled:border-muted disabled:shadow-none min-h-[48px]";
+      "relative inline-flex flex-row items-center justify-center font-display font-bold select-none cursor-pointer outline-none transition-all duration-120 sticker-press disabled:pointer-events-none disabled:bg-lavender disabled:text-muted disabled:border-muted disabled:shadow-none min-h-[44px] w-auto whitespace-nowrap shrink-0";
 
-    // Size variants (all satisfy >= 44px min-height)
+    // Size variants: compact width according to the word, touch targets >= 44x44px
     const sizeStyles: Record<ButtonSize, string> = {
-      sm: "min-h-[44px] px-4 text-sm rounded-m gap-1.5",
-      md: "min-h-[48px] px-6 text-button rounded-m gap-2",
-      lg: "min-h-[56px] px-8 text-lg rounded-m gap-2.5",
+      sm: "min-h-[44px] px-3.5 py-1 text-xs rounded-m gap-1.5",
+      md: "min-h-[44px] px-4 py-2 text-sm rounded-m gap-2",
+      lg: "min-h-[52px] px-6 py-2.5 text-base rounded-m gap-2.5",
     };
 
     // Variant styling - Section 5
@@ -119,17 +119,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading ? (
-          <span className="inline-flex items-center gap-1.5 py-1" aria-hidden="true">
+          <span className="inline-flex flex-row items-center justify-center gap-1.5 py-1 whitespace-nowrap" aria-hidden="true">
             <span className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:-0.3s]" />
             <span className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:-0.15s]" />
             <span className="w-2 h-2 rounded-full bg-current animate-bounce" />
           </span>
         ) : (
-          <>
-            {leftIcon && <span className="shrink-0">{leftIcon}</span>}
-            <span>{children}</span>
-            {rightIcon && <span className="shrink-0">{rightIcon}</span>}
-          </>
+          <span className="inline-flex flex-row items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap [&>svg]:shrink-0 [&>svg]:inline-block [&>span]:inline-flex [&>span]:items-center">
+            {leftIcon && <span className="shrink-0 inline-flex items-center justify-center">{leftIcon}</span>}
+            {children}
+            {rightIcon && <span className="shrink-0 inline-flex items-center justify-center">{rightIcon}</span>}
+          </span>
         )}
       </button>
     );

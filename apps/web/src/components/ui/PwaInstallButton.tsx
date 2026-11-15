@@ -60,10 +60,10 @@ export function PwaInstallButton({ className = "" }: { className?: string }) {
     <button
       type="button"
       onClick={handleInstallClick}
-      className={`px-3 py-1.5 rounded-full border border-mint/40 bg-mint/10 text-mint text-xs font-semibold flex items-center gap-1.5 hover:bg-mint/20 transition-all cursor-pointer shadow-xs ${className}`}
+      className={`px-3 py-1.5 rounded-full border border-mint/40 bg-mint/10 text-mint text-xs font-semibold inline-flex flex-row items-center gap-1.5 hover:bg-mint/20 transition-all cursor-pointer shadow-xs whitespace-nowrap w-auto ${className}`}
       title="Install Oddly Web App"
     >
-      <Download className="w-3.5 h-3.5" />
+      <Download className="w-3.5 h-3.5 shrink-0" />
       <span>Install App</span>
     </button>
   );

@@ -103,9 +103,9 @@ export function OrbitRequestCard({
           isLoading={loadingAction === "decline"}
           disabled={loadingAction !== null}
           onClick={handleDecline}
-          className="min-h-[44px] h-11 border-[2px] border-ink font-display font-bold text-muted hover:text-ink active:translate-x-[2px] active:translate-y-[2px] active:shadow-sticker-flat"
+          className="border-[2px] border-ink text-muted hover:text-ink"
         >
-          <X className="w-4 h-4 stroke-[2.5] mr-1" />
+          <X className="w-4 h-4 stroke-[2.5] shrink-0" />
           <span>Not now</span>
         </Button>
 
@@ -116,9 +116,9 @@ export function OrbitRequestCard({
           isLoading={loadingAction === "accept"}
           disabled={loadingAction !== null}
           onClick={handleAccept}
-          className="min-h-[44px] h-11 bg-mint hover:bg-mint text-ink border-[2.5px] border-ink shadow-sticker active:translate-x-[2px] active:translate-y-[2px] active:shadow-sticker-flat font-display font-extrabold"
+          className="bg-mint hover:bg-mint text-ink border-[2.5px] border-ink shadow-sticker font-extrabold"
         >
-          <Check className="w-4 h-4 stroke-[3] mr-1" />
+          <Check className="w-4 h-4 stroke-[3] shrink-0" />
           <span>Accept</span>
         </Button>
       </div>

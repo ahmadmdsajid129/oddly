@@ -35,7 +35,6 @@ export default function HistoryPage() {
           variant="secondary"
           size="sm"
           onClick={() => router.push("/")}
-          className="flex items-center gap-1.5"
         >
           <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span>Home</span>

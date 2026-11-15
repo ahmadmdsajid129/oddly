@@ -128,14 +128,16 @@ export default function OrbitListPage() {
             </p>
           </div>
 
-          <Button
-            variant="primary"
-            size="md"
-            className="w-full bg-coral hover:bg-coral text-ink border-[2.5px] border-ink shadow-sticker"
-            onClick={openLoginModal}
-          >
-            Sign in with Google
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              variant="primary"
+              size="md"
+              className="bg-coral hover:bg-coral text-ink border-[2.5px] border-ink shadow-sticker px-6"
+              onClick={openLoginModal}
+            >
+              Sign in with Google
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">

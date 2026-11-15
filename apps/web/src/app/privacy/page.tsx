@@ -16,7 +16,6 @@ export default function PrivacyPage() {
           variant="secondary"
           size="sm"
           onClick={() => router.back()}
-          className="flex items-center gap-1.5"
         >
           <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span>Back</span>

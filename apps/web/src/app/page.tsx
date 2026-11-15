@@ -618,9 +618,9 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => auth.openLoginModal()}
-              className="px-3.5 py-1.5 text-chip font-display font-bold rounded-m border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer flex items-center gap-1.5 min-h-[44px]"
+              className="px-3.5 py-1.5 text-chip font-display font-bold rounded-m border-[2.5px] border-ink bg-paper text-ink shadow-sticker sticker-press cursor-pointer inline-flex flex-row items-center gap-1.5 min-h-[44px] whitespace-nowrap w-auto"
             >
-              <User className="w-4 h-4 stroke-[2.5] text-violet" />
+              <User className="w-4 h-4 stroke-[2.5] text-violet shrink-0" />
               <span>Sign in</span>
             </button>
           )}
@@ -664,11 +664,10 @@ export default function HomePage() {
               Matched {submissionResult.match.matched_picks}/5 with a stranger in {submissionResult.match.twin_location}
             </p>
 
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center pt-1">
               <Button
                 variant="primary"
                 size="md"
-                className="w-full flex items-center justify-center gap-2"
                 onClick={() => setStep("reveal")}
               >
                 <span>View Twin & Oddness</span>

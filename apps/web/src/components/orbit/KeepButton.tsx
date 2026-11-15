@@ -111,12 +111,12 @@ export function KeepButton({
         disabled
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "w-full h-11 px-4 rounded-m bg-cream/70 border-[2px] border-ink/40 text-ink/60 font-display text-xs font-bold flex items-center justify-center gap-1.5 cursor-not-allowed opacity-80",
+          "w-auto min-h-[44px] px-4 rounded-m bg-cream/70 border-[2px] border-ink/40 text-ink/60 font-display text-xs font-bold inline-flex flex-row items-center justify-center gap-1.5 cursor-not-allowed opacity-80 whitespace-nowrap",
           className
         )}
         title="Unlocks after 07:00 IST lock"
       >
-        <Clock className="w-3.5 h-3.5" />
+        <Clock className="w-3.5 h-3.5 shrink-0" />
         <span>Keep locks at 07:00 IST</span>
       </button>
     );
@@ -127,11 +127,11 @@ export function KeepButton({
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "w-full h-11 px-4 rounded-m bg-violet text-paper border-[2.5px] border-ink shadow-sticker-flat font-display text-xs font-extrabold flex items-center justify-center gap-2",
+          "w-auto min-h-[44px] px-4 rounded-m bg-violet text-paper border-[2.5px] border-ink shadow-sticker-flat font-display text-xs font-extrabold inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap",
           className
         )}
       >
-        <Sparkles className="w-4 h-4 text-sun stroke-[2.5]" />
+        <Sparkles className="w-4 h-4 text-sun stroke-[2.5] shrink-0" />
         <span>In Orbit with Twin ✨</span>
       </div>
     );
@@ -142,11 +142,11 @@ export function KeepButton({
       <div
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "w-full h-11 px-4 rounded-m bg-lavender text-ink border-[2px] border-ink shadow-sticker-flat font-display text-xs font-bold flex items-center justify-center gap-2",
+          "w-auto min-h-[44px] px-4 rounded-m bg-lavender text-ink border-[2px] border-ink shadow-sticker-flat font-display text-xs font-bold inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap",
           className
         )}
       >
-        <Check className="w-4 h-4 text-ink stroke-[3]" />
+        <Check className="w-4 h-4 text-ink stroke-[3] shrink-0" />
         <span>Keep Request Sent (48h)</span>
       </div>
     );
@@ -160,11 +160,11 @@ export function KeepButton({
       isLoading={status === "loading"}
       onClick={handleKeepClick}
       className={cn(
-        "w-full h-11 font-display text-sm font-extrabold flex items-center justify-center gap-2 bg-coral hover:bg-coral text-ink border-[2.5px] border-ink shadow-sticker active:translate-x-[2px] active:translate-y-[2px] active:shadow-sticker-flat",
+        "bg-coral hover:bg-coral text-ink border-[2.5px] border-ink shadow-sticker text-sm font-extrabold",
         className
       )}
     >
-      <Heart className="w-4 h-4 fill-ink stroke-ink stroke-[1.5]" />
+      <Heart className="w-4 h-4 fill-ink stroke-ink stroke-[1.5] shrink-0" />
       <span>Keep this twin</span>
     </Button>
   );

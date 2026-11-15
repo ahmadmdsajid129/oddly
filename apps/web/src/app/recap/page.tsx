@@ -188,15 +188,14 @@ export default function MorningRecapPage() {
           </div>
 
           {/* Keep Twin & Share Actions */}
-          <div className="space-y-2 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <KeepButton dropId={data.dropId} isProvisional={false} />
             <Button
               variant="secondary"
               size="md"
-              className="w-full flex items-center justify-center gap-2"
               onClick={() => setIsShareOpen(true)}
             >
-              <Share2 className="w-4 h-4 stroke-[2.5]" />
+              <Share2 className="w-4 h-4 stroke-[2.5] shrink-0" />
               <span>Share Yesterday&apos;s Card</span>
             </Button>
           </div>
@@ -213,15 +212,16 @@ export default function MorningRecapPage() {
             </p>
           </div>
 
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full flex items-center justify-center gap-2"
-            onClick={() => router.push("/")}
-          >
-            <span>Play Today&apos;s Five</span>
-            <ArrowRight className="w-4 h-4 stroke-[3]" />
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => router.push("/")}
+            >
+              <span>Play Today&apos;s Five</span>
+              <ArrowRight className="w-4 h-4 stroke-[3] shrink-0" />
+            </Button>
+          </div>
         </div>
       </div>
 

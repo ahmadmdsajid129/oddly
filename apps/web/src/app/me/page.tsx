@@ -78,7 +78,6 @@ export default function MePage() {
           variant="secondary"
           size="sm"
           onClick={() => router.push("/")}
-          className="flex items-center gap-1.5"
         >
           <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span>Home</span>
@@ -120,7 +119,7 @@ export default function MePage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => auth.logout()}
-                className="flex items-center gap-1.5 text-xs text-error"
+                className="text-xs text-error"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Sign out</span>
@@ -130,7 +129,7 @@ export default function MePage() {
                 variant="primary"
                 size="sm"
                 onClick={() => auth.openLoginModal()}
-                className="flex items-center gap-1.5 text-xs"
+                className="text-xs"
               >
                 <User className="w-3.5 h-3.5" />
                 <span>Sign in</span>
