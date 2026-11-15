@@ -9,8 +9,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage F1: Orbit Foundation (Backend) — COMPLETE.
-- **Current Target:** Stage F1 complete and verified; proceeding to Stage M0 (Memes, Signals, and Insights Engine Analysis & Documentation).
+- **Current Stage:** Stage M0: Memes, Signals & Insights Engine Analysis & Documentation — COMPLETE.
+- **Current Target:** Stage M0 complete and verified; awaiting Founder review and authorization to proceed to Stage M1 (Phase 10E: Meme Questions & Themed Drops).
 
 ---
 
@@ -763,3 +763,69 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
   - `DELETE /v1/me` severs active orbits (`ended_by = "dpdp_erasure"`) and expires pending keeps within the 7-day erasure window.
 - **Integration Test Verification (`P10A.10`):**
   - `services/api/src/orbit.integration.test.ts`: **13 of 13 integration tests passed** against live Docker PostgreSQL 16 & Redis 7. All typechecks (`@oddly/api`, `@oddly/shared`, `@oddly/worker`) pass cleanly.
+
+---
+
+## 19. Stage M0 Analysis & Decisions Log (Memes, Signals & Insights Engine)
+
+### 19.1 Approved Feature Invariants (Founder Scope Authorization 2026-11-15)
+- **F24 Meme Questions & Themed Drops (Build in v1.0, Stage M1):** Existing question types with presentation variant `render_variant = "meme"`. Pure matching math unchanged. Vector templates from illustration registry (D-015). Live DOM text captions. Mandatory neutral subject tagging. Optional `drops.theme_key`.
+- **F25 Signals Foundation (Build in v1.0, Stage M2):** First-party consented telemetry pipeline (`POST /v1/events`, 202 Accepted, beacon/batch). Low priority lane (rank 7 load shedding). Allowlisted event dictionary (`docs/event-dictionary.md`). 90-day retention in `events_raw` with daily rollups. Granular DPDP consents (`analytics` and `personalisation`), default OFF.
+- **F26 Meme Lab (Stage M3 — Documented Fully, Build on Command):** Community caption submissions ($\le 100$ chars) on vector templates. Moderation queue, Turnstile, originality attestation, optional post-drop Meme Corner card with "Funny" / "Not for me" ratings, Wilson lower bound scoring ($N \ge 200$), 20% exploration share. Candidate promotion requires two-person approval. Blocked until Rule 3 amendment, admin moderation queue in Phase 11, and legal review.
+- **F27 Insights Engine, Statistics Only (Stage M4 — Documented Fully):** Explainable statistics. Smoothed `player_taste` affinity scores ($n \ge 20$) for non-Drop surfaces only. Drop questions remain 100% identical globally (Rule 12). Question quality flags, cohort notification timing, editor suggestions. Instant deletion on consent withdrawal.
+- **F28 Taste Dimension: Sync by Subject (Stage M5 — Documented Fully):** Orbit mutual agreement percentage per tag across shared Drops (min 5 shared answers). Individual picks remain hidden (Rule 19).
+- **F29 Recognition: Creator Badges & Featured Memes (Stage M6 — Documented Fully):** Benchmark badges, Satori 3D flip achievement cards with alias and macro-region ($k \ge 20$) only. Curated "Meme of the Week" showcase. Strictly NO public leaderboards.
+- **F30 ML Ranker for Optional Surfaces (Stage M7 — Documented Only):** Shadow-mode explainable model (logistic regression / GBDT), non-Drop surfaces only, instant kill switch, zero sensitive attributes. Gated by tens of thousands of ratings and > 50,000 DAU.
+- **F31 Premium Groundwork (Stage M8 — Documented Only, After Gate G3):** Provider-agnostic entitlements engine (`plans`, `entitlements`, `subscriptions`). "No pressure to pay" guardrails (max 1 offer/14d, 90d halt after 2 dismissals, zero streak panic copy).
+- **Non-Goals Additions:** Image uploads from users, selling user data, propensity-to-buy models in v1, and per-user Drop question changes are permanently Out of Scope.
+
+### 19.2 Rules Codified in `rules.md`
+- Rule 12: Identical Drop rule (globally identical questions; personalisation on non-Drop surfaces only).
+- Rule 13: Consent rule (separate, withdrawable DPDP consents for analytics & personalisation; default OFF; deletion on withdrawal).
+- Rule 14: No sensitive inference rule (never infer protected classes; neutral subject tags only; build-fail unit test).
+- Rule 15: No identity-joined profiling rule (pseudonymous `analytics_id`; $k \ge 20$ group reporting in admin).
+- Rule 16: Experiment rule (A/B testing strictly on non-Drop surfaces via flags with kill switch).
+- Rule 17: No pressure to pay (daily play free forever; zero guilt or streak urgency; frequency caps).
+- Rule 18: Free-text exception for Meme Lab captions ($\le 100$ chars, moderation-gated; marked inactive until Stage M3 is approved).
+- Rule 19: Orbit subject-sync amendment (aggregate agreement rates with min 5 shared answers; individual picks hidden).
+- Rule 9 reminder: Any new dependency (analytics SDK, payments, moderation) must have failure modes documented before use.
+- Section 9.2: Editorial Rules for Meme Questions.
+
+### 19.3 Questions for the Founder (with Recommended Defaults)
+1. **Themed-Drop Rotation:**  
+   - *Question:* Should themed Drop rotations (e.g. weekly thematic groupings via `drops.theme_key`) be active by default?  
+   - *Recommendation:* **Default to OFF (`app_config: drops.theme_rotation = false`)**. Keep daily Drops purely instinct-driven at launch; activate themed rotations only when a complete, cohesive 7-day editorial arc is planned and reviewed.
+2. **Minimum Raters for Community Memes ($N \ge 200$):**  
+   - *Question:* Is a sample threshold of 200 raters appropriate before computing Wilson lower-bound scores for Drop candidate promotion?  
+   - *Recommendation:* **200 raters**. Provides 95% statistical confidence without premature promotion based on small-sample noise.
+3. **Meme Lab Caption Character Ceiling (100 Characters):**  
+   - *Question:* Is a 100-character limit optimal for user caption submissions?  
+   - *Recommendation:* **100 characters**. Keeps captions punchy, readable in 2 lines at 360px mobile viewports, and discourages essay-style rants or abusive diatribes.
+4. **Taste Affinity Rating Threshold ($n \ge 20$):**  
+   - *Question:* Should player tag affinity (`player_taste`) require at least 20 ratings on that tag cluster before displaying or personalizing?  
+   - *Recommendation:* **Yes, minimum 20 ratings**. Prevents volatile skewing from a user rating 1 or 2 outlier memes.
+5. **Raw Events Retention Window (90 Days):**  
+   - *Question:* Is 90 days of raw partitioned event retention (`events_raw`) sufficient before dropping daily partitions?  
+   - *Recommendation:* **90 days**. Matches ADR-013 retention standards. Immutable daily rollups (`question_stats_daily`, `tag_stats_daily`) are retained permanently for longitudinal analysis.
+6. **Featured Memes Page (`/featured`):**  
+   - *Question:* Is a dedicated showcase page for the editor-curated "Meme of the Week" approved?  
+   - *Recommendation:* **Approved as an editorial showcase**, provided it never displays ranked leaderboards, scores, or public creator competition.
+7. **Payment Provider Evaluation for Gate G3 (Stage M8):**  
+   - *Question:* Which payment providers should be benchmarked when product Gate G3 is reached?  
+   - *Recommendation:* **Razorpay (India UPI Autopay / Cards) and Stripe**. To be formally evaluated under Rule 9 with documented failure modes once Gate G3 is authorized.
+
+### 19.4 Admin Spec & Phase 11 Mismatches Reconciled
+- Addendum A tasks (`P11.26` to `P11.32`) added to Phase 11 in `task.md`.
+- `P11.26` (taxonomy/templates), `P11.27` (question quality), and `P11.28` (signals admin) are marked **[P1]** and ship with Stage 11.
+- `P11.29` (Meme Lab moderation queue) is marked **[P2]** and is required before Stage M3 can be built.
+- `P11.30` (category performance) and `P11.31` (recognition) are marked **[P2]**.
+- `P11.32` (premium admin) is marked **[P3]** and deferred until Gate G3.
+
+---
+
+## 20. Next Steps
+
+> **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
+
+1. **Founder Review:** Founder reviews Stage M0 Report (`docs/stage-M0-report.md`) and resolves open questions.
+2. **Proceed to Stage M1:** Upon Founder instruction *"proceed to Stage M1"*, begin Phase 10E (Meme Questions & Themed Drops: migrations, seed tags & templates, polymorphic renderer variant, importer, and regression tests).
