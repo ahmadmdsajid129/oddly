@@ -48,7 +48,7 @@ describe("Stage R2.0 Worker Real-Infrastructure Integration Proofs (Postgres 16 
 
   describe("Proof 3.c: Full 10,000-Player Pipeline on Real Postgres with Recorded Timings", () => {
     const pipelineDropId = "00000000-0000-4000-c000-000000000001";
-    const pipelineDateStr = "2026-11-20";
+    const pipelineDateStr = "2025-01-02";
     const totalPlayers = 10000;
     const chunkSize = 5000;
 
@@ -58,6 +58,7 @@ describe("Stage R2.0 Worker Real-Infrastructure Integration Proofs (Postgres 16 
       await realPrisma.oddnessScore.deleteMany({ where: { submission: { drop_id: pipelineDropId } } });
       await realPrisma.match.deleteMany({ where: { drop_id: pipelineDropId } });
       await realPrisma.submission.deleteMany({ where: { drop_id: pipelineDropId } });
+      await realPrisma.answerOption.deleteMany({ where: { question: { drop_id: pipelineDropId } } });
       await realPrisma.question.deleteMany({ where: { drop_id: pipelineDropId } });
       await realPrisma.drop.deleteMany({ where: { id: pipelineDropId } });
 
@@ -185,7 +186,7 @@ describe("Stage R2.0 Worker Real-Infrastructure Integration Proofs (Postgres 16 
 
   describe("Proof 3.d: Worker Kill Mid Final-Batch, Resumable Restart & Byte-for-Byte Match", () => {
     const resumeDropId = "00000000-0000-4000-d000-000000000001";
-    const resumeDateStr = "2026-11-21";
+    const resumeDateStr = "2025-01-03";
     const totalPlayers = 1500;
     const chunkSize = 500; // 3 chunks
 
@@ -195,6 +196,7 @@ describe("Stage R2.0 Worker Real-Infrastructure Integration Proofs (Postgres 16 
       await realPrisma.oddnessScore.deleteMany({ where: { submission: { drop_id: resumeDropId } } });
       await realPrisma.match.deleteMany({ where: { drop_id: resumeDropId } });
       await realPrisma.submission.deleteMany({ where: { drop_id: resumeDropId } });
+      await realPrisma.answerOption.deleteMany({ where: { question: { drop_id: resumeDropId } } });
       await realPrisma.question.deleteMany({ where: { drop_id: resumeDropId } });
       await realPrisma.drop.deleteMany({ where: { id: resumeDropId } });
 

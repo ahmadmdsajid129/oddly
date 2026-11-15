@@ -166,6 +166,22 @@ async function main() {
         }
       }
     }
+
+    // Assign designated Telepathy question (P10C.01)
+    const allQuestions = await prisma.question.findMany({
+      where: { drop_id: drop.id },
+      include: { answerOptions: true },
+      orderBy: { position: "asc" },
+    });
+    const telepathyCandidate = allQuestions.find(
+      (q) => (q.type === "text" || q.type === "image") && q.answerOptions.length >= 2 && q.answerOptions.length <= 4
+    ) || allQuestions[0];
+    if (telepathyCandidate) {
+      await prisma.drop.update({
+        where: { id: drop.id },
+        data: { telepathy_question_id: telepathyCandidate.id },
+      });
+    }
   }
 
   console.log("✅ Seed completed successfully!");

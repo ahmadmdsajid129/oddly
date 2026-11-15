@@ -269,6 +269,51 @@ export interface OrbitDetail {
   can_express_today: boolean;
 }
 
+export interface TelepathyQuestion {
+  id: string;
+  position: number;
+  type: "text" | "image";
+  prompt: string;
+  answer_options: Array<{
+    id: string;
+    label: string;
+    value: string;
+    display_order: number;
+    illustration_key?: string | null;
+  }>;
+}
+
+export interface TelepathyReveal {
+  partner_pick: string;
+  is_match: boolean;
+  baseline_p: number;
+}
+
+export interface TelepathySyncSummary {
+  total_rounds: number;
+  matches: number;
+  sync_score: number;
+  baseline_score: number;
+  lift: number;
+  unlocked: boolean;
+  min_rounds: number;
+}
+
+export interface TelepathyRoundResponse {
+  drop_date: string;
+  question: TelepathyQuestion | null;
+  has_both_submitted: boolean;
+  caller_submitted: boolean;
+  partner_submitted: boolean;
+  my_guess: {
+    guessed_option: string;
+    locked_at: string;
+  } | null;
+  partner_guess_locked: boolean;
+  reveal: TelepathyReveal | null;
+  sync_summary: TelepathySyncSummary | null;
+}
+
 export interface OrbitDetailResponse {
   ok: boolean;
   orbit: OrbitDetail;
@@ -608,6 +653,33 @@ export class OddlyApiClient {
   /** Retrieve aggregated macro-region arcs and Orbit lines for Twin Globe (P10B.06) */
   async getGlobe(): Promise<GlobeResponse> {
     return this.request<GlobeResponse>("/v1/globe");
+  }
+
+  /** Get current Telepathy round state for an Orbit (P10C.04) */
+  async getTelepathy(
+    orbitId: string,
+    dropDate?: string
+  ): Promise<{ ok: boolean; round: TelepathyRoundResponse }> {
+    const qs = dropDate ? `?drop_date=${encodeURIComponent(dropDate)}` : "";
+    return this.request<{ ok: boolean; round: TelepathyRoundResponse }>(
+      `/v1/orbits/${orbitId}/telepathy${qs}`
+    );
+  }
+
+  /** Lock in Telepathy guess for today's drop (P10C.04, P10C.05) */
+  async submitTelepathyGuess(
+    orbitId: string,
+    guessedOption: string,
+    dropDate?: string
+  ): Promise<{ ok: boolean; round: TelepathyRoundResponse }> {
+    const qs = dropDate ? `?drop_date=${encodeURIComponent(dropDate)}` : "";
+    return this.request<{ ok: boolean; round: TelepathyRoundResponse }>(
+      `/v1/orbits/${orbitId}/telepathy/guess${qs}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ guessed_option: guessedOption }),
+      }
+    );
   }
 }
 

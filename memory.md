@@ -842,9 +842,43 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 22. Next Steps
+## 23. Phase 10C (Stage F3): Telepathy (Instinct Sync) Completion
+
+### 23.1 Shipped Architecture & Deliverables
+- **Schema & Migration (`003_telepathy_foundation.sql` - P10C.01, P10C.03):**
+  - Added `telepathy_question_id` to table `drops` with index and relation to `questions`.
+  - Created range-partitioned table `telepathy_guesses` (partitioned by `drop_date`), unique constraint on `(orbit_id, drop_date, guesser_player_id)`, default partition and alert trigger.
+  - Registered `"telepathy_guesses"` into `PartitionManager` with 14-day advance pre-creation buffer and 90-day retention.
+  - Populated all existing 17 drops with designated low-cardinality questions.
+- **Admin Validation Rule (`telepathy.ts` - P10C.02):**
+  - Built `isEligibleTelepathyQuestion`, `selectTelepathyQuestion`, and `validateDropTelepathy` rejecting Drops lacking an eligible Type 1 or Type 4 question ($\le 4$ options).
+- **Backend Endpoints (`telepathy.ts` & `telepathy.repo.ts` - P10C.04, P10C.05):**
+  - `GET /v1/orbits/:id/telepathy`: Returns current round state, question details, caller guess, and running Sync summary.
+  - `POST /v1/orbits/:id/telepathy/guess`: Submits guess with permanent lock-in (subsequent guesses return 409 `GUESS_ALREADY_LOCKED`). Requires both players to have submitted today (422 `SUBMISSION_REQUIRED`).
+  - **Rule 4 Scoped Reveal Exception:** Reveals partner pick strictly for the designated question and strictly AFTER caller has locked in their own guess. Zero other answers or vectors are exposed.
+- **Mathematical Honesty Baseline (`telepathy.ts` & `closure.worker.ts` - P10C.06):**
+  - Baseline chance calculated as weighted sum of squared probabilities $\sum [p(a)]^2$ from the question's distribution.
+  - Integrated into `ClosureWorker.computeTelepathyBaseline`.
+- **Telepathy UI (`TelepathyGameCard.tsx` - P10C.07, P10C.08):**
+  - Tappable option buttons with $\ge 44\text{px}$ touch targets and tactile press-flat physics.
+  - Side-by-side sticker pair: "Your Guess" and "Twin's Pick".
+  - Shape-based outcome indicator: Check icon `✓` with soft mint for match; Slash icon `✕` for differ (accessible, never relying on color alone).
+  - Baseline comparison caption: *"Random chance baseline: X%"*.
+  - Composite Sync Summary card: Surfaces once 5 rounds are completed ($N \ge 5$).
+  - Mounted seamlessly into `/orbit/[id]`.
+- **SDK & Client Wrappers:**
+  - Added `getTelepathy` and `submitTelepathyGuess` to `@oddly/api-client` and `apps/web/src/lib/api.ts`.
+- **Verification & Test Suite (P10C.09):**
+  - Unit tests in `packages/shared/src/telepathy.test.ts`: 13/13 passed (100%).
+  - API integration tests in `services/api/src/telepathy.integration.test.ts`: 6/6 passed (100%).
+  - Web domain tests in `apps/web/src/telepathy.test.ts`: 6/6 passed (100%).
+  - Total web tests: 61/61 passed (100%). Total API tests: 94/94 passed (100%).
+
+---
+
+## 24. Next Steps
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
 
-1. **Founder Review:** Founder reviews Stage F2 Report.
-2. **Proceed to Stage F3:** Upon Founder instruction *"proceed to Stage F3"*, begin Phase 10C (Telepathy: designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score).
+1. **Founder Review:** Founder reviews Stage F3 Report.
+2. **Proceed to Stage F4:** Upon Founder instruction *"proceed to Stage F4"*, begin Phase 10D (Anti-Twin, Share Faces & Verification Gate).

@@ -16,6 +16,7 @@ import {
   percentile,
   classifyTier,
   calculateStreak,
+  calculateLuckBaseline,
   type AnswerFrequency,
   type Tier,
 } from "@oddly/shared";
@@ -141,6 +142,18 @@ export class ClosureWorker {
     }
 
     return results;
+  }
+
+  /**
+   * Computes the mathematical random luck baseline for the designated Telepathy question:
+   * sum(p(a)^2) across option probabilities.
+   */
+  static computeTelepathyBaseline(
+    telepathyQuestionId: string,
+    frequencies: AnswerFrequency[],
+    defaultOptionCount: number = 4
+  ): number {
+    return calculateLuckBaseline(telepathyQuestionId, frequencies, defaultOptionCount);
   }
 
   /**

@@ -132,6 +132,11 @@ export const api = {
   globe: {
     get: () => rawClient.getGlobe(),
   },
+  telepathy: {
+    get: (orbitId: string, dropDate?: string) => rawClient.getTelepathy(orbitId, dropDate),
+    guess: (orbitId: string, guessedOption: string, dropDate?: string) =>
+      rawClient.submitTelepathyGuess(orbitId, guessedOption, dropDate),
+  },
 };
 
 export const oddlyApi = rawClient;

@@ -104,6 +104,7 @@ model Player {
   orbitsAsA        Orbit[]    @relation("OrbitPlayerA")
   orbitsAsB        Orbit[]    @relation("OrbitPlayerB")
   orbitExpressions OrbitExpression[]
+  telepathyGuesses TelepathyGuess[]
 
   @@index([account_id])
   @@index([did])
@@ -114,12 +115,14 @@ model Player {
 // 3. drops — one per day (07:00 IST open, 23:59 IST close)
 // ---------------------------------------------------------------------------
 model Drop {
-  id         String     @id @default(uuid())
-  drop_date  DateTime   @db.Date @unique // YYYY-MM-DD in IST
-  opens_at   DateTime                    // UTC timestamp for 07:00 IST
-  closes_at  DateTime                    // UTC timestamp for 23:59 IST
-  status     DropStatus @default(pending)
-  created_at DateTime   @default(now())
+  id                    String     @id @default(uuid())
+  drop_date             DateTime   @db.Date @unique // YYYY-MM-DD in IST
+  opens_at              DateTime                    // UTC timestamp for 07:00 IST
+  closes_at             DateTime                    // UTC timestamp for 23:59 IST
+  status                DropStatus @default(pending)
+  telepathy_question_id String?
+  telepathy_question    Question?  @relation("DropTelepathyQuestion", fields: [telepathy_question_id], references: [id])
+  created_at            DateTime   @default(now())
 
   questions    Question[]
   submissions  Submission[]
@@ -130,6 +133,7 @@ model Drop {
 
   @@index([drop_date])
   @@index([status])
+  @@index([telepathy_question_id])
   @@map("drops")
 }
 
@@ -145,7 +149,9 @@ model Question {
   payload    Json         // discriminated by type (see D-006)
   created_at DateTime     @default(now())
 
-  answerOptions    AnswerOption[]
+  answerOptions      AnswerOption[]
+  telepathyForDrops  Drop[]            @relation("DropTelepathyQuestion")
+  telepathyGuesses   TelepathyGuess[]
 
   @@unique([drop_id, position])
   @@index([drop_id])
@@ -549,6 +555,7 @@ model Orbit {
   updated_at        DateTime    @default(now()) @updatedAt
 
   expressions       OrbitExpression[]
+  telepathyGuesses  TelepathyGuess[]
 
   @@index([player_a_id, status])
   @@index([player_b_id, status])
@@ -574,6 +581,34 @@ model OrbitExpression {
   @@index([orbit_id, drop_date])
   @@map("orbit_expressions")
 }
+
+// ---------------------------------------------------------------------------
+// 26. telepathy_guesses — daily instinct guessing inside Orbits (Stage F3 / Phase 10C)
+// Range-partitioned by drop_date, 90-day retention
+// ---------------------------------------------------------------------------
+model TelepathyGuess {
+  id                 String   @default(uuid())
+  orbit_id           String
+  orbit              Orbit    @relation(fields: [orbit_id], references: [id], onDelete: Cascade)
+  drop_date          DateTime @db.Date
+  guesser_player_id  String
+  guesser_player     Player   @relation(fields: [guesser_player_id], references: [id], onDelete: Cascade)
+  question_id        String
+  question           Question @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  guessed_option_key String
+  partner_option_key String?
+  hit                Boolean?
+  baseline_p         Float    @default(0.25)
+  created_at         DateTime @default(now())
+
+  @@id([id, drop_date])
+  @@unique([orbit_id, drop_date, guesser_player_id])
+  @@index([drop_date])
+  @@index([orbit_id, drop_date])
+  @@index([guesser_player_id, drop_date])
+  @@map("telepathy_guesses")
+}
+
 
 
 

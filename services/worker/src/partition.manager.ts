@@ -66,6 +66,7 @@ export class PartitionManager {
       "answer_stats",
       "twin_keeps",
       "orbit_expressions",
+      "telepathy_guesses",
     ];
     const baseDate = getTwinDay(referenceDate);
     const checkedDates: string[] = [];

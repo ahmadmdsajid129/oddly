@@ -181,7 +181,49 @@ export const DropResponseSchema = z.object({
   opens_at: z.string().datetime(),
   closes_at: z.string().datetime(),
   status: DropStatusSchema,
+  telepathy_question_id: UUIDSchema.optional().nullable(),
   questions: z.array(QuestionResponseSchema),
+});
+
+// ---------------------------------------------------------------------------
+// Telepathy (Instinct Sync) Schemas (Stage F3 / Phase 10C)
+// ---------------------------------------------------------------------------
+
+export const SubmitTelepathyGuessSchema = z.object({
+  guessed_option: z.string().min(1).max(200),
+});
+
+export const TelepathyRevealSchema = z.object({
+  partner_pick: z.string(),
+  is_match: z.boolean(),
+  baseline_p: z.number().min(0).max(1),
+});
+
+export const TelepathySyncSummarySchema = z.object({
+  total_rounds: z.number().int().min(0),
+  matches: z.number().int().min(0),
+  sync_score: z.number().min(0).max(1),
+  baseline_score: z.number().min(0).max(1),
+  lift: z.number(),
+  unlocked: z.boolean(),
+  min_rounds: z.number().int(),
+});
+
+export const TelepathyRoundResponseSchema = z.object({
+  drop_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  question: QuestionResponseSchema.nullable(),
+  has_both_submitted: z.boolean(),
+  caller_submitted: z.boolean(),
+  partner_submitted: z.boolean(),
+  my_guess: z
+    .object({
+      guessed_option: z.string(),
+      locked_at: z.string().datetime(),
+    })
+    .nullable(),
+  partner_guess_locked: z.boolean(),
+  reveal: TelepathyRevealSchema.nullable(),
+  sync_summary: TelepathySyncSummarySchema.nullable(),
 });
 
 export const TierDefinitionResponseSchema = z.object({
@@ -291,4 +333,8 @@ export type ValidatedSubmissionRequest = z.infer<typeof SubmissionRequestSchema>
 export type ValidatedAnswerPayload = z.infer<typeof AnswerPayloadSchema>;
 export type ValidatedPlayerSession = z.infer<typeof PlayerSessionSchema>;
 export type ValidatedStoredAnswer = z.infer<typeof StoredAnswerSchema>;
+export type ValidatedTelepathyRoundResponse = z.infer<typeof TelepathyRoundResponseSchema>;
+export type ValidatedSubmitTelepathyGuess = z.infer<typeof SubmitTelepathyGuessSchema>;
+export type ValidatedTelepathyReveal = z.infer<typeof TelepathyRevealSchema>;
+export type ValidatedTelepathySyncSummary = z.infer<typeof TelepathySyncSummarySchema>;
 

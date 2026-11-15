@@ -358,19 +358,19 @@ _Status: COMPLETE | Target: "Keep this twin" UX, Orbit list/detail screens, expr
 
 ### Phase 10C: Telepathy (Instinct Sync) (Stage F3)
 
-_Status: TODO | Target: Designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score._
+_Status: COMPLETE | Target: Designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score._
 
-| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
-| `[ ] P10C.01` | Add `telepathy_question_id` to `drops` table schema and implement question selection logic (Type 1 or 4)   | High     | TODO   | P2.01        | Agent | —         | Eligible low-cardinality questions ($\le 4$) |
-| `[ ] P10C.02` | Add admin validation rule rejecting Drops lacking an eligible Telepathy question                            | High     | TODO   | P10C.01      | Agent | —         | Content safety gate                      |
-| `[ ] P10C.03` | Expand migration: `telepathy_guesses` range-partitioned by `drop_date` with 90-day retention                | Critical | TODO   | P10A.01      | Agent | —         | Zero-downtime expand migration           |
-| `[ ] P10C.04` | Implement Telepathy endpoints: `GET /v1/orbits/:id/telepathy`, `POST /v1/orbits/:id/telepathy/guess`        | Critical | TODO   | P10C.03      | Agent | —         | Active only after both players submit    |
-| `[ ] P10C.05` | Implement permanent guess lock-in and Rule 4 scoped reveal exception (partner pick shown only after lock)   | Critical | TODO   | P10C.04      | Agent | —         | Single question; zero other picks exposed|
-| `[ ] P10C.06` | Implement final batch random luck baseline calculation ($\sum [p(a)]^2$) in closure worker                  | High     | TODO   | P9.01, P10C.04 | Agent | —       | Mathematical chance baseline             |
-| `[ ] P10C.07` | Build Telepathy UI: option rows, side-by-side sticker pair, check/slash icons, baseline comparison caption  | High     | TODO   | P10C.04, P1.01 | Agent | —       | Shape + icon indicators (not color alone)|
-| `[ ] P10C.08` | Implement composite Sync summary calculation and display after 5 completed rounds                           | Medium   | TODO   | P10C.07      | Agent | —         | Eliminates early sample noise            |
-| `[ ] P10C.09` | Author automated tests for Telepathy guessing lifecycle, baseline math correctness, and Sync aggregation   | High     | TODO   | P10C.06      | Agent | —         | Unit and route integration test suite    |
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------------- |
+| `[x] P10C.01` | Add `telepathy_question_id` to `drops` table schema and implement question selection logic (Type 1 or 4)   | High     | DONE   | P2.01        | Agent | 2026-11-15  | Eligible low-cardinality questions ($\le 4$) |
+| `[x] P10C.02` | Add admin validation rule rejecting Drops lacking an eligible Telepathy question                            | High     | DONE   | P10C.01      | Agent | 2026-11-15  | Content safety gate                      |
+| `[x] P10C.03` | Expand migration: `telepathy_guesses` range-partitioned by `drop_date` with 90-day retention                | Critical | DONE   | P10A.01      | Agent | 2026-11-15  | Zero-downtime expand migration           |
+| `[x] P10C.04` | Implement Telepathy endpoints: `GET /v1/orbits/:id/telepathy`, `POST /v1/orbits/:id/telepathy/guess`        | Critical | DONE   | P10C.03      | Agent | 2026-11-15  | Active only after both players submit    |
+| `[x] P10C.05` | Implement permanent guess lock-in and Rule 4 scoped reveal exception (partner pick shown only after lock)   | Critical | DONE   | P10C.04      | Agent | 2026-11-15  | Single question; zero other picks exposed|
+| `[x] P10C.06` | Implement final batch random luck baseline calculation ($\sum [p(a)]^2$) in closure worker                  | High     | DONE   | P9.01, P10C.04 | Agent | 2026-11-15  | Mathematical chance baseline             |
+| `[x] P10C.07` | Build Telepathy UI: option rows, side-by-side sticker pair, check/slash icons, baseline comparison caption  | High     | DONE   | P10C.04, P1.01 | Agent | 2026-11-15  | Shape + icon indicators (not color alone)|
+| `[x] P10C.08` | Implement composite Sync summary calculation and display after 5 completed rounds                           | Medium   | DONE   | P10C.07      | Agent | 2026-11-15  | Eliminates early sample noise            |
+| `[x] P10C.09` | Author automated tests for Telepathy guessing lifecycle, baseline math correctness, and Sync aggregation   | High     | DONE   | P10C.06      | Agent | 2026-11-15  | Unit and route integration test suite    |
 
 ---
 

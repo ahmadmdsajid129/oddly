@@ -16,6 +16,7 @@ export * from "./qrcode.js";
 export * from "./share-cards.js";
 export * from "./storage.js";
 export * from "./degradation.js";
+export * from "./telepathy.js";
 export * from "./redis/keys.js";
 export * from "./redis/client.js";
 export * from "./blueprint-generator.js";

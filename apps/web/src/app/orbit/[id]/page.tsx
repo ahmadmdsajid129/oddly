@@ -8,6 +8,7 @@ import { BrandMark } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { ProceduralAvatar } from "@/components/orbit/ProceduralAvatar";
 import { StagedUnlocks } from "@/components/orbit/StagedUnlocks";
+import { TelepathyGameCard } from "@/components/orbit/TelepathyGameCard";
 import { ExpressionTray, APPROVED_EXPRESSIONS } from "@/components/orbit/ExpressionTray";
 import { ResponsiveDialog } from "@/components/ui/Dialogs";
 import { useToast } from "@/components/ui/Toast";
@@ -184,6 +185,14 @@ export default function OrbitDetailPage() {
           currentStreak={orbit.co_streak_current}
           bestStreak={orbit.co_streak_best}
         />
+
+        {/* Daily Telepathy (Instinct Sync) */}
+        {!isEnded && (
+          <TelepathyGameCard
+            orbitId={orbitId}
+            onSyncUpdated={() => void loadOrbit()}
+          />
+        )}
 
         {/* Daily Expression Tray (The Wave) */}
         {!isEnded && (

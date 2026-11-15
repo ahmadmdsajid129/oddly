@@ -93,43 +93,35 @@ describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
       ],
     });
 
-    // Locate or create test drops
-    const closedDrop = await prisma.drop.findFirst({ where: { status: "closed" } });
-    if (closedDrop) {
-      testDropId = closedDrop.id;
-      testDropDate = closedDrop.drop_date;
-    } else {
-      testDropId = randomUUID();
-      testDropDate = new Date("2026-11-20T00:00:00.000Z");
-      await prisma.drop.create({
-        data: {
-          id: testDropId,
-          drop_date: testDropDate,
-          opens_at: new Date("2026-11-20T01:30:00.000Z"),
-          closes_at: new Date("2026-11-20T18:29:59.000Z"),
-          status: "closed",
-        },
-      });
-    }
+    // Create dedicated test drops with valid UUIDs
+    testDropDate = new Date("2025-05-10T00:00:00.000Z");
+    const provisionalDate = new Date("2025-05-11T00:00:00.000Z");
 
-    const liveDrop = await prisma.drop.findFirst({ where: { status: "live" } });
-    let provisionalDate = new Date();
-    if (liveDrop) {
-      testProvisionalDropId = liveDrop.id;
-      provisionalDate = liveDrop.drop_date;
-    } else {
-      testProvisionalDropId = randomUUID();
-      provisionalDate = new Date("2026-11-21T00:00:00.000Z");
-      await prisma.drop.create({
-        data: {
-          id: testProvisionalDropId,
-          drop_date: provisionalDate,
-          opens_at: new Date("2026-11-21T01:30:00.000Z"),
-          closes_at: new Date("2026-11-21T18:29:59.000Z"),
-          status: "live",
-        },
-      });
-    }
+    await prisma.drop.deleteMany({
+      where: { drop_date: { in: [testDropDate, provisionalDate] } },
+    });
+
+    testDropId = randomUUID();
+    await prisma.drop.create({
+      data: {
+        id: testDropId,
+        drop_date: testDropDate,
+        opens_at: new Date("2025-05-10T01:30:00.000Z"),
+        closes_at: new Date("2025-05-10T18:29:59.000Z"),
+        status: "closed",
+      },
+    });
+
+    testProvisionalDropId = randomUUID();
+    await prisma.drop.create({
+      data: {
+        id: testProvisionalDropId,
+        drop_date: provisionalDate,
+        opens_at: new Date("2025-05-11T01:30:00.000Z"),
+        closes_at: new Date("2025-05-11T18:29:59.000Z"),
+        status: "live",
+      },
+    });
 
     // Seed test locked match between Player A and Player B (non-provisional)
     const pMin = playerAId < playerBId ? playerAId : playerBId;
