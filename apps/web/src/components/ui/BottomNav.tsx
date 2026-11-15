@@ -82,3 +82,4 @@ export function BottomNav() {
     </nav>
   );
 }
+

@@ -113,3 +113,4 @@ Route (app)                              Size     First Load JS
    - When drop window volume is below 50 submissions, the map automatically displays the honest Replay badge (*"Quiet right now. Replaying yesterday's twins"*). No artificial bot arcs are ever rendered.
 5. **Blame-Free Safety Invariant:**
    - The End Orbit dialog uses neutral, non-accusatory language. Dissolution is instantaneous and one-sided, quietly returning both players to the daily pool without alerts or blame.
+

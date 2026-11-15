@@ -64,3 +64,4 @@ export async function aggregateGlobeArcs(): Promise<AggregatedArcRecord[]> {
 
   return results;
 }
+
