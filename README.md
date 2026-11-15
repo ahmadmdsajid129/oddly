@@ -9,7 +9,7 @@
 
 Oddly drops five instinct-driven questions every day at 07:00 IST—the exact same five for everyone on Earth. You answer with no profiles, no quizzes to study for, and no followers to chase. Immediately, Oddly computes your **Twin**: the one stranger anywhere in the world who answered most like you today. It also computes your **Oddness**: an information-theoretic rarity score based on real observed probability.
 
-Oddly intentionally eliminates chat, public leaderboards, direct messages, and user photos. The result itself is the product. Approved v1 features also include the **Twin Globe** (F18: ambient map of twins forming worldwide), **Keep & Orbit** (F19: mutual anonymous connection to preserve twin bonds across daily drops), **Telepathy** (F20: daily instinct sync inside an Orbit), and **Anti-Twin** (F21: discovering your playful opposite today). Handle swaps, DMs, and contact exchange are permanently Not Planned.
+Oddly intentionally eliminates chat, public leaderboards, direct messages, and user photos. The result itself is the product. Approved v1 features also include the **Twin Globe** (F18: ambient map of twins forming worldwide), **Keep & Orbit** (F19: mutual anonymous connection to preserve twin bonds across daily drops), **Telepathy** (F20: daily instinct sync inside an Orbit), **Anti-Twin** (F21: discovering your playful opposite today), **Meme Questions & Themed Drops** (F24: culturally resonant instinct prompts), and **Signals Foundation** (F25: consented first-party question-quality telemetry). Handle swaps, DMs, image uploads, and contact exchange are permanently Not Planned.
 
 ---
 
@@ -73,8 +73,10 @@ The architecture and operational standards are fully articulated across six foun
 | **Design System**          | [`design.md`](./design.md)             | Colors, typography, spacing, component states, motion specs, accessibility, and screen blueprints.        |
 | **Task Breakdown**         | [`task.md`](./task.md)                 | 16-phase task tracker (Stage 0 to Stage 15), progress bars, dependencies, and verification checklists.    |
 | **Living Memory**          | [`memory.md`](./memory.md)             | Real-time state, architectural decisions, defect logs, learnings, environment notes, and next actions.    |
-| **Admin Panel Spec**       | [`docs/admin-panel-spec.md`](./docs/admin-panel-spec.md) | Mission Control authoritative specification: access control, Command Center, ops tools, audit log.     |
+| **Admin Panel Spec**       | [`docs/admin-panel-spec.md`](./docs/admin-panel-spec.md) | Mission Control authoritative specification: access control, Command Center, ops tools, audit log, and Addendum A. |
 | **Connection Features**    | [`docs/connection-features.md`](./docs/connection-features.md) | Architectural analysis, DPDP compliance, scale projections, and threat models for F18–F23.            |
+| **Event Dictionary**       | [`docs/event-dictionary.md`](./docs/event-dictionary.md) | Allowlisted event dictionary, telemetry schemas, priority lanes, and DPDP consent policies for F25.    |
+| **Memes & Insights Features** | [`docs/meme-and-insights-features.md`](./docs/meme-and-insights-features.md) | Feasibility analysis, legal review requirements, Wilson scoring, and capacity math for F24–F31.        |
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**
 
