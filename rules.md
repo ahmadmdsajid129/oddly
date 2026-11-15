@@ -15,9 +15,17 @@ Purpose of this file: Immutable operational rules, coding standards, error-handl
 6. **Strict MVP Scope Boundaries:** Never build features in the OUT OF SCOPE list (chat, user profiles, leaderboards, real-money betting, native mobile apps, friends groups, wave, premium billing) without explicit written Founder approval. *(Founder approval recorded 2026-11-14: F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin approved for v1; F22 Oddly Deck and F23 Friend-invite Orbit documented for v1.5; handle swap, DMs, contact exchange permanently Not Planned; F12 Wave superseded by F19).*
 7. **Never Hide Failing Tests or Lint Errors:** All tests, typechecks, and lints must pass cleanly. If a test fails, report it honestly in the Stage Report; do not comment it out, skip it, or alter assertions to mask bugs.
 8. **Never Overwrite or Rewrite History in `memory.md`:** `memory.md` logs are append-only. Record fixes, adjustments, and decisions sequentially. Never delete tasks from `task.md` without an explicit changelog explanation.
-9. **No Unrecorded Dependencies:** Before installing any package not listed in `architecture.md`, document it first (name, pinned version, purpose, features using it, alternative evaluated) and announce it in the Stage Report.
+9. **No Unrecorded Dependencies:** Before installing any package not listed in `architecture.md`, document it first (name, pinned version, purpose, features using it, alternative evaluated) and announce it in the Stage Report. Any new dependency (analytics SDK, payments, moderation service) must be documented with failure modes before use in `docs/failure-modes.md`.
 10. **Never Block Interaction with Animation:** Animations must remain under 600ms (except the 1.5s dot-map search journey and count-up numbers). Every animation must be skippable by a tap and must strictly respect `prefers-reduced-motion`.
 11. **Everything Dynamic from Database (Override Addendum):** No content, questions, palettes, illustrations, UI copy, notification templates, tier cut-offs, or configuration values are hard-coded in application code. Layout and logic are in code; all content is stored in PostgreSQL, editable via Admin, and served via cached endpoints (`/v1/content/:locale`, `/v1/drop/today`). The only hard-coded copy permitted in code is the minimal offline fallback (see Section 12).
+12. **Identical Drop Rule (Founder-approved, M0):** The five questions of a Drop are identical for every player. No engine, flag, experiment or personalisation may change which questions a player sees or their order. Personalisation applies only to non-Drop surfaces (optional meme card, notification timing, Orbit prompts, suggested share card).
+13. **Consent Rule (Founder-approved, M0):** Analytics and personalisation each require separate, withdrawable consent (DPDP, per `product.md` section 13.1), default OFF until granted. Security processing (bot detection such as the 3 second minimum answer time, rate limiting) is not analytics and is documented separately. Withdrawal stops collection immediately and deletes personalisation data (`player_taste`) within the existing deletion window.
+14. **No Sensitive Inference Rule (Founder-approved, M0):** Never infer or store religion, caste, politics, sexuality, health, mental state, body image, income or any category in the forbidden-topics list from taste, humour tags, timing or any other signal. Tag taxonomies must contain only neutral subject tags; an automated test fails the build if a tag key matches the forbidden list.
+15. **No Identity-Joined Profiling Rule (Founder-approved, M0):** Behavioural data is keyed by a pseudonymous analytics ID, not by email or name. No dashboards at individual level; any breakdown shows only groups of at least 20 players (k-anonymity).
+16. **Experiment Rule (Founder-approved, M0):** A/B tests run only on non-Drop surfaces, through feature flags, with a documented hypothesis, a guardrail metric and a kill switch.
+17. **No Pressure to Pay (Founder-approved, M0; extends Rule 3 'Never Do'):** Daily play is always free. Never use guilt copy, fake urgency, countdowns, scarcity or "your streak is about to die" prompts to sell anything. Never show an offer at the moment of a streak break. Max 1 offer per 14 days (*config*); after 2 dismissals, stop for 90 days (*config*). Cancellation is as easy as purchase. Prices shown plainly.
+18. **Free-Text Exception (Founder-approved, M0; inactive until Stage M3):** The only user-authored text allowed besides the 140 character report note is a Meme Lab caption of at most 100 characters (*config*), passed through moderation before anyone else sees it. *Status: Inactive until the Founder approves Stage M3.*
+19. **Orbit Subject-Sync Amendment (Founder-approved, M0; extends Rule 4 exception from F0):** Inside an active Orbit the app may show aggregate agreement rates per subject tag with a minimum of 5 shared answers per tag (*config*). Individual picks are still never shown except the Telepathy question as already amended.
 
 ---
 
@@ -202,6 +210,18 @@ The question curation tool and JSON importer reject or flag questions touching:
 7. **Living Individuals:** Real celebrities, influencers, public figures.
 8. **Commercial Brands:** Corporate logos or product endorsements (unless sponsored in v2.0).
 
+### 9.2 Editorial Rules for Meme Questions (Founder-approved, M0)
+
+All meme questions (`render_variant = "meme"`) must adhere to strict editorial standards:
+
+1. **Zero Right or Wrong Answers:** Questions must be pure instinct and preference; never trivia, intelligence, or correctness tests.
+2. **Language-Light:** Prompts and option captions must be concise and easily understood across English-speaking and bilingual Indian cohorts.
+3. **No Forbidden Topics:** Strict zero tolerance for any theme or subtext touching Section 9.1 categories.
+4. **No Content That Mocks a Group:** Humour must be self-referential or universally relatable to daily human quirks; never punching down, stereotyping, or mocking any demographic, region, or subculture.
+5. **Balanced Answer Spread (Entropy Check):** Options must be designed so no single option monopolizes selections (entropy verified before publishing).
+6. **Original-to-Oddly Policy:** Never claim a meme is *"never seen on the internet"*; claim only that it was written for Oddly. All captions must be freshly authored for Oddly.
+7. **Mandatory Subject Tagging:** Every meme question must carry at least one valid subject tag from the database-managed neutral taxonomy before admin approval.
+
 ---
 
 ## 10. Copywriting and Honesty Standards
@@ -221,6 +241,17 @@ The question curation tool and JSON importer reject or flag questions touching:
 
 ## 11. Change Log
 
+- **2026-11-15:** Stage M0 rule additions approved by Founder:
+  - Rule 12: Identical Drop rule (the five questions of a Drop are identical for every player; zero personalisation on Drop questions).
+  - Rule 13: Consent rule (analytics and personalisation require separate, withdrawable DPDP consent, default OFF; security processing separate; deletion on withdrawal).
+  - Rule 14: No sensitive inference rule (never infer or store protected categories from taste or timing; build-fail test on forbidden tag matches).
+  - Rule 15: No identity-joined profiling rule (pseudonymous analytics ID; no individual-level dashboards; $k \ge 20$ group reporting).
+  - Rule 16: Experiment rule (A/B testing strictly restricted to non-Drop surfaces via flags with documented hypothesis, guardrails, and kill switch).
+  - Rule 17: No pressure to pay (daily play free forever; zero guilt or streak urgency copy; max 1 offer per 14 days, stop for 90 days after 2 dismissals).
+  - Rule 18: Free-text exception for Meme Lab captions ($\le 100$ chars, moderation-gated; marked inactive until Stage M3 is approved).
+  - Rule 19: Orbit subject-sync amendment (aggregate agreement rates per tag with min 5 shared answers; individual picks remain hidden).
+  - Rule 9 reminder: Any new dependency (analytics SDK, payments, moderation) must have failure modes documented before use.
+  - Section 9.2: Added Editorial Rules for Meme Questions.
 - **2026-11-14:** Stage F0 rule amendments approved by Founder:
   - Rule 4: Added consent-scoped exception for active Orbit Telepathy question (partner's pick label shown to viewer after own guess locked).
   - Rule 6: Recorded approval of F18 (Twin Globe), F19 (Keep & Orbit), F20 (Telepathy), and F21 (Anti-twin) for v1; F22 and F23 as v1.5 documented only; handle swap/DMs/contact exchange permanently Not Planned; F12 Wave superseded by F19.
