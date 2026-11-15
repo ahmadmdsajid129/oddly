@@ -21,9 +21,9 @@ test.describe("Oddly v1: Guest Play Flow (S1 to S4)", () => {
     await playButton.click();
 
     // 3. Confirm 18+ Status in Age Gate Modal
-    const checkbox = page.getByLabel("I confirm that I am 18 years of age or older");
-    await expect(checkbox).toBeVisible();
-    await checkbox.check();
+    const checkboxLabel = page.locator("label").filter({ hasText: "I confirm that I am 18 years of age or older" });
+    await expect(checkboxLabel).toBeVisible();
+    await checkboxLabel.click();
 
     const continueButton = page.getByRole("button", {
       name: /Continue to today's five/i,
@@ -40,27 +40,22 @@ test.describe("Oddly v1: Guest Play Flow (S1 to S4)", () => {
     await firstOption.click();
 
     // 5. Question 2 (Number Dial)
-    await expect(page.getByText("Choose a Number")).toBeVisible({ timeout: 2000 });
-    const confirmNumberBtn = page.getByRole("button", {
-      name: /Confirm Number/i,
-    });
-    if (await confirmNumberBtn.isVisible()) {
-      await confirmNumberBtn.click();
-    }
+    await expect(page.getByText("Choose a Number")).toBeVisible({ timeout: 5000 });
+    const confirmNumberBtn = page.getByRole("button", { name: /Confirm Number/i });
+    await expect(confirmNumberBtn).toBeVisible();
+    await confirmNumberBtn.click();
 
     // 6. Question 3 (Colour Swatch)
-    await expect(page.getByText("Pick a Colour")).toBeVisible({ timeout: 2000 });
-    const mintSwatch = page.locator("button").filter({ hasText: /Mint/i }).first();
-    if (await mintSwatch.isVisible()) {
-      await mintSwatch.click();
-    }
+    await expect(page.getByText("Pick a Colour")).toBeVisible({ timeout: 5000 });
+    const mintSwatch = page.getByRole("button", { name: "Mint" });
+    await expect(mintSwatch).toBeVisible();
+    await mintSwatch.click();
 
     // 7. Question 4 (Image Grid)
-    await expect(page.getByText("Select an Image")).toBeVisible({ timeout: 2000 });
-    const firstImage = page.locator("button").filter({ hasText: /Instant Ramen/i }).first();
-    if (await firstImage.isVisible()) {
-      await firstImage.click();
-    }
+    await expect(page.getByText("Select an Image")).toBeVisible({ timeout: 5000 });
+    const firstImage = page.getByRole("button", { name: /Instant Ramen/i });
+    await expect(firstImage).toBeVisible();
+    await firstImage.click();
 
     // 8. Question 5 (Word Chips)
     await expect(page.getByText("Select Three Words")).toBeVisible({ timeout: 2000 });
@@ -96,7 +91,7 @@ test.describe("Oddly v1: Guest Play Flow (S1 to S4)", () => {
     await expect(page.getByText(/Picks Matched/i)).toBeVisible({
       timeout: 5000,
     });
-    await expect(page.getByText(/Someone in Berlin, Germany/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Someone in Berlin, Germany/i })).toBeVisible();
 
     // S7 Oddness Screen
     const seeOddnessBtn = page.getByRole("button", {
@@ -105,8 +100,8 @@ test.describe("Oddly v1: Guest Play Flow (S1 to S4)", () => {
     await expect(seeOddnessBtn).toBeVisible();
     await seeOddnessBtn.click();
 
-    await expect(page.getByText(/Oddness Score/i)).toBeVisible();
-    await expect(page.getByText(/Rarer than/i)).toBeVisible();
+    await expect(page.getByText("Oddness Score", { exact: true })).toBeVisible();
+    await expect(page.locator("p").filter({ hasText: /Rarer than/i })).toBeVisible();
   });
 
   test("courteously excludes users under 18 with zero data collected", async ({

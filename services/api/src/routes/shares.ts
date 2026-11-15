@@ -59,6 +59,11 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
 
       const { short_id: shortId } = await SharesRepository.createShortLink(submission.id);
 
+      reply.header(
+        "Cache-Control",
+        "public, max-age=3600, s-maxage=86400"
+      );
+
       return reply.send({
         success: true,
         shortId,
@@ -143,7 +148,12 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
         submission.player_id
       );
       const oddness = await prisma.oddnessScore.findUnique({
-        where: { submission_id: submission.id },
+        where: {
+          submission_id_drop_date: {
+            submission_id: submission.id,
+            drop_date: submission.drop_date,
+          },
+        },
       });
 
       const twinPlayer = match
@@ -186,6 +196,11 @@ export const sharesRoutes: FastifyPluginAsyncZod = async (app) => {
         options: q.options,
         media_url: q.media_url,
       }));
+
+      reply.header(
+        "Cache-Control",
+        "public, max-age=3600, s-maxage=86400"
+      );
 
       return reply.send({
         success: true,

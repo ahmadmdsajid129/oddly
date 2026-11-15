@@ -71,8 +71,18 @@ export class SharesRepository {
   static async saveShareCard(
     submissionId: string,
     format: ShareFormat,
-    storageKey: string
+    storageKey: string,
+    dropDate?: Date
   ) {
+    let date = dropDate;
+    if (!date) {
+      const sub = await prisma.submission.findFirst({
+        where: { id: submissionId },
+        select: { drop_date: true },
+      });
+      date = sub?.drop_date ?? new Date();
+    }
+
     return await prisma.shareCard.upsert({
       where: {
         submission_id_format: {
@@ -82,6 +92,7 @@ export class SharesRepository {
       },
       create: {
         submission_id: submissionId,
+        drop_date: date,
         format,
         storage_key: storageKey,
       },

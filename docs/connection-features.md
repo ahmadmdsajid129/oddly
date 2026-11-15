@@ -121,3 +121,4 @@ In alignment with Oddly's core brand promise (*"Real numbers only"*):
    - Never marketed as "mind reading", "telepathy", or "psychic ability" in any literal or misleading way.
 3. **Zero Fabricated Opposites in Anti-Twin:**
    - If today's player pool is under 200 submissions, Anti-twin is gracefully hidden with honest copy: *"Not enough players yet today to find a genuine opposite. Check back this evening."*
+

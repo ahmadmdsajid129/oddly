@@ -60,7 +60,12 @@ export const resultsRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       const oddness = await prisma.oddnessScore.findUnique({
-        where: { submission_id: submission.id },
+        where: {
+          submission_id_drop_date: {
+            submission_id: submission.id,
+            drop_date: submission.drop_date,
+          },
+        },
       });
 
       const match = await MatchesRepository.getMatchForPlayer(

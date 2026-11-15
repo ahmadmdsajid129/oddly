@@ -13,6 +13,7 @@ export class MatchesRepository {
    */
   static async createMatch(data: {
     drop_id: string;
+    drop_date?: Date;
     player_a_id: string;
     player_b_id: string;
     submission_a_id?: string;
@@ -20,9 +21,16 @@ export class MatchesRepository {
     similarity_score: number;
     is_provisional?: boolean;
   }) {
+    let dropDate = data.drop_date;
+    if (!dropDate) {
+      const drop = await prisma.drop.findUnique({ where: { id: data.drop_id } });
+      dropDate = drop?.drop_date || new Date();
+    }
+
     return prisma.match.create({
       data: {
         drop_id: data.drop_id,
+        drop_date: dropDate,
         player_a_id: data.player_a_id,
         player_b_id: data.player_b_id,
         submission_a_id: data.submission_a_id,

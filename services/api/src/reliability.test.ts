@@ -155,13 +155,20 @@ describe("Stage R1 & R1-PATCH: Reliability Remediation API Tests", () => {
 
   describe("R1.4 & R1-PATCH Item 5: Rate Limiting (Device+IP and Coarse IP-Only Ceiling)", () => {
     const originalEnv = process.env.NODE_ENV;
+    const originalMetricsToken = process.env.METRICS_BEARER_TOKEN;
 
     beforeEach(() => {
       process.env.NODE_ENV = "production";
+      process.env.METRICS_BEARER_TOKEN = "test-metrics-token-rate-limit";
     });
 
     afterEach(() => {
       process.env.NODE_ENV = originalEnv;
+      if (originalMetricsToken !== undefined) {
+        process.env.METRICS_BEARER_TOKEN = originalMetricsToken;
+      } else {
+        delete process.env.METRICS_BEARER_TOKEN;
+      }
     });
 
     it("enforces device+IP limit on POST /v1/submissions (30 req/min)", async () => {

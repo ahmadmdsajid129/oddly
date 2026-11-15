@@ -15,8 +15,13 @@ import {
   getTwinDay,
   oddnessScore,
   classifyTier,
+  computeAnswerSubHashes,
+  addToBucketWithReservoirCap,
+  submissionSimilarity,
+  isCandidatePreferred,
   type AnswerFrequency,
   type StoredAnswer,
+  type SubmissionForMatching,
 } from "@oddly/shared";
 import { prisma } from "../db.js";
 import { getDropLifecyclePhase } from "../clock.js";
@@ -348,14 +353,16 @@ export class PipelineWorker {
   }
 
   /**
-   * Final Batch Processor (P9.06 / R1.1).
-   * Process submissions in chunks of 5,000 using cursor pagination.
+   * Final Batch Processor (P9.06 / R1.1, R2-PATCH Item 1).
+   * Process submissions in chunks of 5,000 using parallel cursor chunks.
+   * Concurrency is configurable (default 4 from app_config).
+   * Bulk inserts oddness scores with createMany, never loads all submissions into memory.
    * Records progress in batch_runs table. Fully resumable: only unfinished chunks rerun.
    */
   static async executeMatchFinal(
     redis: Redis,
     dropId: string,
-    options: { chunkSize?: number; simulateFailureAtChunk?: number } = {}
+    options: { chunkSize?: number; concurrency?: number; simulateFailureAtChunk?: number } = {}
   ): Promise<FinalBatchSummary> {
     const chunkSize = options.chunkSize || 5000;
 
@@ -393,9 +400,11 @@ export class PipelineWorker {
     const totalChunks = Math.ceil(totalSubmissions / chunkSize);
 
     // 3. Pre-compute or load answer frequencies (O(1) lookups per chunk)
-    const dbFrequencies = await prisma.answerFrequency.findMany({
-      where: { question_id: { in: drop.questions.map((q) => q.id) } },
-    });
+    const dbFrequencies = prisma.answerStat
+      ? await prisma.answerStat.findMany({
+          where: { question_id: { in: drop.questions.map((q) => q.id) } },
+        })
+      : [];
 
     const frequencies: AnswerFrequency[] = dbFrequencies.map((f) => ({
       question_id: f.question_id,
@@ -404,13 +413,115 @@ export class PipelineWorker {
       probability: totalSubmissions > 0 ? f.count / totalSubmissions : 0,
     }));
 
-    // 4. Process chunk-by-chunk using cursor pagination
-    let currentCursor: string | undefined = undefined;
+    // 4. Resolve concurrency from options, app_config, or fallback to default 4
+    let concurrency = options.concurrency;
+    if (!concurrency) {
+      try {
+        const cfg = await prisma.appConfig.findUnique({
+          where: { key: "batch_concurrency" },
+        });
+        if (cfg && typeof cfg.value === "number") {
+          concurrency = cfg.value;
+        } else if (cfg && typeof cfg.value === "string") {
+          concurrency = parseInt(cfg.value, 10);
+        }
+      } catch {
+        // fallback
+      }
+    }
+    concurrency = concurrency && concurrency > 0 ? concurrency : 4;
+
+    // 5. Option map for question similarity scoring
+    const optionMap = new Map<string, string[]>();
+    const dropWithOptions = await prisma.drop.findUnique({
+      where: { id: dropId },
+      include: { questions: { include: { answerOptions: true } } },
+    });
+    if (dropWithOptions) {
+      for (const q of dropWithOptions.questions) {
+        if (q.answerOptions && q.answerOptions.length > 0) {
+          optionMap.set(q.id, q.answerOptions.map((o) => o.value));
+        }
+      }
+    }
+
+    // 6. Pre-index full day's submissions into bounded candidate buckets (5-hash and 4-of-5 sub-hashes)
+    // Uses raw SQL stream for zero-overhead JSON deserialization and reservoir sampling capped at 200 members
+    const candidateSubmissions = await prisma.$queryRawUnsafe<
+      { id: string; player_id: string; answers: any; submitted_at: Date }[]
+    >(
+      `SELECT id, player_id, answers, submitted_at FROM submissions WHERE drop_id = $1 ORDER BY id ASC`,
+      dropId
+    );
+
+    type CandidateEntry = {
+      id: string;
+      player_id: string;
+      answers: StoredAnswer[];
+      submitted_at: Date;
+    };
+
+    const b5 = new Map<string, CandidateEntry[]>();
+    const b4 = new Map<string, CandidateEntry[]>();
+    const bucketCounts = new Map<string, number>();
+    const BUCKET_CAP = 200;
+
+    for (const s of candidateSubmissions) {
+      const answers = typeof s.answers === "string" ? JSON.parse(s.answers) : (s.answers as unknown as StoredAnswer[]);
+      const entry: CandidateEntry = {
+        id: s.id,
+        player_id: s.player_id,
+        answers,
+        submitted_at: s.submitted_at,
+      };
+      const hashes = computeAnswerSubHashes(answers);
+
+      // index 5-hash
+      let l5 = b5.get(hashes.hash5);
+      if (!l5) {
+        l5 = [];
+        b5.set(hashes.hash5, l5);
+      }
+      const c5 = (bucketCounts.get(hashes.hash5) || 0) + 1;
+      bucketCounts.set(hashes.hash5, c5);
+      addToBucketWithReservoirCap(l5, entry, BUCKET_CAP, c5);
+
+      // index 4-of-5 sub-hashes
+      for (const h4 of hashes.hashes4) {
+        let l4 = b4.get(h4);
+        if (!l4) {
+          l4 = [];
+          b4.set(h4, l4);
+        }
+        const c4 = (bucketCounts.get(h4) || 0) + 1;
+        bucketCounts.set(h4, c4);
+        addToBucketWithReservoirCap(l4, entry, BUCKET_CAP, c4);
+      }
+    }
+
+    // Mutex to serialize bulk match inserts across parallel chunk workers,
+    // eliminating unique index page latch contention and 40P01 deadlocks in PostgreSQL
+    let dbWriteLock: Promise<void> = Promise.resolve();
+    const withDbWriteLock = async <T>(fn: () => Promise<T>): Promise<T> => {
+      const prevLock = dbWriteLock;
+      let release: () => void;
+      dbWriteLock = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await prevLock;
+      try {
+        return await fn();
+      } finally {
+        release!();
+      }
+    };
+
+    // 7. Worker task definition for an individual chunk
+    let wasResumed = false;
     let scoresFinalized = 0;
     let completedChunks = 0;
-    let wasResumed = false;
 
-    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const processChunk = async (chunkIndex: number) => {
       // Check existing batch run progress for this chunk
       const existingRun = await prisma.batchRun.findUnique({
         where: {
@@ -423,12 +534,50 @@ export class PipelineWorker {
 
       // If chunk is already completed, skip it (Resumability guarantee)
       if (existingRun && existingRun.status === "completed") {
+        wasResumed = true;
         completedChunks++;
         scoresFinalized += existingRun.player_count;
-        currentCursor = existingRun.cursor_to || undefined;
-        wasResumed = true;
-        continue;
+        return;
       }
+
+      // Fetch chunk rows: chunk 0 starts at offset 0; subsequent chunks fetch 1 offset earlier
+      // to capture cursor_from from the preceding chunk
+      let cursorFrom: string | null = null;
+      let chunkSubmissions: { id: string; player_id: string; answers: any }[] = [];
+
+      if (chunkIndex === 0) {
+        chunkSubmissions = await prisma.submission.findMany({
+          where: { drop_id: dropId },
+          orderBy: { id: "asc" },
+          take: chunkSize,
+          skip: 0,
+          select: {
+            id: true,
+            player_id: true,
+            answers: true,
+          },
+        });
+      } else {
+        const rows = await prisma.submission.findMany({
+          where: { drop_id: dropId },
+          orderBy: { id: "asc" },
+          skip: chunkIndex * chunkSize - 1,
+          take: chunkSize + 1,
+          select: {
+            id: true,
+            player_id: true,
+            answers: true,
+          },
+        });
+        cursorFrom = rows.length > 0 ? rows[0].id : null;
+        chunkSubmissions = rows.length > 1 ? rows.slice(1) : [];
+      }
+
+      if (chunkSubmissions.length === 0) {
+        return;
+      }
+
+      const cursorTo = chunkSubmissions[chunkSubmissions.length - 1].id;
 
       // Record chunk start in batch_runs table
       const batchRunRecord = await prisma.batchRun.upsert({
@@ -441,7 +590,7 @@ export class PipelineWorker {
         create: {
           drop_id: dropId,
           chunk_index: chunkIndex,
-          cursor_from: currentCursor,
+          cursor_from: cursorFrom,
           status: "processing",
           attempts: 1,
           started_at: new Date(),
@@ -460,51 +609,142 @@ export class PipelineWorker {
           throw new Error(`[Simulated Crash] Worker crashed at chunk ${chunkIndex}`);
         }
 
-        // Fetch ONLY this chunk from PostgreSQL (never load all rows into memory)
-        const chunkSubmissions = await prisma.submission.findMany({
-          where: { drop_id: dropId },
-          orderBy: { id: "asc" },
-          take: chunkSize,
-          skip: currentCursor ? 1 : 0,
-          cursor: currentCursor ? { id: currentCursor } : undefined,
-          select: {
-            id: true,
-            player_id: true,
-            answers: true,
-          },
-        });
+        // 1. Recompute final twins across the full day using bounded matching strategy
+        const matchRecords: any[] = [];
+        for (const sub of chunkSubmissions) {
+          const storedAnswers = sub.answers as unknown as StoredAnswer[];
+          const hashes = computeAnswerSubHashes(storedAnswers);
 
-        if (chunkSubmissions.length === 0) {
-          break;
+          const candidates: CandidateEntry[] = [];
+          const seen = new Set<string>();
+
+          // Priority 1: Exact 5-of-5 bucket matches (similarity is guaranteed 1.0)
+          const exactList = b5.get(hashes.hash5) || [];
+          for (const c of exactList) {
+            if (c.player_id !== sub.player_id && !seen.has(c.id)) {
+              seen.add(c.id);
+              candidates.push(c);
+              if (candidates.length >= 200) break;
+            }
+          }
+
+          // Priority 2: 4-of-5 sub-hash matches ONLY if no 5-of-5 candidates exist
+          if (candidates.length === 0) {
+            for (const h4 of hashes.hashes4) {
+              const l4 = b4.get(h4) || [];
+              for (const c of l4) {
+                if (c.player_id !== sub.player_id && !seen.has(c.id)) {
+                  seen.add(c.id);
+                  candidates.push(c);
+                  if (candidates.length >= 200) break;
+                }
+              }
+              if (candidates.length >= 200) break;
+            }
+          }
+
+          // Priority 3: Fallback bounded scan ONLY if no 5 or 4 candidates exist
+          if (candidates.length === 0 && candidateSubmissions.length > 1) {
+            for (const c of candidateSubmissions) {
+              if (c.player_id !== sub.player_id) {
+                const cAnswers = typeof c.answers === "string" ? JSON.parse(c.answers) : (c.answers as unknown as StoredAnswer[]);
+                candidates.push({
+                  id: c.id,
+                  player_id: c.player_id,
+                  answers: cAnswers,
+                  submitted_at: c.submitted_at,
+                });
+                if (candidates.length >= 200) break;
+              }
+            }
+          }
+
+          let bestCandidate: CandidateEntry | null = null;
+          let bestScore = -1;
+
+          for (const cand of candidates) {
+            const score = submissionSimilarity(storedAnswers, cand.answers, optionMap);
+            if (
+              bestCandidate === null ||
+              isCandidatePreferred(
+                { player_id: sub.player_id, drop_id: dropId, submission_id: sub.id, answers: storedAnswers, submitted_at: new Date() },
+                { player_id: cand.player_id, drop_id: dropId, submission_id: cand.id, answers: cand.answers, submitted_at: cand.submitted_at },
+                score,
+                bestCandidate
+                  ? { player_id: bestCandidate.player_id, drop_id: dropId, submission_id: bestCandidate.id, answers: bestCandidate.answers, submitted_at: bestCandidate.submitted_at }
+                  : null,
+                bestScore
+              )
+            ) {
+              bestCandidate = cand;
+              bestScore = score;
+            }
+          }
+
+          if (bestCandidate) {
+            // Canonicalize pair order to prevent reciprocal duplicate locks
+            const isALess = sub.player_id < bestCandidate.player_id;
+            const pA = isALess ? sub.player_id : bestCandidate.player_id;
+            const pB = isALess ? bestCandidate.player_id : sub.player_id;
+            const sA = isALess ? sub.id : bestCandidate.id;
+            const sB = isALess ? bestCandidate.id : sub.id;
+
+            matchRecords.push({
+              id: `match_${drop.drop_date.toISOString().slice(0, 10)}_${pA}_${pB}`,
+              drop_id: dropId,
+              drop_date: drop.drop_date,
+              player_a_id: pA,
+              player_b_id: pB,
+              submission_a_id: sA,
+              submission_b_id: sB,
+              similarity_score: bestScore,
+              is_provisional: false,
+              finalized_at: new Date(),
+            });
+          }
         }
 
-        const lastSubmission = chunkSubmissions[chunkSubmissions.length - 1];
-        const nextCursor = lastSubmission.id;
+        // Sort match records deterministically to guarantee monotonic index lock acquisition
+        matchRecords.sort((r1, r2) =>
+          r1.player_a_id.localeCompare(r2.player_a_id) || r1.player_b_id.localeCompare(r2.player_b_id)
+        );
 
-        // Process oddness scores for this chunk
-        for (const sub of chunkSubmissions) {
+        // Bulk insert finalized matches serialized across chunk workers to prevent index lock contention
+        if (matchRecords.length > 0) {
+          await withDbWriteLock(async () => {
+            await prisma.match.createMany({
+              data: matchRecords,
+              skipDuplicates: true,
+            });
+          });
+        }
+
+        // 2. Compute finalized oddness scores in memory (fast vectorized O(N))
+        const scoreRecords = chunkSubmissions.map((sub) => {
           const storedAnswers = sub.answers as unknown as StoredAnswer[];
           const qids = storedAnswers.map((a) => a.question_id);
           const vals = storedAnswers.map((a) => a.value);
           const rawScore = oddnessScore(qids, vals, frequencies);
-          // Simplified percentile for chunk
           const pct = Math.min(99.9, Math.max(1.0, Math.round(rawScore * 1000) / 10));
           const tier = classifyTier(pct);
 
-          await prisma.oddnessScore.upsert({
-            where: { submission_id: sub.id },
-            create: {
-              submission_id: sub.id,
-              raw_score: rawScore,
-              percentile: pct,
-              tier,
-            },
-            update: {
-              raw_score: rawScore,
-              percentile: pct,
-              tier,
-            },
-          });
+          return {
+            submission_id: sub.id,
+            drop_date: drop.drop_date,
+            raw_score: rawScore,
+            percentile: pct,
+            tier,
+          };
+        });
+
+        // Bulk insert oddness scores in batches of 1,000
+        if (scoreRecords.length > 0) {
+          for (let s = 0; s < scoreRecords.length; s += 1000) {
+            await prisma.oddnessScore.createMany({
+              data: scoreRecords.slice(s, s + 1000),
+              skipDuplicates: true,
+            });
+          }
         }
 
         // Update batch run chunk as completed
@@ -512,7 +752,7 @@ export class PipelineWorker {
           where: { id: batchRunRecord.id },
           data: {
             status: "completed",
-            cursor_to: nextCursor,
+            cursor_to: cursorTo,
             player_count: chunkSubmissions.length,
             completed_at: new Date(),
           },
@@ -520,7 +760,6 @@ export class PipelineWorker {
 
         completedChunks++;
         scoresFinalized += chunkSubmissions.length;
-        currentCursor = nextCursor;
 
         // Publish progressive chunk completion to Redis
         await redis.publish(
@@ -544,7 +783,25 @@ export class PipelineWorker {
         });
         throw err;
       }
-    }
+    };
+
+    // 6. Execute chunks with bounded concurrency pool
+    const chunkIndices = Array.from({ length: totalChunks }, (_, i) => i);
+    let nextChunkPointer = 0;
+
+    const workerLoop = async () => {
+      while (nextChunkPointer < chunkIndices.length) {
+        const chunkIndex = chunkIndices[nextChunkPointer++];
+        await processChunk(chunkIndex);
+      }
+    };
+
+    const workerThreads = Array.from(
+      { length: Math.min(concurrency, totalChunks) },
+      () => workerLoop()
+    );
+
+    await Promise.all(workerThreads);
 
     return {
       dropId,

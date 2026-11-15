@@ -224,14 +224,39 @@ export function computeAnswerSubHashes(
   return { hash5, hashes4, hashes3 };
 }
 
+export const DEFAULT_BUCKET_MEMBER_CAP = 200;
+
+/**
+ * Adds an item to a bucket with reservoir sampling cap (R2.9).
+ * Guarantees that popular answer buckets never exceed bucketCap members while giving
+ * all candidates uniform retention probability.
+ */
+export function addToBucketWithReservoirCap<T>(
+  bucket: T[],
+  item: T,
+  cap: number = DEFAULT_BUCKET_MEMBER_CAP,
+  totalSeen: number
+): void {
+  if (bucket.length < cap) {
+    bucket.push(item);
+  } else {
+    const j = Math.floor(Math.random() * totalSeen);
+    if (j < cap) {
+      bucket[j] = item;
+    }
+  }
+}
+
 /**
  * Selects candidate submissions prioritized by answer-hash buckets, capped at maxCandidates.
  * Exact 5-match bucket first, then 4-of-5, then 3-of-5.
+ * Uses reservoir sampling bucket caps (default 200 members/bucket) to preserve memory budget.
  */
 export function selectBoundedCandidates(
   target: SubmissionForMatching,
   pool: SubmissionForMatching[],
-  maxCandidates = 2000
+  maxCandidates = 2000,
+  bucketCap = DEFAULT_BUCKET_MEMBER_CAP
 ): SubmissionForMatching[] {
   // Exclude target itself
   const validPool = pool.filter(
@@ -244,28 +269,37 @@ export function selectBoundedCandidates(
 
   const targetHashes = computeAnswerSubHashes(target.answers);
 
-  // Index pool into bucket maps
+  // Index pool into bucket maps with reservoir sampling caps (R2.9)
   const b5Map = new Map<string, SubmissionForMatching[]>();
   const b4Map = new Map<string, SubmissionForMatching[]>();
   const b3Map = new Map<string, SubmissionForMatching[]>();
+  const seenMap = new Map<string, number>();
+
+  const insert = (map: Map<string, SubmissionForMatching[]>, hash: string, candidate: SubmissionForMatching) => {
+    let list = map.get(hash);
+    if (!list) {
+      list = [];
+      map.set(hash, list);
+    }
+    const seen = (seenMap.get(hash) || 0) + 1;
+    seenMap.set(hash, seen);
+    addToBucketWithReservoirCap(list, candidate, bucketCap, seen);
+  };
 
   for (const candidate of validPool) {
     const cHashes = computeAnswerSubHashes(candidate.answers);
 
     // 5-hash
-    if (!b5Map.has(cHashes.hash5)) b5Map.set(cHashes.hash5, []);
-    b5Map.get(cHashes.hash5)!.push(candidate);
+    insert(b5Map, cHashes.hash5, candidate);
 
     // 4-hashes
     for (const h4 of cHashes.hashes4) {
-      if (!b4Map.has(h4)) b4Map.set(h4, []);
-      b4Map.get(h4)!.push(candidate);
+      insert(b4Map, h4, candidate);
     }
 
     // 3-hashes
     for (const h3 of cHashes.hashes3) {
-      if (!b3Map.has(h3)) b3Map.set(h3, []);
-      b3Map.get(h3)!.push(candidate);
+      insert(b3Map, h3, candidate);
     }
   }
 

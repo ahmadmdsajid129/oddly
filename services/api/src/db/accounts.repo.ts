@@ -187,6 +187,10 @@ export class AccountsRepository {
         })) as unknown as InMemoryPlayerRecord;
       }
     } catch {
+      // Fallback if DB query errors
+    }
+
+    if (!guestPlayer) {
       if (guestPlayerId) {
         guestPlayer = inMemoryPlayers.get(guestPlayerId) || null;
       } else if (guestDid) {
@@ -227,10 +231,13 @@ export class AccountsRepository {
         },
       })) as unknown as InMemoryPlayerRecord[];
     } catch {
-      allLinkedPlayers = Array.from(inMemoryPlayers.values()).filter(
-        (p) => p.account_id === accountId
-      );
+      // Fallback
     }
+
+    const inMemLinked = Array.from(inMemoryPlayers.values()).filter(
+      (p) => p.account_id === accountId
+    );
+    allLinkedPlayers = [...allLinkedPlayers, ...inMemLinked];
 
     // 4. Gather all distinct drop dates across all linked devices
     const seenPlayerIds = new Set<string>();

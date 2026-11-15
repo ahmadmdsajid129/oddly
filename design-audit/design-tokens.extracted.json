@@ -1,0 +1,206 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "audit": {
+    "project": "Oddly v1",
+    "stage": "Stage D0: Design Audit",
+    "generated_at": "2026-11-14T13:46:00.000Z",
+    "status": "READ-ONLY AUDIT COMPLETE"
+  },
+  "tokens": {
+    "colors": {
+      "light": {
+        "midnight": { "value": "#14123A", "source": "packages/ui-tokens/src/tokens.ts:3" },
+        "violet": { "value": "#6C4CF1", "source": "packages/ui-tokens/src/tokens.ts:4" },
+        "violetPress": { "value": "#5538D6", "source": "packages/ui-tokens/src/tokens.ts:5" },
+        "coral": { "value": "#FF6B5E", "source": "packages/ui-tokens/src/tokens.ts:6" },
+        "mint": { "value": "#1FBF93", "source": "packages/ui-tokens/src/tokens.ts:7" },
+        "cream": { "value": "#FFF8F0", "source": "packages/ui-tokens/src/tokens.ts:8" },
+        "lavender": { "value": "#EEEAFE", "source": "packages/ui-tokens/src/tokens.ts:9" },
+        "bg": { "value": "#FFF8F0", "source": "packages/ui-tokens/src/tokens.ts:10" },
+        "surface": { "value": "#FFFFFF", "source": "packages/ui-tokens/src/tokens.ts:11" },
+        "surface2": { "value": "#EEEAFE", "source": "packages/ui-tokens/src/tokens.ts:12" },
+        "border": { "value": "#DDD6FA", "source": "packages/ui-tokens/src/tokens.ts:13" },
+        "text": { "value": "#14123A", "source": "packages/ui-tokens/src/tokens.ts:14" },
+        "textMuted": { "value": "#5B5780", "source": "packages/ui-tokens/src/tokens.ts:15" },
+        "danger": { "value": "#D93C4B", "source": "packages/ui-tokens/src/tokens.ts:16" },
+        "warning": { "value": "#E69A1A", "source": "packages/ui-tokens/src/tokens.ts:17" },
+        "success": { "value": "#1FBF93", "source": "packages/ui-tokens/src/tokens.ts:18" }
+      },
+      "dark": {
+        "midnight": { "value": "#14123A", "source": "packages/ui-tokens/src/tokens.ts:21" },
+        "violet": { "value": "#8B72FF", "source": "packages/ui-tokens/src/tokens.ts:22" },
+        "violetPress": { "value": "#6C4CF1", "source": "packages/ui-tokens/src/tokens.ts:23" },
+        "coral": { "value": "#FF8176", "source": "packages/ui-tokens/src/tokens.ts:24" },
+        "mint": { "value": "#3DDBB0", "source": "packages/ui-tokens/src/tokens.ts:25" },
+        "cream": { "value": "#14123A", "source": "packages/ui-tokens/src/tokens.ts:26" },
+        "lavender": { "value": "#28245E", "source": "packages/ui-tokens/src/tokens.ts:27" },
+        "bg": { "value": "#14123A", "source": "packages/ui-tokens/src/tokens.ts:28" },
+        "surface": { "value": "#1E1B4B", "source": "packages/ui-tokens/src/tokens.ts:29" },
+        "surface2": { "value": "#28245E", "source": "packages/ui-tokens/src/tokens.ts:30" },
+        "border": { "value": "#3A3580", "source": "packages/ui-tokens/src/tokens.ts:31" },
+        "text": { "value": "#F4F1FF", "source": "packages/ui-tokens/src/tokens.ts:32" },
+        "textMuted": { "value": "#B3AEE0", "source": "packages/ui-tokens/src/tokens.ts:33" },
+        "danger": { "value": "#FF6B7A", "source": "packages/ui-tokens/src/tokens.ts:34" },
+        "warning": { "value": "#FFC857", "source": "packages/ui-tokens/src/tokens.ts:35" },
+        "success": { "value": "#3DDBB0", "source": "packages/ui-tokens/src/tokens.ts:36" }
+      },
+      "palette12": [
+        { "label": "Crimson", "hex": "#D7263D", "source": "packages/ui-tokens/src/tokens.ts:39" },
+        { "label": "Coral", "hex": "#FF6B5E", "source": "packages/ui-tokens/src/tokens.ts:40" },
+        { "label": "Amber", "hex": "#F59E0B", "source": "packages/ui-tokens/src/tokens.ts:41" },
+        { "label": "Sunshine", "hex": "#FFD23F", "source": "packages/ui-tokens/src/tokens.ts:42" },
+        { "label": "Lime", "hex": "#8BC34A", "source": "packages/ui-tokens/src/tokens.ts:43" },
+        { "label": "Mint", "hex": "#3DDBB0", "source": "packages/ui-tokens/src/tokens.ts:44" },
+        { "label": "Teal", "hex": "#0F9D9A", "source": "packages/ui-tokens/src/tokens.ts:45" },
+        { "label": "Sky", "hex": "#4CC9F0", "source": "packages/ui-tokens/src/tokens.ts:46" },
+        { "label": "Indigo", "hex": "#3F37C9", "source": "packages/ui-tokens/src/tokens.ts:47" },
+        { "label": "Violet", "hex": "#8E5CF6", "source": "packages/ui-tokens/src/tokens.ts:48" },
+        { "label": "Pink", "hex": "#F472B6", "source": "packages/ui-tokens/src/tokens.ts:49" },
+        { "label": "Slate", "hex": "#64748B", "source": "packages/ui-tokens/src/tokens.ts:50" }
+      ],
+      "cssVariables": {
+        ":root": {
+          "--color-midnight": { "value": "#14123a", "source": "apps/web/src/styles/globals.css:7" },
+          "--color-violet": { "value": "#8b72ff", "source": "apps/web/src/styles/globals.css:8" },
+          "--color-violet-press": { "value": "#6c4cf1", "source": "apps/web/src/styles/globals.css:9" },
+          "--color-coral": { "value": "#ff8176", "source": "apps/web/src/styles/globals.css:10" },
+          "--color-mint": { "value": "#3ddbb0", "source": "apps/web/src/styles/globals.css:11" },
+          "--color-cream": { "value": "#14123a", "source": "apps/web/src/styles/globals.css:12" },
+          "--color-lavender": { "value": "#c4b5fd", "source": "apps/web/src/styles/globals.css:13", "conflict": "Defined as #28245E in tokens.ts:27" },
+          "--color-bg": { "value": "#14123a", "source": "apps/web/src/styles/globals.css:14" },
+          "--color-surface": { "value": "#1e1b4b", "source": "apps/web/src/styles/globals.css:15" },
+          "--color-surface-2": { "value": "#28245e", "source": "apps/web/src/styles/globals.css:16" },
+          "--color-border": { "value": "#3a3580", "source": "apps/web/src/styles/globals.css:17" },
+          "--color-text": { "value": "#f4f1ff", "source": "apps/web/src/styles/globals.css:18" },
+          "--color-text-muted": { "value": "#b3aee0", "source": "apps/web/src/styles/globals.css:19" },
+          "--color-danger": { "value": "#dc2626", "source": "apps/web/src/styles/globals.css:20", "conflict": "Defined as #FF6B7A in tokens.ts:34" },
+          "--color-warning": { "value": "#ffc857", "source": "apps/web/src/styles/globals.css:21" },
+          "--color-success": { "value": "#3ddbb0", "source": "apps/web/src/styles/globals.css:22" }
+        },
+        ".light": {
+          "--color-midnight": { "value": "#14123a", "source": "apps/web/src/styles/globals.css:34" },
+          "--color-violet": { "value": "#6c4cf1", "source": "apps/web/src/styles/globals.css:35" },
+          "--color-violet-press": { "value": "#5538d6", "source": "apps/web/src/styles/globals.css:36" },
+          "--color-coral": { "value": "#ff6b5e", "source": "apps/web/src/styles/globals.css:37" },
+          "--color-mint": { "value": "#1fbf93", "source": "apps/web/src/styles/globals.css:38" },
+          "--color-cream": { "value": "#fff8f0", "source": "apps/web/src/styles/globals.css:39" },
+          "--color-lavender": { "value": "#eeeafe", "source": "apps/web/src/styles/globals.css:40" },
+          "--color-bg": { "value": "#fff8f0", "source": "apps/web/src/styles/globals.css:41" },
+          "--color-surface": { "value": "#ffffff", "source": "apps/web/src/styles/globals.css:42" },
+          "--color-surface-2": { "value": "#eeeafe", "source": "apps/web/src/styles/globals.css:43" },
+          "--color-border": { "value": "#ddd6fa", "source": "apps/web/src/styles/globals.css:44" },
+          "--color-text": { "value": "#14123a", "source": "apps/web/src/styles/globals.css:45" },
+          "--color-text-muted": { "value": "#5b5780", "source": "apps/web/src/styles/globals.css:46" },
+          "--color-danger": { "value": "#d93c4b", "source": "apps/web/src/styles/globals.css:47" },
+          "--color-warning": { "value": "#e69a1a", "source": "apps/web/src/styles/globals.css:48" },
+          "--color-success": { "value": "#1fbf93", "source": "apps/web/src/styles/globals.css:49" }
+        }
+      },
+      "hardcodedDeviations": [
+        { "code": "#6C4CF1", "usage": "Primary button background, active chips, and selected word chips", "source": "apps/web/src/components/ui/Button.tsx:66, Card.tsx:97, AnswerComponents.tsx:143, 313" },
+        { "code": "#5538D6", "usage": "Primary button hover background", "source": "apps/web/src/components/ui/Button.tsx:66" },
+        { "code": "#DC2626", "usage": "Destructive button background", "source": "apps/web/src/components/ui/Button.tsx:72" },
+        { "code": "#B91C1C", "usage": "Destructive button hover background", "source": "apps/web/src/components/ui/Button.tsx:72" },
+        { "code": "#0E0C28", "usage": "PWA Manifest background color", "source": "apps/web/src/app/manifest.ts:11" },
+        { "code": "#120E30", "usage": "Share card Mythic background", "source": "packages/shared/src/share-cards.ts:93" },
+        { "code": "#1D1645", "usage": "Share card Mythic surface", "source": "packages/shared/src/share-cards.ts:94" },
+        { "code": "#8E5CF6", "usage": "Palette 12 Violet swatch (differs from brand #6C4CF1)", "source": "packages/ui-tokens/src/tokens.ts:48" },
+        { "code": "#059669", "usage": "Share card Light Mint text (differs from brand #3DDBB0)", "source": "packages/shared/src/share-cards.ts:83" },
+        { "code": "#10B981", "usage": "Share card Dark Mint pill text", "source": "packages/shared/src/share-cards.ts:113" },
+        { "code": "text-rose-600 / text-rose-400", "usage": "Input & Textarea error message text", "source": "apps/web/src/components/ui/FormControls.tsx:131, 163" }
+      ]
+    },
+    "typography": {
+      "fontFamilies": {
+        "heading": { "name": "Space Grotesk", "weights": ["500", "700"], "display": "swap", "source": "apps/web/src/app/layout.tsx:18-23" },
+        "body": { "name": "Inter", "weights": ["400", "500", "600"], "display": "swap", "source": "apps/web/src/app/layout.tsx:25-30" },
+        "shareCard": { "name": "Noto Sans", "file": "noto-sans-regular.ttf", "sizeBytes": 28388, "source": "packages/shared/src/share-cards.ts:46" }
+      },
+      "scale": {
+        "text-[10px]": { "fontSize": "10px", "lineHeight": "14px", "usage": "Pick match labels, navigation tab labels" },
+        "text-[11px]": { "fontSize": "11px", "lineHeight": "16px", "usage": "Card rare pick badges, keyboard hint footer" },
+        "text-xs": { "fontSize": "12px", "lineHeight": "16px", "usage": "Badges, countdown labels, footnotes, live counter" },
+        "text-sm": { "fontSize": "14px", "lineHeight": "20px", "usage": "Body copy, input placeholder, button sm, chip" },
+        "text-base": { "fontSize": "16px", "lineHeight": "24px", "usage": "Primary body copy, button lg, answer text" },
+        "text-lg": { "fontSize": "18px", "lineHeight": "28px", "usage": "Question prompt text, card subheadings" },
+        "text-xl": { "fontSize": "20px", "lineHeight": "28px", "usage": "Brand wordmark, modal titles, sealed drop title" },
+        "text-2xl": { "fontSize": "24px", "lineHeight": "32px", "usage": "Login header, section titles" },
+        "text-3xl": { "fontSize": "30px", "lineHeight": "36px", "usage": "Landing hero heading mobile, design kit title" },
+        "text-4xl": { "fontSize": "36px", "lineHeight": "40px", "usage": "Landing hero heading desktop" },
+        "text-6xl": { "fontSize": "60px", "lineHeight": "1", "usage": "Number dial value, Oddness percentile mobile" },
+        "text-7xl": { "fontSize": "72px", "lineHeight": "1", "usage": "Oddness percentile display desktop" }
+      }
+    },
+    "spacing": {
+      "scale": {
+        "0": { "px": 0, "source": "packages/ui-tokens/src/tokens.ts:55" },
+        "1": { "px": 4, "source": "packages/ui-tokens/src/tokens.ts:56" },
+        "2": { "px": 8, "source": "packages/ui-tokens/src/tokens.ts:57" },
+        "3": { "px": 12, "source": "packages/ui-tokens/src/tokens.ts:58" },
+        "4": { "px": 16, "source": "packages/ui-tokens/src/tokens.ts:59" },
+        "5": { "px": 20, "source": "packages/ui-tokens/src/tokens.ts:60" },
+        "6": { "px": 24, "source": "packages/ui-tokens/src/tokens.ts:61" },
+        "8": { "px": 32, "source": "packages/ui-tokens/src/tokens.ts:62" },
+        "10": { "px": 40, "source": "packages/ui-tokens/src/tokens.ts:63" },
+        "12": { "px": 48, "source": "packages/ui-tokens/src/tokens.ts:64" },
+        "16": { "px": 64, "source": "packages/ui-tokens/src/tokens.ts:65" },
+        "20": { "px": 80, "source": "packages/ui-tokens/src/tokens.ts:66" },
+        "24": { "px": 96, "source": "packages/ui-tokens/src/tokens.ts:67" }
+      }
+    },
+    "radius": {
+      "xs": { "value": "6px", "source": "packages/ui-tokens/src/tokens.ts:71" },
+      "sm": { "value": "10px", "source": "packages/ui-tokens/src/tokens.ts:72" },
+      "md": { "value": "16px", "source": "packages/ui-tokens/src/tokens.ts:73" },
+      "lg": { "value": "24px", "source": "packages/ui-tokens/src/tokens.ts:74" },
+      "xl": { "value": "32px", "source": "packages/ui-tokens/src/tokens.ts:75" },
+      "full": { "value": "9999px", "source": "packages/ui-tokens/src/tokens.ts:76" },
+      "hardcoded": [
+        { "value": "12px", "usage": "Checkboxes, dialog handle, rarest pick container", "source": "FormControls.tsx:99, Dialogs.tsx:69, OddnessScreen.tsx:172" },
+        { "value": "28px", "usage": "Age gate checkbox wrapper, Mythic glow ring", "source": "FormControls.tsx:65, icons/index.tsx:106" },
+        { "value": "rounded-t-[32px]", "usage": "Mobile bottom sheet header", "source": "Dialogs.tsx:62" }
+      ]
+    },
+    "shadows": {
+      "1": { "value": "0 1px 2px rgba(20, 18, 58, 0.08)", "source": "packages/ui-tokens/src/tokens.ts:80" },
+      "2": { "value": "0 8px 24px rgba(20, 18, 58, 0.12)", "source": "packages/ui-tokens/src/tokens.ts:81" },
+      "3": { "value": "0 20px 48px rgba(108, 76, 241, 0.25)", "source": "packages/ui-tokens/src/tokens.ts:82" },
+      "glowMint": { "value": "0 0 32px rgba(61, 219, 176, 0.45)", "source": "packages/ui-tokens/src/tokens.ts:83" },
+      "glowViolet": { "value": "0 0 32px rgba(108, 76, 241, 0.50)", "source": "packages/ui-tokens/src/tokens.ts:84" },
+      "gradients": {
+        "gradHeroDark": "radial-gradient(ellipse at 20% 0%, rgba(108, 76, 241, 0.25) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(255, 107, 94, 0.20) 0%, transparent 60%), #14123a",
+        "gradHeroLight": "radial-gradient(ellipse at 20% 0%, rgba(108, 76, 241, 0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(255, 107, 94, 0.10) 0%, transparent 60%), #fff8f0",
+        "gradMatch": "linear-gradient(135deg, #6c4cf1 0%, #3ddbb0 100%)",
+        "gradMythic": "conic-gradient(from 180deg at 50% 50%, #6c4cf1, #ff6b5e, #ffd23f, #3ddbb0, #6c4cf1)"
+      }
+    },
+    "motion": {
+      "springs": {
+        "springDefault": { "type": "spring", "stiffness": 380, "damping": 28, "source": "apps/web/src/lib/motion.ts:3-7" },
+        "springBouncy": { "type": "spring", "stiffness": 450, "damping": 20, "source": "apps/web/src/lib/motion.ts:9-13" },
+        "springGentle": { "type": "spring", "stiffness": 250, "damping": 30, "source": "apps/web/src/lib/motion.ts:15-19" }
+      },
+      "easings": {
+        "transitionEase": { "duration": 0.22, "ease": [0.2, 0.8, 0.2, 1], "source": "apps/web/src/lib/motion.ts:21-24" },
+        "sheetExitEase": { "duration": 0.24, "ease": [0.32, 0.72, 0, 1], "source": "apps/web/src/lib/motion.ts:47" }
+      },
+      "durations": {
+        "buttonDuration": "150ms",
+        "cardDuration": "200ms",
+        "searchMapDuration": "2000ms",
+        "revealCountStep": "280ms",
+        "oddnessCountStep": "35ms",
+        "autoAdvanceDelay": "350ms",
+        "toastAutoDismiss": "3500ms"
+      }
+    },
+    "zIndex": {
+      "z-10": { "usage": "Brand marks, background decorative circles, login card container" },
+      "z-20": { "usage": "Top navigation header, question main containers, footers" },
+      "z-30": { "usage": "Sticky TopNav bar" },
+      "z-40": { "usage": "Dialog & bottom sheet backdrop overlays" },
+      "z-50": { "usage": "Dialog modal content, toast notifications, tooltips" }
+    }
+  }
+}
+

@@ -12,9 +12,19 @@ export class SubmissionsRepository {
   /**
    * Check if a submission with the given idempotency request_id already exists.
    */
-  static async findByRequestId(requestId: string) {
+  static async findByRequestId(requestId: string, dropDate?: Date) {
     try {
-      return await prisma.submission.findUnique({
+      if (dropDate) {
+        return await prisma.submission.findUnique({
+          where: {
+            drop_date_request_id: {
+              drop_date: dropDate,
+              request_id: requestId,
+            },
+          },
+        });
+      }
+      return await prisma.submission.findFirst({
         where: { request_id: requestId },
       });
     } catch {
@@ -25,14 +35,25 @@ export class SubmissionsRepository {
   /**
    * Get submission by player and drop ID.
    */
-  static async findByPlayerAndDrop(playerId: string, dropId: string) {
+  static async findByPlayerAndDrop(playerId: string, dropId: string, dropDate?: Date) {
     try {
-      return await prisma.submission.findUnique({
-        where: {
-          drop_id_player_id: {
-            drop_id: dropId,
-            player_id: playerId,
+      if (dropDate) {
+        return await prisma.submission.findUnique({
+          where: {
+            drop_date_player_id: {
+              drop_date: dropDate,
+              player_id: playerId,
+            },
           },
+          include: {
+            oddnessScore: true,
+          },
+        });
+      }
+      return await prisma.submission.findFirst({
+        where: {
+          drop_id: dropId,
+          player_id: playerId,
         },
         include: {
           oddnessScore: true,
@@ -48,13 +69,21 @@ export class SubmissionsRepository {
    */
   static async createSubmission(data: {
     drop_id: string;
+    drop_date?: Date;
     player_id: string;
     request_id: string;
     answers: StoredAnswer[];
   }) {
+    let dropDate = data.drop_date;
+    if (!dropDate) {
+      const drop = await prisma.drop.findUnique({ where: { id: data.drop_id } });
+      dropDate = drop?.drop_date || new Date();
+    }
+
     return prisma.submission.create({
       data: {
         drop_id: data.drop_id,
+        drop_date: dropDate,
         player_id: data.player_id,
         request_id: data.request_id,
         answers: data.answers as unknown as Prisma.InputJsonValue,
@@ -87,7 +116,7 @@ export class SubmissionsRepository {
    * Fetch single submission by ID with full details.
    */
   static async getById(id: string) {
-    return prisma.submission.findUnique({
+    return prisma.submission.findFirst({
       where: { id },
       include: {
         player: true,

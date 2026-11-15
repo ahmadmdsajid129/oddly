@@ -6,6 +6,7 @@
  */
 
 import { describe, expect, it, beforeEach } from "vitest";
+import { getTwinDay, offsetDate } from "@oddly/shared";
 import { getTimelineConfig, getDropLifecyclePhase } from "./clock.js";
 import { PairingWorker, type PairingCandidate } from "./workers/pairing.worker.js";
 import { ClosureWorker, type SubmissionData } from "./workers/closure.worker.js";
@@ -212,20 +213,14 @@ describe("Stage 9: Daily Pipeline & Scheduler (P9.01 - P9.07)", () => {
     });
 
     it("calculates streaks and identifies milestone awards (7, 30, 100, 365)", () => {
+      const today = getTwinDay(new Date());
+      const d = (offset: number) => offsetDate(today, -offset);
       const playerDates = new Map<string, string[]>([
         [
           "player_7_day",
-          [
-            "2026-11-09",
-            "2026-11-08",
-            "2026-11-07",
-            "2026-11-06",
-            "2026-11-05",
-            "2026-11-04",
-            "2026-11-03",
-          ],
+          [d(0), d(1), d(2), d(3), d(4), d(5), d(6)],
         ],
-        ["player_3_day", ["2026-11-09", "2026-11-08", "2026-11-07"]],
+        ["player_3_day", [d(0), d(1), d(2)]],
       ]);
 
       const results = ClosureWorker.processStreaks(playerDates);

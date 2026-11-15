@@ -6,7 +6,7 @@
  * Zod validation, OpenAPI docs, cookies, and rate limits.
  */
 
-import Fastify from "fastify";
+import Fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import cookie from "@fastify/cookie";
@@ -39,23 +39,28 @@ import { historyRoutes } from "./routes/history.js";
 import { meRoutes } from "./routes/me.js";
 import { reportsRoutes } from "./routes/reports.js";
 import { pushRoutes } from "./routes/push.js";
+import { DegradationManager } from "./resilience/degradation.js";
+import { registerMetrics } from "./metrics.js";
 
 export interface ServerOptions {
   logger?: boolean;
+  testing?: boolean;
   isShuttingDown?: () => boolean;
   ipRateLimitCeiling?: number;
+  allowList?: string[];
   underPressure?: {
     maxEventLoopDelay?: number;
     maxHeapUsedBytes?: number;
     maxRssBytes?: number;
     sampleInterval?: number;
-  };
+  } | false;
 }
 
 export async function buildServer(
   opts: ServerOptions = {}
 ) {
   const app = Fastify({
+    trustProxy: true,
     logger: opts.logger ?? {
       level: process.env.LOG_LEVEL || "info",
       transport:
@@ -93,32 +98,35 @@ export async function buildServer(
   app.setSerializerCompiler(serializerCompiler);
 
   // 2. Load shedding with @fastify/under-pressure (R1.3)
-  const maxDelay =
-    opts.underPressure?.maxEventLoopDelay ??
-    (Number(process.env.UNDER_PRESSURE_MAX_EVENT_LOOP_DELAY_MS) ||
-      (process.env.NODE_ENV === "test" ? 2000 : 250));
-  const maxHeap =
-    opts.underPressure?.maxHeapUsedBytes ??
-    (Number(process.env.UNDER_PRESSURE_MAX_HEAP_BYTES) || 1024 * 1024 * 1024);
-  const maxRss =
-    opts.underPressure?.maxRssBytes ??
-    (Number(process.env.UNDER_PRESSURE_MAX_RSS_BYTES) || 1536 * 1024 * 1024);
+  if (opts.underPressure !== false) {
+    const upConfig = typeof opts.underPressure === "object" ? opts.underPressure : {};
+    const maxDelay =
+      upConfig.maxEventLoopDelay ??
+      (Number(process.env.UNDER_PRESSURE_MAX_EVENT_LOOP_DELAY_MS) ||
+        (process.env.NODE_ENV === "test" ? 2000 : 250));
+    const maxHeap =
+      upConfig.maxHeapUsedBytes ??
+      (Number(process.env.UNDER_PRESSURE_MAX_HEAP_BYTES) || 1024 * 1024 * 1024);
+    const maxRss =
+      upConfig.maxRssBytes ??
+      (Number(process.env.UNDER_PRESSURE_MAX_RSS_BYTES) || 1536 * 1024 * 1024);
 
-  await app.register(underPressure, {
-    maxEventLoopDelay: maxDelay,
-    maxHeapUsedBytes: maxHeap,
-    maxRssBytes: maxRss,
-    sampleInterval: opts.underPressure?.sampleInterval ?? 1000,
-    pressureHandler: (_req, rep) => {
-      rep.header("Retry-After", "5");
-      rep.status(503).send({
-        ok: false,
-        error: "OVERLOADED",
-        message: "Server is temporarily overloaded. Please try again shortly.",
-        retry_after: 5,
-      });
-    },
-  });
+    await app.register(underPressure, {
+      maxEventLoopDelay: maxDelay,
+      maxHeapUsedBytes: maxHeap,
+      maxRssBytes: maxRss,
+      sampleInterval: upConfig.sampleInterval ?? 1000,
+      pressureHandler: (_req, rep) => {
+        rep.header("Retry-After", "5");
+        rep.status(503).send({
+          ok: false,
+          error: "OVERLOADED",
+          message: "Server is temporarily overloaded. Please try again shortly.",
+          retry_after: 5,
+        });
+      },
+    });
+  }
 
   // 3. Security headers (Helmet)
   await app.register(helmet, {
@@ -151,6 +159,14 @@ export async function buildServer(
   });
 
   // 6. Redis-backed rate limiting (R1.4: deviceId + IP)
+  if (redis.status === "wait") {
+    try {
+      await redis.connect();
+    } catch {
+      // ignore
+    }
+  }
+
   await app.register(rateLimit, {
     redis: redis.status === "ready" ? redis : undefined,
     max: 120, // 120 requests per minute default
@@ -162,7 +178,7 @@ export async function buildServer(
         "anon";
       return `${deviceId}:${req.ip}`;
     },
-    allowList: process.env.NODE_ENV === "production" ? [] : ["127.0.0.1", "localhost"],
+    allowList: opts.allowList ?? (process.env.NODE_ENV === "production" ? [] : ["127.0.0.1", "localhost"]),
   });
 
   // 6b. Coarse IP-only ceiling rate limit (R1-PATCH Item 5)
@@ -262,6 +278,16 @@ export async function buildServer(
     },
   });
 
+  // Degradation Header (R2.5) & Request-ID Correlation Header
+  app.addHook("preHandler", async (request, reply) => {
+    const level = await DegradationManager.getLevel();
+    reply.header("x-oddly-degradation-level", String(level));
+    reply.header("x-request-id", request.id);
+  });
+
+  // 6.5. Prometheus Metrics Instrumentation (R2.6)
+  registerMetrics(app as unknown as FastifyInstance);
+
   // 7. Register domain routes
   await app.register(healthRoutes);
   await app.register(dropsRoutes);
@@ -280,12 +306,7 @@ export async function buildServer(
   await app.register(reportsRoutes);
   await app.register(pushRoutes);
 
-  // 8. Propagate correlation requestId header on all responses
-  app.addHook("onSend", async (request, reply) => {
-    reply.header("x-request-id", request.id);
-  });
-
-  // 9. Global error handler mapping Zod errors cleanly
+  // 8. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {
     const err = error as {
       code?: string;

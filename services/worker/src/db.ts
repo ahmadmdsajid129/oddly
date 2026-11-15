@@ -73,8 +73,9 @@ export function createWorkerPrismaClient(): PrismaClient {
     return globalThis.__workerPrisma;
   }
 
+  const defaultUrl = "postgresql://oddly:oddlypass@localhost:5432/oddly?schema=public";
   const client = new PrismaClient({
-    datasourceUrl: configureWorkerDatabaseUrl(process.env.DATABASE_URL),
+    datasourceUrl: configureWorkerDatabaseUrl(process.env.DATABASE_URL || defaultUrl),
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 

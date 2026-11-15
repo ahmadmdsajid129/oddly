@@ -1,0 +1,21 @@
+[
+  {
+    "name": "Play route shared vendor chunk (compressed)",
+    "path": "apps/web/.next/static/chunks/03799a2c-*.js",
+    "limit": "60 KB"
+  },
+  {
+    "name": "Initial play route core runtime (compressed)",
+    "path": [
+      "apps/web/.next/static/chunks/main-*.js",
+      "apps/web/.next/static/chunks/framework-*.js"
+    ],
+    "limit": "150 KB"
+  },
+  {
+    "name": "First load total all client bundles (compressed)",
+    "path": "apps/web/.next/static/chunks/**/*.js",
+    "limit": "500 KB"
+  }
+]
+

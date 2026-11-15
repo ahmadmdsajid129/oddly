@@ -3,6 +3,7 @@ import { z } from "zod";
 import crypto from "node:crypto";
 import { OAuth2Client } from "google-auth-library";
 import { AccountsRepository } from "../db/accounts.repo.js";
+import { DegradationManager } from "../resilience/degradation.js";
 import {
   signAccessToken,
   signRefreshToken,
@@ -66,6 +67,11 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       },
     },
     async (req, reply) => {
+      // Degradation Ladder Check (L3+: pause new sign-ups, guest play continues)
+      if (!(await DegradationManager.checkSignUpAllowed(reply))) {
+        return reply;
+      }
+
       const { id_token, turnstile_token } = req.body;
 
       // 1. Bot defense check via Cloudflare Turnstile (P7.06)

@@ -76,7 +76,12 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
         : null;
       const oddness = submission
         ? await prisma.oddnessScore.findUnique({
-            where: { submission_id: submission.id },
+            where: {
+              submission_id_drop_date: {
+                submission_id: submission.id,
+                drop_date: submission.drop_date,
+              },
+            },
           }).catch(() => null)
         : null;
 
@@ -155,7 +160,7 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
 
         publicUrl = await storage.putCard(storageKey, pngBuffer);
         if (submission) {
-          await SharesRepository.saveShareCard(submission.id, format, storageKey);
+          await SharesRepository.saveShareCard(submission.id, format, storageKey, submission.drop_date);
         }
       }
 

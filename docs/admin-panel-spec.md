@@ -406,3 +406,4 @@ All write endpoints take a `reason` and an idempotency key, and return the audit
 - [ ] Dashboards load in under 2 seconds with 10 lakh players of data (tiles read only from aggregates).
 - [ ] The panel is usable at 390 px width (phone).
 - [ ] Reduced-motion setting is respected by all count-up and confetti effects.
+

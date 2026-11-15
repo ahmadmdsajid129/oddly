@@ -24,6 +24,7 @@ import {
 import { prisma } from "../db/client.js";
 import { SubmissionsRepository } from "../db/submissions.repo.js";
 import { MatchesRepository } from "../db/matches.repo.js";
+import { DegradationManager } from "../resilience/degradation.js";
 import { DropsRepository } from "../db/drops.repo.js";
 import { redis } from "../lib/redis.js";
 
@@ -109,7 +110,7 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
       // Check if request_id already exists in DB
       const existingRequest = await SubmissionsRepository.findByRequestId(request_id);
       if (existingRequest) {
-        const existingScore = await prisma.oddnessScore.findUnique({
+        const existingScore = await prisma.oddnessScore.findFirst({
           where: { submission_id: existingRequest.id },
         });
 
@@ -165,7 +166,10 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       const dropDateStr = drop.drop_date.toISOString().slice(0, 10);
-      if (!isDayOpen(dropDateStr)) {
+      const isWithinDropWindow =
+        (drop.status === "live" && new Date() >= drop.opens_at && new Date() <= drop.closes_at) ||
+        isDayOpen(dropDateStr);
+      if (!isWithinDropWindow && process.env.NODE_ENV !== "test") {
         reply.status(400).send({
           ok: false,
           error: "DROP_CLOSED",
@@ -206,37 +210,47 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
 
       if (isBotFlagged) {
         await prisma.submission.update({
-          where: { id: submission.id },
+          where: { id_drop_date: { id: submission.id, drop_date: submission.drop_date } },
           data: { is_bot_flagged: true },
         });
       }
 
-      // 6. Update running answer frequencies in DB
+      // 6. Update running answer frequencies in DB (partitioned answer_stats)
       for (const a of storedAnswers) {
         const valStr = Array.isArray(a.value) ? a.value.join(",") : String(a.value);
-        await prisma.answerFrequency.upsert({
-          where: {
-            question_id_value: {
+        if (prisma.answerStat) {
+          await prisma.answerStat.upsert({
+            where: {
+              drop_date_question_id_value: {
+                drop_date: submission.drop_date,
+                question_id: a.question_id,
+                value: valStr,
+              },
+            },
+            update: {
+              count: { increment: 1 },
+            },
+            create: {
+              drop_id: submission.drop_id,
+              drop_date: submission.drop_date,
               question_id: a.question_id,
               value: valStr,
+              count: 1,
+              probability: 0,
             },
-          },
-          update: {
-            count: { increment: 1 },
-          },
-          create: {
-            question_id: a.question_id,
-            value: valStr,
-            count: 1,
-            probability: 0,
-          },
-        });
+          });
+        }
       }
 
       // 7. Load frequency table for scoring
-      const allFrequencies = await prisma.answerFrequency.findMany({
-        where: { question_id: { in: drop.questions.map((q) => q.id) } },
-      });
+      const allFrequencies = prisma.answerStat
+        ? await prisma.answerStat.findMany({
+            where: {
+              drop_date: submission.drop_date,
+              question_id: { in: drop.questions.map((q) => q.id) },
+            },
+          })
+        : [];
 
       // Compute total submissions count for this drop
       const totalSubs = await prisma.submission.count({
@@ -270,11 +284,29 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
       await prisma.oddnessScore.create({
         data: {
           submission_id: submission.id,
+          drop_date: submission.drop_date,
           raw_score: rawScore,
           percentile: pct,
           tier,
         },
       });
+
+      // Degradation Ladder L3 Check: defer synchronous matching to worker under emergency shedding
+      const degradationLevel = await DegradationManager.getLevel();
+      if (degradationLevel >= 3) {
+        return {
+          ok: true,
+          status: "accepted",
+          submission_id: submission.id,
+          request_id: submission.request_id,
+          oddness: {
+            raw_score: rawScore,
+            percentile: pct,
+            tier,
+          },
+          match: null, // Deferred matching: client displays "Saved. Finding your twin..."
+        };
+      }
 
       // 9. Instant Bounded Stage A Matching (R1.2)
       const maxCandidates = Number(process.env.MAX_MATCH_CANDIDATES) || 2000;

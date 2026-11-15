@@ -129,7 +129,6 @@ model Question {
   created_at DateTime     @default(now())
 
   answerOptions    AnswerOption[]
-  answerFrequencies AnswerFrequency[]
 
   @@unique([drop_id, position])
   @@index([drop_id])
@@ -153,26 +152,28 @@ model AnswerOption {
 }
 
 // ---------------------------------------------------------------------------
-// 6. submissions — one per player per drop (idempotent via request_id)
+// 6. submissions — range-partitioned by drop_date (R2.1)
 // ---------------------------------------------------------------------------
 model Submission {
-  id           String   @id @default(uuid())
+  id           String   @default(uuid())
   drop_id      String
+  drop_date    DateTime @db.Date
   drop         Drop     @relation(fields: [drop_id], references: [id])
   player_id    String
   player       Player   @relation(fields: [player_id], references: [id])
-  request_id   String   @unique @db.VarChar(64) // client-generated idempotency key
+  request_id   String   @db.VarChar(64) // client-generated idempotency key
   answers      Json     // array of {question_id, value} — matches AnswerPayload[]
   submitted_at DateTime @default(now())
   is_bot_flagged Boolean @default(false)
 
-  oddnessScore OddnessScore?
-  shareCards   ShareCard[]
-  matchAsA     Match[]       @relation("SubmissionA")
-  matchAsB     Match[]       @relation("SubmissionB")
-  reports      Report[]      @relation("ReportedSubmission")
+  oddnessScore      OddnessScore?
+  shareCards        ShareCard[]
+  submissionAnswers SubmissionAnswer[]
 
-  @@unique([drop_id, player_id])
+  @@id([id, drop_date])
+  @@unique([drop_date, request_id])
+  @@unique([drop_date, player_id])
+  @@index([drop_date])
   @@index([drop_id])
   @@index([player_id])
   @@index([submitted_at])
@@ -180,43 +181,69 @@ model Submission {
 }
 
 // ---------------------------------------------------------------------------
-// 7. answer_frequencies — running probability per question value (updated live)
+// 6b. submission_answers — normalized answers partitioned by drop_date (R2.1)
 // ---------------------------------------------------------------------------
-model AnswerFrequency {
-  id          String   @id @default(uuid())
-  question_id String
-  question    Question @relation(fields: [question_id], references: [id])
-  value       String   @db.VarChar(200)
-  count       Int      @default(0)
-  probability Float    @default(0) // count / total_submissions_for_drop
+model SubmissionAnswer {
+  id            String     @default(uuid())
+  submission_id String
+  drop_id       String
+  drop_date     DateTime   @db.Date
+  player_id     String
+  question_id   String
+  value         String     @db.VarChar(200)
+  created_at    DateTime   @default(now())
 
-  @@unique([question_id, value])
-  @@index([question_id])
-  @@map("answer_frequencies")
+  submission    Submission @relation(fields: [submission_id, drop_date], references: [id, drop_date])
+
+  @@id([id, drop_date])
+  @@index([drop_date, question_id, value])
+  @@index([drop_date, player_id])
+  @@map("submission_answers")
 }
 
 // ---------------------------------------------------------------------------
-// 8. matches — pairwise match for a drop
+// 7. answer_stats — running probability per question value partitioned by drop_date (R2.1)
+// ---------------------------------------------------------------------------
+model AnswerStat {
+  id          String   @default(uuid())
+  drop_id     String
+  drop_date   DateTime @db.Date
+  question_id String
+  value       String   @db.VarChar(200)
+  count       Int      @default(0)
+  probability Float    @default(0) // count / total_submissions_for_drop
+  updated_at  DateTime @default(now())
+
+  @@id([id, drop_date])
+  @@unique([drop_date, question_id, value])
+  @@index([drop_date])
+  @@index([question_id])
+  @@map("answer_stats")
+}
+
+// ---------------------------------------------------------------------------
+// 8. matches — pairwise match for a drop partitioned by drop_date (R2.1)
 // ---------------------------------------------------------------------------
 model Match {
-  id               String    @id @default(uuid())
+  id               String    @default(uuid())
   drop_id          String
+  drop_date        DateTime  @db.Date
   drop             Drop      @relation(fields: [drop_id], references: [id])
   player_a_id      String
   player_a         Player    @relation("PlayerA", fields: [player_a_id], references: [id])
   player_b_id      String
   player_b         Player    @relation("PlayerB", fields: [player_b_id], references: [id])
   submission_a_id  String?
-  submission_a     Submission? @relation("SubmissionA", fields: [submission_a_id], references: [id])
   submission_b_id  String?
-  submission_b     Submission? @relation("SubmissionB", fields: [submission_b_id], references: [id])
   similarity_score Float     // dice coefficient [0, 1]
   is_provisional   Boolean   @default(true)  // true until drop closes
   matched_at       DateTime  @default(now())
   finalized_at     DateTime?
 
-  @@unique([drop_id, player_a_id])
-  @@unique([drop_id, player_b_id])
+  @@id([id, drop_date])
+  @@unique([drop_date, player_a_id])
+  @@unique([drop_date, player_b_id])
+  @@index([drop_date])
   @@index([drop_id])
   @@index([player_a_id])
   @@index([player_b_id])
@@ -228,12 +255,14 @@ model Match {
 // ---------------------------------------------------------------------------
 model OddnessScore {
   id            String     @id @default(uuid())
-  submission_id String     @unique
-  submission    Submission @relation(fields: [submission_id], references: [id])
+  submission_id String
+  drop_date     DateTime   @db.Date
+  submission    Submission @relation(fields: [submission_id, drop_date], references: [id, drop_date])
   raw_score     Float      // weighted entropy [0, 1]
   percentile    Float      // 0-100 within day's cohort
   tier          TierEnum
 
+  @@unique([submission_id, drop_date])
   @@index([submission_id])
   @@index([tier])
   @@map("oddness_scores")
@@ -262,7 +291,8 @@ model StreakLog {
 model ShareCard {
   id            String      @id @default(uuid())
   submission_id String
-  submission    Submission  @relation(fields: [submission_id], references: [id])
+  drop_date     DateTime    @db.Date
+  submission    Submission  @relation(fields: [submission_id, drop_date], references: [id, drop_date])
   format        ShareFormat
   storage_key   String      @db.Text // S3/R2 object key
   generated_at  DateTime    @default(now())
@@ -369,7 +399,6 @@ model Report {
   drop_id     String
   drop        Drop         @relation(fields: [drop_id], references: [id])
   submission_id String
-  submission  Submission   @relation("ReportedSubmission", fields: [submission_id], references: [id])
   reason      ReportReason
   note        String?      @db.Text
   created_at  DateTime     @default(now())
@@ -419,4 +448,43 @@ model SchedulerRun {
   @@index([job_name, run_for, status])
   @@map("scheduler_runs")
 }
+
+// ---------------------------------------------------------------------------
+// 21. user_history_summaries — compacted daily player summaries for 90-day retention (R2.1)
+// ---------------------------------------------------------------------------
+model UserHistorySummary {
+  id               String   @id @default(uuid())
+  player_id        String
+  account_id       String?
+  drop_id          String
+  drop_date        DateTime @db.Date
+  similarity_score Float
+  oddness_score    Float
+  percentile       Float
+  tier             String   @db.VarChar(32)
+  twin_player_id   String?
+  twin_region      String?  @db.VarChar(10)
+  summary_json     Json
+  created_at       DateTime @default(now())
+
+  @@unique([player_id, drop_date])
+  @@index([player_id])
+  @@index([drop_date])
+  @@map("user_history_summaries")
+}
+
+// ---------------------------------------------------------------------------
+// 22. partition_alerts — records any fallback rows caught by DEFAULT partition (R2.1)
+// ---------------------------------------------------------------------------
+model PartitionAlert {
+  id            String   @id @default(uuid())
+  table_name    String
+  drop_date     DateTime @db.Date
+  row_id        String
+  alert_message String
+  created_at    DateTime @default(now())
+
+  @@map("partition_alerts")
+}
+
 

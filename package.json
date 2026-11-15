@@ -13,16 +13,27 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "size-limit": "node scripts/check-bundle-budget.mjs",
+    "bench:partition": "pnpm --filter @oddly/shared exec tsx scripts/bench-partition.ts",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\"",
     "db:migrate": "echo 'Stage 2 task: prisma migrate dev'",
     "db:seed": "echo 'Stage 2 task: prisma db seed'"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@size-limit/file": "^14.3.0",
+    "@types/opossum": "^8.1.9",
     "@typescript-eslint/eslint-plugin": "^8.13.0",
     "@typescript-eslint/parser": "^8.13.0",
     "eslint": "^9.14.0",
     "prettier": "^3.3.3",
+    "size-limit": "^14.3.0",
     "turbo": "^2.2.3",
     "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "opossum": "^10.0.0",
+    "prom-client": "^15.1.3"
   }
 }

@@ -8,14 +8,20 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "vitest run",
+    "test:integration": "echo 'shared: unit tests only'",
     "generate": "prisma generate --schema=./prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
     "db:seed": "tsx prisma/seed.ts",
     "sim": "tsx src/simulation.ts"
   },
   "dependencies": {
+    "@oddly/ui-tokens": "workspace:*",
     "@prisma/client": "5.22.0",
     "@resvg/resvg-js": "^2.6.2",
+    "@types/ioredis": "^5.0.0",
+    "@types/pg": "^8.23.1",
+    "ioredis": "^6.0.0",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "satori": "^0.63.2",
     "zod": "^3.23.8"

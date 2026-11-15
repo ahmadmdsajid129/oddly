@@ -9,6 +9,7 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { getAuthAccount } from "../auth/tokens.js";
+import { DegradationManager } from "../resilience/degradation.js";
 
 export const reportsRoutes: FastifyPluginAsyncZod = async (app) => {
   /**
@@ -50,6 +51,11 @@ export const reportsRoutes: FastifyPluginAsyncZod = async (app) => {
       },
     },
     async (req, reply) => {
+      // Degradation Ladder Check (L2+: shed low-priority routes with 503 OVERLOADED)
+      if (await DegradationManager.checkLowPriorityShedding(req, reply)) {
+        return reply;
+      }
+
       const { target_type, target_id, reason, note } = req.body;
       const auth = await getAuthAccount(req);
       const reporterId = auth?.accountId || req.cookies.oddly_session || req.cookies.oddly_did || "anonymous";

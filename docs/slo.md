@@ -26,6 +26,7 @@
 | **Share Card Readiness** | **p95 < 5 seconds** | Worker queue latency metric | Satori/Resvg card generation |
 | **Share Landing (`/c/:shortId`)** | **p95 < 200 ms**<br>Edge hit ratio > 95% | Cloudflare CDN Analytics | Viral landing page delivery |
 | **Push Notification Stagger** | First slice at 07:00 IST<br>All slices complete within 10 min | Worker notification queue timer | Staggered 5,000/batch slices |
+| **Clamped Matching Accuracy (R2.9)** | **Exact Match >= 98%**<br>p99 Gap < 0.05<br>Twin Coverage >= 95% | Sampled verifier (1% sample vs exhaustive brute force) | Evaluated across skewed 50k+ player distributions |
 | **Disaster Recovery (RTO / RPO)** | **RTO < 30 minutes**<br>**RPO < 5 minutes** | Quarterly disaster recovery drills | Recovery time & max acceptable data loss |
 
 ---
@@ -74,4 +75,32 @@ When system capacity is constrained, work is preserved or shed in strict priorit
 | **PartitionDepletionRisk** | Fewer than 7 future daily partitions exist in Postgres | Medium | `docs/runbook.md#partition-maintenance` |
 | **ErrorBudgetExceeded** | Monthly error budget burn > 50% | Medium | Freeze feature deploys |
 | **CostRunawayAlert** | Daily infrastructure spend > 150% of budget forecast | Medium | `docs/runbook.md#cost-spikes` |
+
+---
+
+## 6. Prometheus Metrics Catalog (`prom-client`)
+
+The following metrics are instrumented across API and Worker services and exported via bearer-authenticated `GET /metrics`. High-cardinality values (user IDs, drop IDs, dynamic URL tokens) are strictly forbidden in label names to protect memory bounds.
+
+| Metric Name | Type | Labels | Description |
+|---|---|---|---|
+| `oddly_http_requests_total` | Counter | `method`, `route`, `status_code` | Total HTTP request counter for RED golden signal tracking |
+| `oddly_http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | Request latency distribution across standard response buckets |
+| `oddly_http_requests_in_flight` | Gauge | `method`, `route` | Current active requests being processed |
+| `oddly_db_pool_connections_in_use` | Gauge | — | Active Postgres database client connections currently checked out |
+| `oddly_db_pool_connections_waiting` | Gauge | — | Requests currently queued waiting for an available DB connection |
+| `oddly_cache_operations_total` | Counter | `operation`, `result` | Redis cache lookups classified by result (`hit`, `miss`, `stale`) |
+| `oddly_circuit_breaker_state` | Gauge | `name` | Breaker state (0 = CLOSED, 1 = HALF_OPEN, 2 = OPEN) |
+| `oddly_circuit_breaker_failures_total` | Counter | `name` | Total consecutive failures intercepted by the breaker |
+| `oddly_circuit_breaker_fallbacks_total` | Counter | `name` | Total invocations of fallback paths under open breaker conditions |
+| `oddly_degradation_level` | Gauge | — | Current degradation ladder rung (0: L0 Normal to 4: L4 Read-Only) |
+| `oddly_shed_requests_total` | Counter | `route`, `reason` | Total requests rejected with 503 during shedding |
+| `oddly_idempotency_conflicts_total` | Counter | `route` | Collisions on Redis idempotency locks returning 409 |
+| `oddly_default_partition_rows_total` | Counter | — | Submissions routed to DEFAULT partition (triggers immediate page) |
+| `oddly_queue_depth` | Gauge | `queue_name`, `state` | BullMQ background jobs in `waiting`, `active`, `delayed`, `failed` |
+| `oddly_queue_oldest_job_age_seconds` | Gauge | `queue_name` | Age of the longest-waiting job in worker queues |
+| `oddly_final_batch_chunk_progress` | Gauge | `chunk_id`, `status` | Progress tracking across 5,000-submission chunks in final match |
+| `oddly_provisional_refresh_evaluated_total` | Counter | — | Total players examined in provisional twin refresh sweeps |
+| `oddly_provisional_upgrades_total` | Counter | — | Total twin upgrades (>= +0.10 similarity) discovered |
+
 

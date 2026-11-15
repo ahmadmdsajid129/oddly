@@ -70,10 +70,11 @@ function configureDatabaseUrl(rawUrl: string | undefined): string | undefined {
   return url;
 }
 
+const defaultApiDbUrl = "postgresql://oddly:oddlypass@localhost:5432/oddly?schema=public";
 export const prisma =
   globalThis.__prisma ||
   new PrismaClient({
-    datasourceUrl: configureDatabaseUrl(process.env.DATABASE_URL),
+    datasourceUrl: configureDatabaseUrl(process.env.DATABASE_URL || defaultApiDbUrl),
     log:
       process.env.NODE_ENV === "development"
         ? ["query", "info", "warn", "error"]

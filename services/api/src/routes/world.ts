@@ -9,6 +9,7 @@
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
+import { handleConditionalRequest } from "../cache/etag.js";
 
 export const worldRoutes: FastifyPluginAsyncZod = async (app) => {
 
@@ -38,8 +39,13 @@ export const worldRoutes: FastifyPluginAsyncZod = async (app) => {
         },
       },
     },
-    async (req) => {
+    async (req, reply) => {
       const dropId = req.params.dropId;
+
+      reply.header(
+        "Cache-Control",
+        "public, max-age=30, s-maxage=60, stale-while-revalidate=120"
+      );
 
       const totalPlayers = await prisma.submission.count({
         where: { drop_id: dropId },
@@ -63,10 +69,20 @@ export const worldRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       // Find rarest pick
-      const frequencies = await prisma.answerFrequency.findMany({
-        where: { question: { drop_id: dropId } },
+      const frequencies = await prisma.answerStat.findMany({
+        where: { drop_id: dropId },
         orderBy: { count: "asc" },
         take: 1,
+      }).catch(async () => {
+        interface RawStat {
+          question_id: string;
+          value: string;
+          count: number;
+        }
+        return (await prisma.$queryRawUnsafe<RawStat[]>(
+          "SELECT question_id, value, count FROM answer_stats WHERE drop_id = $1 ORDER BY count ASC LIMIT 1",
+          dropId
+        )) || [];
       });
 
       const rarest = frequencies[0];
@@ -82,12 +98,18 @@ export const worldRoutes: FastifyPluginAsyncZod = async (app) => {
           }
         : null;
 
-      return {
+      const payload = {
         drop_id: dropId,
         total_players: totalPlayers,
         tier_distribution: tierDistribution,
         rarest_pick: rarestPick,
       };
+
+      if (handleConditionalRequest(req, reply, payload)) {
+        return;
+      }
+
+      return payload;
     }
   );
 };

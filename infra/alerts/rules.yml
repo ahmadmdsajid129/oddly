@@ -1,0 +1,74 @@
+groups:
+  - name: oddly_reliability_alerts
+    interval: 15s
+    rules:
+      - alert: EventLoopLagHigh
+        expr: oddly_nodejs_eventloop_lag_seconds > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "Node.js Event Loop Lag High (> 100ms)"
+          description: "API process event loop latency is {{ $value }}s, exceeding 100ms threshold."
+
+      - alert: P95SubmitLatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(oddly_http_request_duration_seconds_bucket{route="/v1/submissions"}[5m])) by (le)) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "POST /v1/submissions p95 Latency High"
+          description: "p95 submission latency is {{ $value }}s, breaching the 500ms SLO target."
+
+      - alert: PostgresPoolExhausted
+        expr: oddly_db_pool_connections_waiting > 5
+        for: 30s
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "Postgres Connection Pool Saturation"
+          description: "There are {{ $value }} requests blocked waiting for a Postgres connection."
+
+      - alert: BreakerOpen
+        expr: oddly_circuit_breaker_state == 2
+        for: 1m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "Circuit Breaker Tripped Open"
+          description: "Circuit breaker {{ $labels.name }} has tripped open and is failing fast or using fallback."
+
+      - alert: DefaultPartitionActive
+        expr: oddly_default_partition_rows_total > 0
+        for: 0m
+        labels:
+          severity: critical
+          service: worker
+        annotations:
+          summary: "DEFAULT Postgres Partition Received Data"
+          description: "Data inserted into default partition. Future date partition was not pre-created!"
+
+      - alert: HighIdempotencyLockContention
+        expr: sum(rate(oddly_idempotency_conflicts_total[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "Elevated Idempotency Lock Conflicts"
+          description: "High rate of duplicate or concurrent submission locks detected."
+
+      - alert: EmergencyDegradationLevel
+        expr: oddly_degradation_level >= 3
+        for: 1m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "System Operating in Emergency Degradation (L3/L4)"
+          description: "Degradation level is currently L{{ $value }}. Synchronous matching and sign-ups deferred."
+

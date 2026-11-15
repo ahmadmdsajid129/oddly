@@ -8,6 +8,7 @@
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
+import { handleConditionalRequest } from "../cache/etag.js";
 
 export const pagesRoutes: FastifyPluginAsyncZod = async (app) => {
 
@@ -46,15 +47,21 @@ export const pagesRoutes: FastifyPluginAsyncZod = async (app) => {
 
       reply.header(
         "Cache-Control",
-        "public, s-maxage=3600, stale-while-revalidate=86400"
+        "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
       );
 
-      return {
+      const payload = {
         slug: page.slug,
         title: page.title,
         body_md: page.body_md,
         updated_at: page.updated_at.toISOString(),
       };
+
+      if (handleConditionalRequest(req, reply, payload)) {
+        return;
+      }
+
+      return payload;
     }
   );
 };

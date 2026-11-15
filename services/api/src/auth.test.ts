@@ -169,6 +169,8 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
       // 1. Setup mock guest player with submissions on distinct dates
       const guestDid = `did_merge_test_${Date.now()}`;
       const guestPlayerId = `plyr_${Date.now()}`;
+      const today = new Date();
+      const yesterday = new Date(Date.now() - 86400000);
       const guestPlayer: InMemoryPlayerRecord = {
         id: guestPlayerId,
         did: guestDid,
@@ -178,12 +180,12 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
           {
             id: "sub_1",
             player_id: guestPlayerId,
-            drop: { drop_date: new Date("2026-11-08") },
+            drop: { drop_date: yesterday },
           },
           {
             id: "sub_2",
             player_id: guestPlayerId,
-            drop: { drop_date: new Date("2026-11-09") },
+            drop: { drop_date: today },
           },
         ],
       };
