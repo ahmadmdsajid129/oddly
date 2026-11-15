@@ -38,6 +38,34 @@
   {
     "key": "timing.drop_close_time_ist",
     "value": "23:59:59"
+  },
+  {
+    "key": "features.orbit",
+    "value": { "enabled": true }
+  },
+  {
+    "key": "feature.orbit",
+    "value": true
+  },
+  {
+    "key": "orbit.max_active_per_player",
+    "value": 3
+  },
+  {
+    "key": "orbit.keep_expiry_hours",
+    "value": 48
+  },
+  {
+    "key": "orbit.cooldown_days",
+    "value": 30
+  },
+  {
+    "key": "orbit.max_incoming_per_day",
+    "value": 3
+  },
+  {
+    "key": "orbit.expressions",
+    "value": ["wave_hand", "sparkle", "nod", "coffee", "high_five", "eyes"]
   }
 ]
 

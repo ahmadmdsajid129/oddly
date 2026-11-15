@@ -21,7 +21,6 @@ import {
   isCandidatePreferred,
   type AnswerFrequency,
   type StoredAnswer,
-  type SubmissionForMatching,
 } from "@oddly/shared";
 import { prisma } from "../db.js";
 import { getDropLifecyclePhase } from "../clock.js";
@@ -666,15 +665,15 @@ export class PipelineWorker {
             const score = submissionSimilarity(storedAnswers, cand.answers, optionMap);
             if (
               bestCandidate === null ||
-              isCandidatePreferred(
-                { player_id: sub.player_id, drop_id: dropId, submission_id: sub.id, answers: storedAnswers, submitted_at: new Date() },
-                { player_id: cand.player_id, drop_id: dropId, submission_id: cand.id, answers: cand.answers, submitted_at: cand.submitted_at },
-                score,
-                bestCandidate
-                  ? { player_id: bestCandidate.player_id, drop_id: dropId, submission_id: bestCandidate.id, answers: bestCandidate.answers, submitted_at: bestCandidate.submitted_at }
-                  : null,
-                bestScore
-              )
+              score > bestScore ||
+              (score === bestScore &&
+                isCandidatePreferred(
+                  { player_id: sub.player_id, drop_id: dropId, submission_id: sub.id, answers: storedAnswers, submitted_at: new Date() },
+                  { player_id: cand.player_id, drop_id: dropId, submission_id: cand.id, answers: cand.answers, submitted_at: cand.submitted_at },
+                  score,
+                  { player_id: bestCandidate.player_id, drop_id: dropId, submission_id: bestCandidate.id, answers: bestCandidate.answers, submitted_at: bestCandidate.submitted_at },
+                  bestScore
+                ))
             ) {
               bestCandidate = cand;
               bestScore = score;
@@ -803,6 +802,10 @@ export class PipelineWorker {
 
     await Promise.all(workerThreads);
 
+    // 7. Compute Orbit co-streaks and expire stale keeps (Stage F1 / Task P10A.06, P10A.05)
+    await this.computeCoStreaks(dropId, drop.drop_date);
+    await this.expireStaleKeeps();
+
     return {
       dropId,
       dropDate: dropDateStr,
@@ -812,6 +815,84 @@ export class PipelineWorker {
       scoresFinalized,
       isResumed: wasResumed,
     };
+  }
+
+  /**
+   * Compute Orbit co-streaks for a drop (Task P10A.06).
+   * For each active Orbit:
+   * 1. Check if both player_a and player_b submitted answers for dropId.
+   * 2. If both submitted: increment co_streak_current, update co_streak_best, set last_co_date = dropDate.
+   * 3. If either missed: quietly reset co_streak_current to 0 (zero guilt, zero nagging).
+   */
+  static async computeCoStreaks(
+    dropId: string,
+    dropDate: Date
+  ): Promise<{ activeOrbits: number; keptCoStreak: number; resetCoStreak: number }> {
+    const activeOrbits = await prisma.orbit.findMany({
+      where: { status: "active" },
+    });
+
+    if (activeOrbits.length === 0) {
+      return { activeOrbits: 0, keptCoStreak: 0, resetCoStreak: 0 };
+    }
+
+    const submissions = await prisma.submission.findMany({
+      where: { drop_id: dropId },
+      select: { player_id: true },
+    });
+    const submitterIds = new Set(submissions.map((s) => s.player_id));
+
+    let kept = 0;
+    let reset = 0;
+
+    for (const orbit of activeOrbits) {
+      const bothCompleted =
+        submitterIds.has(orbit.player_a_id) && submitterIds.has(orbit.player_b_id);
+
+      if (bothCompleted) {
+        const newCurrent = orbit.co_streak_current + 1;
+        const newBest = Math.max(orbit.co_streak_best, newCurrent);
+        await prisma.orbit.update({
+          where: { id: orbit.id },
+          data: {
+            co_streak_current: newCurrent,
+            co_streak_best: newBest,
+            last_co_date: dropDate,
+          },
+        });
+        kept++;
+      } else {
+        if (orbit.co_streak_current > 0) {
+          await prisma.orbit.update({
+            where: { id: orbit.id },
+            data: {
+              co_streak_current: 0,
+            },
+          });
+          reset++;
+        }
+      }
+    }
+
+    return { activeOrbits: activeOrbits.length, keptCoStreak: kept, resetCoStreak: reset };
+  }
+
+  /**
+   * Expire keeps that have remained pending > 48 hours (Task P10A.05).
+   */
+  static async expireStaleKeeps(expiryHours: number = 48): Promise<number> {
+    const cutoff = new Date(Date.now() - expiryHours * 60 * 60 * 1000);
+    const result = await prisma.twinKeep.updateMany({
+      where: {
+        status: "pending",
+        created_at: { lt: cutoff },
+      },
+      data: {
+        status: "expired",
+        decided_at: new Date(),
+      },
+    });
+    return result.count;
   }
 
   /**

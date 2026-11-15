@@ -52,6 +52,18 @@ enum ReportReason {
   other
 }
 
+enum KeepStatus {
+  pending
+  accepted
+  declined
+  expired
+}
+
+enum OrbitStatus {
+  active
+  ended
+}
+
 // ---------------------------------------------------------------------------
 // 1. accounts — optional Google-linked account (may be null for guest players)
 // ---------------------------------------------------------------------------
@@ -87,6 +99,11 @@ model Player {
   matchesAsA       Match[]  @relation("PlayerA")
   matchesAsB       Match[]  @relation("PlayerB")
   reports          Report[]
+  keepsSent        TwinKeep[] @relation("KeepFrom")
+  keepsReceived    TwinKeep[] @relation("KeepTo")
+  orbitsAsA        Orbit[]    @relation("OrbitPlayerA")
+  orbitsAsB        Orbit[]    @relation("OrbitPlayerB")
+  orbitExpressions OrbitExpression[]
 
   @@index([account_id])
   @@index([did])
@@ -486,5 +503,77 @@ model PartitionAlert {
 
   @@map("partition_alerts")
 }
+
+// ---------------------------------------------------------------------------
+// 23. twin_keeps — private symmetric requests to establish an Orbit (Stage F1 / Phase 10A)
+// Range-partitioned by drop_date
+// ---------------------------------------------------------------------------
+model TwinKeep {
+  id                  String     @default(uuid())
+  drop_date           DateTime   @db.Date
+  from_player_id      String
+  from_player         Player     @relation("KeepFrom", fields: [from_player_id], references: [id])
+  to_player_id        String
+  to_player           Player     @relation("KeepTo", fields: [to_player_id], references: [id])
+  status              KeepStatus @default(pending)
+  similarity_snapshot Float
+  created_at          DateTime   @default(now())
+  decided_at          DateTime?
+
+  @@id([id, drop_date])
+  @@unique([drop_date, from_player_id])
+  @@index([drop_date])
+  @@index([to_player_id, status])
+  @@index([from_player_id, drop_date])
+  @@map("twin_keeps")
+}
+
+// ---------------------------------------------------------------------------
+// 24. orbits — mutual long-running relationship between two players (Stage F1 / Phase 10A)
+// Invariant: player_a_id < player_b_id (lexicographical sorting)
+// ---------------------------------------------------------------------------
+model Orbit {
+  id                String      @id @default(uuid())
+  player_a_id       String
+  player_a          Player      @relation("OrbitPlayerA", fields: [player_a_id], references: [id])
+  player_b_id       String
+  player_b          Player      @relation("OrbitPlayerB", fields: [player_b_id], references: [id])
+  status            OrbitStatus @default(active)
+  started_on        DateTime    @db.Date
+  ended_on          DateTime?   @db.Date
+  co_streak_current Int         @default(0)
+  co_streak_best    Int         @default(0)
+  last_co_date      DateTime?   @db.Date
+  ended_by          String?
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @default(now()) @updatedAt
+
+  expressions       OrbitExpression[]
+
+  @@index([player_a_id, status])
+  @@index([player_b_id, status])
+  @@map("orbits")
+}
+
+// ---------------------------------------------------------------------------
+// 25. orbit_expressions — lightweight daily one-tap non-verbal sticker interactions (The Wave)
+// Range-partitioned by drop_date
+// ---------------------------------------------------------------------------
+model OrbitExpression {
+  id             String   @default(uuid())
+  orbit_id       String
+  orbit          Orbit    @relation(fields: [orbit_id], references: [id])
+  from_player_id String
+  from_player    Player   @relation(fields: [from_player_id], references: [id])
+  drop_date      DateTime @db.Date
+  expression_key String   @db.VarChar(50)
+  created_at     DateTime @default(now())
+
+  @@id([id, drop_date])
+  @@unique([orbit_id, from_player_id, drop_date])
+  @@index([orbit_id, drop_date])
+  @@map("orbit_expressions")
+}
+
 
 

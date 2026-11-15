@@ -249,11 +249,6 @@ describe("Stage R2.9: Clamping Accuracy & Bucket Memory Budget", () => {
       const habits = ["Morning", "Night"];
       const drinksMorning = ["Coffee", "Tea", "Water"];
       const drinksNight = ["Tea", "Water", "Coffee"];
-      const sceneriesMint = ["Ocean", "Forest"];
-      const sceneriesViolet = ["Mountain", "City"];
-      const sceneriesCoral = ["Ocean", "Desert"];
-      const sceneriesGold = ["City", "Sky"];
-
       // Option Map for scoring
       const optionMap = new Map<string, string[]>();
       optionMap.set("q1", colors);
@@ -473,17 +468,6 @@ describe("Stage R2.9: Clamping Accuracy & Bucket Memory Budget", () => {
         const sampleSize = poolSize <= 2000 ? poolSize : Math.min(poolSize, 2000);
         const MAX_CANDIDATES = 2000;
         const BUCKET_CAP = 200;
-
-        // Correlated distributions from blueprint
-        const colors = ["Mint", "Violet", "Coral", "Gold"];
-        const numbers = ["7", "42", "3", "99"];
-        const habits = ["Morning", "Night"];
-        const drinksMorning = ["Coffee", "Tea", "Water"];
-        const drinksNight = ["Tea", "Water", "Coffee"];
-        const sceneriesMint = ["Ocean", "Forest"];
-        const sceneriesViolet = ["Mountain", "City"];
-        const sceneriesCoral = ["Ocean", "Desert"];
-        const sceneriesGold = ["City", "Sky"];
 
         const buf = new Uint8Array(poolSize * 5);
 

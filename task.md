@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[████████████░░░░░░░░] 59%`                                                     |
-| **Current Active Stage**        | **Stage F0: New Features Analysis & Documentation (COMPLETE)**                   |
+| **Overall Project Progress**    | `[█████████████░░░░░░░] 62%`                                                     |
+| **Current Active Stage**        | **Stage F1: Orbit Foundation (Backend) (COMPLETE)**                              |
 | **Total Tasks Tracked**         | 274 tasks                                                                        |
-| **Completed Tasks (`DONE`)**    | 161 tasks (Proven by code, tests & design report)                               |
+| **Completed Tasks (`DONE`)**    | 171 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 113 tasks                                                                        |
+| **Pending (`TODO`)**            | 103 tasks                                                                        |
 
 ---
 
@@ -37,7 +37,7 @@
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | PARTIAL   | `[#########-] 92%` | 11 / 12            | Stage 8 & Stage R2    |
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#########-] 93%` | 14 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 10 & Stage R2   |
-| **Phase 10A**| Orbit Foundation (Backend)                  | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage F1              |
+| **Phase 10A**| Orbit Foundation (Backend)                  | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage F1              |
 | **Phase 10B**| Orbit and Globe UI                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage F2              |
 | **Phase 10C**| Telepathy (Instinct Sync)                   | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F3              |
 | **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F4              |
@@ -313,20 +313,20 @@ _Status: PARTIAL | Target: Web Push sender, 2-per-day cap, quiet hours, installa
 
 ### Phase 10A: Orbit Foundation (Backend) (Stage F1)
 
-_Status: TODO | Target: Database entities, partitions, repositories, Keep/Orbit API, state machine, co-streak pipeline, Orbit push channel, tests._
+_Status: COMPLETE | Target: Database entities, partitions, repositories, Keep/Orbit API, state machine, co-streak pipeline, Orbit push channel, tests._
 
-| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
-| `[ ] P10A.01` | Expand migrations: `twin_keeps` (partitioned by `drop_date`), `orbits`, `orbit_expressions` (partitioned)   | Critical | TODO   | P2.01, P2.02 | Agent | —         | Expand-and-contract, range partitions    |
-| `[ ] P10A.02` | Implement repositories and entity queries for Keeps, Orbits, and Expressions                                 | Critical | TODO   | P10A.01      | Agent | —         | Strict isolation; sorted pair indexing   |
-| `[ ] P10A.03` | Add `app_config` keys and feature flag `feature.orbit` with cached loader fallback                          | High     | TODO   | P3.02        | Agent | —         | Configurable caps and TTLs               |
-| `[ ] P10A.04` | Implement Keep API: `POST /v1/keeps`, `GET /v1/keeps/incoming`, `POST /v1/keeps/:id/respond`                 | Critical | TODO   | P10A.02      | Agent | —         | Single Keep/drop cap, Google Auth guard  |
-| `[ ] P10A.05` | Implement Orbit state machine: mutual acceptance, silent decline, 48h expiry, 30-day cooldown, 3-orbit cap  | Critical | TODO   | P10A.04      | Agent | —         | Anti-stalking & anti-spam invariants     |
-| `[ ] P10A.06` | Integrate co-streak computation into daily pipeline worker (consecutive Drop completions)                   | High     | TODO   | P9.01, P10A.02| Agent | —        | Quiet resets; zero guilt/nagging copy    |
-| `[ ] P10A.07` | Implement "Orbit" push notification channel (request received, accepted) respecting 2/day quiet-hour caps    | High     | TODO   | P10.04, P10A.05| Agent| —         | Templates stored in database             |
-| `[ ] P10A.08` | Implement instant unprovoked dissolution: `POST /v1/orbits/:id/end` and admin sever tool                     | Critical | TODO   | P10A.05      | Agent | —         | Safety invariant; zero blame attribution |
-| `[ ] P10A.09` | Implement DPDP deletion and export hooks purging Orbit linkages within 7 days                                | High     | TODO   | P10A.02      | Agent | —         | Compliant with DPDP Section 12           |
-| `[ ] P10A.10` | Author automated unit and integration tests for Orbit state machine, concurrency, and route policies        | High     | TODO   | P10A.05      | Agent | —         | Verified against real Docker PostgreSQL  |
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------------- |
+| `[x] P10A.01` | Expand migrations: `twin_keeps` (partitioned by `drop_date`), `orbits`, `orbit_expressions` (partitioned)   | Critical | DONE   | P2.01, P2.02 | Agent | 2026-11-15  | Expand-and-contract, range partitions    |
+| `[x] P10A.02` | Implement repositories and entity queries for Keeps, Orbits, and Expressions                                 | Critical | DONE   | P10A.01      | Agent | 2026-11-15  | Strict isolation; sorted pair indexing   |
+| `[x] P10A.03` | Add `app_config` keys and feature flag `feature.orbit` with cached loader fallback                          | High     | DONE   | P3.02        | Agent | 2026-11-15  | Configurable caps and TTLs               |
+| `[x] P10A.04` | Implement Keep API: `POST /v1/keeps`, `GET /v1/keeps/incoming`, `POST /v1/keeps/:id/respond`                 | Critical | DONE   | P10A.02      | Agent | 2026-11-15  | Single Keep/drop cap, Google Auth guard  |
+| `[x] P10A.05` | Implement Orbit state machine: mutual acceptance, silent decline, 48h expiry, 30-day cooldown, 3-orbit cap  | Critical | DONE   | P10A.04      | Agent | 2026-11-15  | Anti-stalking & anti-spam invariants     |
+| `[x] P10A.06` | Integrate co-streak computation into daily pipeline worker (consecutive Drop completions)                   | High     | DONE   | P9.01, P10A.02| Agent | 2026-11-15 | Quiet resets; zero guilt/nagging copy    |
+| `[x] P10A.07` | Implement "Orbit" push notification channel (request received, accepted) respecting 2/day quiet-hour caps    | High     | DONE   | P10.04, P10A.05| Agent| 2026-11-15 | Templates stored in database             |
+| `[x] P10A.08` | Implement instant unprovoked dissolution: `POST /v1/orbits/:id/end` and admin sever tool                     | Critical | DONE   | P10A.05      | Agent | 2026-11-15  | Safety invariant; zero blame attribution |
+| `[x] P10A.09` | Implement DPDP deletion and export hooks purging Orbit linkages within 7 days                                | High     | DONE   | P10A.02      | Agent | 2026-11-15  | Compliant with DPDP Section 12           |
+| `[x] P10A.10` | Author automated unit and integration tests for Orbit state machine, concurrency, and route policies        | High     | DONE   | P10A.05      | Agent | 2026-11-15  | Verified against real Docker PostgreSQL  |
 
 ---
 
@@ -563,12 +563,12 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 - **Stage 10 Checklist:**
   - [x] Install PWA to mobile home screen; accept push prompt; receive test notification on drop time.
 - **Stage F1 Checklist (Phase 10A: Orbit Foundation):**
-  - [ ] Run expand migrations for `twin_keeps`, `orbits`, `orbit_expressions` against PostgreSQL 16 (Docker).
-  - [ ] Verify `twin_keeps` range partition exists for today's drop date.
-  - [ ] Verify Keep request creation, 48h expiration cron, and 30-day cooldown logic.
-  - [ ] Verify co-streak daily pipeline increments on mutual completions and resets quietly on breaks.
-  - [ ] Verify DPDP deletion purges Orbit linkages within 7 days.
-  - [ ] Run `pnpm test` verifying 100% pass on Orbit state machine.
+  - [x] Run expand migrations for `twin_keeps`, `orbits`, `orbit_expressions` against PostgreSQL 16 (Docker).
+  - [x] Verify `twin_keeps` range partition exists for today's drop date.
+  - [x] Verify Keep request creation, 48h expiration cron, and 30-day cooldown logic.
+  - [x] Verify co-streak daily pipeline increments on mutual completions and resets quietly on breaks.
+  - [x] Verify DPDP deletion purges Orbit linkages within 7 days.
+  - [x] Run `pnpm test` verifying 100% pass on Orbit state machine.
 - **Stage F2 Checklist (Phase 10B: Orbit & Globe UI):**
   - [ ] Verify "Keep this twin" button renders on locked final twin card back and `/recap`.
   - [ ] Test soft sign-in prompt for guest users attempting to Keep.
@@ -627,6 +627,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-15` | Phase 10A (Stage F1)      | Completed Phase 10A Orbit Foundation backend: migrations, repositories, APIs, co-streaks, push, DPDP, 13/13 integration tests. | Stage F1 verification and completion.         |
 | `2026-11-14` | Phase 10A–10D, Phase 11   | Added Phases 10A, 10B, 10C, 10D (Stages F1–F4) for F18–F21 connection features. Expanded Phase 11 to 25 tasks matching `docs/admin-panel-spec.md`. Dashboard updated to 274 tasks. | Stage F0 Founder approval & scope decisions.  |
 | `2026-11-14` | Stage D1 Complete         | Completed full UI redesign to Sticker Pop (tokens, primitives, play flow, 3D flip card, dev UI showcase).     | Stage D1 verification and completion.         |
 | `2026-11-07` | Architecture / Section 12 | Integrated Override Addendum: all content, questions, palettes, copy, and configs are dynamic from PostgreSQL. | Founder requirement: zero hard-coded content. |

@@ -11,7 +11,7 @@
  * - 100,000 players: ~93% 5/5 best twin matches (actual: 93.0% analytical, 93.1% empirical)
  */
 
-import type { SubmissionForMatching, StoredAnswer } from "./types.js";
+
 
 const Kh = 13200;
 const Kt = 22500;

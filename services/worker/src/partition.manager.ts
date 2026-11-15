@@ -59,7 +59,14 @@ export class PartitionManager {
     const pool = this.getPool(connectionString);
     const client = await pool.connect();
 
-    const tables = ["submissions", "submission_answers", "matches", "answer_stats"];
+    const tables = [
+      "submissions",
+      "submission_answers",
+      "matches",
+      "answer_stats",
+      "twin_keeps",
+      "orbit_expressions",
+    ];
     const baseDate = getTwinDay(referenceDate);
     const checkedDates: string[] = [];
 

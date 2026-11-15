@@ -9,8 +9,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage F0: New Features Analysis & Documentation — COMPLETE.
-- **Current Target:** Stage F0 complete and verified; awaiting Founder review and authorization to proceed to Stage F1 (Phase 10A: Orbit Foundation).
+- **Current Stage:** Stage F1: Orbit Foundation (Backend) — COMPLETE.
+- **Current Target:** Stage F1 complete and verified; proceeding to Stage M0 (Memes, Signals, and Insights Engine Analysis & Documentation).
 
 ---
 
@@ -734,9 +734,32 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 17. Next Steps
+## 18. Stage F1 Implementation & Verification Log (Phase 10A: Orbit Foundation Backend)
 
-> **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**
-
-1. **Founder Review:** Founder reviews Stage F0 Report (`docs/stage-F0-report.md`) and resolves open questions.
-2. **Proceed to Stage F1:** Upon Founder instruction *"proceed to Stage F1"*, begin Phase 10A (Orbit Foundation backend: migrations, repositories, Keep/Orbit API, push channel, tests).
+- **Completed:** 2026-11-15
+- **Branch:** `stage-F1-orbit-backend`
+- **Scope:** Tasks `P10A.01` through `P10A.10` from `task.md`.
+- **Database & Migrations (`P10A.01`):**
+  - Added PostgreSQL enums `"KeepStatus"` (`pending`, `accepted`, `declined`, `expired`) and `"OrbitStatus"` (`active`, `ended`, `severed`).
+  - Created range-partitioned table `twin_keeps` (partitioned by `drop_date`), regular table `orbits` with check constraint `player_a_id < player_b_id` and unique partial index `WHERE status = 'active'`, and range-partitioned table `orbit_expressions` (partitioned by `drop_date`).
+  - Pre-created range partitions 14 days in advance via `partition.manager.ts`.
+- **Repositories (`P10A.02`):**
+  - `keeps.repo.ts`: Asymmetric privacy enforcement (zero sender ID or vector leakage; returns only coarse region and age band). Expiry cron, cooldown check, daily caps.
+  - `orbits.repo.ts`: Canonical pair order, 3 active cap, expressions ("The Wave": 6 approved stickers, 1/day limit), co-streak tracking with quiet resets.
+- **Config & Runtime Flags (`P10A.03`):**
+  - Cached loader `getOrbitConfig` in `orbit.config.ts` backed by Redis and `app_config` table (`feature.orbit`, `orbit.max_active_per_player: 3`, `orbit.keep_expiry_hours: 48`, `orbit.cooldown_days: 30`, `orbit.max_incoming_per_day: 3`).
+- **REST APIs (`P10A.04`, `P10A.05`, `P10A.08`):**
+  - `POST /v1/keeps`: Google auth guard, locked drop guard, mutual keep auto-connection.
+  - `GET /v1/keeps/incoming`: Sanitized traits query.
+  - `POST /v1/keeps/:id/respond`: Accept / decline transitions.
+  - `GET /v1/orbits`, `GET /v1/orbits/:id`: Detail & expression status.
+  - `POST /v1/orbits/:id/express`: 6 approved stickers, 1/day limit.
+  - `POST /v1/orbits/:id/end`: Instant unprovoked dissolution.
+  - `POST /v1/admin/orbits/:id/sever`: Admin severance with mandatory audit reason.
+- **Pipeline & Push (`P10A.06`, `P10A.07`):**
+  - Integrated `computeCoStreaks` and `expireStaleKeeps` into `pipeline.worker.ts`.
+  - Orbit push notification channel with quiet hours enforcement (22:00-07:00 IST), 2/day daily cap, and zero guilt copy.
+- **DPDP Compliance (`P10A.09`):**
+  - `DELETE /v1/me` severs active orbits (`ended_by = "dpdp_erasure"`) and expires pending keeps within the 7-day erasure window.
+- **Integration Test Verification (`P10A.10`):**
+  - `services/api/src/orbit.integration.test.ts`: **13 of 13 integration tests passed** against live Docker PostgreSQL 16 & Redis 7. All typechecks (`@oddly/api`, `@oddly/shared`, `@oddly/worker`) pass cleanly.

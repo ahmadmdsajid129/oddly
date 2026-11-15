@@ -9,11 +9,19 @@ async function applyMigrations() {
   await client.connect();
 
   try {
-    const migrationPath = path.resolve(__dirname, "../prisma/migrations/001_partitioning.sql");
-    const sql = fs.readFileSync(migrationPath, "utf-8");
-    console.log(`[Migration] Applying ${migrationPath} to ${DATABASE_URL}...`);
-    await client.query(sql);
-    console.log("[Migration] Migration applied successfully.");
+    const migrationsDir = path.resolve(__dirname, "../prisma/migrations");
+    const migrationFiles = fs
+      .readdirSync(migrationsDir)
+      .filter((f) => f.endsWith(".sql"))
+      .sort();
+
+    for (const file of migrationFiles) {
+      const migrationPath = path.join(migrationsDir, file);
+      const sql = fs.readFileSync(migrationPath, "utf-8");
+      console.log(`[Migration] Applying ${file} to ${DATABASE_URL}...`);
+      await client.query(sql);
+      console.log(`[Migration] ${file} applied successfully.`);
+    }
   } catch (err) {
     console.error("[Migration] Migration failed:", err);
     process.exit(1);

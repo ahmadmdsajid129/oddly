@@ -11,16 +11,13 @@
  */
 
 import { PrismaClient } from "@oddly/shared";
-import Redis from "ioredis";
 import {
   computeAnswerSubHashes,
   addToBucketWithReservoirCap,
   type StoredAnswer,
   oddnessScore,
-  percentile,
   classifyTier,
   type AnswerFrequency,
-  type SubmissionForMatching,
 } from "@oddly/shared";
 
 const workerId = process.argv[2] || `worker_${process.pid}`;
@@ -164,7 +161,8 @@ async function runWorker() {
     const scoreInserts: any[] = [];
 
     for (const sub of chunkSubmissions) {
-      const answers = typeof sub.answers === "string" ? JSON.parse(sub.answers) : (sub.answers as StoredAnswer[]);
+      const answers: StoredAnswer[] =
+        typeof sub.answers === "string" ? JSON.parse(sub.answers) : (sub.answers as StoredAnswer[]);
       const hashes = computeAnswerSubHashes(answers);
 
       // Collect bounded candidates
@@ -228,8 +226,8 @@ async function runWorker() {
       }
 
       // Oddness score
-      const qIds = answers.map((a) => a.question_id);
-      const vals = answers.map((a) => a.value);
+      const qIds = answers.map((a: StoredAnswer) => a.question_id);
+      const vals = answers.map((a: StoredAnswer) => a.value);
       const rawScore = oddnessScore(qIds, vals, frequencies);
       const pct = Math.min(99.9, Math.max(1.0, Math.round(rawScore * 1000) / 10));
       const tier = classifyTier(pct);

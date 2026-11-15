@@ -14,4 +14,6 @@ export * from "./shares.repo.js";
 export * from "./accounts.repo.js";
 export * from "./streaks.repo.js";
 export * from "./history.repo.js";
+export * from "./keeps.repo.js";
+export * from "./orbits.repo.js";
 

@@ -19,8 +19,12 @@ export * from "./degradation.js";
 export * from "./redis/keys.js";
 export * from "./redis/client.js";
 export * from "./blueprint-generator.js";
-export { PrismaClient } from "./db.js";
-export type { Prisma } from "./db.js";
+export {
+  PrismaClient,
+  type Prisma,
+  KeepStatus,
+  OrbitStatus,
+} from "./db.js";
 
 export function getAppMeta() {
   return {

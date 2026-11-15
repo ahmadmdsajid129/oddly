@@ -289,6 +289,30 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
       const playerId = req.cookies.oddly_session;
       if (playerId) {
         try {
+          // DPDP Orbit Hook (Task P10A.09): Sever active orbits and expire pending keeps
+          await prisma.orbit.updateMany({
+            where: {
+              OR: [{ player_a_id: playerId }, { player_b_id: playerId }],
+              status: "active",
+            },
+            data: {
+              status: "ended",
+              ended_on: new Date(),
+              ended_by: "dpdp_erasure",
+            },
+          });
+
+          await prisma.twinKeep.updateMany({
+            where: {
+              OR: [{ from_player_id: playerId }, { to_player_id: playerId }],
+              status: "pending",
+            },
+            data: {
+              status: "expired",
+              decided_at: new Date(),
+            },
+          });
+
           await prisma.player.update({
             where: { id: playerId },
             data: {
