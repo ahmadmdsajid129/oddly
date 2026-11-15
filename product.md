@@ -93,7 +93,16 @@ Oddly turns the **result itself into the entire product**. By stripping away cha
 - **NO real-money prizes or betting:** Free-to-play, zero gambling mechanics (compliant with 2025 Indian online gaming regulations).
 - **NO native iOS/Android apps in v1.0:** Web-first responsive PWA; native apps slated for v1.1 (Expo).
 - **NO paid subscriptions or ads in v1.0:** Monetisation (streaks freeze, sponsored questions) is strictly deferred.
-- **Scope approvals recorded on 2026-11-14:** Founder approved adding F18 (Twin Globe), F19 (Keep this twin & Orbit), F20 (Telepathy), and F21 (Anti-twin) to v1.0. F22 (Oddly Deck) and F23 (Friend-invite Orbit) are approved for documentation only (v1.5). F12 (Wave) is superseded by F19. All other Non-Goals remain strictly immutable.
+- **NO image uploads from users:** Users never upload photos, memes, avatars, or media. In Meme Lab (M3), players write captions for app-provided vector templates only.
+- **NO selling or sharing user-level data:** Data is never sold, brokered, or shared with third parties.
+- **NO propensity-to-buy model in v1:** No behavioural monetization profiling or dynamic pricing algorithms.
+- **NO per-user change to Drop questions:** The five questions of the daily Drop are identical for every player across the globe. Personalisation never touches Drop questions.
+- **Scope approvals recorded on 2026-11-14 & 2026-11-15:**
+  - Founder approved adding F18 (Twin Globe), F19 (Keep this twin & Orbit), F20 (Telepathy), and F21 (Anti-twin) to v1.0. F22 (Oddly Deck) and F23 (Friend-invite Orbit) are approved for documentation only (v1.5). F12 (Wave) is superseded by F19.
+  - Founder approved adding F24 (Meme questions & themed Drops, Stage M1) and F25 (Signals foundation, Stage M2) to v1.0.
+  - F26 (Meme Lab, Stage M3), F27 (Insights engine, Stage M4), F28 (Taste dimension: Sync by subject, Stage M5), and F29 (Recognition, Stage M6) are documented fully and will be built only upon Founder command.
+  - F30 (ML ranker, Stage M7) and F31 (Premium groundwork, Stage M8) are documented only.
+  - All other Non-Goals remain strictly immutable.
 
 ### 4.3 Success Metrics
 
@@ -106,6 +115,9 @@ Oddly turns the **result itself into the entire product**. By stripping away cha
 - **Reliability & Availability SLO:** 99.9% monthly play-path uptime; 99.95% during the 07:00–08:00 IST peak window.
 - **Submission Durability:** 100% (zero acknowledged submissions ever lost).
 - **Monthly Error Budget:** Maximum 43.2 minutes of degraded service per month; releases freeze if > 50% burned.
+- **Meme Question Quality:** Meme questions (`render_variant = "meme"`) must maintain equal or higher completion rate and at least +5% higher share rate compared to text questions after 2 weeks of live data.
+- **Signals Pipeline Reliability:** 99.9% event ingestion reliability via beacon/batching with zero impact on submit-path latency.
+- **Consent Strictness:** 100% adherence to zero-event ingestion prior to explicit, granular DPDP consent.
 
 ### 4.4 Reliability Promises & Product Operating Principles
 
@@ -631,6 +643,160 @@ To prevent deanonymisation of players:
   1. Should friend Orbits count against the 3-Orbit limit or have an independent cap (e.g. 5 friends)?
   2. Does Telepathy behave identically with friends, or should it feature historical instinct tracking across past Drops?
   3. How should asymmetric friend comparisons handle non-simultaneous Drop completions across different timezones?
+
+---
+
+## 11B. Memes, Signals and Insights (F24 to F31)
+
+### F24: Meme Questions and Themed Drops (v1.0, Stage M1)
+
+- **Purpose:** Introduce relatable, culturally sharp, and humorous instinct questions using vector illustrations to increase completion rates and organic card shares without modifying the underlying five-question matching mechanics.
+- **Exact Behaviour:**
+  - A meme question is an existing question type with a new presentation: `render_variant = "meme"`.
+  - Reuses **Type 1** (2 to 4 text options) or **Type 4** (image options). The stored answer format, pure math functions (`similarity`, `entropy`, `oddness`), and matching engine remain 100% unchanged.
+  - Images are vector templates loaded from the application's illustration registry (extending the D-015 registry). Each template defines an SVG illustration, alt text, and license note. No user uploads, no raster files, no real people, no living celebrities, and no commercial brands.
+  - Captions are rendered as live DOM text by the client application (fully accessible, screen-reader friendly, translatable, and themed with `@oddly/ui-tokens`), never baked into an image.
+  - Every question is assigned one or more **subject tags** from a database-managed neutral taxonomy (`tags` table). Seed tags: `humour`, `daily-habits`, `absurd-hypotheticals`, `food-style`, `sleep-and-time`, `decision-style`, `nostalgia`, `phone-behaviour`, `music-mood`, `places`, `word-and-mood`, `colour-and-aesthetics`, `work-and-study-style`, `quirks`.
+  - Forbidden categories (religion, politics, caste, sexuality, health, body image, money, living people, sports teams) are strictly excluded by automated tests.
+  - **Themed Drops:** Optional `drops.theme_key` allows grouping daily Drops by editorial themes (e.g., "Monday Slump", "Nostalgia Trip"). Themes are editorial labels and visual badges; they do not alter matching rules. The "no same question type in the same slot on consecutive days" rule remains inviolable.
+- **Copy Rules:**
+  - Zero right or wrong answers.
+  - Language-light and universally relatable across Indian linguistic cohorts.
+  - No group mockery or punching down.
+  - Original-to-Oddly policy: never claim a meme is *"never seen on the internet"*; claim only that it was written for Oddly.
+- **Privacy Rules:** Answers are anonymous instinct choices subject to standard k-anonymity matching.
+- **Data Touched:** `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key`.
+- **Degradation Behaviour:** If a template illustration fails to load, gracefully falls back to standard text presentation with zero layout shift.
+- **Feature Flag:** `feature.meme_questions` (boolean, runtime dynamic via `app_config`).
+- **Success Metric:** Completion rate and share rate equal to or exceeding baseline non-meme questions after 2 weeks of live Drop data.
+
+---
+
+### F25: Signals Foundation (v1.0, Stage M2)
+
+- **Purpose:** A first-party, consented, privacy-safe event pipeline to measure question quality, UX friction, and viral funnel drops without third-party tracking dependencies or PII collection.
+- **Exact Behaviour:**
+  - Client event batcher sends telemetry via `POST /v1/events` using `navigator.sendBeacon` or batched fetch (202 Accepted, empty response).
+  - Executed exclusively on Low priority lane (resource rank 7). Sampled 50% at degradation level L1, completely shed at L2+. Never executed on the HTTP submit path.
+  - Client script size is strictly bounded (< 500 bytes added to play route bundle; 159.5 KB limit preserved).
+  - Implements the strict Allowlisted Event Dictionary (`docs/event-dictionary.md`): `drop_viewed`, `question_shown`, `question_answered` (with dwell time, change count, back count), `drop_abandoned`, `submission_completed`, `reveal_viewed`, `card_flipped`, `share_tapped`, `share_completed`, `link_opened`, `notification_opened`, `install_prompt_shown`, `perf_vitals`.
+  - Raw storage in `events_raw` (partitioned by day, 90-day retention default per ADR-013).
+  - Nightly worker job rolls raw events into immutable aggregate statistics tables: `question_stats_daily` (dwell p50/p90, change rate, back rate, abandon rate, entropy) and `tag_stats_daily`.
+  - **PostHog Reconciliation:** Unified single event dictionary. The first-party pipeline feeds PostgreSQL and Mission Control; PostHog (if enabled in Phase 12) receives identical allowlisted pseudonymous events. Zero double instrumentation.
+- **Copy Rules:** Transparent, plain-English consent notices in Settings and first-run banner: *"Help us find confusing questions. Anonymous and optional."*
+- **Privacy Rules:**
+  - Separate, granular DPDP consent toggles in Settings (`analytics` vs. `personalisation`), default OFF until granted.
+  - Behavioural data keyed exclusively by pseudonymous `analytics_id`, never by user ID, email, or IP.
+  - Deletion and export hooks purge raw events and analytics mappings upon user request.
+- **Data Touched:** `consents`, `events_raw`, `question_stats_daily`, `tag_stats_daily`, `analytics_ids`.
+- **Degradation Behaviour:** Fully disabled at L2+ (first route shed).
+- **Feature Flag:** `feature.signals` (boolean).
+- **Success Metric:** 99.9% event ingestion reliability with 0ms impact on play submit latency.
+
+---
+
+### F26: Meme Lab (Stage M3 — Documented Fully, Build on Command)
+
+- **Purpose:** Community caption authoring engine where players submit text captions for curated Oddly vector templates, feeding a rated candidate queue for future Drops.
+- **Exact Behaviour:**
+  - Signed-in, adult-confirmed players pick an illustration from the app's vector template registry and author a caption of at most 100 characters (*config: `meme_lab.max_caption_len`*).
+  - Zero image uploads permitted from users (Rule 3).
+  - Submissions enter an asynchronous admin moderation queue (`meme_submissions`).
+  - Automated safeguards: duplicate string detection, blocklist check, Turnstile challenge, originality attestation checkbox (*"I wrote this myself"*).
+  - **Rating Surface ("Meme Corner"):** After completing today's Drop, an optional post-recap card displays one approved meme with two simple reaction buttons: "Funny" and "Not for me".
+  - **Scoring & Retirement:** Memes require at least *(config: `meme_lab.min_raters`, default: 200)* raters. Ranked via Wilson lower bound score. 20% exploration traffic allocated to fresh memes. Memes retire after *(config: `meme_lab.freshness_days`, default: 14)* days.
+  - **Drop Candidate Pipeline:** Top-performing memes generate candidate suggestions in Mission Control. Memes are **never auto-published** into Drops; two-person admin approval and D-2 lock are strictly mandatory.
+  - **Legal & Safety Gate:** Requires formal intermediary compliance review, grievance officer registration, and takedown SLA implementation prior to feature activation.
+- **Copy Rules:** Friendly rejection notices (*"This one didn't fit our guidelines, but keep creating!"*); kind, supportive microcopy.
+- **Privacy Rules:** Creator can delete their submission at any time. Public views show creator's pseudonymous alias and coarse region only ($k \ge 20$). Ratings are completely anonymous.
+- **Data Touched:** `meme_submissions`, `meme_ratings`, `meme_stats`, `meme_exposures`, `moderation_actions`.
+- **Degradation Behaviour:** Meme corner hidden at L2+.
+- **Feature Flag:** `feature.meme_lab` (default: false).
+- **Success Metric:** > 15% player participation on the post-drop Meme Corner with < 0.1% moderation flags.
+
+---
+
+### F27: Insights Engine, Statistics Only (Stage M4 — Documented Fully, Build on Command)
+
+- **Purpose:** Provide explainable, statistical taste insights to optimize non-Drop surfaces and editorial Drop planning without black-box ML models.
+- **Exact Behaviour:**
+  - **Player Taste Profile (`player_taste`):** Computes smoothed affinity scores per subject tag based on ratings and answers, with exponential recency weighting. Generated only if player has granted personalisation consent and rated $\ge 20$ items in that tag cluster.
+  - **Non-Drop Personalisation Only:** Taste data is used exclusively to rank optional Meme Corner cards, optimize notification send-hour cohorts, suggest Orbit conversation prompts, and customize suggested share card themes. **Drop questions remain 100% identical for all players globally (Rule 12).**
+  - **Category Performance Dashboard:** Aggregate completion rate, share rate, and dwell time by subject tag.
+  - **Question Quality Alerts:** Automatically flags confusing questions in Mission Control (high dwell > 15s, high option toggling > 3, high abandon rate).
+  - **Editor Suggestions:** Suggests balanced tag combinations for upcoming Drops to avoid topic fatigue.
+- **Copy Rules:** Explainable transparency: *"Based on 25 questions you answered..."*
+- **Privacy Rules:** Consent-gated (`personalisation`). Instant hard deletion upon consent withdrawal. Zero sensitive inferences (Rule 14).
+- **Data Touched:** `player_taste`, `notification_timing_stats`, `editor_suggestions`.
+- **Degradation Behaviour:** Computed via scheduled background worker; zero runtime impact.
+- **Feature Flag:** `feature.insights` (default: false).
+- **Success Metric:** +10% lift in notification engagement through cohort timing optimization.
+
+---
+
+### F28: Taste Dimension: Sync by Subject (Stage M5 — Documented Fully, Build on Command)
+
+- **Purpose:** Deepen mutual Orbit connections by revealing thematic instinct alignment across shared daily Drops without disclosing secret individual answer vectors.
+- **Exact Behaviour:**
+  - For an active Orbit pair, calculates the agreement percentage on individual subject tags across Drops both players submitted (e.g. *"You agree on 80% of Humour questions"*).
+  - Enforces a strict minimum threshold of at least *(config: `orbit.taste_sync_min_shared`, default: 5)* shared questions per tag before showing a percentage.
+  - Unlocked automatically as an Orbit milestone (e.g. Day 7 co-streak).
+  - Individual question choices remain strictly hidden (Rule 19), preserving the core mystery of the stranger twin.
+- **Copy Rules:** Warm, celebratory copy celebrating shared human wavelengths; never displaying negative disagreement metrics.
+- **Privacy Rules:** Aggregate percentage only. Zero raw answer vector exposure.
+- **Data Touched:** Reads existing `orbits`, `answers`, and `question_tags`.
+- **Degradation Behaviour:** Read-only endpoint; cached for 1 hour.
+- **Feature Flag:** `feature.taste_sync` (default: false).
+- **Success Metric:** Sustained co-streaks among Orbits that unlock the Subject Sync tab.
+
+---
+
+### F29: Recognition: Creator Badges & Featured Memes (Stage M6 — Documented Fully, Build on Command)
+
+- **Purpose:** Celebrate high-performing meme creators and consistent community contributors with collectible sticker badges and shareable achievement cards.
+- **Exact Behaviour:**
+  - **Creator Badges:** Awarded when a creator's meme crosses verified statistical benchmarks in Meme Lab (e.g., $\ge 500$ raters and $\ge 70\%$ "Funny" rating).
+  - **Achievement Cards:** Satori-rendered, 3D-flippable sticker card celebrating the milestone. Displays the creator's chosen alias and macro-region ($k \ge 20$). Sharing is 100% opt-in.
+  - **Featured Memes:** Curated "Meme of the Week" showcase surface in the web app, manually selected by editors using Wilson scores as an advisory input.
+  - **Strictly Zero Public Leaderboards:** No ranked lists of creators or competition walls (preserving peaceful, non-toxic brand ethos).
+- **Copy Rules:** Whimsical, humble badge titles (*"Certified Wit"*, *"Absurd Instinct"*).
+- **Privacy Rules:** Alias and macro-region only; creator can delete their meme, which revokes the public share card.
+- **Data Touched:** `badge_definitions`, `creator_badges`, `featured_memes`.
+- **Degradation Behaviour:** Static CDN cached; zero live origin compute.
+- **Feature Flag:** `feature.recognition` (default: false).
+- **Success Metric:** Viral sharing of achievement cards with positive K-factor lift.
+
+---
+
+### F30: ML Ranker for Optional Surfaces (Stage M7 — Documented Only)
+
+- **Purpose:** Explore lightweight machine learning ranking for non-Drop optional surfaces (Meme Corner ordering, notification cohorting) once sufficient scale is reached.
+- **Prerequisites to Start:**
+  - At least tens of thousands of verified rating events.
+  - Stable active user base (> 50,000 DAU).
+  - Offline statistical baseline from M4 established to beat.
+  - Strict shadow-mode validation prior to any production traffic.
+- **Operating Invariants:**
+  - Explainable linear model or gradient boosted trees (GBDT); **strictly no black-box LLMs or generative hallucination**.
+  - Applies **strictly to non-Drop surfaces** (Drop questions remain identical globally).
+  - Instant administrative kill switch to revert to statistical Wilson scoring.
+  - Zero sensitive attributes as model features (Rule 14).
+- **Feature Flag:** `feature.ml_ranker` (default: false).
+
+---
+
+### F31: Premium Groundwork (Stage M8 — Documented Only, After Gate G3)
+
+- **Purpose:** Architectural groundwork for optional subscriptions ("Oddly Plus") honoring the non-negotiable "No pressure to pay" standard.
+- **Prerequisites:** Must pass product Gate G3 (Monetisation Feasibility Review) and obtain explicit Founder authorization.
+- **Operating Invariants:**
+  - Daily play is 100% free forever.
+  - Strictly zero guilt copy, fake urgency, streak death countdowns, or scarcity pressure (Rule 17).
+  - Offers never presented at the moment of a broken streak.
+  - Frequency cap: maximum 1 offer per 14 days; if dismissed twice, halt offers for 90 days.
+  - Cancellation is self-service and requires exactly one tap.
+  - Architecture: Provider-agnostic entitlements engine (`plans`, `entitlements`, `subscriptions`). Payment provider (e.g. Razorpay/Stripe with UPI autopay) to be evaluated under Rule 9.
+- **Feature Flag:** `feature.premium` (default: false).
 
 ---
 
