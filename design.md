@@ -378,6 +378,101 @@ All components strictly use existing `@oddly/ui-tokens` constants, 4 approved ra
 
 ---
 
+## 12B. Detailed Design Specifications for Memes, Signals & Insights (F24 to F31)
+
+All components strictly use existing `@oddly/ui-tokens` constants, 4 approved radii (`sm: 8px`, `m: 14px`, `l: 20px`, `pill: 9999px`), hard sticker shadows (`shadow-sticker`: `4px 4px 0 #14123A`), and Bricolage Grotesque / Inter typography. Strictly no new colours or soft blur shadows.
+
+### 12B.1 Meme Question Card (`render_variant = "meme"`)
+
+1. **Card Layout:**
+   - Container: `bg-paper border-[2.5px] border-ink shadow-card rounded-l p-4 sm:p-6 space-y-4 select-none`.
+   - Subject Tag Pill: Placed above illustration: `bg-lavender text-ink border-[1.5px] border-ink rounded-pill px-3 py-1 text-chip font-bold uppercase tracking-wider inline-flex items-center gap-1`.
+   - Template Illustration Container: 1:1 or 16:9 aspect box (`bg-cream border-[2px] border-ink rounded-m overflow-hidden flex items-center justify-center p-3 sm:p-4`).
+   - SVG Template: Vector graphic loaded from illustration registry (`D-015`). Includes descriptive `aria-label` matching `alt_text_i18n`.
+   - Prompt & Live Caption Options: 2 to 4 options rendered via `OptionRow` component (`bg-paper border-[2.5px] border-ink shadow-sticker rounded-m min-h-[56px] p-4 text-body font-bold text-ink cursor-pointer`).
+   - Selected State: `bg-lavender border-ink` with check badge sticker (`bg-violet text-paper rounded-pill p-1`).
+   - Tactile Signature: Hover: `shadow-sticker-lift -translate-x-[2px] -translate-y-[2px]`. Active / Press Flat: `shadow-sticker-flat translate-x-[4px] translate-y-[4px]`.
+
+### 12B.2 Meme Corner Card (Optional Post-Drop Surface, M3)
+
+1. **Card Presentation:**
+   - Placed below the reveal/recap sheet on non-Drop surface.
+   - Container: `bg-cream border-[2.5px] border-ink shadow-card rounded-l p-5 space-y-4`.
+   - Header Row: `font-display font-extrabold text-h3 text-ink flex items-center justify-between`: "Meme Corner" with `bg-sun text-ink border-[1.5px] border-ink rounded-pill px-2.5 py-0.5 text-chip font-bold` badge ("Community Pick").
+   - Meme Display: Vector SVG template container + live caption rendered in prominent display font (`font-display text-lg font-bold text-ink leading-snug`).
+   - Reaction Buttons: Two side-by-side sticker buttons ($\ge 44\text{ px}$ target):
+     - **"Funny" Button:** `bg-mint text-ink border-[2px] border-ink shadow-sticker rounded-m min-h-[48px] px-4 font-display font-extrabold flex-1 flex items-center justify-center gap-2 hover:shadow-sticker-lift active:shadow-sticker-flat`.
+     - **"Not for me" Button:** `bg-paper text-muted border-[2px] border-ink shadow-sticker rounded-m min-h-[48px] px-4 font-display font-bold flex-1 flex items-center justify-center gap-2 hover:shadow-sticker-lift active:shadow-sticker-flat`.
+   - Post-Rating State: Replaces buttons with playful ink micro-stamp: `bg-paper border-[2px] border-ink rounded-pill px-4 py-2 font-display font-extrabold text-ink inline-block mx-auto` ("Rated!").
+
+### 12B.3 Consent Notice and Settings Toggles (M2)
+
+1. **First-Run Consent Notice Banner:**
+   - Fixed or sticky bottom banner: `bg-paper border-[2.5px] border-ink shadow-card rounded-m p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3`.
+   - Text: `font-body text-sm font-medium text-ink`: *"We use anonymous, consented analytics to find confusing questions. No personal data."*
+   - Actions: Primary button "Got it" (`Button variant="primary" size="sm"`) and subtle text link "Customize" (`text-violet underline font-bold`).
+2. **Settings Screen Toggles (`/me`):**
+   - Two separate toggle rows:
+     - Toggle A: *"Anonymous question-quality analytics"* (`app_content: "settings.consent.analytics"`).
+     - Toggle B: *"Personalised taste on bonus cards"* (`app_content: "settings.consent.personalisation"`).
+   - Switch Primitive: Accessible Radix switch (`w-12 h-7 bg-paper border-[2px] border-ink rounded-pill p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet`).
+   - Active State: `bg-mint`. Switch Thumb: `w-5 h-5 bg-ink rounded-pill transition-transform`.
+
+### 12B.4 Meme Lab Composer & Status Cards (M3)
+
+1. **Caption Composer Screen (`/memes/new`):**
+   - Template Selector: Horizontal sticker carousel with `snap-x` scrolling of approved vector templates.
+   - Selected Template Preview: `bg-cream border-[2.5px] border-ink rounded-m p-3 aspect-square max-w-xs mx-auto`.
+   - Caption Input Area: `bg-paper border-[2.5px] border-ink rounded-m p-3 text-body font-medium text-ink w-full min-h-[96px] focus:outline-none focus:ring-2 focus:ring-violet`.
+   - Live Character Counter: `text-right text-caption text-muted font-bold`: `X / 100`.
+   - Originality Checkbox: Custom sticker checkbox (`w-6 h-6 border-[2px] border-ink rounded-s bg-paper checked:bg-violet flex items-center justify-center text-paper font-bold cursor-pointer`) with label: *"I wrote this caption myself"*.
+   - Submit Button: `Button variant="primary" size="lg" w-full min-h-[48px]`: *"Submit to Meme Lab"*.
+2. **Author Submission Status Cards (`/me/memes`):**
+   - **Queued Card:** `bg-sun/20 border-[2px] border-ink shadow-sticker rounded-m p-4 space-y-1` with yellow status pill "In Review".
+   - **Approved Card:** `bg-mint/20 border-[2px] border-ink shadow-sticker rounded-m p-4 space-y-1` with green status pill "Approved". Shows live stats: *"N ratings, Wilson score X.XX"*.
+   - **Rejected Card:** `bg-paper border-[2px] border-ink/40 shadow-sticker rounded-m p-4 space-y-1 text-muted` with gray status pill "Retired". Kind microcopy: *"Didn't fit this time, but keep creating!"*
+
+### 12B.5 Creator Badge Chip & Achievement Cards (M6)
+
+1. **Badge Chip:**
+   - Compact inline pill: `bg-sun text-ink border-[2px] border-ink shadow-sticker rounded-pill px-3 py-1 text-chip font-extrabold flex items-center gap-1.5`.
+   - Renders 16px geometric badge SVG icon + badge name (e.g. *"Certified Wit"*).
+2. **Achievement Card (Satori Flip Card):**
+   - Form factor: 210:290 aspect ratio, 3D flip card with holographic sheen on front.
+   - Front Face: Ink border, cream desk background, hero illustration, badge title in `display-l` font, creator alias, and coarse macro-region ($k \ge 20$).
+   - Back Face: Card flip reveals milestone statistics: *"78% rated Funny across 640 players. Oddly Meme Lab."*
+   - Export: Satori SSR PNG generator at 1080x1920 (Story), 1080x1080 (Square), and 1200x630 (Link).
+
+### 12B.6 Featured Memes Surface (M6)
+
+1. **Showcase Layout (`/featured`):**
+   - Header: `font-display font-extrabold text-display-m text-ink`: *"Meme of the Week"*.
+   - Featured Sticker Hero: `bg-paper border-[2.5px] border-ink shadow-card rounded-l p-6 space-y-4 max-w-md mx-auto`.
+   - Template SVG + large caption text (`font-display text-xl font-bold text-ink`).
+   - Creator Credit: `bg-cream border-[1.5px] border-ink rounded-pill px-3 py-1 text-sm font-bold text-ink inline-block`: *"By [Alias], [Macro-Region]"*.
+
+### 12B.7 Subject-Sync Row in Orbit View (M5)
+
+1. **Agreement Metric Row:**
+   - Rendered in Orbit detail view under "Instinct Sync":
+   - Row: `bg-paper border-[2px] border-ink shadow-sticker rounded-m p-3.5 flex items-center justify-between gap-3`.
+   - Tag Label: `font-display font-bold text-body text-ink`: e.g. *"Humour (5 shared drops)"*.
+   - Percentage Pill: `bg-lavender text-ink border-[1.5px] border-ink rounded-pill px-2.5 py-0.5 font-extrabold text-sm`: *"80% Sync"*.
+   - Progress Track: `w-24 h-2.5 bg-cream border-[1.5px] border-ink rounded-pill overflow-hidden`.
+   - Progress Fill: `bg-violet h-full rounded-pill transition-all`.
+
+### 12B.8 Accessibility, Touch Targets & Motion
+
+1. **Touch Targets:** All interactive buttons, reaction stickers, template carousel thumbnails, and consent switches are strictly $\ge 44 \times 44\text{ px}$.
+2. **Focus Rings:** Double-ring focus visible utility (`2px solid #FFF8F0` inner offset + `2px solid #6C4CF1` outer) applied to all interactive elements.
+3. **Reduced Motion:** When `prefers-reduced-motion: reduce` is active:
+   - Reaction button stamps render immediately without pop animation.
+   - Template carousel slides without smooth transition.
+   - Achievement cards use instant cross-fade instead of 3D card flip.
+4. **Color Tokens:** Zero custom hex literals; all fills, outlines, and text use imported `@oddly/ui-tokens`.
+
+---
+
 # PART B: STAGE D1: UI REDESIGN PROMPT
 
 ## 13. Instructions to the agent
@@ -488,5 +583,6 @@ Write `design-d1/REPORT.md` containing: what changed per step D1.1 to D1.8, the 
 
 ## 22. Change log
 
+- 2026-11-15: v1.2. Added Section 12B (detailed design specifications for F24-F31: Meme question card, Meme Corner card, consent notice and Settings toggles, Meme Lab composer & status cards, creator badges and achievement cards, featured memes, Orbit subject-sync rows, touch targets $\ge 44\text{px}$, and accessibility). Zero new colours.
 - 2026-11-14: v1.1. Added Section 12A (detailed design specifications for F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin, touch targets, accessibility, and Satori share faces). Reconciled core color tokens: verified `packages/ui-tokens` matches Section 2.1 WCAG AA palette (`#3DDBB0` mint, `#FF6B5E` coral, `#FFD23F` sun, `#EEEAFE` lavender).
 - 2026-11-14: v1.0. Sticker pop direction chosen by the owner. Palette, type, buttons, flip card, and D1 redesign stage defined.
