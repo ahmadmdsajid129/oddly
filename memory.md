@@ -823,9 +823,28 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 20. Next Steps
+## 21. Phase 10B (Stage F2): Orbit and Globe UI Completion
+
+### 21.1 Shipped Architecture & Deliverables
+- **`KeepButton.tsx` (P10B.01):** Interactive sticker button on `FlipCard.tsx` back face and `/recap`. Guarded by `is_provisional === false` (locks at 07:00 IST). Integrated with guest soft sign-in modal (`LoginModal`) with clear value copy: *"Sign in with Google to keep your twin across daily drops. Never lose a bond."*
+- **`OrbitRequestCard.tsx` (P10B.02):** Incoming request card displaying anonymous coarse macro-region ($k \ge 20$), age band, and match similarity percentage with accessible touch targets $\ge 44\text{px}$ and Accept / Not now actions.
+- **`ProceduralAvatar.tsx` (P10B.03):** Deterministic 2-color SVG geometric avatar derived from pairing seed / shared answers using the sticker pop palette.
+- **`OrbitListRow.tsx` & `/orbit` Screens (P10B.03):** Clean Orbit management list (`/orbit`) with active vs ended badges, flame co-streak counters, and detail screen (`/orbit/[id]`) with instant unprovoked dissolution (neutral blame-free confirmation dialog).
+- **`ExpressionTray.tsx` (The Wave - P10B.04):** 6-sticker tactile expression tray (`👋`, `✨`, `💜`, `🙌`, `☕`, `🤔`) with 1/day limit per direction, physical press-flat animation, and countdown timer until 07:00 IST daily reset.
+- **`StagedUnlocks.tsx` (P10B.05):** 5-milestone horizontal progression track (Day 1 Globe Line, Day 3 Pick Overlap, Day 7 Telepathy Sync, Day 14 Orbit Card, Day 30 Co-Anniversary).
+- **`TwinGlobeMap.tsx` & `/globe` Screen (P10B.06, P10B.07, P10B.08):** Static SVG dotted equirectangular world map with quadratic bezier regional arcs ($k \ge 20$), glowing violet active Orbit lines, 44px pulsing pins, zero WebGL/Three.js dependencies (First load JS: 107 kB), and automatic Live vs Replay fallback (< 50 submissions/window).
+- **`BottomNav.tsx` (P10B.09):** Standard 4-tab navigation bar (`Today`, `Globe`, `History`, `Me`) with keyboard focus rings and $\ge 44\text{px}$ touch targets.
+- **Test Suite & Verification (P10B.09, P10B.10):**
+  - Web unit & component test suite (`apps/web/src/orbit-globe.test.ts`): 55/55 tests passed (100%).
+  - API Orbit integration tests (`services/api/src/orbit.integration.test.ts`): 13/13 tests passed (100%).
+  - R2 infrastructure integration tests (`services/api/src/r2.integration.test.ts`): 5/5 tests passed (100%).
+  - Production build: Zero errors, zero warnings.
+
+---
+
+## 22. Next Steps
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
 
-1. **Founder Review:** Founder reviews Stage M0 Report (`docs/stage-M0-report.md`) and resolves open questions.
-2. **Proceed to Stage M1:** Upon Founder instruction *"proceed to Stage M1"*, begin Phase 10E (Meme Questions & Themed Drops: migrations, seed tags & templates, polymorphic renderer variant, importer, and regression tests).
+1. **Founder Review:** Founder reviews Stage F2 Report.
+2. **Proceed to Stage F3:** Upon Founder instruction *"proceed to Stage F3"*, begin Phase 10C (Telepathy: designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score).

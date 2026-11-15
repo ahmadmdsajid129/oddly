@@ -38,7 +38,7 @@
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | PARTIAL   | `[#########-] 93%` | 14 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 10 & Stage R2   |
 | **Phase 10A**| Orbit Foundation (Backend)                  | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage F1              |
-| **Phase 10B**| Orbit and Globe UI                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage F2              |
+| **Phase 10B**| Orbit and Globe UI                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage F2              |
 | **Phase 10C**| Telepathy (Instinct Sync)                   | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F3              |
 | **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F4              |
 | **Phase 10E**| Meme Questions & Themed Drops               | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage M1 (after F4)   |
@@ -339,20 +339,20 @@ _Status: COMPLETE | Target: Database entities, partitions, repositories, Keep/Or
 
 ### Phase 10B: Orbit and Globe UI (Stage F2)
 
-_Status: TODO | Target: "Keep this twin" UX, Orbit list/detail screens, expression sticker picker, SVG Twin Globe map, 4th tab._
+_Status: COMPLETE | Target: "Keep this twin" UX, Orbit list/detail screens, expression sticker picker, SVG Twin Globe map, 4th tab._
 
-| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
-| `[ ] P10B.01` | Add "Keep this twin" button on flip-card back and recap screen with guest soft sign-in modal                 | High     | TODO   | P10A.04, P1.01 | Agent | —       | Only available on locked final twin      |
-| `[ ] P10B.02` | Build Orbit incoming request card component with anonymous coarse region, age band, Accept / Not now       | High     | TODO   | P10B.01      | Agent | —         | Accessible touch targets $\ge 44\text{px}$|
-| `[ ] P10B.03` | Build Orbit list row and detail screen (`/orbit/:id`) with procedural geometric pick avatars and co-streaks | High     | TODO   | P10A.05, P1.01 | Agent | —       | Anonymous title "Twin #N"                |
-| `[ ] P10B.04` | Implement expression sticker picker (The Wave) with 6 curated database stickers and 1/day direction limit   | High     | TODO   | P10B.03      | Agent | —         | Tactile sticker-press interaction        |
-| `[ ] P10B.05` | Build staged unlocks visual track (5 milestone dots: Day 1, 3, 7, 14, 30) driven by `app_content` data      | Medium   | TODO   | P10B.03      | Agent | —         | Content-driven progression               |
-| `[ ] P10B.06` | Build Twin Globe 5-minute batch aggregation worker and edge-cached endpoint `/v1/globe` (`s-maxage=60`)     | High     | TODO   | P9.01, P3.02 | Agent | —         | Regional k-anonymity aggregation         |
-| `[ ] P10B.07` | Build Twin Globe screen (`/globe`) with static SVG map, k-anonymity arcs ($k \ge 20$), and Orbit lines      | High     | TODO   | P10B.06      | Agent | —         | Zero WebGL; violet glowing Orbit strokes |
-| `[ ] P10B.08` | Implement Twin Globe Live / Replay loop toggle with automatic fallback when volume < 50 submissions/window   | High     | TODO   | P10B.07      | Agent | —         | Transparent labeling; zero fake arcs     |
-| `[ ] P10B.09` | Mount "Globe" as 4th tab in main navigation bar (Today, Globe, History, Me) with keyboard focus rings       | High     | TODO   | P10B.07      | Agent | —         | Preserves initial route bundle           |
-| `[ ] P10B.10` | Implement degradation handling (L1-L4): doubled refresh interval, replay loop switch, and read-only banners | High     | TODO   | P10B.07, P10B.03 | Agent | —     | Dynamic copy from `app_content`          |
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------------- |
+| `[x] P10B.01` | Add "Keep this twin" button on flip-card back and recap screen with guest soft sign-in modal                 | High     | DONE   | P10A.04, P1.01 | Agent | 2026-11-15  | Only available on locked final twin      |
+| `[x] P10B.02` | Build Orbit incoming request card component with anonymous coarse region, age band, Accept / Not now       | High     | DONE   | P10B.01      | Agent | 2026-11-15  | Accessible touch targets $\ge 44\text{px}$|
+| `[x] P10B.03` | Build Orbit list row and detail screen (`/orbit/:id`) with procedural geometric pick avatars and co-streaks | High     | DONE   | P10A.05, P1.01 | Agent | 2026-11-15  | Anonymous title "Twin #N"                |
+| `[x] P10B.04` | Implement expression sticker picker (The Wave) with 6 curated database stickers and 1/day direction limit   | High     | DONE   | P10B.03      | Agent | 2026-11-15  | Tactile sticker-press interaction        |
+| `[x] P10B.05` | Build staged unlocks visual track (5 milestone dots: Day 1, 3, 7, 14, 30) driven by `app_content` data      | Medium   | DONE   | P10B.03      | Agent | 2026-11-15  | Content-driven progression               |
+| `[x] P10B.06` | Build Twin Globe 5-minute batch aggregation worker and edge-cached endpoint `/v1/globe` (`s-maxage=60`)     | High     | DONE   | P9.01, P3.02 | Agent | 2026-11-15  | Regional k-anonymity aggregation         |
+| `[x] P10B.07` | Build Twin Globe screen (`/globe`) with static SVG map, k-anonymity arcs ($k \ge 20$), and Orbit lines      | High     | DONE   | P10B.06      | Agent | 2026-11-15  | Zero WebGL; violet glowing Orbit strokes |
+| `[x] P10B.08` | Implement Twin Globe Live / Replay loop toggle with automatic fallback when volume < 50 submissions/window   | High     | DONE   | P10B.07      | Agent | 2026-11-15  | Transparent labeling; zero fake arcs     |
+| `[x] P10B.09` | Mount "Globe" as 4th tab in main navigation bar (Today, Globe, History, Me) with keyboard focus rings       | High     | DONE   | P10B.07      | Agent | 2026-11-15  | Preserves initial route bundle           |
+| `[x] P10B.10` | Implement degradation handling (L1-L4): doubled refresh interval, replay loop switch, and read-only banners | High     | DONE   | P10B.07, P10B.03 | Agent | 2026-11-15| Dynamic copy from `app_content`          |
 
 ---
 
@@ -704,14 +704,14 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Verify DPDP deletion purges Orbit linkages within 7 days.
   - [x] Run `pnpm test` verifying 100% pass on Orbit state machine.
 - **Stage F2 Checklist (Phase 10B: Orbit & Globe UI):**
-  - [ ] Verify "Keep this twin" button renders on locked final twin card back and `/recap`.
-  - [ ] Test soft sign-in prompt for guest users attempting to Keep.
-  - [ ] Verify Orbit incoming request card with Accept / Not now actions.
-  - [ ] Verify Orbit list row renders procedural geometric avatar and co-streak chip.
-  - [ ] Verify 6-sticker expression tray (The Wave) sends 1 sticker per direction per day.
-  - [ ] Test `/globe` static SVG map: verify $k \ge 20$ region aggregation, live arcs, and violet glowing Orbit lines.
-  - [ ] Test automatic switch to Replay loop when live volume < 50 submissions/window.
-  - [ ] Verify Globe as 4th tab with $\ge 44\text{px}$ touch targets.
+  - [x] Verify "Keep this twin" button renders on locked final twin card back and `/recap`.
+  - [x] Test soft sign-in prompt for guest users attempting to Keep.
+  - [x] Verify Orbit incoming request card with Accept / Not now actions.
+  - [x] Verify Orbit list row renders procedural geometric avatar and co-streak chip.
+  - [x] Verify 6-sticker expression tray (The Wave) sends 1 sticker per direction per day.
+  - [x] Test `/globe` static SVG map: verify $k \ge 20$ region aggregation, live arcs, and violet glowing Orbit lines.
+  - [x] Test automatic switch to Replay loop when live volume < 50 submissions/window.
+  - [x] Verify Globe as 4th tab with $\ge 44\text{px}$ touch targets.
 - **Stage F3 Checklist (Phase 10C: Telepathy):**
   - [ ] Verify admin question check rejects Drops lacking an eligible $\le 4$ option question.
   - [ ] Run expand migration for `telepathy_guesses` with range partitioning and 90-day retention.
