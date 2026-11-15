@@ -105,7 +105,7 @@ describe("Stage R2.0 Real-Infrastructure Integration Proofs (Postgres 16 & Redis
     let appA: Awaited<ReturnType<typeof buildServer>>;
     let appB: Awaited<ReturnType<typeof buildServer>>;
     const testDeviceId = `did_proof3b_${Date.now()}`;
-    const testDate = new Date().toISOString().slice(0, 10);
+    const testDate = "2025-01-01";
 
     beforeAll(async () => {
       // 1. Clean up previous test drop
@@ -113,6 +113,7 @@ describe("Stage R2.0 Real-Infrastructure Integration Proofs (Postgres 16 & Redis
       await realPrisma.oddnessScore.deleteMany({ where: { submission: { drop_id: testDropId } } });
       await realPrisma.submission.deleteMany({ where: { drop_id: testDropId } });
       await realPrisma.answerStat.deleteMany({ where: { drop_id: testDropId } });
+      await realPrisma.answerOption.deleteMany({ where: { question: { drop_id: testDropId } } });
       await realPrisma.question.deleteMany({ where: { drop_id: testDropId } });
       await realPrisma.drop.deleteMany({ where: { id: testDropId } });
 
@@ -239,6 +240,7 @@ describe("Stage R2.0 Real-Infrastructure Integration Proofs (Postgres 16 & Redis
 
     beforeAll(async () => {
       process.env.NODE_ENV = "production";
+      process.env.METRICS_BEARER_TOKEN = process.env.METRICS_BEARER_TOKEN || "test-metrics-token-12345";
       appA = await buildServer({ logger: false, underPressure: false, allowList: [] });
       appB = await buildServer({ logger: false, underPressure: false, allowList: [] });
       await appA.ready();
@@ -247,8 +249,8 @@ describe("Stage R2.0 Real-Infrastructure Integration Proofs (Postgres 16 & Redis
 
     afterAll(async () => {
       process.env.NODE_ENV = "test";
-      await appA.close();
-      await appB.close();
+      if (appA) await appA.close();
+      if (appB) await appB.close();
     });
 
     it("shares rate-limit counters in real Redis across both API instances (trips at 30 req/min for submissions)", async () => {

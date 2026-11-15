@@ -41,6 +41,7 @@ import { reportsRoutes } from "./routes/reports.js";
 import { pushRoutes } from "./routes/push.js";
 import { keepsRoutes } from "./routes/keeps.js";
 import { orbitsRoutes } from "./routes/orbits.js";
+import { globeRoutes } from "./routes/globe.js";
 import { DegradationManager } from "./resilience/degradation.js";
 import { registerMetrics } from "./metrics.js";
 
@@ -309,6 +310,7 @@ export async function buildServer(
   await app.register(pushRoutes);
   await app.register(keepsRoutes);
   await app.register(orbitsRoutes);
+  await app.register(globeRoutes);
 
   // 8. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {

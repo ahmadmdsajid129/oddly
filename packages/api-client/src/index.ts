@@ -201,6 +201,117 @@ export interface ReportResponse {
   message: string;
 }
 
+export interface KeepResponse {
+  ok: boolean;
+  keep_id?: string;
+  status?: string;
+  message?: string;
+  error?: string;
+}
+
+export interface IncomingKeepItem {
+  id: string;
+  drop_date: string;
+  similarity_snapshot: number;
+  region: string;
+  age_band: string;
+  created_at: string;
+}
+
+export interface IncomingKeepsResponse {
+  ok: boolean;
+  incoming: IncomingKeepItem[];
+}
+
+export interface RespondKeepResponse {
+  ok: boolean;
+  decision: "accept" | "decline";
+  orbit_id?: string;
+  message: string;
+}
+
+export interface OrbitListItem {
+  orbit_id: string;
+  status: "active" | "ended";
+  started_on: string;
+  co_streak_current: number;
+  co_streak_best: number;
+  last_co_date: string | null;
+  partner: {
+    region: string;
+    age_band: string;
+  };
+}
+
+export interface OrbitsListResponse {
+  ok: boolean;
+  orbits: OrbitListItem[];
+}
+
+export interface OrbitExpressionItem {
+  id: string;
+  is_from_me: boolean;
+  expression_key: string;
+  created_at: string;
+}
+
+export interface OrbitDetail {
+  id: string;
+  status: "active" | "ended";
+  started_on: string;
+  co_streak_current: number;
+  co_streak_best: number;
+  partner: {
+    region: string;
+    age_band: string;
+  };
+  today_expressions: OrbitExpressionItem[];
+  can_express_today: boolean;
+}
+
+export interface OrbitDetailResponse {
+  ok: boolean;
+  orbit: OrbitDetail;
+}
+
+export interface SendExpressionResponse {
+  ok: boolean;
+  expression_key: string;
+  created_at: string;
+  message: string;
+}
+
+export interface EndOrbitResponse {
+  ok: boolean;
+  status: "ended";
+  message: string;
+}
+
+export interface GlobeArc {
+  id: string;
+  from_region: string;
+  from_coords: [number, number];
+  to_region: string;
+  to_coords: [number, number];
+  count: number;
+}
+
+export interface UserOrbitLine {
+  orbit_id: string;
+  partner_region: string;
+  partner_coords: [number, number];
+  user_coords: [number, number];
+}
+
+export interface GlobeResponse {
+  ok: boolean;
+  mode: "live" | "replay";
+  status_text: string;
+  arcs: GlobeArc[];
+  user_orbits: UserOrbitLine[];
+  live_count: number;
+}
+
 export interface SessionResponse {
   authenticated: boolean;
   account: {
@@ -439,6 +550,64 @@ export class OddlyApiClient {
       method: "POST",
       body: JSON.stringify(data),
     });
+  }
+
+  /** Send a Keep request to today's locked twin (P10A.04) */
+  async createKeep(dropId: string): Promise<KeepResponse> {
+    return this.request<KeepResponse>("/v1/keeps", {
+      method: "POST",
+      body: JSON.stringify({ drop_id: dropId }),
+    });
+  }
+
+  /** List incoming pending Keep connection requests (P10A.04) */
+  async getIncomingKeeps(): Promise<IncomingKeepsResponse> {
+    return this.request<IncomingKeepsResponse>("/v1/keeps/incoming");
+  }
+
+  /** Respond to an incoming Keep request (P10A.04) */
+  async respondKeep(
+    id: string,
+    decision: "accept" | "decline",
+    dropDate?: string
+  ): Promise<RespondKeepResponse> {
+    return this.request<RespondKeepResponse>(`/v1/keeps/${id}/respond`, {
+      method: "POST",
+      body: JSON.stringify({ decision, drop_date: dropDate }),
+    });
+  }
+
+  /** List active Orbits for the current authenticated player (P10A.05) */
+  async getOrbits(): Promise<OrbitsListResponse> {
+    return this.request<OrbitsListResponse>("/v1/orbits");
+  }
+
+  /** Get single Orbit detail and expressions (P10A.05) */
+  async getOrbit(id: string): Promise<OrbitDetailResponse> {
+    return this.request<OrbitDetailResponse>(`/v1/orbits/${id}`);
+  }
+
+  /** Send daily tactile expression (The Wave) in Orbit (P10A.05, P10B.04) */
+  async sendOrbitExpression(
+    id: string,
+    expressionKey: string
+  ): Promise<SendExpressionResponse> {
+    return this.request<SendExpressionResponse>(`/v1/orbits/${id}/express`, {
+      method: "POST",
+      body: JSON.stringify({ expression_key: expressionKey }),
+    });
+  }
+
+  /** End an Orbit instantly (P10A.08) */
+  async endOrbit(id: string): Promise<EndOrbitResponse> {
+    return this.request<EndOrbitResponse>(`/v1/orbits/${id}/end`, {
+      method: "POST",
+    });
+  }
+
+  /** Retrieve aggregated macro-region arcs and Orbit lines for Twin Globe (P10B.06) */
+  async getGlobe(): Promise<GlobeResponse> {
+    return this.request<GlobeResponse>("/v1/globe");
   }
 }
 

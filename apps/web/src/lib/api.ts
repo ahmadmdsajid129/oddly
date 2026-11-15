@@ -116,6 +116,22 @@ export const api = {
     submit: (data: Parameters<typeof rawClient.submitReport>[0]) =>
       rawClient.submitReport(data),
   },
+  keeps: {
+    create: (dropId: string) => rawClient.createKeep(dropId),
+    getIncoming: () => rawClient.getIncomingKeeps(),
+    respond: (id: string, decision: "accept" | "decline", dropDate?: string) =>
+      rawClient.respondKeep(id, decision, dropDate),
+  },
+  orbits: {
+    list: () => rawClient.getOrbits(),
+    get: (id: string) => rawClient.getOrbit(id),
+    express: (id: string, expressionKey: string) =>
+      rawClient.sendOrbitExpression(id, expressionKey),
+    end: (id: string) => rawClient.endOrbit(id),
+  },
+  globe: {
+    get: () => rawClient.getGlobe(),
+  },
 };
 
 export const oddlyApi = rawClient;

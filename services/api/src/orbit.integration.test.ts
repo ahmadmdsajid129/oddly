@@ -19,16 +19,14 @@
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import { PrismaClient } from "@oddly/shared";
 import { buildServer } from "./server.js";
-import { PipelineWorker } from "../../worker/src/workers/pipeline.worker.js";
 import { randomUUID } from "node:crypto";
-import type { FastifyInstance } from "fastify";
 
 const DATABASE_URL =
   process.env.DATABASE_URL || "postgresql://oddly:oddlypass@localhost:5432/oddly?schema=public";
 
 describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
   let prisma: PrismaClient;
-  let server: FastifyInstance;
+  let server: Awaited<ReturnType<typeof buildServer>>;
 
   let testDropId = "";
   let testProvisionalDropId = "";
@@ -36,7 +34,6 @@ describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
 
   const accountAId = randomUUID();
   const accountBId = randomUUID();
-  const accountCId = randomUUID();
 
   const playerAId = randomUUID();
   const playerBId = randomUUID();
@@ -392,7 +389,10 @@ describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
       skipDuplicates: true,
     });
 
-    const resultBoth = await PipelineWorker.computeCoStreaks(testDropId, testDropDate);
+    // Dynamically import worker method to avoid rootDir cross-package compile constraint
+    const workerPath = "../../worker/src/workers/pipeline.worker.js";
+    const workerModule: any = await import(/* @vite-ignore */ workerPath);
+    const resultBoth = await workerModule.PipelineWorker.computeCoStreaks(testDropId, testDropDate);
     expect(resultBoth.activeOrbits).toBeGreaterThanOrEqual(1);
     expect(resultBoth.keptCoStreak).toBeGreaterThanOrEqual(1);
 
@@ -402,7 +402,7 @@ describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
 
     // 2. A missed drop -> co-streak quietly resets to 0 (zero guilt copy)
     const dummyDropId = randomUUID();
-    const resultMissed = await PipelineWorker.computeCoStreaks(dummyDropId, new Date());
+    const resultMissed = await workerModule.PipelineWorker.computeCoStreaks(dummyDropId, new Date());
     expect(resultMissed.resetCoStreak).toBeGreaterThanOrEqual(1);
 
     const orbitAfterMiss = await prisma.orbit.findUnique({ where: { id: orbitId } });
