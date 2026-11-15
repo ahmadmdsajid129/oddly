@@ -188,6 +188,16 @@ Cloudflare sits in front of all services. Over 95% of requests never reach the o
 | `/v1/orbits/:id/telepathy/guess` | POST | 3 s | 10/min/device | No-store | `request_id` | Low | Paused at L2+ |
 | `/v1/globe` | GET | 3 s | 60/min/IP | Edge s-maxage=60 | None | Low | Stale up to 10m at L1, hidden at L2+ |
 | `/v1/results/:dropId/anti-twin` | GET | 3 s | 20/min/device | Private no-store | None | Low | Hidden at L2+ |
+| `/v1/events` | POST | 3 s | 60/min/device | No-store | None | Low | Sampled 50% at L1, shed at L2+; never in submit path |
+| `/v1/consents` | GET | 3 s | 30/min/device | Private no-store | None | Medium | Shed at L2+ |
+| `/v1/consents` | PUT | 3 s | 10/min/device | No-store | `request_id` | Medium | Shed at L2+ |
+| `/v1/memes/today` | GET | 3 s | 60/min/device | Edge s-maxage=60 | None | Low | Hidden at L2+ (M3) |
+| `/v1/memes/:id/rating` | POST | 3 s | 30/min/device | No-store | `request_id` | Low | Paused at L2+ (M3) |
+| `/v1/memes/submissions` | POST | 5 s | 5/min/device | No-store | `request_id` | Low | Blocked at L2+ (M3) |
+| `/v1/me/memes` | GET | 3 s | 20/min/device | Private no-store | None | Low | Shed at L2+ (M3) |
+| `/v1/me/badges` | GET | 3 s | 30/min/device | Private no-store | None | Low | Shed at L2+ (M6) |
+| `/v1/shoutouts` | GET | 3 s | 60/min/IP | Edge s-maxage=300 | None | Low | Stale up to 1h at L2+ (M6) |
+| `/v1/orbits/:id/subject-sync` | GET | 3 s | 30/min/device | Private ETag | None | Low | Hidden at L2+ (M5) |
 | `/admin/*` | ALL | 10 s | 120/min/IP | No-store | None | Low | Block writes at L2/L3 |
 
 ### 7.2 Layered Rate Limiting and Indian CGNAT Cellular Architecture (R1-PATCH Item 5)
@@ -271,8 +281,8 @@ Controlled dynamically via database `app_config.degradation_level` (L0 to L4). S
 1. Priority 1 (Core): Drop JSON, Submissions (Mode A -> Mode B), `/health`.  
 2. Priority 3: Results, Twin Reveal, Oddness.  
 3. Priority 5: User History, Settings, Me Drawer, **Keep requests & Orbit status**.  
-4. Priority 7: Share Card Pre-render, Analytics, Live Counters, **Twin Globe Arcs, Telepathy Guesses, Anti-twin calculation**.  
-5. Priority 9: Non-essential pushes, background audits, admin exports.
+4. Priority 7: Share Card Pre-render, Live Counters, **Twin Globe Arcs, Telepathy Guesses, Anti-twin calculation, Signals `/v1/events` (sampled 50% at L1, shed at L2+), Meme Corner rating (M3)**.  
+5. Priority 9: Non-essential pushes, background audits, admin exports, **Meme Lab submissions (M3)**.
 
 *Hysteresis Rule:* Stepping down to a lower level requires **5 consecutive minutes** of healthy metrics below threshold.
 
@@ -420,6 +430,101 @@ All daily tables are range-partitioned by `drop_date` from day one, matching exi
   - Cache Role (`allkeys-lru`): `cache:globe:arcs:latest`, `cache:antitwin:{dropId}:{userId}` (TTL 24h).
   - Counters Role (`noeviction`): `counters:orbit:active:{userId}`, `counters:keeps:incoming:{userId}:{dropDate}` (TTL 48h).
 
+### 16.3 M0 Addendum: Memes, Signals, and Insights Data Architecture
+
+#### 16.3.1 Relational Schema Definitions
+
+1. **`tags` (M1):** Database-managed taxonomy of neutral subject tags.
+   - Columns: `id` (UUID, PK), `key` (TEXT, UNIQUE, e.g. `'humour'`, `'daily-habits'`), `label_i18n` (JSONB, NOT NULL), `group` (TEXT, NOT NULL, default `'lifestyle'`), `status` (ENUM: `'active'`, `'retired'`), `created_at` (TIMESTAMPTZ, NOT NULL).
+   - Invariant: Build-fail unit test verifies zero tag keys overlap with Section 9.1 forbidden topics.
+2. **`question_tags` (M1):** Many-to-many join between questions and taxonomy tags.
+   - Columns: `question_id` (UUID, NOT NULL, FK to `questions`), `tag_id` (UUID, NOT NULL, FK to `tags`), `created_at` (TIMESTAMPTZ, NOT NULL).
+   - Constraints: Primary Key `(question_id, tag_id)`.
+3. **`meme_templates` (M1):** Curated vector SVG illustration templates from the app's registry (extending D-015).
+   - Columns: `id` (UUID, PK), `key` (TEXT, UNIQUE), `illustration_registry_key` (TEXT, NOT NULL), `aspect` (TEXT, NOT NULL, default `'1:1'`), `alt_text_i18n` (JSONB, NOT NULL), `license_note` (TEXT, NOT NULL), `status` (ENUM: `'active'`, `'retired'`), `created_at` (TIMESTAMPTZ, NOT NULL).
+4. **`questions` Table Extensions (M1):**
+   - Added column: `render_variant` (VARCHAR(20), NOT NULL, default `'standard'`). Allowed: `'standard'`, `'meme'`.
+   - Added column: `template_id` (UUID, nullable, FK to `meme_templates`).
+5. **`drops` Table Extensions (M1):**
+   - Added column: `theme_key` (VARCHAR(50), nullable). Editorial label and badge; does not alter matching.
+6. **`consents` (M2):** Granular, withdrawable DPDP consent records.
+   - Columns: `id` (UUID, PK), `player_id` (UUID, NOT NULL, FK to `users`), `purpose` (TEXT, NOT NULL; `'analytics'` or `'personalisation'`), `policy_version` (INT, NOT NULL), `granted_at` (TIMESTAMPTZ, NOT NULL), `withdrawn_at` (TIMESTAMPTZ, nullable).
+   - Constraints: Unique index on `(player_id, purpose)`. Default OFF.
+7. **`analytics_ids` (M2):** One-to-one pseudonymous identity isolation table.
+   - Columns: `player_id` (UUID, PK, FK to `users`), `analytics_id` (UUID, UNIQUE, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL).
+   - Purpose: Disconnects behavioral event streams from user identity. Purged upon DPDP erasure request.
+8. **`events_raw` (M2):** High-throughput, consented telemetry events.
+   - Columns: `id` (UUID, PK), `analytics_id` (UUID, NOT NULL), `drop_date` (DATE, NOT NULL), `event_name` (VARCHAR(50), NOT NULL), `props` (JSONB, NOT NULL), `session_id` (VARCHAR(64), nullable), `created_at` (TIMESTAMPTZ, NOT NULL).
+   - Constraints: Range-partitioned by `drop_date`. Retention: 90 days (*config*).
+   - Invariant: Ingested only with active `'analytics'` consent. Strict JSON schema allowlist; zero IPs, zero PII, zero free text.
+9. **`question_stats_daily` (M2):** Nightly aggregated question quality metrics.
+   - Columns: `drop_date` (DATE, NOT NULL), `question_id` (UUID, NOT NULL, FK to `questions`), `shown_count` (INT, NOT NULL), `answered_count` (INT, NOT NULL), `dwell_p50_ms` (INT, NOT NULL), `dwell_p90_ms` (INT, NOT NULL), `change_rate` (FLOAT, NOT NULL), `back_rate` (FLOAT, NOT NULL), `abandon_rate` (FLOAT, NOT NULL), `report_rate` (FLOAT, NOT NULL), `entropy` (FLOAT, NOT NULL).
+   - Constraints: Primary Key `(drop_date, question_id)`.
+10. **`tag_stats_daily` (M2):** Nightly aggregated performance by subject tag.
+    - Columns: `drop_date` (DATE, NOT NULL), `tag_id` (UUID, NOT NULL, FK to `tags`), `completions` (INT, NOT NULL), `share_count` (INT, NOT NULL), `dwell_p50_ms` (INT, NOT NULL).
+    - Constraints: Primary Key `(drop_date, tag_id)`.
+11. **`player_taste` (M4):** Consented, smoothed player tag affinity scores.
+    - Columns: `analytics_id` (UUID, NOT NULL), `tag_id` (UUID, NOT NULL, FK to `tags`), `score` (FLOAT, NOT NULL), `n` (INT, NOT NULL), `updated_at` (TIMESTAMPTZ, NOT NULL).
+    - Constraints: Primary Key `(analytics_id, tag_id)`.
+    - Invariant: Populated only with `'personalisation'` consent and $n \ge 20$. Deleted immediately upon consent withdrawal.
+12. **`notification_timing_stats` (M4):** Cohort-level open rates by hour bucket.
+    - Columns: `cohort_id` (TEXT, NOT NULL), `hour_bucket` (INT, NOT NULL), `open_count` (INT, NOT NULL), `send_count` (INT, NOT NULL).
+    - Constraints: Primary Key `(cohort_id, hour_bucket)`.
+13. **`editor_suggestions` (M4):** Drop planning advisory records generated for Mission Control.
+    - Columns: `id` (UUID, PK), `for_date` (DATE, NOT NULL), `suggested_tags` (JSONB, NOT NULL), `reason` (TEXT, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL).
+14. **`meme_submissions` (M3 — Documented):** User caption submissions for Meme Lab.
+    - Columns: `id` (UUID, PK), `author_player_id` (UUID, NOT NULL, FK to `users`), `template_id` (UUID, NOT NULL, FK to `meme_templates`), `caption_text` (VARCHAR(100), NOT NULL), `status` (ENUM: `'queued'`, `'approved'`, `'rejected'`, `'retired'`), `originality_attested_at` (TIMESTAMPTZ, NOT NULL), `moderation_reason` (TEXT, nullable), `reviewed_by` (UUID, nullable), `reviewed_at` (TIMESTAMPTZ, nullable), `created_at` (TIMESTAMPTZ, NOT NULL).
+15. **`meme_ratings` (M3 — Documented):** Post-drop Meme Corner ratings.
+    - Columns: `submission_id` (UUID, NOT NULL, FK to `meme_submissions`), `rater_player_id` (UUID, NOT NULL, FK to `users`), `rating` (ENUM: `'funny'`, `'not_for_me'`), `drop_date` (DATE, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL).
+    - Constraints: Primary Key `(submission_id, rater_player_id)`.
+16. **`meme_stats` (M3 — Documented):** Aggregate rating counters and Wilson lower bound.
+    - Columns: `submission_id` (UUID, PK, FK to `meme_submissions`), `raters` (INT, NOT NULL, default 0), `funny_count` (INT, NOT NULL, default 0), `wilson_lb` (FLOAT, NOT NULL, default 0.0), `last_shown_at` (TIMESTAMPTZ, nullable).
+17. **`meme_exposures` (M3 — Documented):** Impression tracking for Meme Corner diversity and exploration caps.
+    - Columns: `submission_id` (UUID, NOT NULL, FK to `meme_submissions`), `player_id` (UUID, NOT NULL, FK to `users`), `drop_date` (DATE, NOT NULL), `shown_at` (TIMESTAMPTZ, NOT NULL).
+    - Constraints: Primary Key `(submission_id, player_id)`.
+18. **`moderation_actions` (M3 — Documented):** Immutable audit log for all moderation decisions.
+    - Columns: `id` (UUID, PK), `submission_id` (UUID, NOT NULL), `action` (TEXT, NOT NULL), `reason` (TEXT, NOT NULL), `admin_id` (UUID, NOT NULL), `created_at` (TIMESTAMPTZ, NOT NULL).
+19. **`badge_definitions` (M6 — Documented):** Recognition badge catalogue.
+    - Columns: `id` (UUID, PK), `key` (TEXT, UNIQUE), `name_i18n` (JSONB, NOT NULL), `description_i18n` (JSONB, NOT NULL), `icon_key` (TEXT, NOT NULL), `benchmark_config` (JSONB, NOT NULL), `status` (TEXT, NOT NULL, default `'active'`).
+20. **`creator_badges` (M6 — Documented):** User badge awards.
+    - Columns: `id` (UUID, PK), `player_id` (UUID, NOT NULL, FK to `users`), `badge_id` (UUID, NOT NULL, FK to `badge_definitions`), `meme_id` (UUID, nullable, FK to `meme_submissions`), `awarded_at` (TIMESTAMPTZ, NOT NULL).
+    - Constraints: Unique index on `(player_id, badge_id)`.
+21. **`featured_memes` (M6 — Documented):** Curated "Meme of the Week".
+    - Columns: `id` (UUID, PK), `submission_id` (UUID, NOT NULL, FK to `meme_submissions`), `week_start_date` (DATE, UNIQUE, NOT NULL), `curator_notes` (TEXT, nullable), `published_at` (TIMESTAMPTZ, NOT NULL).
+22. **`plans`, `entitlements`, `subscriptions`, `paywall_events` (M8 — Documented Only):** Provider-agnostic monetization tables structured per ADR-044.
+
+#### 16.3.2 Configuration & Feature Flags
+
+- **`app_config` Runtime Keys Added:**
+  - `signals.events_retention_days` (default: 90)
+  - `signals.sample_rate_l1` (default: 0.50)
+  - `meme_lab.max_caption_len` (default: 100)
+  - `meme_lab.min_raters` (default: 200)
+  - `meme_lab.exploration_share` (default: 0.20)
+  - `meme_lab.freshness_days` (default: 14)
+  - `insights.min_ratings_per_tag` (default: 20)
+  - `orbit.taste_sync_min_shared` (default: 5)
+  - `premium.offer_cooldown_days` (default: 14)
+  - `premium.dismiss_halt_days` (default: 90)
+- **Feature Flags Added:**
+  - `feature.meme_questions` (boolean, default: false)
+  - `feature.signals` (boolean, default: false)
+  - `feature.meme_lab` (boolean, default: false)
+  - `feature.insights` (boolean, default: false)
+  - `feature.taste_sync` (boolean, default: false)
+  - `feature.recognition` (boolean, default: false)
+  - `feature.ml_ranker` (boolean, default: false)
+  - `feature.premium` (boolean, default: false)
+
+#### 16.3.3 Entity Relationship Invariants
+
+- **Zero Coupling with Core Matching:** `questions` links to `meme_templates` and `tags` purely for presentation. The mathematical matching engine (`similarity`, `oddness`) operates strictly on the numeric/text option index $a \in \{1 \dots K\}$ and is completely agnostic to whether a question is a meme or standard question.
+- **Orbit Subject-Sync Without Schema Bloat:** Subject-level agreement inside an Orbit is computed by joining existing `answers` and `question_tags`. Zero new relational join tables or duplicated answers are created.
+- **Strict Privacy Isolation:** `player_taste` and `events_raw` are keyed strictly by pseudonymous `analytics_id` (isolated in `analytics_ids`), completely severed from user profile identity, email, or Orbit relationships.
+- **Meme Lab Anonymity:** Public surfaces display only the author's alias and coarse macro-region ($k \ge 20$). Raters cast anonymous votes; rater identity is never disclosed to the meme creator.
+
+---
+
 ---
 
 ## 17. Architecture Decision Records (ADRs)
@@ -504,3 +609,27 @@ All daily tables are range-partitioned by `drop_date` from day one, matching exi
 - **Context:** Computing an opposite twin ("your opposite today") must not degrade the core submission hot path and must not reveal the opposite user's answer choices.
 - **Decision:** Decouple Anti-twin calculation from the submit path. Enqueue an idempotent background worker job (`ComputeAntiTwinJob`) on first visit to the Anti-twin view. Scan a bounded sample of 2,000 candidates from today's pool. Display only the number of differed questions ("You differed on N of 5"), coarse region ($k \ge 20$), and age band. Strictly never display the opposite player's pick labels.
 - **Consequence:** Core submission path latency is untouched; zero database locks on live pools; absolute adherence to zero-vector privacy standards.
+
+### ADR 041: Meme Questions Polymorphic Presentation & Neutral Subject Taxonomy
+- **Date:** 2026-11-15
+- **Context:** Introducing humor and relatable cultural questions must not break the existing scoring algorithms, must not bloat bundle size, and must not introduce toxic or sensitive themes.
+- **Decision:** Model meme questions as a pure presentation variant (`render_variant = 'meme'`) on existing Type 1 (2–4 text options) or Type 4 (image options) structures. Render template illustrations exclusively from the local SVG registry (no user raster uploads). Render captions as live text. Enforce a database-managed subject tag taxonomy containing strictly neutral lifestyle categories. Implement a build-failing automated test that rejects any tag key matching the forbidden-topics list.
+- **Consequence:** 100% mathematical backwards-compatibility, zero impact on the matching engine, accessible and translatable text captions, and zero sensitive demographic leakage.
+
+### ADR 042: Consented Signals Pipeline, Low-Lane Beaconing & PostHog Unified Dictionary
+- **Date:** 2026-11-15
+- **Context:** We need telemetry on question quality and funnel friction to refine the editorial Drop process, but must avoid third-party SDK bloat and respect India's DPDP Act.
+- **Decision:** Build a lightweight first-party event ingestion route (`POST /v1/events`, 202 Accepted, beacon/batch) on the Low priority lane. Enforce explicit, granular DPDP consent toggles in Settings (default OFF). Key all events by a pseudonymous `analytics_id` rather than user ID or email. Maintain an immutable allowlisted Event Dictionary. Unify the event dictionary so that if PostHog is evaluated in Phase 12, it consumes the exact same allowlisted pseudonymous stream with zero double-instrumentation. Roll raw partitioned events into daily aggregate question stats and drop raw partitions after 90 days.
+- **Consequence:** Zero play-path submit latency impact, < 500 bytes client bundle overhead, full regulatory compliance, and clean aggregate editorial analytics.
+
+### ADR 043: Meme Lab Community Captions, Wilson Scoring & Two-Person Approval Gate
+- **Date:** 2026-11-15
+- **Context:** Enabling community-authored captions introduces content moderation liability and potential quality degradation.
+- **Decision:** Strictly restrict user authoring to caption text ($\le 100$ characters) for pre-approved vector templates (zero image uploads). Enforce Turnstile, originality attestation, and mandatory admin moderation queue. Rate approved memes via an optional post-drop "Meme Corner" card with "Funny" / "Not for me" reactions. Rank candidate memes using the Wilson score lower bound ($N \ge 200$) with a 20% exploration share. Strictly mandate two-person approval and D-2 lock before any community meme can be promoted into a daily Drop.
+- **Consequence:** Prevents spam, copyright infringement, and brand damage while establishing a safe, highly-rated pipeline of future Drop candidates.
+
+### ADR 044: Statistical Insights Engine, Non-Drop Personalisation & Zero Sensitive Inferences
+- **Date:** 2026-11-15
+- **Context:** Personalising secondary surfaces must not violate the core product principle that the daily five questions are globally identical.
+- **Decision:** Personalisation applies exclusively to non-Drop surfaces (optional Meme Corner card ordering, notification send-hour cohorts, suggested share card themes). The daily Drop questions remain 100% identical worldwide. Derive taste affinities purely through explainable statistics (smoothed rating percentages), never opaque ML models or sensitive attribute inferences. Enforce instant hard deletion of `player_taste` records upon consent withdrawal.
+- **Consequence:** Protects the collective shared cultural ritual of the Drop while providing personalized utility on secondary screens in full compliance with privacy rules.
