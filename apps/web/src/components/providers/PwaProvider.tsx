@@ -17,8 +17,24 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
   const [showPushPrompt, setShowPushPrompt] = useState(false);
 
   useEffect(() => {
-    // 1. Register service worker at /sw.js
-    registerServiceWorker();
+    // 1. In production, register service worker at /sw.js
+    if (process.env.NODE_ENV === "production") {
+      registerServiceWorker();
+    } else if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+      // In development on localhost, clean up any stale service workers and cached chunks
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
+      if (typeof window !== "undefined" && "caches" in window) {
+        caches.keys().then((names) => {
+          for (const name of names) {
+            caches.delete(name);
+          }
+        });
+      }
+    }
 
     // 2. Track visit count
     recordVisit();

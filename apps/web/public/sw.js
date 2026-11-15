@@ -42,6 +42,16 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  // 0. Never intercept or cache on localhost during development or HMR hot-updates
+  if (
+    url.hostname === "localhost" ||
+    url.hostname === "127.0.0.1" ||
+    url.pathname.includes("webpack-hmr") ||
+    url.pathname.includes(".hot-update.")
+  ) {
+    return;
+  }
+
   // 1. Strictly bypass service worker caching for personalised/sensitive APIs (R2.7)
   if (
     url.pathname.startsWith("/v1/results") ||
