@@ -25,6 +25,8 @@ export const QuestionTypeSchema = z.enum([
   "word",
 ]);
 
+export const RenderVariantSchema = z.enum(["standard", "meme"]);
+
 export const TierSchema = z.enum(["Common", "Uncommon", "Rare", "Mythic"]);
 
 export const ShareFormatSchema = z.enum(["story", "square", "link"]);
@@ -171,8 +173,38 @@ export const QuestionResponseSchema = z.object({
   id: UUIDSchema,
   position: z.number().int().min(1).max(5),
   type: QuestionTypeSchema,
+  render_variant: RenderVariantSchema.default("standard"),
+  template_id: z.string().nullable().optional(),
+  template_key: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional(),
   payload: QuestionPayloadSchema,
   answer_options: z.array(AnswerOptionResponseSchema),
+});
+
+export const MemeQuestionSchema = QuestionResponseSchema.superRefine((val, ctx) => {
+  if (val.render_variant === "meme") {
+    if (val.type !== "text" && val.type !== "image") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Meme question render variant only supports Type 1 (text) and Type 4 (image)",
+        path: ["type"],
+      });
+    }
+    if (!val.template_key && !val.template_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Meme question requires a valid template_key or template_id",
+        path: ["template_key"],
+      });
+    }
+    if (!val.tags || val.tags.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Meme question requires at least 1 tag",
+        path: ["tags"],
+      });
+    }
+  }
 });
 
 export const DropResponseSchema = z.object({
@@ -181,6 +213,7 @@ export const DropResponseSchema = z.object({
   opens_at: z.string().datetime(),
   closes_at: z.string().datetime(),
   status: DropStatusSchema,
+  theme_key: z.string().nullable().optional(),
   telepathy_question_id: UUIDSchema.optional().nullable(),
   questions: z.array(QuestionResponseSchema),
 });

@@ -123,6 +123,7 @@ model Drop {
   status                DropStatus @default(pending)
   telepathy_question_id String?
   telepathy_question    Question?  @relation("DropTelepathyQuestion", fields: [telepathy_question_id], references: [id])
+  theme_key             String?    @db.VarChar(50)
   created_at            DateTime   @default(now())
 
   questions    Question[]
@@ -135,6 +136,7 @@ model Drop {
   @@index([drop_date])
   @@index([status])
   @@index([telepathy_question_id])
+  @@index([theme_key])
   @@map("drops")
 }
 
@@ -145,17 +147,23 @@ model Question {
   id         String       @id @default(uuid())
   drop_id    String
   drop       Drop         @relation(fields: [drop_id], references: [id])
-  position   Int          @db.SmallInt // 1-5
-  type       QuestionType
-  payload    Json         // discriminated by type (see D-006)
-  created_at DateTime     @default(now())
+  position       Int          @db.SmallInt // 1-5
+  type           QuestionType
+  render_variant String       @default("standard") @db.VarChar(20) // "standard" | "meme"
+  template_id    String?
+  memeTemplate   MemeTemplate? @relation(fields: [template_id], references: [id])
+  payload        Json         // discriminated by type (see D-006)
+  created_at     DateTime     @default(now())
 
   answerOptions      AnswerOption[]
   telepathyForDrops  Drop[]            @relation("DropTelepathyQuestion")
   telepathyGuesses   TelepathyGuess[]
+  questionTags       QuestionTag[]
 
   @@unique([drop_id, position])
   @@index([drop_id])
+  @@index([render_variant])
+  @@index([template_id])
   @@map("questions")
 }
 
@@ -627,6 +635,60 @@ model AntiTwinResult {
   @@index([drop_date])
   @@index([player_id])
   @@map("anti_twin_results")
+}
+
+// ---------------------------------------------------------------------------
+// 28. tags — neutral subject taxonomy (Stage M1 / Phase 10E / F24)
+// ---------------------------------------------------------------------------
+model Tag {
+  id         String   @id @default(uuid())
+  key        String   @unique @db.VarChar(50)
+  label_i18n Json     // localized labels { en: "Humour", ... }
+  category   String   @db.VarChar(30)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  questionTags QuestionTag[]
+
+  @@index([key])
+  @@index([category])
+  @@map("tags")
+}
+
+// ---------------------------------------------------------------------------
+// 29. question_tags — many-to-many link between questions and subject tags (Stage M1 / Phase 10E)
+// ---------------------------------------------------------------------------
+model QuestionTag {
+  question_id String
+  question    Question @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  tag_id      String
+  tag         Tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+  created_at  DateTime @default(now())
+
+  @@id([question_id, tag_id])
+  @@index([question_id])
+  @@index([tag_id])
+  @@map("question_tags")
+}
+
+// ---------------------------------------------------------------------------
+// 30. meme_templates — curated vector SVG illustration templates (Stage M1 / Phase 10E / F24)
+// ---------------------------------------------------------------------------
+model MemeTemplate {
+  id                        String   @id @default(uuid())
+  key                       String   @unique
+  illustration_registry_key String
+  aspect                    String   @default("1:1")
+  alt_text_i18n             Json
+  license_note              String
+  status                    String   @default("active") @db.VarChar(20)
+  created_at                DateTime @default(now())
+
+  questions Question[]
+
+  @@index([key])
+  @@index([status])
+  @@map("meme_templates")
 }
 
 

@@ -1,0 +1,370 @@
+{
+  "batch_id": "batch_meme_001",
+  "description": "Verified Sample Meme Batch for Oddly Stage M1 (Phase 10E)",
+  "drops": [
+    {
+      "drop_date": "2026-12-01",
+      "theme_key": "monday-survival",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "snooze-battle",
+          "tags": ["humour", "sleep-and-time"],
+          "payload": {
+            "type": "text",
+            "prompt": "Your morning alarm rings at 06:30. What actually happens?",
+            "options": [
+              { "label": "Instant leap out of bed like a military drill", "value": "instant_leap" },
+              { "label": "Snooze every 5 minutes until emergency speed", "value": "snooze_repeat" },
+              { "label": "Stare at ceiling questioning life choices", "value": "stare_ceiling" },
+              { "label": "Turn off alarm and accept whatever fate arrives", "value": "accept_fate" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Instant leap out of bed like a military drill", "value": "instant_leap", "display_order": 0 },
+            { "label": "Snooze every 5 minutes until emergency speed", "value": "snooze_repeat", "display_order": 1 },
+            { "label": "Stare at ceiling questioning life choices", "value": "stare_ceiling", "display_order": 2 },
+            { "label": "Turn off alarm and accept whatever fate arrives", "value": "accept_fate", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "chai-urgency",
+          "tags": ["food-style", "daily-habits"],
+          "payload": {
+            "type": "text",
+            "prompt": "It starts pouring rain outside at 4 PM. Your immediate craving?",
+            "options": [
+              { "label": "Piping hot cutting chai + crisp pakodas", "value": "chai_pakoda" },
+              { "label": "Spicy Maggi noodles with extra masala", "value": "spicy_maggi" },
+              { "label": "Hot filter coffee by the window", "value": "filter_coffee" },
+              { "label": "Just a nap with the balcony door open", "value": "balcony_nap" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Piping hot cutting chai + crisp pakodas", "value": "chai_pakoda", "display_order": 0 },
+            { "label": "Spicy Maggi noodles with extra masala", "value": "spicy_maggi", "display_order": 1 },
+            { "label": "Hot filter coffee by the window", "value": "filter_coffee", "display_order": 2 },
+            { "label": "Just a nap with the balcony door open", "value": "balcony_nap", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 3,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "battery-anxiety",
+          "tags": ["phone-behaviour", "quirks"],
+          "payload": {
+            "type": "text",
+            "prompt": "Your phone drops to 2% battery and you're 20 minutes from home. Your survival strategy?",
+            "options": [
+              { "label": "Ultra power save + screen brightness at 0%", "value": "ultra_save" },
+              { "label": "Airplane mode and hope for the best", "value": "airplane_mode" },
+              { "label": "Keep scrolling Instagram anyway. Living dangerously", "value": "scroll_danger" },
+              { "label": "Beg a friendly stranger for a 3-minute charge", "value": "borrow_charger" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Ultra power save + screen brightness at 0%", "value": "ultra_save", "display_order": 0 },
+            { "label": "Airplane mode and hope for the best", "value": "airplane_mode", "display_order": 1 },
+            { "label": "Keep scrolling Instagram anyway. Living dangerously", "value": "scroll_danger", "display_order": 2 },
+            { "label": "Beg a friendly stranger for a 3-minute charge", "value": "borrow_charger", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "browser-tabs-clutter",
+          "tags": ["work-and-study-style", "daily-habits"],
+          "payload": {
+            "type": "text",
+            "prompt": "How many browser tabs are open on your laptop right now?",
+            "options": [
+              { "label": "1 to 5. Clean, minimalist, zen", "value": "tabs_zen" },
+              { "label": "6 to 20. Organized chaos with purpose", "value": "tabs_medium" },
+              { "label": "50+. The favicons are now invisible dots", "value": "tabs_hoarder" },
+              { "label": "I reopen the whole crashed session every day", "value": "tabs_crashed" }
+            ]
+          },
+          "answer_options": [
+            { "label": "1 to 5. Clean, minimalist, zen", "value": "tabs_zen", "display_order": 0 },
+            { "label": "6 to 20. Organized chaos with purpose", "value": "tabs_medium", "display_order": 1 },
+            { "label": "50+. The favicons are now invisible dots", "value": "tabs_hoarder", "display_order": 2 },
+            { "label": "I reopen the whole crashed session every day", "value": "tabs_crashed", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "overthinking-3am",
+          "tags": ["absurd-hypotheticals", "humour"],
+          "payload": {
+            "type": "text",
+            "prompt": "It is 3:15 AM. What absurdity is your brain currently investigating?",
+            "options": [
+              { "label": "Replaying an awkward interaction from 2017", "value": "awkward_2017" },
+              { "label": "Designing an entire business that will never launch", "value": "fake_business" },
+              { "label": "Do fish ever get thirsty?", "value": "thirsty_fish" },
+              { "label": "Calculating exactly how many hours of sleep left", "value": "sleep_math" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Replaying an awkward interaction from 2017", "value": "awkward_2017", "display_order": 0 },
+            { "label": "Designing an entire business that will never launch", "value": "fake_business", "display_order": 1 },
+            { "label": "Do fish ever get thirsty?", "value": "thirsty_fish", "display_order": 2 },
+            { "label": "Calculating exactly how many hours of sleep left", "value": "sleep_math", "display_order": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-12-02",
+      "theme_key": "midnight-curiosity",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "midnight-refrigerator",
+          "tags": ["food-style", "quirks"],
+          "payload": {
+            "type": "text",
+            "prompt": "Midnight kitchen raid. The golden fridge door opens. What do you grab?",
+            "options": [
+              { "label": "A slice of cold cheese eaten right by the door", "value": "fridge_cheese" },
+              { "label": "Last spoon of ice cream directly from the tub", "value": "fridge_icecream" },
+              { "label": "Leftover pizza cold without heating", "value": "fridge_pizza" },
+              { "label": "Guiltily close the door and drink water instead", "value": "fridge_water" }
+            ]
+          },
+          "answer_options": [
+            { "label": "A slice of cold cheese eaten right by the door", "value": "fridge_cheese", "display_order": 0 },
+            { "label": "Last spoon of ice cream directly from the tub", "value": "fridge_icecream", "display_order": 1 },
+            { "label": "Leftover pizza cold without heating", "value": "fridge_pizza", "display_order": 2 },
+            { "label": "Guiltily close the door and drink water instead", "value": "fridge_water", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "neon-street-cravings",
+          "tags": ["decision-style", "places"],
+          "payload": {
+            "type": "text",
+            "prompt": "Friend group asks: 'Where should we eat tonight?' Your move?",
+            "options": [
+              { "label": "The classic: 'Anything is fine with me' (lies)", "value": "anything_fine" },
+              { "label": "Instantly send a Google Maps link of the exact spot", "value": "maps_dictator" },
+              { "label": "Veto every suggestion without offering an alternative", "value": "veto_master" },
+              { "label": "Same comfort spot we went to yesterday", "value": "comfort_repeat" }
+            ]
+          },
+          "answer_options": [
+            { "label": "The classic: 'Anything is fine with me' (lies)", "value": "anything_fine", "display_order": 0 },
+            { "label": "Instantly send a Google Maps link of the exact spot", "value": "maps_dictator", "display_order": 1 },
+            { "label": "Veto every suggestion without offering an alternative", "value": "veto_master", "display_order": 2 },
+            { "label": "Same comfort spot we went to yesterday", "value": "comfort_repeat", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 3,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "indie-cinema-vibe",
+          "tags": ["nostalgia", "music-mood"],
+          "payload": {
+            "type": "text",
+            "prompt": "You put on headphones on a rainy bus ride. What movie character are you?",
+            "options": [
+              { "label": "The mysterious protagonist gazing out the window", "value": "window_protagonist" },
+              { "label": "Secretly conducting an imaginary orchestra", "value": "imaginary_orchestra" },
+              { "label": "Mentally rehearsing a movie speech that will never happen", "value": "movie_speech" },
+              { "label": "Just hoping my stop isn't missed", "value": "practical_rider" }
+            ]
+          },
+          "answer_options": [
+            { "label": "The mysterious protagonist gazing out the window", "value": "window_protagonist", "display_order": 0 },
+            { "label": "Secretly conducting an imaginary orchestra", "value": "imaginary_orchestra", "display_order": 1 },
+            { "label": "Mentally rehearsing a movie speech that will never happen", "value": "movie_speech", "display_order": 2 },
+            { "label": "Just hoping my stop isn't missed", "value": "practical_rider", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "browser-tabs-clutter",
+          "tags": ["phone-behaviour", "quirks"],
+          "payload": {
+            "type": "text",
+            "prompt": "An unknown number is calling your phone. Your instinct?",
+            "options": [
+              { "label": "Stare at the ringing screen until it stops", "value": "stare_until_stop" },
+              { "label": "Immediately decline and Google the phone number", "value": "decline_and_google" },
+              { "label": "Answer casually: 'Hello?' (brave soul)", "value": "answer_brave" },
+              { "label": "Send instant auto-SMS: 'Can I call you back?'", "value": "auto_sms" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Stare at the ringing screen until it stops", "value": "stare_until_stop", "display_order": 0 },
+            { "label": "Immediately decline and Google the phone number", "value": "decline_and_google", "display_order": 1 },
+            { "label": "Answer casually: 'Hello?' (brave soul)", "value": "answer_brave", "display_order": 2 },
+            { "label": "Send instant auto-SMS: 'Can I call you back?'", "value": "auto_sms", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "snooze-battle",
+          "tags": ["daily-habits", "humour"],
+          "payload": {
+            "type": "text",
+            "prompt": "You leave the house and lock the main door. Ten paces away, what happens?",
+            "options": [
+              { "label": "Walk back and physically shake the door handle twice", "value": "shake_door_twice" },
+              { "label": "Take a photo of the locked lock for mental peace", "value": "photo_lock" },
+              { "label": "Assume I locked it and keep walking with mild panic", "value": "mild_panic_walk" },
+              { "label": "Complete zen confidence. Never look back", "value": "zen_confidence" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Walk back and physically shake the door handle twice", "value": "shake_door_twice", "display_order": 0 },
+            { "label": "Take a photo of the locked lock for mental peace", "value": "photo_lock", "display_order": 1 },
+            { "label": "Assume I locked it and keep walking with mild panic", "value": "mild_panic_walk", "display_order": 2 },
+            { "label": "Complete zen confidence. Never look back", "value": "zen_confidence", "display_order": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "drop_date": "2026-12-03",
+      "theme_key": "work-from-couch",
+      "questions": [
+        {
+          "position": 1,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "chai-urgency",
+          "tags": ["work-and-study-style", "humour"],
+          "payload": {
+            "type": "text",
+            "prompt": "A virtual meeting is announced as 'quick 5 minutes'. Actual duration?",
+            "options": [
+              { "label": "47 minutes of discussing things that could be an email", "value": "forty_seven_mins" },
+              { "label": "Strictly 5 minutes (a miracle has occurred)", "value": "miracle_five" },
+              { "label": "You stay on mute and get a snack", "value": "mute_snack" },
+              { "label": "Left meeting after 2 mins due to 'poor network'", "value": "poor_network_escape" }
+            ]
+          },
+          "answer_options": [
+            { "label": "47 minutes of discussing things that could be an email", "value": "forty_seven_mins", "display_order": 0 },
+            { "label": "Strictly 5 minutes (a miracle has occurred)", "value": "miracle_five", "display_order": 1 },
+            { "label": "You stay on mute and get a snack", "value": "mute_snack", "display_order": 2 },
+            { "label": "Left meeting after 2 mins due to 'poor network'", "value": "poor_network_escape", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 2,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "battery-anxiety",
+          "tags": ["colour-and-aesthetics", "word-and-mood"],
+          "payload": {
+            "type": "text",
+            "prompt": "If your mood today were a weather forecast, what would it be?",
+            "options": [
+              { "label": "Sunny with an 80% chance of sudden caffeine cravings", "value": "sunny_caffeine" },
+              { "label": "Comforting overcast with lo-fi beats playing", "value": "overcast_lofi" },
+              { "label": "Tropical thunder: highly productive bursts of energy", "value": "thunder_energy" },
+              { "label": "Gentle fog: buffering... please wait", "value": "buffering_fog" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Sunny with an 80% chance of sudden caffeine cravings", "value": "sunny_caffeine", "display_order": 0 },
+            { "label": "Comforting overcast with lo-fi beats playing", "value": "overcast_lofi", "display_order": 1 },
+            { "label": "Tropical thunder: highly productive bursts of energy", "value": "thunder_energy", "display_order": 2 },
+            { "label": "Gentle fog: buffering... please wait", "value": "buffering_fog", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 3,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "wifi-disconnection",
+          "tags": ["tech-and-devices", "humour"],
+          "payload": {
+            "type": "text",
+            "prompt": "Home Wi-Fi drops in the middle of an important video call:",
+            "options": [
+              { "label": "Sprint across house waving laptop like a flag", "value": "sprint_flag" },
+              { "label": "Stare at router with profound disappointment", "value": "stare_router" },
+              { "label": "Instant hotspot on 1 bar 4G praying to tech gods", "value": "instant_hotspot" },
+              { "label": "Accept freedom and go make chai", "value": "accept_chai" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Sprint across house waving laptop like a flag", "value": "sprint_flag", "display_order": 0 },
+            { "label": "Stare at router with profound disappointment", "value": "stare_router", "display_order": 1 },
+            { "label": "Instant hotspot on 1 bar 4G praying to tech gods", "value": "instant_hotspot", "display_order": 2 },
+            { "label": "Accept freedom and go make chai", "value": "accept_chai", "display_order": 3 }
+          ]
+        },
+        {
+          "position": 4,
+          "type": "image",
+          "render_variant": "meme",
+          "template_key": "snack-indecision",
+          "tags": ["food-style", "daily-habits"],
+          "payload": {
+            "type": "image",
+            "prompt": "The official snack of productive procrastination:",
+            "illustrations": [
+              { "label": "Crunchy Biscuits", "value": "biscuits", "illustration_key": "chai" },
+              { "label": "Warm Samosa", "value": "samosa", "illustration_key": "curry" },
+              { "label": "Buttered Toast", "value": "toast", "illustration_key": "monsoon" },
+              { "label": "Handful of Peanuts", "value": "peanuts", "illustration_key": "cricket" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Crunchy Biscuits", "value": "biscuits", "display_order": 0, "illustration_key": "chai" },
+            { "label": "Warm Samosa", "value": "samosa", "display_order": 1, "illustration_key": "curry" },
+            { "label": "Buttered Toast", "value": "toast", "display_order": 2, "illustration_key": "monsoon" },
+            { "label": "Handful of Peanuts", "value": "peanuts", "display_order": 3, "illustration_key": "cricket" }
+          ]
+        },
+        {
+          "position": 5,
+          "type": "text",
+          "render_variant": "meme",
+          "template_key": "traffic-patience",
+          "tags": ["social-energy", "daily-habits"],
+          "payload": {
+            "type": "text",
+            "prompt": "You are stuck at a 180-second red light signal with zero moving traffic:",
+            "options": [
+              { "label": "Full passenger karaoke session with imaginary band", "value": "karaoke" },
+              { "label": "Invent backstories for every person in the adjacent auto", "value": "backstories" },
+              { "label": "Count the seconds backwards to see if the timer is honest", "value": "count_timer" },
+              { "label": "Contemplate why we ever invented wheeled transport", "value": "contemplate_wheels" }
+            ]
+          },
+          "answer_options": [
+            { "label": "Full passenger karaoke session with imaginary band", "value": "karaoke", "display_order": 0 },
+            { "label": "Invent backstories for every person in the adjacent auto", "value": "backstories", "display_order": 1 },
+            { "label": "Count the seconds backwards to see if the timer is honest", "value": "count_timer", "display_order": 2 },
+            { "label": "Contemplate why we ever invented wheeled transport", "value": "contemplate_wheels", "display_order": 3 }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

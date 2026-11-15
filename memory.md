@@ -924,9 +924,45 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 25. Next Steps
+## 25. Stage M1: Meme Questions & Themed Drops (Phase 10E) Completed (2026-11-15)
+
+- **Database Migrations (`005_meme_questions_foundation.sql` & `schema.prisma` - P10E.01):**
+  - Created `tags` table with `id`, `key`, `label_i18n`, `category`, `is_active`.
+  - Created `meme_templates` table with `id`, `key`, `illustration_registry_key`, `aspect`, `alt_text_i18n`, `license_note`, `status`.
+  - Created `question_tags` join table `(question_id, tag_id)` with composite primary key.
+  - Extended `questions` with `render_variant` (default `'standard'`) and `template_id` (FK to `meme_templates.id`).
+  - Extended `drops` with `theme_key`.
+  - Inserted `feature.meme_questions` flag in `app_config`.
+  - Applied migration to PostgreSQL; generated Prisma client.
+- **Taxonomy & Vector Meme Template Seeding (`seed-meme-taxonomy.ts` - P10E.02):**
+  - Seeded 14 strictly neutral subject tags (`SEED_NEUTRAL_TAGS`) across 6 categories.
+  - Seeded 8 curated vector meme templates into PostgreSQL linking to in-house vector illustrations with CC0 licenses and full alt text.
+- **Section 9.1 & Rule 14 Forbidden Topics Safety Linter (`taxonomy.ts` & `taxonomy.test.ts` - P10E.08):**
+  - Defined comprehensive `FORBIDDEN_TOPIC_TERMS` strictly forbidding religion, politics, caste, sexuality, health, body image, living individuals, and commercial brands.
+  - Built-fail linter protects against any prohibited tag injection (3/3 tests passed).
+- **Zod Schemas & Types (`schemas.ts` & `types.ts` - P10E.03):**
+  - Added `RenderVariantSchema` (`standard` | `meme`).
+  - Added `MemeQuestionSchema`: validates that meme questions use Type 1 (text) or Type 4 (image), carry $\ge 1$ neutral tag, and have a valid template key.
+  - Extended `QuestionResponse` and `DropResponse` with `render_variant`, `template_id`, `template_key`, `tags`, and `theme_key`.
+- **JSON Batch Importer (`batch-importer.ts` & `batch-importer.test.ts` - P10E.04):**
+  - Built `validateBatch`: dry-run validation, forbidden topic verification, meme question schema checks, and 3-consecutive same-slot warning.
+  - Built `importBatchJson`: transactional upsert into drops, questions, answer_options, and question_tags.
+  - Unit tests verified 6/6 passed (100%).
+- **Curated 15-Question Seed Batch (`batch_meme_sample.json` - P10E.06):**
+  - Authored verified sample batch containing 15 language-light, universally relatable meme questions across 3 themed drops adhering to the Original-to-Oddly authoring policy.
+- **Mathematical Parity Regression Invariant (`meme-parity.test.ts` - P10E.07):**
+  - Proved 100% mathematical invariance: Dice similarity, answer hashes, Shannon entropy, Oddness calculation, tier classification, and Anti-Twin candidate ranking are completely identical between standard and meme questions (4/4 tests passed).
+- **Polymorphic Question UI Renderer (`QuestionScreen.tsx` & `page.tsx` - P10E.05, P10E.09):**
+  - Integrated `render_variant === "meme"`: renders "Meme Pick" badge and subject tag, renders template vector illustration frame from local SVG registry inside a sticker frame (`rounded-l border-[2.5px] border-ink shadow-sticker`), and displays live DOM text prompt.
+  - Preserved standard tactile press mechanics, minimum touch target $\ge 44 \times 44\text{px}$, and keyboard shortcuts (1-4).
+  - Added Drop theme badge to Landing screen when `drop.theme_key` is present.
+  - Verified bundle budget: `/` route First Load JS is $\approx 45\text{ KB}$ gzipped, well within $\le 159.5\text{ KB}$.
+
+---
+
+## 26. Next Steps
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
 
-1. **Founder Review:** Founder reviews Stage F4 Report.
-2. **Proceed to Stage M1 (Phase 10E):** Upon explicit Founder command *"proceed to Stage M1"*, begin Phase 10E (Meme Questions & Themed Drops). Per Rule 1, agent stops here.
+1. **Founder Review:** Founder reviews Stage M1 Report (`docs/stage-M1-report.md`).
+2. **Proceed to Stage M2 (Phase 10F):** Upon explicit Founder command *"proceed to Stage M2"* or *"proceed to Phase 10F"*, begin Phase 10F (Signals Foundation). Per Rule 1, agent stops here.

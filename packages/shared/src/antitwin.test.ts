@@ -173,3 +173,4 @@ describe("AntiTwin Domain Engine (Stage F4 / Phase 10D)", () => {
     expect(getAntiTwinAffirmation(1, 5)).toContain("closest opposites share common ground");
   });
 });
+

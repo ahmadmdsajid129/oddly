@@ -18,6 +18,8 @@ export * from "./storage.js";
 export * from "./degradation.js";
 export * from "./telepathy.js";
 export * from "./antitwin.js";
+export * from "./taxonomy.js";
+export * from "./batch-importer.js";
 export * from "./redis/keys.js";
 export * from "./redis/client.js";
 export * from "./blueprint-generator.js";

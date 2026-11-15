@@ -394,19 +394,19 @@ _Status: TODO | Target: Asynchronous Anti-twin worker, candidate scan, result ca
 
 ### Phase 10E: Meme Questions & Themed Drops (Stage M1)
 
-_Status: TODO | Target: Taxonomy and template migrations, question schema & validation engine extensions, meme render variant, importer format, 12 sample questions, regression test._
+_Status: DONE (100%) | Target: Taxonomy and template migrations, question schema & validation engine extensions, meme render variant, importer format, 12 sample questions, regression test._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10E.01` | Expand migrations: `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key` | Critical | TODO | P2.01, P10D.01 | Agent | — | Zero-downtime expand migration |
-| `[ ] P10E.02` | Seed neutral subject taxonomy (14 tags) and vector meme template library with licenses and alt text         | High     | TODO   | P10E.01        | Agent | —         | Extends D-015 registry                   |
-| `[ ] P10E.03` | Extend question Zod schemas and validation engine: require >= 1 tag and valid template for meme variant    | Critical | TODO   | P10E.01        | Agent | —         | Strict boundary validation               |
-| `[ ] P10E.04` | Extend JSON batch importer to parse `tags`, `render_variant`, and `template_key` with dry run validation   | High     | TODO   | P10E.03        | Agent | —         | Pre-admin panel authoring path           |
-| `[ ] P10E.05` | Implement `meme` render variant in polymorphic question renderer using Type 1 / Type 4 components & tokens  | High     | TODO   | P10E.02        | Agent | —         | DOM live text captions; token imports    |
-| `[ ] P10E.06` | Author 12 sample meme questions across neutral tags in a verified seed batch                                | Medium   | TODO   | P10E.04        | Agent | —         | Original-to-Oddly policy                 |
-| `[ ] P10E.07` | Automated regression test proving matching math, similarity, and oddness remain 100% identical              | Critical | TODO   | P2.04, P10E.05 | Agent | —         | Mathematical parity invariant            |
-| `[ ] P10E.08` | Automated build-fail linter verifying zero tag keys match Section 9.1 forbidden topics                      | Critical | TODO   | P10E.02        | Agent | —         | Strict safety invariant                  |
-| `[ ] P10E.09` | Accessibility (a11y) verification, >= 44px touch targets, and play route bundle check (<= 159.5 KB)         | High     | TODO   | P10E.05        | Agent | —         | WCAG AA compliance                       |
+| `[x] P10E.01` | Expand migrations: `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key` | Critical | DONE | P2.01, P10D.01 | Agent | 2026-11-15 | Zero-downtime expand migration completed |
+| `[x] P10E.02` | Seed neutral subject taxonomy (14 tags) and vector meme template library with licenses and alt text         | High     | DONE   | P10E.01        | Agent | 2026-11-15 | Extends D-015 registry; seeded in DB     |
+| `[x] P10E.03` | Extend question Zod schemas and validation engine: require >= 1 tag and valid template for meme variant    | Critical | DONE   | P10E.01        | Agent | 2026-11-15 | Strict boundary validation in schemas.ts |
+| `[x] P10E.04` | Extend JSON batch importer to parse `tags`, `render_variant`, and `template_key` with dry run validation   | High     | DONE   | P10E.03        | Agent | 2026-11-15 | Pre-admin panel authoring path & tests   |
+| `[x] P10E.05` | Implement `meme` render variant in polymorphic question renderer using Type 1 / Type 4 components & tokens  | High     | DONE   | P10E.02        | Agent | 2026-11-15 | DOM live text captions; token imports    |
+| `[x] P10E.06` | Author 12 sample meme questions across neutral tags in a verified seed batch                                | Medium   | DONE   | P10E.04        | Agent | 2026-11-15 | Original-to-Oddly policy (15 questions)  |
+| `[x] P10E.07` | Automated regression test proving matching math, similarity, and oddness remain 100% identical              | Critical | DONE   | P2.04, P10E.05 | Agent | 2026-11-15 | Mathematical parity invariant verified   |
+| `[x] P10E.08` | Automated build-fail linter verifying zero tag keys match Section 9.1 forbidden topics                      | Critical | DONE   | P10E.02        | Agent | 2026-11-15 | Strict safety invariant build-fail tests |
+| `[x] P10E.09` | Accessibility (a11y) verification, >= 44px touch targets, and play route bundle check (<= 159.5 KB)         | High     | DONE   | P10E.05        | Agent | 2026-11-15 | WCAG AA touch targets & budget verified  |
 
 ---
 

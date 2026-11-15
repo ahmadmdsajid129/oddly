@@ -16,6 +16,8 @@ export type DropStatus = "pending" | "live" | "closed";
 
 export type QuestionType = "text" | "number" | "colour" | "image" | "word";
 
+export type RenderVariant = "standard" | "meme";
+
 export type ShareFormat = "story" | "square" | "link";
 
 export type Tier = "Common" | "Uncommon" | "Rare" | "Mythic";
@@ -137,6 +139,10 @@ export interface QuestionResponse {
   id: string;
   position: number;
   type: QuestionType;
+  render_variant?: RenderVariant;
+  template_id?: string | null;
+  template_key?: string | null;
+  tags?: string[];
   payload: QuestionPayload;
   answer_options: AnswerOptionResponse[];
 }
@@ -148,6 +154,8 @@ export interface DropResponse {
   opens_at: string;  // ISO 8601 UTC
   closes_at: string; // ISO 8601 UTC
   status: DropStatus;
+  theme_key?: string | null;
+  telepathy_question_id?: string | null;
   questions: QuestionResponse[];
 }
 

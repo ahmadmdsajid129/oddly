@@ -646,10 +646,19 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Live Player Counter */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-paper border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
-          <span className="w-2.5 h-2.5 rounded-pill bg-mint border border-ink" />
-          <span>3,482 players today</span>
+        {/* Live Player Counter & Drop Theme */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-paper border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
+            <span className="w-2.5 h-2.5 rounded-pill bg-mint border border-ink" />
+            <span>3,482 players today</span>
+          </div>
+
+          {(dropData as any)?.theme_key && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-lavender border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
+              <Sparkles className="w-3 h-3 text-violet shrink-0" />
+              <span className="capitalize">{((dropData as any).theme_key as string).replace(/-/g, " ")} Drop</span>
+            </div>
+          )}
         </div>
 
         {/* Completed Drop Summary or Play CTA */}

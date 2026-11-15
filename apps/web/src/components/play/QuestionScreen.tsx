@@ -12,13 +12,32 @@ import {
   ImageTileGrid,
   WordChipsGrid,
 } from "@/components/play/AnswerComponents";
+import { DynamicIllustration } from "@/components/illustrations";
 import { Button } from "@/components/ui/Button";
 import type { AnswerPayload } from "@oddly/shared";
+
+const TEMPLATE_KEY_TO_ILLUSTRATION: Record<string, string> = {
+  "snooze-battle": "weekend-nap",
+  "overthinking-3am": "sky-starry",
+  "chai-urgency": "path-chai",
+  "battery-anxiety": "island-torch",
+  "browser-tabs-clutter": "island-notebook",
+  "midnight-refrigerator": "market-sweets",
+  "indie-cinema-vibe": "weekend-cinema",
+  "neon-street-cravings": "path-neon",
+  "wifi-disconnection": "island-torch",
+  "snack-indecision": "weekend-streetfood",
+  "traffic-patience": "path-chai",
+};
 
 export interface QuestionData {
   id: string;
   order: number;
   type: "text" | "number" | "colour" | "image" | "word";
+  render_variant?: "standard" | "meme";
+  template_key?: string;
+  template_illustration_key?: string;
+  tags?: string[];
   payload: {
     type: string;
     prompt: string;
@@ -166,15 +185,43 @@ export function QuestionScreen({
       </header>
 
       {/* Question Content Body */}
-      <main className="relative z-20 w-full max-w-lg mx-auto my-auto flex flex-col items-center text-center space-y-5 py-2">
-        {/* Type Badge - Section 7: Chip: Display 700 12, padding 4x10, radius-pill, outline-thin */}
-        <div className="inline-flex items-center px-3 py-1 rounded-pill text-chip font-display font-bold uppercase tracking-wider bg-lavender text-ink border-[1.5px] border-ink">
-          {question.type === "text" && "Pick One"}
-          {question.type === "number" && "Choose a Number"}
-          {question.type === "colour" && "Pick a Colour"}
-          {question.type === "image" && "Select an Image"}
-          {question.type === "word" && "Select Words"}
-        </div>
+      <main className="relative z-20 w-full max-w-lg mx-auto my-auto flex flex-col items-center text-center space-y-4 py-2">
+        {/* Type or Meme Badge */}
+        {question.render_variant === "meme" ? (
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center px-3 py-1 rounded-pill text-chip font-display font-bold uppercase tracking-wider bg-coral text-ink border-[1.5px] border-ink">
+              Meme Pick
+            </span>
+            {question.tags && question.tags.length > 0 && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-pill text-caption font-display font-bold bg-lavender text-ink border-[1.5px] border-ink">
+                #{question.tags[0].replace(/-/g, " ")}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="inline-flex items-center px-3 py-1 rounded-pill text-chip font-display font-bold uppercase tracking-wider bg-lavender text-ink border-[1.5px] border-ink">
+            {question.type === "text" && "Pick One"}
+            {question.type === "number" && "Choose a Number"}
+            {question.type === "colour" && "Pick a Colour"}
+            {question.type === "image" && "Select an Image"}
+            {question.type === "word" && "Select Words"}
+          </div>
+        )}
+
+        {/* Meme Vector Template Sticker Frame */}
+        {question.render_variant === "meme" && (
+          <div className="w-full max-w-xs mx-auto p-3 bg-paper border-[2.5px] border-ink rounded-l shadow-sticker flex flex-col items-center justify-center">
+            <DynamicIllustration
+              assetKey={
+                question.template_illustration_key ||
+                (question.template_key ? TEMPLATE_KEY_TO_ILLUSTRATION[question.template_key] : undefined) ||
+                "weekend-nap"
+              }
+              size={120}
+              className="mx-auto"
+            />
+          </div>
+        )}
 
         {/* Question Prompt - Section 3: Display-l clamp(26px, 7vw, 32px), Display 800 */}
         <h1
