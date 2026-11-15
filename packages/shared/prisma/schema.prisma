@@ -105,6 +105,7 @@ model Player {
   orbitsAsB        Orbit[]    @relation("OrbitPlayerB")
   orbitExpressions OrbitExpression[]
   telepathyGuesses TelepathyGuess[]
+  antiTwinResults  AntiTwinResult[]
 
   @@index([account_id])
   @@index([did])
@@ -608,6 +609,26 @@ model TelepathyGuess {
   @@index([guesser_player_id, drop_date])
   @@map("telepathy_guesses")
 }
+
+// ---------------------------------------------------------------------------
+// 27. anti_twin_results — asynchronously computed opposite match per user (Stage F4 / Phase 10D)
+// 7-day rolling retention, zero opposite pick exposure
+// ---------------------------------------------------------------------------
+model AntiTwinResult {
+  drop_date               DateTime @db.Date
+  player_id               String
+  player                  Player   @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  opposite_submission_ref String
+  differed_count          Int
+  sample_size             Int
+  computed_at             DateTime @default(now())
+
+  @@id([drop_date, player_id])
+  @@index([drop_date])
+  @@index([player_id])
+  @@map("anti_twin_results")
+}
+
 
 
 

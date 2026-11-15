@@ -2,6 +2,8 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import {
   renderShareCardPng,
+  renderAntiTwinCardPng,
+  renderOrbitCardPng,
   computeCardContentHash,
   computeCardStorageKey,
   getCardStorage,
@@ -9,6 +11,7 @@ import {
   type ShareTheme,
   type Tier,
 } from "@oddly/shared";
+import { resolveAuthenticatedPlayer } from "../auth/player-auth.js";
 import {
   prisma,
   SubmissionsRepository,
@@ -198,6 +201,117 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
       reply.header("Content-Type", "image/png");
       reply.header("Cache-Control", "public, max-age=86400, s-maxage=604800, immutable");
       return reply.send(buffer);
+    }
+  );
+
+  /**
+   * GET /v1/results/:dropId/anti-twin/card
+   * On-demand renders Anti-Twin PNG (P10D.05)
+   */
+  app.get(
+    "/v1/results/:dropId/anti-twin/card",
+    {
+      schema: {
+        tags: ["Cards", "AntiTwin"],
+        summary: "Render Anti-Twin share card PNG",
+        params: z.object({ dropId: z.string() }),
+        querystring: z.object({
+          side: z.enum(["front", "back"]).default("front"),
+        }),
+      },
+    },
+    async (req, reply) => {
+      const player = await resolveAuthenticatedPlayer(req);
+      if (!player) {
+        return reply.status(401).send({ error: "Unauthorized", message: "Authentication required" });
+      }
+
+      const { dropId } = req.params as { dropId: string };
+      const { side } = req.query as { side?: "front" | "back" };
+
+      const drop = await prisma.drop.findUnique({ where: { id: dropId } });
+      if (!drop) {
+        return reply.status(404).send({ error: "NotFound", message: "Drop not found" });
+      }
+
+      const antiTwin = await prisma.antiTwinResult.findUnique({
+        where: {
+          drop_date_player_id: {
+            drop_date: drop.drop_date,
+            player_id: player.id,
+          },
+        },
+      });
+
+      const png = await renderAntiTwinCardPng({
+        differedCount: antiTwin?.differed_count ?? 4,
+        total: 5,
+        oppositeLocation: "Global Opposite",
+        oppositeAgeBand: "18+",
+        sampleSize: antiTwin?.sample_size ?? 2000,
+        shortId: `at-${dropId.slice(0, 6)}`,
+        side: side || "front",
+      });
+
+      reply.header("Content-Type", "image/png");
+      reply.header("Cache-Control", "public, max-age=86400, s-maxage=604800, immutable");
+      return reply.send(png);
+    }
+  );
+
+  /**
+   * GET /v1/orbits/:id/card
+   * On-demand renders Orbit milestone PNG for Day 14 or Day 30 (P10D.06)
+   */
+  app.get(
+    "/v1/orbits/:id/card",
+    {
+      schema: {
+        tags: ["Cards", "Orbit"],
+        summary: "Render Orbit milestone share card PNG",
+        params: z.object({ id: z.string() }),
+        querystring: z.object({
+          milestone: z.coerce.number().default(14),
+          side: z.enum(["front", "back"]).default("front"),
+        }),
+      },
+    },
+    async (req, reply) => {
+      const player = await resolveAuthenticatedPlayer(req);
+      if (!player) {
+        return reply.status(401).send({ error: "Unauthorized", message: "Authentication required" });
+      }
+
+      const { id } = req.params as { id: string };
+      const { milestone, side } = req.query as { milestone: number; side?: "front" | "back" };
+
+      const orbit = await prisma.orbit.findUnique({
+        where: { id },
+        include: {
+          player_a: true,
+          player_b: true,
+        },
+      });
+
+      if (!orbit) {
+        return reply.status(404).send({ error: "NotFound", message: "Orbit not found" });
+      }
+
+      const partner = orbit.player_a_id === player.id ? orbit.player_b : orbit.player_a;
+      const milestoneDay = milestone === 30 ? 30 : 14;
+
+      const png = await renderOrbitCardPng({
+        milestoneDay,
+        coStreakDays: orbit.co_streak_current || milestoneDay,
+        partnerLocation: partner?.region || "Orbit Partner",
+        partnerAgeBand: partner?.age_band || "18+",
+        shortId: `orb-${id.slice(0, 6)}`,
+        side: side || "front",
+      });
+
+      reply.header("Content-Type", "image/png");
+      reply.header("Cache-Control", "public, max-age=86400, s-maxage=604800, immutable");
+      return reply.send(png);
     }
   );
 };

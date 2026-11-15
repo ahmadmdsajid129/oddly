@@ -137,6 +137,10 @@ export const api = {
     guess: (orbitId: string, guessedOption: string, dropDate?: string) =>
       rawClient.submitTelepathyGuess(orbitId, guessedOption, dropDate),
   },
+  antitwin: {
+    get: (dropId: string, sampleSize?: number, minPool?: number) =>
+      rawClient.getAntiTwin(dropId, sampleSize, minPool),
+  },
 };
 
 export const oddlyApi = rawClient;

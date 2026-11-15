@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[██████████░░░░░░░░░░] 51%`                                                     |
-| **Current Active Stage**        | **Stage M0: Memes, Signals & Insights Engine (Documentation COMPLETE)**          |
+| **Overall Project Progress**    | `[███████████░░░░░░░░░] 56%`                                                     |
+| **Current Active Stage**        | **Stage F4: Anti-Twin, Share Faces & Verification Gate (COMPLETE)**              |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 171 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 189 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 165 tasks                                                                        |
+| **Pending (`TODO`)**            | 147 tasks                                                                        |
 
 ---
 
@@ -39,8 +39,8 @@
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | COMPLETE  | `[##########] 100%`| 11 / 11            | Stage 10 & Stage R2   |
 | **Phase 10A**| Orbit Foundation (Backend)                  | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage F1              |
 | **Phase 10B**| Orbit and Globe UI                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage F2              |
-| **Phase 10C**| Telepathy (Instinct Sync)                   | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F3              |
-| **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage F4              |
+| **Phase 10C**| Telepathy (Instinct Sync)                   | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage F3              |
+| **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage F4              |
 | **Phase 10E**| Meme Questions & Themed Drops               | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage M1 (after F4)   |
 | **Phase 10F**| Signals Foundation                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage M2 (after M1)   |
 | **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M3 (Deferred)   |
@@ -378,17 +378,17 @@ _Status: COMPLETE | Target: Designated question selection, lock-in guessing, par
 
 _Status: TODO | Target: Asynchronous Anti-twin worker, candidate scan, result card, Satori share cards, a11y & bundle audit._
 
-| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date | Notes                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | --------- | ---------------------------------------- |
-| `[ ] P10D.01` | Expand migration: `anti_twin_results` table with 7-day rolling retention                                    | High     | TODO   | P2.01        | Agent | —         | Lightweight relational cache             |
-| `[ ] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | Critical | TODO   | P9.01, P10D.01 | Agent | —       | Completely decoupled from submit path    |
-| `[ ] P10D.03` | Implement endpoint `GET /v1/results/:dropId/anti-twin` and low-pool (< 200 players) graceful hide logic     | High     | TODO   | P10D.02      | Agent | —         | Honest notice when pool is sparse        |
-| `[ ] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | High     | TODO   | P10D.03, P1.01 | Agent | —       | Coral accent chip, kind playful tone     |
-| `[ ] P10D.05` | Build Anti-twin Satori share card PNG exports (`renderAntiTwinCardPng`) matching token constants            | High     | TODO   | P6.01, P10D.04 | Agent | —       | Flip card anatomy with coral face        |
-| `[ ] P10D.06` | Build Orbit milestone & anniversary Satori share card PNG exports (`renderOrbitCardPng`)                    | High     | TODO   | P6.01, P10B.05 | Agent | —       | Day 14 and Day 30 commemorative cards    |
-| `[ ] P10D.07` | Run automated axe-core accessibility suite across all new screens (Globe, Orbit, Telepathy, Anti-twin)      | High     | TODO   | P10B.07, P10D.04| Agent | —      | WCAG 2.1 AA compliance; $\ge 44\text{px}$|
-| `[ ] P10D.08` | Run bundle budget verification confirming initial play route remains $\le 159.5\text{ KB}$ gzipped          | Critical | TODO   | P10B.09      | Agent | —         | Verifies lazy code-splitting isolation   |
-| `[ ] P10D.09` | Author complete Playwright E2E test suite covering Keep -> Orbit -> Telepathy -> Anti-twin journeys        | High     | TODO   | P10B.01, P10D.04| Agent | —      | Full connection loop verification        |
+| ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date  | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ---------------------------------------- |
+| `[x] P10D.01` | Expand migration: `anti_twin_results` table with 7-day rolling retention                                    | High     | DONE   | P2.01        | Agent | 2026-11-15 | Lightweight relational cache             |
+| `[x] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | Critical | DONE   | P9.01, P10D.01 | Agent | 2026-11-15 | Completely decoupled from submit path    |
+| `[x] P10D.03` | Implement endpoint `GET /v1/results/:dropId/anti-twin` and low-pool (< 200 players) graceful hide logic     | High     | DONE   | P10D.02      | Agent | 2026-11-15 | Honest notice when pool is sparse        |
+| `[x] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | High     | DONE   | P10D.03, P1.01 | Agent | 2026-11-15 | Coral accent chip, kind playful tone     |
+| `[x] P10D.05` | Build Anti-twin Satori share card PNG exports (`renderAntiTwinCardPng`) matching token constants            | High     | DONE   | P6.01, P10D.04 | Agent | 2026-11-15 | Flip card anatomy with coral face        |
+| `[x] P10D.06` | Build Orbit milestone & anniversary Satori share card PNG exports (`renderOrbitCardPng`)                    | High     | DONE   | P6.01, P10B.05 | Agent | 2026-11-15 | Day 14 and Day 30 commemorative cards    |
+| `[x] P10D.07` | Run automated axe-core accessibility suite across all new screens (Globe, Orbit, Telepathy, Anti-twin)      | High     | DONE   | P10B.07, P10D.04| Agent | 2026-11-15 | WCAG 2.1 AA compliance; $\ge 44\text{px}$|
+| `[x] P10D.08` | Run bundle budget verification confirming initial play route remains $\le 159.5\text{ KB}$ gzipped          | Critical | DONE   | P10B.09      | Agent | 2026-11-15 | Verifies lazy code-splitting isolation   |
+| `[x] P10D.09` | Author complete Playwright E2E test suite covering Keep -> Orbit -> Telepathy -> Anti-twin journeys        | High     | DONE   | P10B.01, P10D.04| Agent | 2026-11-15 | Full connection loop verification        |
 
 ---
 

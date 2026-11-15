@@ -76,6 +76,23 @@ export async function resolveAuthenticatedPlayer(
     }
   }
 
+  // 4. Fall back to device ID header (guest player)
+  const deviceId = req.headers["x-device-id"] as string | undefined;
+  if (deviceId) {
+    const p = await prisma.player.findUnique({
+      where: { did: deviceId },
+    });
+    if (p) {
+      return {
+        id: p.id,
+        accountId: p.account_id,
+        region: p.region,
+        ageBand: p.age_band,
+        isGoogleAuthenticated: !!p.account_id,
+      };
+    }
+  }
+
   return null;
 }
 

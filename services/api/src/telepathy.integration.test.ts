@@ -15,7 +15,7 @@
  */
 
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
-import { PrismaClient, calculateLuckBaseline } from "@oddly/shared";
+import { PrismaClient } from "@oddly/shared";
 import { buildServer } from "./server.js";
 import { randomUUID } from "node:crypto";
 

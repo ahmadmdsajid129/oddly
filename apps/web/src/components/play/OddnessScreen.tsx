@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { TierBadge } from "@/components/ui/Card";
 import { feedback } from "@/lib/feedback";
 import { fireConfetti } from "@/components/icons";
-import { ArrowLeft, Share2, Users, Flame } from "lucide-react";
+import { ArrowLeft, Share2, Users, Flame, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export interface OddnessData {
   percentile: number;
@@ -26,6 +27,7 @@ interface OddnessScreenProps {
   onShare?: () => void;
   onChallenge?: () => void;
   onHome?: () => void;
+  onAntiTwin?: () => void;
 }
 
 export function OddnessScreen({
@@ -34,7 +36,9 @@ export function OddnessScreen({
   onShare,
   onChallenge,
   onHome,
+  onAntiTwin,
 }: OddnessScreenProps) {
+  const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
   const targetPercentile = Math.round(oddness.percentile);
   const [displayPercentile, setDisplayPercentile] = useState<number>(
@@ -185,6 +189,23 @@ export function OddnessScreen({
           >
             <Users className="w-5 h-5 stroke-[2.5]" />
             <span>Challenge a friend</span>
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="lg"
+            className="w-full bg-paper text-ink border-[2.5px] border-ink shadow-sticker hover:bg-cream"
+            onClick={() => {
+              feedback.playSound("tick");
+              if (onAntiTwin) {
+                onAntiTwin();
+              } else {
+                router.push("/anti-twin");
+              }
+            }}
+          >
+            <Sparkles className="w-5 h-5 text-coral stroke-[2.5]" />
+            <span>See your opposite today</span>
           </Button>
 
           {onHome && (

@@ -195,11 +195,21 @@ export class RetentionWorker {
       const guestRes = await client.query(pruneGuestSql, [guestCutoffDate]);
       inactiveGuestsPruned = guestRes.rowCount ?? 0;
 
+      // 4. Prune anti_twin_results older than 7 days (Stage F4 / ADR-040)
+      const antiTwinCutoffDate = offsetDate(baseDate, -7);
+      const pruneAntiTwinSql = `
+        DELETE FROM anti_twin_results
+        WHERE drop_date < $1::date;
+      `;
+      const antiTwinRes = await client.query(pruneAntiTwinSql, [antiTwinCutoffDate]);
+      const antiTwinPruned = antiTwinRes.rowCount ?? 0;
+
       return {
         summariesCreated: totalSummaries,
         partitionsDetached: detached,
         partitionsDropped: dropped,
         inactiveGuestsPruned,
+        antiTwinPruned,
       };
     } finally {
       client.release();

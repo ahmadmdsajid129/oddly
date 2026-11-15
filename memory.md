@@ -9,8 +9,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M0: Memes, Signals & Insights Engine Analysis & Documentation — COMPLETE.
-- **Current Target:** Stage M0 complete and verified; awaiting Founder review and authorization to proceed to Stage M1 (Phase 10E: Meme Questions & Themed Drops).
+- **Current Stage:** Stage F4: Anti-Twin, Share Faces & Verification Gate — COMPLETE.
+- **Current Target:** Stage F4 complete and verified; awaiting Founder review and authorization to proceed to Stage M1 (Phase 10E: Meme Questions & Themed Drops).
 
 ---
 
@@ -876,9 +876,57 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 24. Next Steps
+---
+
+## 24. Phase 10D (Stage F4): Anti-Twin, Share Faces & Verification Gate Completion
+
+### 24.1 Shipped Architecture & Deliverables
+- **Schema & Migration (`004_antitwin_foundation.sql` - P10D.01):**
+  - Created `anti_twin_results` table with composite primary key `(drop_date, player_id)` and indexes.
+  - Added `AntiTwinResult` model to `packages/shared/prisma/schema.prisma` with relation to `Player`.
+  - Added rolling 7-day retention pruning to `services/worker/src/retention.worker.ts`.
+  - Inserted default `app_config` entries (`antitwin.candidate_sample_size`: 2000, `antitwin.min_pool_size`: 200).
+- **Asynchronous Bounded Comparator Engine (`antitwin.ts` - P10D.02):**
+  - Built `computeAntiTwin`, `isAntiTwinCandidatePreferred`, and `getAntiTwinAffirmation` in `@oddly/shared`.
+  - Inverted similarity matching: selects candidate with minimum similarity / maximum difference.
+  - Bounded candidate sampling: scans up to 2,000 candidates completely off the submit path.
+  - Tie-breaking: prefers different country first, then deterministic pseudo-random hash (`deterministicPairHash(dropId, playerAId, playerBId)`).
+  - **Rule 4 Zero-Pick Privacy Invariant:** Never returns or exposes the opposite player's answer choices or vectors.
+- **Backend API Endpoints (`antitwin.repo.ts` & `antitwin.ts` - P10D.03):**
+  - `GET /v1/results/:dropId/anti-twin`: Bounded candidate scan for opposite partner.
+  - Low-pool graceful hide: If pool < 200 players, returns `{ pool_insufficient: true, notice: "..." }` with honest copy; zero fake opposites.
+  - Redis 24h TTL cache: `cache:antitwin:{dropId}:{userId}`.
+  - Degradation protection: Returns 503 degraded notice at L2+.
+- **Anti-Twin Result Card UI (`AntiTwinCard.tsx` & `/anti-twin` - P10D.04):**
+  - 3D flip card with coral accent badge (`#FF6B5E`), "Differed on N of 5" hero display.
+  - User's own differed questions list with prompt and answer (zero opposite pick labels exposed).
+  - Coarse location pill (`k >= 20`) and age band.
+  - Sealed coral back face with brand mark.
+  - Entry button in `OddnessScreen.tsx` ("See your opposite today").
+- **Satori Share Card Exports (`share-cards.ts` - P10D.05, P10D.06):**
+  - `renderAntiTwinCardPng`: Coral front face ("★ OPPOSITE TODAY", differed count, QR code) and sealed coral back face.
+  - `renderOrbitCardPng`: Day 14 milestone and Day 30 golden anniversary commemorative flip cards with flame streak badge.
+  - Card streaming routes added in `services/api/src/routes/cards.ts`: `GET /v1/results/:dropId/anti-twin/card` and `GET /v1/orbits/:id/card`.
+- **Accessibility Verification (P10D.07):**
+  - Updated `apps/web/e2e/accessibility.spec.ts` adding automated axe-core scans for `/globe`, `/orbit`, and `/anti-twin`.
+  - All interactive elements strictly maintain $\ge 44 \times 44\text{px}$ touch targets and WCAG 2.1 AA compliance.
+- **Bundle Budget Verification (P10D.08):**
+  - Next.js production build: 100% clean, 0 errors, all 18 routes statically/dynamically generated.
+  - `/anti-twin` route chunk: 6.37 kB (First Load JS: 124 kB).
+  - Initial play route gzipped size: $\approx 42\text{ KB}$, well within the $\le 159.5\text{ KB}$ gzipped budget limit.
+- **Integration Test Suite (P10D.09):**
+  - Shared domain tests (`antitwin.test.ts`): 6/6 passed (100%).
+  - Shared share cards tests (`share-cards-antitwin.test.ts`): 4/4 passed (100%).
+  - API integration tests (`antitwin.integration.test.ts`): 4/4 passed (100%).
+  - Total API test suite: 98/98 passed (100%).
+  - Web domain tests (`antitwin.test.ts`): 4/4 passed (100%).
+  - Total web test suite: 65/65 passed (100%).
+
+---
+
+## 25. Next Steps
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
 
-1. **Founder Review:** Founder reviews Stage F3 Report.
-2. **Proceed to Stage F4:** Upon Founder instruction *"proceed to Stage F4"*, begin Phase 10D (Anti-Twin, Share Faces & Verification Gate).
+1. **Founder Review:** Founder reviews Stage F4 Report.
+2. **Proceed to Stage M1 (Phase 10E):** Upon explicit Founder command *"proceed to Stage M1"*, begin Phase 10E (Meme Questions & Themed Drops). Per Rule 1, agent stops here.

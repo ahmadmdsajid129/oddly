@@ -73,6 +73,51 @@ test.describe("Oddly v1: WCAG 2.1 AA Accessibility Verification (R2.7, P1.19)", 
     expect(failures).toEqual([]);
   });
 
+  test("Twin Globe View ('/globe') has zero serious or critical violations (P10D.07)", async ({ page }) => {
+    await page.goto("/globe");
+    await page.waitForLoadState("domcontentloaded");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+
+    const failures = scanResults.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious"
+    );
+
+    expect(failures).toEqual([]);
+  });
+
+  test("Orbit Hub View ('/orbit') has zero serious or critical violations (P10D.07)", async ({ page }) => {
+    await page.goto("/orbit");
+    await page.waitForLoadState("domcontentloaded");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+
+    const failures = scanResults.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious"
+    );
+
+    expect(failures).toEqual([]);
+  });
+
+  test("Anti-Twin View ('/anti-twin') has zero serious or critical violations (P10D.07)", async ({ page }) => {
+    await page.goto("/anti-twin");
+    await page.waitForLoadState("domcontentloaded");
+
+    const scanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+
+    const failures = scanResults.violations.filter(
+      (v) => v.impact === "critical" || v.impact === "serious"
+    );
+
+    expect(failures).toEqual([]);
+  });
+
   test("Offline Fallback Page ('/offline') has zero serious or critical violations", async ({ page }) => {
     await page.goto("/offline");
     await page.waitForLoadState("domcontentloaded");

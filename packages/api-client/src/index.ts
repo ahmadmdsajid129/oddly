@@ -681,6 +681,43 @@ export class OddlyApiClient {
       }
     );
   }
+
+  /** Retrieve Anti-Twin opposite match for a drop (P10D.03, ADR-040) */
+  async getAntiTwin(
+    dropId: string,
+    sampleSize?: number,
+    minPool?: number
+  ): Promise<AntiTwinResponse> {
+    const params = new URLSearchParams();
+    if (sampleSize) params.set("sample_size", sampleSize.toString());
+    if (minPool) params.set("min_pool", minPool.toString());
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    return this.request<AntiTwinResponse>(`/v1/results/${dropId}/anti-twin${qs}`);
+  }
+}
+
+export interface AntiTwinResponse {
+  ok: boolean;
+  drop_id: string;
+  drop_date?: string;
+  pool_insufficient?: boolean;
+  pool_count?: number;
+  min_pool_size?: number;
+  notice?: string;
+  differed_count?: number;
+  sample_size?: number;
+  opposite?: {
+    region: string;
+    age_band: string;
+  };
+  own_differed_questions?: Array<{
+    question_id: string;
+    position: number;
+    prompt: string;
+    your_answer: string;
+  }>;
+  note?: string;
+  degraded?: boolean;
 }
 
 export function createOddlyClient(config: OddlyClientConfig): OddlyApiClient {

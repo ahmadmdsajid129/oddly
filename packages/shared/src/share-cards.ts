@@ -1545,3 +1545,882 @@ export async function renderBackCardPng(data: ShareCardData): Promise<Buffer> {
 export async function renderCompositeStoryPng(data: ShareCardData): Promise<Buffer> {
   return renderShareCardPng({ ...data, format: "story", side: "composite" });
 }
+
+// ---------------------------------------------------------------------------
+// Anti-Twin & Orbit Satori Share Card Exports (Stage F4 / Tasks P10D.05, P10D.06)
+// ---------------------------------------------------------------------------
+
+export interface AntiTwinShareCardData {
+  differedCount: number;
+  total?: number;
+  oppositeLocation?: string;
+  oppositeAgeBand?: string;
+  sampleSize?: number;
+  shortId: string;
+  appDomain?: string;
+  side?: "front" | "back";
+  dateStr?: string;
+}
+
+export interface OrbitShareCardData {
+  milestoneDay: 14 | 30;
+  coStreakDays: number;
+  partnerLocation?: string;
+  partnerAgeBand?: string;
+  shortId: string;
+  appDomain?: string;
+  side?: "front" | "back";
+  dateStr?: string;
+}
+
+export function buildAntiTwinFrontTree(
+  data: AntiTwinShareCardData,
+  qrDataUrl: string
+): Record<string, unknown> {
+  const total = data.total ?? 5;
+  const oppLoc = data.oppositeLocation ? `Stranger in ${data.oppositeLocation}` : "A Stranger across the world";
+  const oppAge = data.oppositeAgeBand || "18+";
+  const sample = (data.sampleSize ?? 2000).toLocaleString();
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: colors.cream,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: colors.paper,
+              border: `10px solid ${colors.ink}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${colors.ink}`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "70px 60px",
+            },
+            children: [
+              // Top Bar: Coral accent badge + Brandmark
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.coral,
+                          border: `5px solid ${colors.ink}`,
+                          borderRadius: "9999px",
+                          padding: "16px 36px",
+                          fontSize: "30px",
+                          fontWeight: 700,
+                          color: colors.ink,
+                        },
+                        children: "★ OPPOSITE TODAY",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "14px",
+                          fontSize: "40px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "16px",
+                                backgroundColor: colors.coral,
+                                border: `4px solid ${colors.ink}`,
+                              },
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: { children: "oddly" },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Hero: Differed on N of 5
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: "24px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: colors.muted,
+                          textTransform: "uppercase",
+                          letterSpacing: "4px",
+                        },
+                        children: "STRANGER OPPOSITE FOUND",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "92px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                          lineHeight: 1.05,
+                        },
+                        children: `Differed on ${data.differedCount} of ${total}`,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.lavender,
+                          border: `5px solid ${colors.ink}`,
+                          borderRadius: "9999px",
+                          padding: "16px 40px",
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: colors.ink,
+                        },
+                        children: `${oppLoc} • ${oppAge}`,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Card Body: Playful kind statement
+              {
+                type: "div",
+                props: {
+                  style: {
+                    backgroundColor: colors.cream,
+                    border: `6px solid ${colors.ink}`,
+                    borderRadius: "28px",
+                    padding: "36px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: "12px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: colors.ink,
+                        },
+                        children: "Different instincts make the world interesting.",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "24px",
+                          fontWeight: 500,
+                          color: colors.muted,
+                        },
+                        children: `Sampled from ${sample} players today.`,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Footer: QR Code + Domain Link
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    borderTop: `4px solid ${colors.ink}`,
+                    paddingTop: "24px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "32px",
+                                fontWeight: 800,
+                                color: colors.ink,
+                              },
+                              children: `${data.appDomain || "oddly.app"}/c/${data.shortId}`,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "24px",
+                                fontWeight: 500,
+                                color: colors.muted,
+                              },
+                              children: data.dateStr || "Today's Five Drop",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      type: "img",
+                      props: {
+                        src: qrDataUrl,
+                        width: 140,
+                        height: 140,
+                        style: {
+                          borderRadius: "14px",
+                          border: `4px solid ${colors.ink}`,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+export function buildAntiTwinBackTree(
+  _data: AntiTwinShareCardData
+): Record<string, unknown> {
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: colors.cream,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: colors.coral,
+              border: `10px solid ${colors.ink}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${colors.ink}`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "70px 60px",
+              gap: "40px",
+              textAlign: "center",
+            },
+            children: [
+              // Sealed Brand Mark
+              {
+                type: "div",
+                props: {
+                  style: {
+                    width: "180px",
+                    height: "180px",
+                    borderRadius: "90px",
+                    backgroundColor: colors.paper,
+                    border: `8px solid ${colors.ink}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: `10px 10px 0px ${colors.ink}`,
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          width: "80px",
+                          height: "80px",
+                          borderRadius: "40px",
+                          backgroundColor: colors.coral,
+                          border: `6px solid ${colors.ink}`,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Typography
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "80px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                        },
+                        children: "oddly opposite",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "36px",
+                          fontWeight: 600,
+                          color: colors.ink,
+                        },
+                        children: "My stranger opposite today.",
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Sealed Badge
+              {
+                type: "div",
+                props: {
+                  style: {
+                    backgroundColor: colors.paper,
+                    border: `5px solid ${colors.ink}`,
+                    borderRadius: "9999px",
+                    padding: "16px 48px",
+                    fontSize: "28px",
+                    fontWeight: 700,
+                    color: colors.ink,
+                    letterSpacing: "2px",
+                  },
+                  children: "SEALED OPPOSITE PAIR",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+export function buildOrbitFrontTree(
+  data: OrbitShareCardData,
+  qrDataUrl: string
+): Record<string, unknown> {
+  const isAnniversary = data.milestoneDay === 30;
+  const badgeColor = isAnniversary ? colors.sun : colors.mint;
+  const badgeText = isAnniversary ? "★ 30-DAY ANNIVERSARY" : "★ DAY 14 ORBIT CARD";
+  const partnerLoc = data.partnerLocation ? `Stranger in ${data.partnerLocation}` : "A Stranger in Orbit";
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: colors.cream,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: colors.paper,
+              border: `10px solid ${colors.ink}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${colors.ink}`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "70px 60px",
+            },
+            children: [
+              // Top Bar
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: badgeColor,
+                          border: `5px solid ${colors.ink}`,
+                          borderRadius: "9999px",
+                          padding: "16px 36px",
+                          fontSize: "30px",
+                          fontWeight: 700,
+                          color: colors.ink,
+                        },
+                        children: badgeText,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "14px",
+                          fontSize: "40px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "16px",
+                                backgroundColor: badgeColor,
+                                border: `4px solid ${colors.ink}`,
+                              },
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: { children: "oddly" },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Hero
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: "24px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: colors.muted,
+                          textTransform: "uppercase",
+                          letterSpacing: "4px",
+                        },
+                        children: "COMMEMORATIVE ORBIT MILESTONE",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "92px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                        },
+                        children: `${data.coStreakDays} Days in Orbit`,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.lavender,
+                          border: `5px solid ${colors.ink}`,
+                          borderRadius: "9999px",
+                          padding: "16px 40px",
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          color: colors.ink,
+                        },
+                        children: `Shared journey with ${partnerLoc}`,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Middle Badge
+              {
+                type: "div",
+                props: {
+                  style: {
+                    backgroundColor: colors.cream,
+                    border: `6px solid ${colors.ink}`,
+                    borderRadius: "28px",
+                    padding: "36px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: "12px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "34px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                        },
+                        children: isAnniversary ? "🏆 30-Day Golden Anniversary" : "✨ Day 14 Keepsake Milestone",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "24px",
+                          fontWeight: 500,
+                          color: colors.muted,
+                        },
+                        children: "Daily instinct sync, silent sticker waves, and shared ritual.",
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Footer
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    borderTop: `4px solid ${colors.ink}`,
+                    paddingTop: "24px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "32px",
+                                fontWeight: 800,
+                                color: colors.ink,
+                              },
+                              children: `${data.appDomain || "oddly.app"}/c/${data.shortId}`,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "24px",
+                                fontWeight: 500,
+                                color: colors.muted,
+                              },
+                              children: data.dateStr || "Oddly Orbit Club",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      type: "img",
+                      props: {
+                        src: qrDataUrl,
+                        width: 140,
+                        height: 140,
+                        style: {
+                          borderRadius: "14px",
+                          border: `4px solid ${colors.ink}`,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+export function buildOrbitBackTree(
+  data: OrbitShareCardData
+): Record<string, unknown> {
+  const isAnniversary = data.milestoneDay === 30;
+  const bgColor = isAnniversary ? colors.sun : colors.mint;
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: colors.cream,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: bgColor,
+              border: `10px solid ${colors.ink}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${colors.ink}`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "70px 60px",
+              gap: "40px",
+              textAlign: "center",
+            },
+            children: [
+              {
+                type: "div",
+                props: {
+                  style: {
+                    width: "180px",
+                    height: "180px",
+                    borderRadius: "90px",
+                    backgroundColor: colors.paper,
+                    border: `8px solid ${colors.ink}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: `10px 10px 0px ${colors.ink}`,
+                    fontSize: "72px",
+                  },
+                  children: "🪐",
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "80px",
+                          fontWeight: 800,
+                          color: colors.ink,
+                        },
+                        children: "oddly orbit",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "36px",
+                          fontWeight: 600,
+                          color: colors.ink,
+                        },
+                        children: `${data.coStreakDays} days connected in space.`,
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    backgroundColor: colors.paper,
+                    border: `5px solid ${colors.ink}`,
+                    borderRadius: "9999px",
+                    padding: "16px 48px",
+                    fontSize: "28px",
+                    fontWeight: 700,
+                    color: colors.ink,
+                    letterSpacing: "2px",
+                  },
+                  children: "PERMANENT MILESTONE BADGE",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+/**
+ * Renders Anti-Twin Satori share card PNG (P10D.05).
+ */
+export async function renderAntiTwinCardPng(data: AntiTwinShareCardData): Promise<Buffer> {
+  const fontBuffer = getFontBuffer();
+  const shortUrl = `https://${data.appDomain || "oddly.app"}/c/${data.shortId}`;
+  const qrDataUrl = await generateQrCodeDataUrl(shortUrl, {
+    width: 200,
+    color: {
+      dark: colors.ink,
+      light: "#00000000",
+    },
+  });
+
+  const vdom = data.side === "back" ? buildAntiTwinBackTree(data) : buildAntiTwinFrontTree(data, qrDataUrl);
+
+  const svg = await satori(vdom as unknown as Parameters<typeof satori>[0], {
+    width: 1080,
+    height: 1490,
+    fonts: [
+      {
+        name: "Noto Sans",
+        data: fontBuffer,
+        weight: 400,
+        style: "normal",
+      },
+    ],
+  });
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1080 },
+  });
+
+  return resvg.render().asPng();
+}
+
+/**
+ * Renders Orbit Milestone Satori share card PNG for Day 14 and Day 30 (P10D.06).
+ */
+export async function renderOrbitCardPng(data: OrbitShareCardData): Promise<Buffer> {
+  const fontBuffer = getFontBuffer();
+  const shortUrl = `https://${data.appDomain || "oddly.app"}/c/${data.shortId}`;
+  const qrDataUrl = await generateQrCodeDataUrl(shortUrl, {
+    width: 200,
+    color: {
+      dark: colors.ink,
+      light: "#00000000",
+    },
+  });
+
+  const vdom = data.side === "back" ? buildOrbitBackTree(data) : buildOrbitFrontTree(data, qrDataUrl);
+
+  const svg = await satori(vdom as unknown as Parameters<typeof satori>[0], {
+    width: 1080,
+    height: 1490,
+    fonts: [
+      {
+        name: "Noto Sans",
+        data: fontBuffer,
+        weight: 400,
+        style: "normal",
+      },
+    ],
+  });
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1080 },
+  });
+
+  return resvg.render().asPng();
+}
+
