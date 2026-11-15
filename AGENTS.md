@@ -16,3 +16,8 @@ Before any UI change read `design.md`; use only `@oddly/ui-tokens`; follow the s
 
 Admin work: read `docs/admin-panel-spec.md` first. It is the authoritative description of what to build in Phase 11.
 
+## Memes, Signals & Insights Rule
+
+Never personalise Drop questions; analytics only with consent; no sensitive inference.
+
+
