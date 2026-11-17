@@ -359,6 +359,61 @@ export const HealthCheckSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Signals & Telemetry Schemas (Stage M2 / Phase 10F)
+// ---------------------------------------------------------------------------
+
+export const SignalEventNameSchema = z.enum([
+  "question_shown",
+  "question_answered",
+  "question_changed",
+  "question_back",
+  "drop_started",
+  "drop_completed",
+  "drop_abandoned",
+  "share_clicked",
+  "theme_viewed",
+]);
+
+export const SignalEventPropsSchema = z
+  .object({
+    question_id: z.string().optional(),
+    position: z.number().int().min(1).max(5).optional(),
+    dwell_ms: z.number().int().min(0).max(600000).optional(),
+    option_count: z.number().int().min(2).max(10).optional(),
+    format: z.string().max(20).optional(),
+    theme_key: z.string().max(50).optional(),
+    tag_key: z.string().max(50).optional(),
+  })
+  .strict(); // strictly forbid any unexpected keys, arbitrary strings or PII
+
+export const SignalEventItemSchema = z.object({
+  event_name: SignalEventNameSchema,
+  drop_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  props: SignalEventPropsSchema.default({}),
+  timestamp_ms: z.number().int().optional(),
+});
+
+export const EventsBatchRequestSchema = z.object({
+  session_id: z.string().max(64).optional(),
+  events: z.array(SignalEventItemSchema).min(1).max(50),
+});
+
+export const ConsentPurposeSchema = z.enum(["analytics", "personalisation"]);
+
+export const UpdateConsentRequestSchema = z.object({
+  purpose: ConsentPurposeSchema,
+  granted: z.boolean(),
+  policy_version: z.number().int().min(1).default(1),
+});
+
+export const ConsentsResponseSchema = z.object({
+  analytics: z.boolean(),
+  personalisation: z.boolean(),
+  policy_version: z.number().int(),
+  analytics_id: z.string().nullable().optional(),
+});
+
+// ---------------------------------------------------------------------------
 // Type inference helpers
 // ---------------------------------------------------------------------------
 

@@ -279,3 +279,55 @@ export interface HealthCheckResult {
   version?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Signals & Consent types (Stage M2 / Phase 10F)
+// ---------------------------------------------------------------------------
+
+export type SignalEventName =
+  | "question_shown"
+  | "question_answered"
+  | "question_changed"
+  | "question_back"
+  | "drop_started"
+  | "drop_completed"
+  | "drop_abandoned"
+  | "share_clicked"
+  | "theme_viewed";
+
+export interface SignalEventProps {
+  question_id?: string;
+  position?: number;
+  dwell_ms?: number;
+  option_count?: number;
+  format?: string;
+  theme_key?: string;
+  tag_key?: string;
+}
+
+export interface SignalEventItem {
+  event_name: SignalEventName;
+  drop_date: string;
+  props?: SignalEventProps;
+  timestamp_ms?: number;
+}
+
+export interface EventsBatchRequest {
+  session_id?: string;
+  events: SignalEventItem[];
+}
+
+export type ConsentPurpose = "analytics" | "personalisation";
+
+export interface UpdateConsentRequest {
+  purpose: ConsentPurpose;
+  granted: boolean;
+  policy_version?: number;
+}
+
+export interface ConsentsResponse {
+  analytics: boolean;
+  personalisation: boolean;
+  policy_version: number;
+  analytics_id?: string | null;
+}
+

@@ -141,6 +141,20 @@ export const api = {
     get: (dropId: string, sampleSize?: number, minPool?: number) =>
       rawClient.getAntiTwin(dropId, sampleSize, minPool),
   },
+  events: {
+    ingest: (
+      events: Parameters<typeof rawClient.ingestEvents>[0],
+      sessionId?: string
+    ) => rawClient.ingestEvents(events, sessionId),
+  },
+  consents: {
+    get: () => rawClient.getConsents(),
+    update: (
+      purpose: "analytics" | "personalisation",
+      granted: boolean,
+      policyVersion?: number
+    ) => rawClient.updateConsent(purpose, granted, policyVersion),
+  },
 };
 
 export const oddlyApi = rawClient;

@@ -106,6 +106,8 @@ model Player {
   orbitExpressions OrbitExpression[]
   telepathyGuesses TelepathyGuess[]
   antiTwinResults  AntiTwinResult[]
+  consents         Consent[]
+  analyticsId      AnalyticsId?
 
   @@index([account_id])
   @@index([did])
@@ -159,6 +161,7 @@ model Question {
   telepathyForDrops  Drop[]            @relation("DropTelepathyQuestion")
   telepathyGuesses   TelepathyGuess[]
   questionTags       QuestionTag[]
+  statsDaily         QuestionStatsDaily[]
 
   @@unique([drop_id, position])
   @@index([drop_id])
@@ -649,6 +652,7 @@ model Tag {
   created_at DateTime @default(now())
 
   questionTags QuestionTag[]
+  statsDaily   TagStatsDaily[]
 
   @@index([key])
   @@index([category])
@@ -689,6 +693,100 @@ model MemeTemplate {
   @@index([key])
   @@index([status])
   @@map("meme_templates")
+}
+
+// ---------------------------------------------------------------------------
+// 31. consents — granular, withdrawable DPDP consent records (Stage M2 / Phase 10F)
+// ---------------------------------------------------------------------------
+model Consent {
+  id             String    @id @default(uuid())
+  player_id      String
+  player         Player    @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  purpose        String    @db.VarChar(30) // 'analytics' | 'personalisation'
+  policy_version Int       @default(1)
+  granted_at     DateTime  @default(now())
+  withdrawn_at   DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @default(now()) @updatedAt
+
+  @@unique([player_id, purpose], name: "player_purpose")
+  @@index([player_id])
+  @@index([purpose])
+  @@map("consents")
+}
+
+// ---------------------------------------------------------------------------
+// 32. analytics_ids — 1:1 pseudonymous identity severance table (Stage M2 / Phase 10F)
+// ---------------------------------------------------------------------------
+model AnalyticsId {
+  player_id    String   @id
+  player       Player   @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  analytics_id String   @unique @default(uuid())
+  created_at   DateTime @default(now())
+
+  @@index([analytics_id])
+  @@map("analytics_ids")
+}
+
+// ---------------------------------------------------------------------------
+// 33. events_raw — high-throughput, consented telemetry events (Stage M2 / Phase 10F)
+// Range-partitioned by drop_date, 90-day retention
+// ---------------------------------------------------------------------------
+model EventRaw {
+  id           String   @default(uuid())
+  analytics_id String
+  drop_date    DateTime @db.Date
+  event_name   String   @db.VarChar(50)
+  props        Json     @default("{}")
+  session_id   String?  @db.VarChar(64)
+  created_at   DateTime @default(now())
+
+  @@id([drop_date, id])
+  @@index([analytics_id])
+  @@index([event_name])
+  @@map("events_raw")
+}
+
+// ---------------------------------------------------------------------------
+// 34. question_stats_daily — nightly aggregated question quality metrics (Stage M2 / Phase 10F)
+// ---------------------------------------------------------------------------
+model QuestionStatsDaily {
+  drop_date      DateTime @db.Date
+  question_id    String
+  question       Question @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  shown_count    Int      @default(0)
+  answered_count Int      @default(0)
+  dwell_p50_ms   Int      @default(0)
+  dwell_p90_ms   Int      @default(0)
+  change_rate    Float    @default(0.0)
+  back_rate      Float    @default(0.0)
+  abandon_rate   Float    @default(0.0)
+  report_rate    Float    @default(0.0)
+  entropy        Float    @default(0.0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+
+  @@id([drop_date, question_id])
+  @@index([question_id])
+  @@map("question_stats_daily")
+}
+
+// ---------------------------------------------------------------------------
+// 35. tag_stats_daily — nightly aggregated performance by subject tag (Stage M2 / Phase 10F)
+// ---------------------------------------------------------------------------
+model TagStatsDaily {
+  drop_date    DateTime @db.Date
+  tag_id       String
+  tag          Tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+  completions  Int      @default(0)
+  share_count  Int      @default(0)
+  dwell_p50_ms Int      @default(0)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now()) @updatedAt
+
+  @@id([drop_date, tag_id])
+  @@index([tag_id])
+  @@map("tag_stats_daily")
 }
 
 

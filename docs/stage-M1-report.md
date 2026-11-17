@@ -101,3 +101,4 @@ Tests:      69 passed (69)
 ## 4. Operational Invariant & Next Stage Note
 
 Per `rules.md` Rule 1, Stage M1 is complete in full and verified. The agent will STOP here and await Founder command before proceeding to Phase 10F (Stage M2: Signals Foundation).
+

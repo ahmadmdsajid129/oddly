@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[███████████░░░░░░░░░] 56%`                                                     |
-| **Current Active Stage**        | **Stage F4: Anti-Twin, Share Faces & Verification Gate (COMPLETE)**              |
+| **Overall Project Progress**    | `[████████████░░░░░░░░] 62%`                                                     |
+| **Current Active Stage**        | **Stage M2: Signals Foundation (COMPLETE)**                                      |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 189 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 208 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 147 tasks                                                                        |
+| **Pending (`TODO`)**            | 128 tasks                                                                        |
 
 ---
 
@@ -41,8 +41,8 @@
 | **Phase 10B**| Orbit and Globe UI                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage F2              |
 | **Phase 10C**| Telepathy (Instinct Sync)                   | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage F3              |
 | **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage F4              |
-| **Phase 10E**| Meme Questions & Themed Drops               | High     | TODO      | `[----------] 0%`  | 0 / 9              | Stage M1 (after F4)   |
-| **Phase 10F**| Signals Foundation                          | High     | TODO      | `[----------] 0%`  | 0 / 10             | Stage M2 (after M1)   |
+| **Phase 10E**| Meme Questions & Themed Drops               | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M1 (after F4)   |
+| **Phase 10F**| Signals Foundation                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage M2 (after M1)   |
 | **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M3 (Deferred)   |
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M4 (Deferred)   |
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | TODO      | `[----------] 0%`  | 0 / 8              | Stage M5/M6 (Deferred)|
@@ -412,20 +412,20 @@ _Status: DONE (100%) | Target: Taxonomy and template migrations, question schema
 
 ### Phase 10F: Signals Foundation (Stage M2)
 
-_Status: TODO | Target: Consents table, Settings toggles, `/v1/events` endpoint, client batcher, partition manager, daily aggregations, retention job, DPDP deletion._
+_Status: COMPLETE | Target: Consents table, Settings toggles, `/v1/events` endpoint, client batcher, partition manager, daily aggregations, retention job, DPDP deletion._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10F.01` | Database migrations: `consents`, `analytics_ids`, `events_raw` (day-partitioned), `question_stats_daily`, `tag_stats_daily` | Critical | TODO | P2.01, P10E.01 | Agent | — | 90-day retention schema |
-| `[ ] P10F.02` | Build client-side event batcher (< 450 bytes) using `navigator.sendBeacon` and memory flush                 | High     | TODO   | P10F.01        | Agent | —         | Zero external analytics SDKs             |
-| `[ ] P10F.03` | Implement Fastify `POST /v1/events` ingestion handler (202 Accepted, Low priority lane, allowlist Zod)     | Critical | TODO   | P10F.01        | Agent | —         | Resource rank 7 load shedding            |
-| `[ ] P10F.04` | Build Settings consent toggles UI (`analytics` and `personalisation`) and first-run notice banner           | High     | TODO   | P10F.01        | Agent | —         | DPDP default OFF compliance              |
-| `[ ] P10F.05` | Partition manager integration: pre-create `events_raw` partitions 14 days in advance                       | High     | TODO   | P10F.01        | Agent | —         | Buffer guarantee                         |
-| `[ ] P10F.06` | Daily worker aggregation job: roll `events_raw` into `question_stats_daily` and `tag_stats_daily`           | High     | TODO   | P10F.01        | Agent | —         | Runs at 07:15 IST off-peak               |
-| `[ ] P10F.07` | Retention worker job: drop `events_raw` partitions older than 90 days                                       | High     | TODO   | P10F.05        | Agent | —         | DDL metadata drop < 15ms                 |
-| `[ ] P10F.08` | Implement DPDP deletion and export hooks: purge raw events, `analytics_id`, and `player_taste` on erasure  | Critical | TODO   | P8.06, P10F.01 | Agent | —         | DPDP Section 12 compliance               |
-| `[ ] P10F.09` | Implement graceful degradation logic: deterministic 50% sampling at L1, 100% load shed at L2+              | High     | TODO   | P10F.03        | Agent | —         | Play-path protection                     |
-| `[ ] P10F.10` | Author integration tests proving zero events sent without consent, zero PII ingested, and kill switch      | Critical | TODO   | P10F.03, P10F.04| Agent | —        | Privacy & compliance suite               |
+| `[x] P10F.01` | Database migrations: `consents`, `analytics_ids`, `events_raw` (day-partitioned), `question_stats_daily`, `tag_stats_daily` | Critical | DONE | P2.01, P10E.01 | Agent | 2026-11-17 | 90-day retention schema, DPDP isolation  |
+| `[x] P10F.02` | Build client-side event batcher (< 450 bytes) using `navigator.sendBeacon` and memory flush                 | High     | DONE   | P10F.01        | Agent | 2026-11-17 | Zero external analytics SDKs (< 450B)    |
+| `[x] P10F.03` | Implement Fastify `POST /v1/events` ingestion handler (202 Accepted, Low priority lane, allowlist Zod)     | Critical | DONE   | P10F.01        | Agent | 2026-11-17 | Resource rank 7 load shedding            |
+| `[x] P10F.04` | Build Settings consent toggles UI (`analytics` and `personalisation`) and first-run notice banner           | High     | DONE   | P10F.01        | Agent | 2026-11-17 | DPDP default OFF compliance              |
+| `[x] P10F.05` | Partition manager integration: pre-create `events_raw` partitions 14 days in advance                       | High     | DONE   | P10F.01        | Agent | 2026-11-17 | Buffer guarantee                         |
+| `[x] P10F.06` | Daily worker aggregation job: roll `events_raw` into `question_stats_daily` and `tag_stats_daily`           | High     | DONE   | P10F.01        | Agent | 2026-11-17 | Runs at 07:15 IST off-peak               |
+| `[x] P10F.07` | Retention worker job: drop `events_raw` partitions older than 90 days                                       | High     | DONE   | P10F.05        | Agent | 2026-11-17 | DDL metadata drop < 15ms                 |
+| `[x] P10F.08` | Implement DPDP deletion and export hooks: purge raw events, `analytics_id`, and `player_taste` on erasure  | Critical | DONE   | P8.06, P10F.01 | Agent | 2026-11-17 | DPDP Section 12 compliance               |
+| `[x] P10F.09` | Implement graceful degradation logic: deterministic 50% sampling at L1, 100% load shed at L2+              | High     | DONE   | P10F.03        | Agent | 2026-11-17 | Play-path protection                     |
+| `[x] P10F.10` | Author integration tests proving zero events sent without consent, zero PII ingested, and kill switch      | Critical | DONE   | P10F.03, P10F.04| Agent | 2026-11-17 | Privacy & compliance suite (all passed)  |
 
 ---
 

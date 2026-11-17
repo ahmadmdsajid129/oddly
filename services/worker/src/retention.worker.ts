@@ -204,6 +204,29 @@ export class RetentionWorker {
       const antiTwinRes = await client.query(pruneAntiTwinSql, [antiTwinCutoffDate]);
       const antiTwinPruned = antiTwinRes.rowCount ?? 0;
 
+      // 5. Prune events_raw partitions older than 90 days (Stage M2 / Phase 10F / P10F.07)
+      const eventsCutoffDate = offsetDate(baseDate, -90);
+      const eventsPartitionsQuery = `
+        SELECT relname 
+        FROM pg_class 
+        WHERE relname LIKE 'events_raw_y%'
+        ORDER BY relname;
+      `;
+      const eventsRes = await client.query(eventsPartitionsQuery);
+
+      for (const row of eventsRes.rows) {
+        const match = row.relname.match(/^events_raw_y(\d{4})_m(\d{2})_d(\d{2})$/);
+        if (match) {
+          const partDate = `${match[1]}-${match[2]}-${match[3]}`;
+          if (partDate < eventsCutoffDate) {
+            await client.query(`ALTER TABLE events_raw DETACH PARTITION ${row.relname}`);
+            detached.push(row.relname);
+            await client.query(`DROP TABLE IF EXISTS ${row.relname}`);
+            dropped.push(row.relname);
+          }
+        }
+      }
+
       return {
         summariesCreated: totalSummaries,
         partitionsDetached: detached,

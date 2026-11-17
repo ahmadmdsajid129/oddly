@@ -276,6 +276,37 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     priorityLane: "background",
     degradationBehavior: "Reports abusive twin or content",
   },
+  // Signals & Consents (Stage M2 / Phase 10F)
+  {
+    method: "POST",
+    path: "/v1/events",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "background",
+    degradationBehavior: "Resource rank 7 shedding: 50% at L1, 100% at L2+",
+  },
+  {
+    method: "GET",
+    path: "/v1/consents",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "DPDP consent status retrieval",
+  },
+  {
+    method: "PUT",
+    path: "/v1/consents",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "DPDP consent update & taste purge",
+  },
 ];
 
 /**

@@ -694,6 +694,61 @@ export class OddlyApiClient {
     const qs = params.toString() ? `?${params.toString()}` : "";
     return this.request<AntiTwinResponse>(`/v1/results/${dropId}/anti-twin${qs}`);
   }
+
+  /** Ingest telemetry events batch (P10F.03) */
+  async ingestEvents(
+    events: Array<{
+      event_name: string;
+      drop_date: string;
+      props?: Record<string, unknown>;
+      timestamp_ms?: number;
+    }>,
+    sessionId?: string
+  ): Promise<{ ok: boolean; accepted: number; dropped?: boolean; consented?: boolean }> {
+    return this.request<{ ok: boolean; accepted: number; dropped?: boolean; consented?: boolean }>(
+      "/v1/events",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          session_id: sessionId,
+          events,
+        }),
+      }
+    );
+  }
+
+  /** Get player DPDP consent states (P10F.04) */
+  async getConsents(): Promise<{
+    ok: boolean;
+    analytics: boolean;
+    personalisation: boolean;
+    policy_version: number;
+    analytics_id?: string | null;
+  }> {
+    return this.request<{
+      ok: boolean;
+      analytics: boolean;
+      personalisation: boolean;
+      policy_version: number;
+      analytics_id?: string | null;
+    }>("/v1/consents");
+  }
+
+  /** Update player DPDP consent purpose (P10F.04) */
+  async updateConsent(
+    purpose: "analytics" | "personalisation",
+    granted: boolean,
+    policyVersion: number = 1
+  ): Promise<{ ok: boolean; purpose: string; granted: boolean }> {
+    return this.request<{ ok: boolean; purpose: string; granted: boolean }>("/v1/consents", {
+      method: "PUT",
+      body: JSON.stringify({
+        purpose,
+        granted,
+        policy_version: policyVersion,
+      }),
+    });
+  }
 }
 
 export interface AntiTwinResponse {

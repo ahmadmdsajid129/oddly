@@ -39,10 +39,12 @@ export interface BatchDropItem {
 }
 
 export interface BatchData {
-  batch_id: string;
+  batch_id?: string;
   description?: string;
   drops: BatchDropItem[];
 }
+
+export type BatchJsonInput = BatchData;
 
 export interface ValidationResult {
   valid: boolean;

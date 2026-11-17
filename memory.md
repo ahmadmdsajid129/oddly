@@ -960,9 +960,50 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 26. Next Steps
+## 26. Stage M2: Signals Foundation (Phase 10F) Completed (2026-11-17)
+
+### 26.1 Shipped Architecture & Deliverables
+- **Database Migrations (`006_signals_foundation.sql` & `schema.prisma` - P10F.01):**
+  - Created `consents` table: `(id, player_id, purpose, policy_version, granted_at, withdrawn_at, created_at, updated_at)` with unique constraint on `(player_id, purpose)`. Purposes: `'analytics'`, `'personalisation'`.
+  - Created `analytics_ids` table: `(player_id PK, analytics_id UUID UNIQUE, created_at)`. Ensures 1:1 pseudonymous severance: `events_raw` never references `player_id`.
+  - Created `events_raw` table partitioned by `drop_date` (with `events_raw_default` fallback partition): `(id, analytics_id, drop_date, event_name, session_id, props, created_at)`.
+  - Created `question_stats_daily` table: composite PK `(drop_date, question_id)`, quality metrics (`shown_count`, `answered_count`, `dwell_p50_ms`, `dwell_p90_ms`, `change_rate`, `back_rate`, `abandon_rate`, `report_rate`, `entropy`).
+  - Created `tag_stats_daily` table: composite PK `(drop_date, tag_id)`, subject performance (`completions`, `share_count`, `dwell_p50_ms`).
+  - Inserted `feature.signals`, `signals.events_retention_days` (90), `signals.sample_rate_l1` (0.50) into `app_config`.
+  - Generated Prisma Client v5.22.0.
+- **Client-Side Event Batcher (`signals.ts` - P10F.02):**
+  - Micro-batcher (< 450 bytes), zero external analytics SDKs, memory-only queue with max 20 events / 10s flush interval.
+  - Flush uses `navigator.sendBeacon` with `fetch(..., { keepalive: true })` fallback.
+  - Hooks into `visibilitychange` and `pagehide` for zero data loss on tab close.
+- **Backend API Routes (`events.ts` & `policy.registry.ts` - P10F.03, P10F.04, P10F.09):**
+  - `POST /v1/events`: Ingests consented telemetry batch in low-priority background lane. Always returns 202 Accepted.
+  - **DPDP Default OFF Rule:** Discards events if caller lacks active `'analytics'` consent.
+  - **Resource Rank 7 Load Shedding:** Deterministic 50% sampling at L1 (via request ID hash), 100% telemetry shed at L2+ immediately returning 202 without DB execution.
+  - `GET /v1/consents`: Returns granular consent states and pseudonymous `analytics_id`.
+  - `PUT /v1/consents`: Updates purpose consent. On `'personalisation'` withdrawal, executes Rule 13 purge hook for `player_taste`.
+- **Frontend Consent Controls & Banner (`FirstRunConsentBanner.tsx` & `/me` - P10F.04):**
+  - First-run notice banner on `/` informing users that telemetry is disabled by default under DPDP Act 2023.
+  - Granular toggle checkboxes in `/me` ("Anonymous Quality Telemetry" and "Taste & Theme Personalisation").
+- **Partition Manager & Retention Worker (`partition.manager.ts` & `retention.worker.ts` - P10F.05, P10F.07):**
+  - Pre-creates `events_raw` daily partitions 14 days in advance with alert when future partitions < 7.
+  - Drops `events_raw` partitions older than 90 days via DDL metadata drop (< 15ms).
+- **Daily Worker Aggregation Job (`signals-aggregation.job.ts` - P10F.06):**
+  - Scheduled for 07:15 IST off-peak.
+  - Rolls `events_raw` into `question_stats_daily` and `tag_stats_daily`.
+- **DPDP Section 12 Erasure Hook (`me.ts` - P10F.08):**
+  - Account deletion purges `analytics_ids`, `events_raw`, and `consents` for the erasing player.
+- **Automated Verification & Test Suites (P10F.10):**
+  - `services/api/src/signals.integration.test.ts`: 6/6 tests passed (100%).
+  - `services/worker/src/signals.aggregation.test.ts`: 2/2 tests passed (100%).
+  - `services/worker/src/partition.test.ts`: 7/7 tests passed (100%).
+  - Total worker tests: 45/45 passed (100%).
+  - Web client tests: 69/69 passed (100%).
+
+---
+
+## 27. Next Steps
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
 
-1. **Founder Review:** Founder reviews Stage M1 Report (`docs/stage-M1-report.md`).
-2. **Proceed to Stage M2 (Phase 10F):** Upon explicit Founder command *"proceed to Stage M2"* or *"proceed to Phase 10F"*, begin Phase 10F (Signals Foundation). Per Rule 1, agent stops here.
+1. **Founder Review:** Founder reviews Stage M2 Report (`docs/stage-M2-report.md`).
+2. **Proceed to Stage M3 (Phase 10G):** Upon explicit Founder command *"proceed to Stage M3"* or *"proceed to Phase 10G"*, begin Phase 10G (Meme Lab - User Captions & Moderation Queue). Per Rule 1, agent stops here.

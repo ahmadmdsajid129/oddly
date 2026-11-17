@@ -44,6 +44,7 @@ import { orbitsRoutes } from "./routes/orbits.js";
 import { globeRoutes } from "./routes/globe.js";
 import { telepathyRoutes } from "./routes/telepathy.js";
 import { antiTwinRoutes } from "./routes/antitwin.js";
+import { eventsRoutes } from "./routes/events.js";
 import { DegradationManager } from "./resilience/degradation.js";
 import { registerMetrics } from "./metrics.js";
 
@@ -315,6 +316,7 @@ export async function buildServer(
   await app.register(globeRoutes);
   await app.register(telepathyRoutes);
   await app.register(antiTwinRoutes);
+  await app.register(eventsRoutes);
 
   // 8. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {

@@ -320,6 +320,30 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
               push_token_enc: null,
             },
           });
+
+          // DPDP Signals Hook (P10F.08): Purge analytics_id, raw events, and consents on erasure
+          const aRec = await prisma.analyticsId.findUnique({
+            where: { player_id: playerId },
+          });
+          if (aRec) {
+            await prisma.eventRaw.deleteMany({
+              where: { analytics_id: aRec.analytics_id },
+            });
+            try {
+              await prisma.$executeRawUnsafe(
+                `DO $$ BEGIN IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'player_taste') THEN EXECUTE 'DELETE FROM player_taste WHERE analytics_id = $1' USING $1; END IF; END $$;`,
+                aRec.analytics_id
+              );
+            } catch {
+              // Non-blocking if table not migrated yet
+            }
+            await prisma.analyticsId.delete({
+              where: { player_id: playerId },
+            });
+          }
+          await prisma.consent.deleteMany({
+            where: { player_id: playerId },
+          });
         } catch {
           // Non-blocking in mock
         }

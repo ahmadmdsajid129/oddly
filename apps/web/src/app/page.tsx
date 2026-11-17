@@ -30,6 +30,7 @@ import {
 } from "@/lib/play-state";
 import { AgeGateModal } from "@/components/play/AgeGateModal";
 import { OfflineBanner } from "@/components/play/OfflineBanner";
+import { FirstRunConsentBanner } from "@/components/ui/FirstRunConsentBanner";
 import { QuestionScreen, QuestionData } from "@/components/play/QuestionScreen";
 import type { TwinMatchData } from "@/components/play/TwinRevealScreen";
 import type { OddnessData } from "@/components/play/OddnessScreen";
@@ -756,6 +757,9 @@ export default function HomePage() {
         onConfirm={handleAgeConfirm}
         onUnder18={handleUnder18}
       />
+
+      {/* First Run DPDP Privacy Consent Banner */}
+      <FirstRunConsentBanner />
     </main>
   );
 }

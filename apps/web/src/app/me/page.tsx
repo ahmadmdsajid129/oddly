@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/components/ui/Toast";
 import { ReportModal } from "@/components/ui/ReportModal";
 import { api } from "@/lib/api";
+import { isAnalyticsConsented, setAnalyticsConsentLocal } from "@/lib/signals";
 import {
   ArrowLeft,
   Bell,
@@ -20,6 +21,8 @@ import {
   LogOut,
   User,
   CheckCircle2,
+  Activity,
+  Sparkles,
 } from "lucide-react";
 
 export default function MePage() {
@@ -33,6 +36,46 @@ export default function MePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [analyticsConsent, setAnalyticsConsent] = useState(false);
+  const [personalisationConsent, setPersonalisationConsent] = useState(false);
+
+  useEffect(() => {
+    setAnalyticsConsent(isAnalyticsConsented());
+    api.consents
+      .get()
+      .then((res) => {
+        if (res.ok) {
+          setAnalyticsConsent(res.analytics);
+          setPersonalisationConsent(res.personalisation);
+          setAnalyticsConsentLocal(res.analytics);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleToggleConsent = async (
+    purpose: "analytics" | "personalisation",
+    granted: boolean
+  ) => {
+    if (purpose === "analytics") {
+      setAnalyticsConsent(granted);
+      setAnalyticsConsentLocal(granted);
+    } else {
+      setPersonalisationConsent(granted);
+    }
+
+    try {
+      await api.consents.update(purpose, granted);
+      toast(
+        granted
+          ? `${purpose === "analytics" ? "Quality Telemetry" : "Personalisation"} consent granted`
+          : `${purpose === "analytics" ? "Quality Telemetry" : "Personalisation"} consent withdrawn`,
+        "info"
+      );
+    } catch {
+      toast("Failed to update consent preferences", "error");
+    }
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -215,6 +258,53 @@ export default function MePage() {
             <span className="font-display text-xs font-bold text-ink bg-sun px-3 py-1 rounded-pill border-[1.5px] border-ink">
               Default
             </span>
+          </div>
+        </div>
+
+        {/* DPDP Granular Data Consents (P10F.04) */}
+        <div className="space-y-2">
+          <h2 className="font-display text-caption font-bold uppercase tracking-wider text-muted px-1">
+            Data Consents (DPDP Act)
+          </h2>
+
+          <div className="p-4 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5 max-w-[280px]">
+                <div className="font-display text-sm font-bold text-ink flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-violet stroke-[2.5]" />
+                  <span>Anonymous Quality Telemetry</span>
+                </div>
+                <p className="font-body text-caption text-muted">
+                  Measures dwell and question balance. Zero PII, severed pseudonymous ID, default OFF.
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                aria-label="Anonymous Quality Telemetry consent"
+                checked={analyticsConsent}
+                onChange={(e) => handleToggleConsent("analytics", e.target.checked)}
+                className="w-5 h-5 rounded border-[2px] border-ink accent-violet cursor-pointer"
+              />
+            </div>
+
+            <div className="pt-3 border-t-[1.5px] border-ink/20 flex items-center justify-between">
+              <div className="space-y-0.5 max-w-[280px]">
+                <div className="font-display text-sm font-bold text-ink flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-violet stroke-[2.5]" />
+                  <span>Taste &amp; Theme Personalisation</span>
+                </div>
+                <p className="font-body text-caption text-muted">
+                  Customizes non-Drop themes and Meme Corner. Never personalises Daily Drop questions.
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                aria-label="Taste and Theme Personalisation consent"
+                checked={personalisationConsent}
+                onChange={(e) => handleToggleConsent("personalisation", e.target.checked)}
+                className="w-5 h-5 rounded border-[2px] border-ink accent-violet cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 
