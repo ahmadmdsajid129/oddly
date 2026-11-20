@@ -307,6 +307,37 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     priorityLane: "normal",
     degradationBehavior: "DPDP consent update & taste purge",
   },
+  // Meme Lab Routes (Stage M3 / Phase 10G)
+  {
+    method: "GET",
+    path: "/v1/memes/templates",
+    timeoutMs: 1500,
+    rateLimitClass: "standard",
+    cacheControl: "public, max-age=3600",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Curated meme template catalog",
+  },
+  {
+    method: "POST",
+    path: "/v1/memes/submissions",
+    timeoutMs: 3000,
+    rateLimitClass: "tight",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Shed at L2+; daily cap 2 per user",
+  },
+  {
+    method: "GET",
+    path: "/v1/memes/submissions/mine",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Author review of submitted meme captions",
+  },
 ];
 
 /**
