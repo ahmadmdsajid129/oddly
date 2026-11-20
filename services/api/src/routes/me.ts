@@ -329,14 +329,9 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
             await prisma.eventRaw.deleteMany({
               where: { analytics_id: aRec.analytics_id },
             });
-            try {
-              await prisma.$executeRawUnsafe(
-                `DO $$ BEGIN IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'player_taste') THEN EXECUTE 'DELETE FROM player_taste WHERE analytics_id = $1' USING $1; END IF; END $$;`,
-                aRec.analytics_id
-              );
-            } catch {
-              // Non-blocking if table not migrated yet
-            }
+            await prisma.playerTaste.deleteMany({
+              where: { player_id: playerId },
+            });
             await prisma.analyticsId.delete({
               where: { player_id: playerId },
             });

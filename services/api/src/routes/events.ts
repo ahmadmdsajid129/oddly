@@ -299,22 +299,11 @@ export const eventsRoutes: FastifyPluginAsyncZod = async (app) => {
           },
         });
 
-        // Rule 13 hook: If personalisation consent is withdrawn, purge player_taste if exists
+        // Rule 13 hook (P10H.03): If personalisation consent is withdrawn, immediately hard delete all player_taste rows
         if (purpose === "personalisation") {
-          const aRec = await prisma.analyticsId.findUnique({
+          await prisma.playerTaste.deleteMany({
             where: { player_id: player.id },
           });
-          if (aRec) {
-            // Raw SQL safe delete in case player_taste table exists or is created
-            try {
-              await prisma.$executeRawUnsafe(
-                `DO $$ BEGIN IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'player_taste') THEN EXECUTE 'DELETE FROM player_taste WHERE analytics_id = $1' USING $1; END IF; END $$;`,
-                aRec.analytics_id
-              );
-            } catch {
-              // Table not yet migrated in Phase 10F (M4 task)
-            }
-          }
         }
       }
 
