@@ -19,6 +19,7 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
+import { MemesRepository } from "../db/memes.repo.js";
 import { resolveAuthenticatedPlayer } from "../auth/player-auth.js";
 import { DegradationManager } from "../resilience/degradation.js";
 import {
@@ -77,6 +78,68 @@ export const memeRoutes: FastifyPluginAsyncZod = async (app) => {
           ...t,
           alt_text_i18n: t.alt_text_i18n as Record<string, unknown>,
         })),
+      });
+    }
+  );
+
+  /**
+   * GET /v1/memes/corner
+   * Fetches the next tailored Meme Corner card for the authenticated player (P10G.06).
+   * Runs the 80/20 exposure engine (80% exploitation top Wilson score, 20% exploration),
+   * enforcing author exclusion, no-repeat limits, and template diversity caps.
+   */
+  app.get(
+    "/v1/memes/corner",
+    {
+      schema: {
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            meme: z
+              .object({
+                id: z.string(),
+                template_id: z.string(),
+                template_key: z.string(),
+                illustration_registry_key: z.string(),
+                caption_text: z.string(),
+                aspect: z.string(),
+                alt_text: z.string().optional(),
+                wilson_lb: z.number(),
+                is_exploration: z.boolean(),
+              })
+              .nullable(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      // 1. Degradation Shedding Check
+      const degradationLevel = await DegradationManager.getLevel();
+      if (degradationLevel >= 2) {
+        return reply.status(503).send({
+          ok: false,
+          error: "SERVICE_DEGRADED",
+          message: "Meme Corner is temporarily paused under high traffic.",
+        });
+      }
+
+      // 2. Authentication Check
+      const player = await resolveAuthenticatedPlayer(req);
+      if (!player) {
+        return reply.status(401).send({
+          ok: false,
+          error: "UNAUTHORIZED",
+          message: "Authentication required to view Meme Corner",
+        });
+      }
+
+      // 3. Exposure Engine Selection
+      const memesRepo = new MemesRepository(prisma);
+      const selected = await memesRepo.selectMemeForPlayer(player.id);
+
+      return reply.status(200).send({
+        ok: true,
+        meme: selected,
       });
     }
   );

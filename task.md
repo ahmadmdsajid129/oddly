@@ -15,10 +15,10 @@
 | **Overall Project Progress**    | `[████████████░░░░░░░░] 62%`                                                     |
 | **Current Active Stage**        | **Stage M3: Meme Lab (IN PROGRESS)**                                            |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 213 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 214 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 5 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 118 tasks                                                                        |
+| **Pending (`TODO`)**            | 117 tasks                                                                        |
 
 ---
 
@@ -43,7 +43,7 @@
 | **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage F4              |
 | **Phase 10E**| Meme Questions & Themed Drops               | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M1 (after F4)   |
 | **Phase 10F**| Signals Foundation                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage M2 (after M1)   |
-| **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | IN PROGRESS| `[#####-----] 56%` | 5 / 9              | Stage M3              |
+| **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | IN PROGRESS| `[######----] 67%` | 6 / 9              | Stage M3              |
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M4 (Deferred)   |
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | TODO      | `[----------] 0%`  | 0 / 8              | Stage M5/M6 (Deferred)|
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M7 (Documented) |
@@ -440,7 +440,7 @@ _Status: TODO | Target: User caption submissions, moderation queue API, Meme Cor
 | `[x] P10G.03` | Build caption composer UI (`/memes/new`) with template carousel and live character counter                 | High     | DONE   | P10G.02        | Agent | 2026-11-20 | >= 44px touch targets; Rule 18 |
 | `[x] P10G.04` | Build post-drop Meme Corner card with "Funny" and "Not for me" reaction buttons                             | Medium   | DONE   | P10G.01        | Agent | 2026-11-20 | Non-Drop surface; >= 44px targets        |
 | `[x] P10G.05` | Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker      | High     | DONE   | P10G.04        | Agent | 2026-11-20 | Min 200 raters threshold                 |
-| `[ ] P10G.06` | Build exposure engine: 20% exploration traffic, freshness retirement, and diversity caps                    | High     | TODO   | P10G.05        | Agent | —         | Balanced impression distribution         |
+| `[x] P10G.06` | Build exposure engine: 20% exploration traffic, freshness retirement, and diversity caps                    | High     | DONE   | P10G.05        | Agent | 2026-11-20 | Balanced impression distribution         |
 | `[ ] P10G.07` | Implement Drop candidate list generation in Mission Control with two-person approval workflow               | High     | TODO   | P10G.05, P11.05| Agent | —         | Never auto-published                     |
 | `[ ] P10G.08` | Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions                     | Critical | TODO   | P10G.01        | Agent | —         | Instant takedown capability              |
 | `[ ] P10G.09` | Author automated abuse-case tests: rating brigading, sockpuppets, rate limits, and Turnstile bypass        | Critical | TODO   | P10G.02, P10G.05| Agent| —         | Anti-abuse test suite                    |

@@ -775,6 +775,37 @@ export class OddlyApiClient {
     }>("/v1/memes/templates");
   }
 
+  /** Get tailored post-drop Meme Corner card via exposure engine (P10G.04, P10G.06) */
+  async getMemeCorner(): Promise<{
+    ok: boolean;
+    meme: {
+      id: string;
+      template_id: string;
+      template_key: string;
+      illustration_registry_key: string;
+      caption_text: string;
+      aspect: string;
+      alt_text?: string;
+      wilson_lb: number;
+      is_exploration: boolean;
+    } | null;
+  }> {
+    return this.request<{
+      ok: boolean;
+      meme: {
+        id: string;
+        template_id: string;
+        template_key: string;
+        illustration_registry_key: string;
+        caption_text: string;
+        aspect: string;
+        alt_text?: string;
+        wilson_lb: number;
+        is_exploration: boolean;
+      } | null;
+    }>("/v1/memes/corner");
+  }
+
   /** Submit community meme caption (P10G.02, P10G.03) */
   async submitMemeCaption(data: {
     template_id: string;

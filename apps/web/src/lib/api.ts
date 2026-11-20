@@ -157,6 +157,7 @@ export const api = {
   },
   memes: {
     getTemplates: () => rawClient.getMemeTemplates(),
+    getCorner: () => rawClient.getMemeCorner(),
     submit: (data: Parameters<typeof rawClient.submitMemeCaption>[0]) =>
       rawClient.submitMemeCaption(data),
     getMySubmissions: () => rawClient.getMyMemeSubmissions(),

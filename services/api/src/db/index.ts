@@ -16,4 +16,5 @@ export * from "./streaks.repo.js";
 export * from "./history.repo.js";
 export * from "./keeps.repo.js";
 export * from "./orbits.repo.js";
+export * from "./memes.repo.js";
 

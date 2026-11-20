@@ -1071,6 +1071,24 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
     - Expanded `services/api/src/memes.integration.test.ts` with 6 new rating tests (17/17 tests passing).
     - Authored `services/worker/src/wilson-scoring.test.ts` (3/3 unit tests passing).
     - Full monorepo verification: `turbo run typecheck` (6/6 passing) and `turbo run lint` (6/6 passing).
+- **`P10G.06`: Exposure Engine (`MemesRepository`, `GET /v1/memes/corner`, 80/20 Traffic Allocation):**
+  - **Exposure Engine & Repository (`services/api/src/db/memes.repo.ts`):**
+    - **80% Exploitation / 20% Exploration Allocation:** By default, 80% probability selects top Wilson lower bound candidates ($N \ge 200$) and 20% exploration selects fresh submissions ($N < 200$) ordered by least impressions (`impressions ASC`) to gather initial ratings.
+    - **Adaptive Fallback:** If exploitation pool has no items (e.g. bootstrap stage), automatically falls back 100% to exploration pool; if exploration has no items, falls back to exploitation.
+    - **Diversity Caps:** Prevents repeat impressions per player across all time (`meme_exposures` and `meme_ratings` check); enforces 7-day template cooldown (`templateCooldownDays: 7`).
+    - **Author Exclusion:** Ensures authors never view or rate their own submissions (`author_player_id != playerId`).
+    - **Atomic Impression Tracking:** Atomically writes to `meme_exposures` and increments `meme_stats.impressions`.
+    - **Freshness Retirement:** `retireStaleMemes` retires submissions older than 14 days without high rating or traction (`wilson_lb < 0.50` or `raters < 20`).
+  - **API Endpoint & Policies:**
+    - `GET /v1/memes/corner`: Returns tailored meme recommendation or `null`, requires player authentication, sheds at degradation L2+.
+    - Added route policy in `policy.registry.ts` (`GET /v1/memes/corner`, timeout 2000ms, rateLimitClass: "standard", priorityLane: "normal").
+  - **Client SDK & Frontend Card:**
+    - Added `getMemeCorner()` to `packages/api-client/src/index.ts`.
+    - Added `oddlyApi.memes.getCorner()` to `apps/web/src/lib/api.ts`.
+    - Updated `MemeCornerCard.tsx` to automatically fetch live recommended meme on mount with fallback to `DEFAULT_MEME`.
+  - **Verification:**
+    - Authored `services/api/src/memes-exposure.integration.test.ts` (7/7 tests passing).
+    - Full monorepo verification: `turbo run typecheck` (6/6 passing) and `turbo run lint` (6/6 passing, 0 warnings).
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
@@ -1091,7 +1109,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
    - **`P10G.03`:** Build caption composer UI (`/memes/new`) (DONE).
    - **`P10G.04`:** Build post-drop Meme Corner card (DONE).
    - **`P10G.05`:** Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker (DONE).
-   - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps).
+   - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps) (DONE).
    - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow.
    - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions.
    - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass).

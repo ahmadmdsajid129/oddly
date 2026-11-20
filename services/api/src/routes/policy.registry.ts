@@ -319,6 +319,16 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     degradationBehavior: "Curated meme template catalog",
   },
   {
+    method: "GET",
+    path: "/v1/memes/corner",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Exposure engine: 80% exploitation / 20% exploration with diversity caps",
+  },
+  {
     method: "POST",
     path: "/v1/memes/submissions",
     timeoutMs: 3000,

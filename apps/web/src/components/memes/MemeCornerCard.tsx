@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Smile, Meh, Sparkles, Check, ArrowRight } from "lucide-react";
 import { Card, Chip } from "@/components/ui/Card";
@@ -34,12 +34,36 @@ interface MemeCornerCardProps {
 }
 
 export function MemeCornerCard({
-  meme = DEFAULT_MEME,
+  meme: initialMeme,
   onRate,
   className = "",
 }: MemeCornerCardProps) {
+  const [activeMeme, setActiveMeme] = useState<MemeCornerData>(initialMeme || DEFAULT_MEME);
   const [selectedRating, setSelectedRating] = useState<"funny" | "not_for_me" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (initialMeme) {
+      setActiveMeme(initialMeme);
+      return;
+    }
+    // Fetch tailored recommendation from exposure engine (P10G.06)
+    api.memes
+      .getCorner()
+      .then((res) => {
+        if (res?.ok && res.meme) {
+          setActiveMeme({
+            id: res.meme.id,
+            template_key: res.meme.template_key,
+            illustration_registry_key: res.meme.illustration_registry_key,
+            caption_text: res.meme.caption_text,
+          });
+        }
+      })
+      .catch(() => {
+        // Fallback to DEFAULT_MEME smoothly
+      });
+  }, [initialMeme]);
 
   const handleRate = async (rating: "funny" | "not_for_me") => {
     if (selectedRating || isSubmitting) return;
@@ -51,15 +75,11 @@ export function MemeCornerCard({
 
     try {
       if (onRate) {
-        await onRate(meme.id, rating);
+        await onRate(activeMeme.id, rating);
       } else {
         // Fallback default rating ingestion if available
         try {
-          await fetch(`/v1/memes/${meme.id}/rating`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rating }),
-          });
+          await api.memes.rate(activeMeme.id, rating);
         } catch {
           // Non-blocking for UI preview
         }
@@ -87,9 +107,9 @@ export function MemeCornerCard({
           </span>
         </div>
 
-        {meme.author_region && (
+        {activeMeme.author_region && (
           <span className="text-[11px] font-mono font-bold text-muted bg-cream px-2.5 py-0.5 rounded-pill border-[1.5px] border-ink">
-            {meme.author_region}
+            {activeMeme.author_region}
           </span>
         )}
       </div>
@@ -98,7 +118,7 @@ export function MemeCornerCard({
       <div className="w-full p-4 bg-cream rounded-m border-[2px] border-ink shadow-inner flex flex-col items-center justify-center text-center">
         <div className="py-2">
           <DynamicIllustration
-            assetKey={meme.illustration_registry_key}
+            assetKey={activeMeme.illustration_registry_key}
             size={120}
             className="mx-auto drop-shadow-sm"
           />
@@ -109,7 +129,7 @@ export function MemeCornerCard({
           data-testid="meme-corner-caption"
           className="font-display text-body-l sm:text-display-s font-extrabold text-ink leading-snug mt-2 max-w-sm px-1 break-words"
         >
-          &ldquo;{meme.caption_text}&rdquo;
+          &ldquo;{activeMeme.caption_text}&rdquo;
         </p>
       </div>
 
