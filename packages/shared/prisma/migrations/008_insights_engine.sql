@@ -62,3 +62,4 @@ INSERT INTO app_config (id, key, value, updated_at) VALUES
 ON CONFLICT (key) DO NOTHING;
 
 COMMIT;
+
