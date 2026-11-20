@@ -17,6 +17,7 @@ import { TierBadge } from "@/components/ui/Card";
 import { BrandMark } from "@/components/icons";
 import { ShareSheet } from "@/components/share/ShareSheet";
 import { KeepButton } from "@/components/orbit/KeepButton";
+import { MemeCornerCard } from "@/components/memes/MemeCornerCard";
 import {
   Sparkles,
   Share2,
@@ -200,6 +201,9 @@ export default function MorningRecapPage() {
             </Button>
           </div>
         </div>
+
+        {/* Post-Drop Meme Corner Card (Stage M3 / Phase 10G / P10G.04) */}
+        <MemeCornerCard />
 
         {/* Seamless Forward CTA to Today's Drop */}
         <div className="p-5 rounded-l bg-sun/40 border-[2.5px] border-ink shadow-sticker text-center space-y-3">

@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M3: Meme Lab (User Captions & Moderation Queue) — IN PROGRESS (Tasks P10G.01, P10G.02, and P10G.03 complete).
+- **Current Stage:** Stage M3: Meme Lab (User Captions & Moderation Queue) — IN PROGRESS (Tasks P10G.01, P10G.02, P10G.03, and P10G.04 complete).
 - **Current Target:** Execute Phase 10G tasks (P10G.01 to P10G.09): Database migrations, Submission API, Caption Composer UI, Meme Corner Card, Wilson rating worker, Exposure engine, Moderation queue, Creator delete, and Abuse-case tests directly on `main`.
 
 ---
@@ -1040,6 +1040,15 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
   - Added meme client methods (`getMemeTemplates`, `submitMemeCaption`, `getMyMemeSubmissions`) in `packages/api-client` and `apps/web/src/lib/api.ts`.
   - Authored `apps/web/src/meme-composer.test.ts` (9/9 unit tests passing).
   - Prerendered cleanly in production build (`/memes/new` static route, 8.6 kB).
+- **`P10G.04`: Post-Drop Meme Corner Card (`MemeCornerCard.tsx` & `/recap`):**
+  - Built `apps/web/src/components/memes/MemeCornerCard.tsx`:
+    - **Physical Paper Sticker Metaphor:** Cream desk context (`#FFF8F0`), ink outline (`2.5px solid #14123A`), hard offset shadow (`4px 4px 0 #14123A`), 0 blur.
+    - **Binary Rating Actions:** "Funny" (`Smile`) and "Not for me" (`Meh`) reaction buttons with guaranteed $\ge 44 \times 44\text{px}$ touch targets and tactile press-flat interaction.
+    - **Post-Vote State:** Confirmation banner ("Marked as Funny!", "Feedback noted! Thanks for curating.") with checkmark.
+    - **Non-Drop Surface Invariant:** Positioned strictly on the post-drop recap screen (`/recap`), completely decoupled from the core 5-question daily Drop matching engine.
+    - **Creator Entry Point:** Direct CTA link (`/memes/new`) inviting players to write their own captions in Meme Lab.
+  - Integrated into `apps/web/src/app/recap/page.tsx`.
+  - Authored `apps/web/src/meme-corner.test.ts` (5/5 unit tests passing).
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
