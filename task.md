@@ -13,12 +13,12 @@
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
 | **Overall Project Progress**    | `[████████████░░░░░░░░] 62%`                                                     |
-| **Current Active Stage**        | **Stage M2: Signals Foundation (COMPLETE)**                                      |
+| **Current Active Stage**        | **Stage M3: Meme Lab (IN PROGRESS)**                                            |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 208 tasks (Proven by code, tests & integration test suite)                       |
-| **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
+| **Completed Tasks (`DONE`)**    | 210 tasks (Proven by code, tests & integration test suite)                       |
+| **In Progress (`IN PROGRESS`)** | 7 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 128 tasks                                                                        |
+| **Pending (`TODO`)**            | 119 tasks                                                                        |
 
 ---
 
@@ -43,7 +43,7 @@
 | **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage F4              |
 | **Phase 10E**| Meme Questions & Themed Drops               | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M1 (after F4)   |
 | **Phase 10F**| Signals Foundation                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage M2 (after M1)   |
-| **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M3 (Deferred)   |
+| **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | IN PROGRESS| `[##--------] 22%` | 2 / 9              | Stage M3              |
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M4 (Deferred)   |
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | TODO      | `[----------] 0%`  | 0 / 8              | Stage M5/M6 (Deferred)|
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M7 (Documented) |
@@ -435,8 +435,8 @@ _Status: TODO | Target: User caption submissions, moderation queue API, Meme Cor
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10G.01` | Database migrations: `meme_submissions`, `meme_ratings`, `meme_stats`, `meme_exposures`, `moderation_actions` | High | TODO | P10F.01 | Agent | — | Deferred until Founder command |
-| `[ ] P10G.02` | Implement Meme Lab submission API: `POST /v1/memes/submissions` (Turnstile, duplicate check, 100 char limit) | High | TODO | P10G.01 | Agent | — | Rule 18 free-text exception |
+| `[x] P10G.01` | Database migrations: `meme_submissions`, `meme_ratings`, `meme_stats`, `meme_exposures`, `moderation_actions` | High | DONE | P10F.01 | Agent | 2026-11-20 | Migration 007 applied & verified |
+| `[x] P10G.02` | Implement Meme Lab submission API: `POST /v1/memes/submissions` (Turnstile, duplicate check, 100 char limit) | High | DONE | P10G.01 | Agent | 2026-11-20 | Rule 18 free-text exception |
 | `[ ] P10G.03` | Build caption composer UI (`/memes/new`) with template carousel and live character counter                 | High     | TODO   | P10G.02        | Agent | —         | >= 44px touch targets                    |
 | `[ ] P10G.04` | Build post-drop Meme Corner card with "Funny" and "Not for me" reaction buttons                             | Medium   | TODO   | P10G.01        | Agent | —         | Non-Drop surface                         |
 | `[ ] P10G.05` | Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker      | High     | TODO   | P10G.04        | Agent | —         | Min 200 raters threshold                 |
