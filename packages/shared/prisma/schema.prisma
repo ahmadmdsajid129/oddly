@@ -108,6 +108,9 @@ model Player {
   antiTwinResults  AntiTwinResult[]
   consents         Consent[]
   analyticsId      AnalyticsId?
+  memeSubmissions  MemeSubmission[]
+  memeRatings      MemeRating[]
+  memeExposures    MemeExposure[]
 
   @@index([account_id])
   @@index([did])
@@ -688,7 +691,8 @@ model MemeTemplate {
   status                    String   @default("active") @db.VarChar(20)
   created_at                DateTime @default(now())
 
-  questions Question[]
+  questions       Question[]
+  memeSubmissions MemeSubmission[]
 
   @@index([key])
   @@index([status])
@@ -787,6 +791,113 @@ model TagStatsDaily {
   @@id([drop_date, tag_id])
   @@index([tag_id])
   @@map("tag_stats_daily")
+}
+
+// ---------------------------------------------------------------------------
+// 36. meme_submissions — user caption submissions for Meme Lab (Stage M3 / Phase 10G)
+// Rule 18: Scoped free-text exception strictly <= 100 characters
+// ---------------------------------------------------------------------------
+model MemeSubmission {
+  id                      String    @id @default(uuid())
+  author_player_id        String
+  author                  Player    @relation(fields: [author_player_id], references: [id], onDelete: Cascade)
+  template_id             String
+  template                MemeTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+  caption_text            String    @db.VarChar(100)
+  status                  String    @default("queued") @db.VarChar(20) // 'queued' | 'approved' | 'rejected' | 'retired'
+  turnstile_verified      Boolean   @default(true)
+  originality_attested_at DateTime  @default(now())
+  moderation_reason       String?
+  reviewed_by             String?
+  reviewed_at             DateTime?
+  created_at              DateTime  @default(now())
+  updated_at              DateTime  @default(now()) @updatedAt
+
+  stats                   MemeStat?
+  ratings                 MemeRating[]
+  exposures               MemeExposure[]
+  moderationActions       ModerationAction[]
+
+  @@index([author_player_id])
+  @@index([status])
+  @@index([template_id])
+  @@index([created_at])
+  @@map("meme_submissions")
+}
+
+// ---------------------------------------------------------------------------
+// 37. meme_ratings — post-drop Meme Corner ratings (Stage M3 / Phase 10G)
+// ---------------------------------------------------------------------------
+model MemeRating {
+  id              String         @id @default(uuid())
+  submission_id   String
+  submission      MemeSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  rater_player_id String
+  rater           Player         @relation(fields: [rater_player_id], references: [id], onDelete: Cascade)
+  rating          String         @db.VarChar(20) // 'funny' | 'not_for_me'
+  drop_date       DateTime       @db.Date
+  created_at      DateTime       @default(now())
+
+  @@unique([submission_id, rater_player_id], name: "submission_rater_unique")
+  @@index([submission_id])
+  @@index([rater_player_id])
+  @@index([drop_date])
+  @@map("meme_ratings")
+}
+
+// ---------------------------------------------------------------------------
+// 38. meme_stats — aggregate rating counters and Wilson score lower bound (Stage M3 / Phase 10G)
+// ---------------------------------------------------------------------------
+model MemeStat {
+  submission_id    String         @id
+  submission       MemeSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  impressions      Int            @default(0)
+  raters           Int            @default(0)
+  funny_count      Int            @default(0)
+  not_for_me_count Int            @default(0)
+  wilson_lb        Float          @default(0.0)
+  last_shown_at    DateTime?
+  updated_at       DateTime       @default(now()) @updatedAt
+
+  @@index([wilson_lb(sort: Desc)])
+  @@map("meme_stats")
+}
+
+// ---------------------------------------------------------------------------
+// 39. meme_exposures — impression tracking for diversity and exploration caps (Stage M3 / Phase 10G)
+// ---------------------------------------------------------------------------
+model MemeExposure {
+  id            String         @id @default(uuid())
+  submission_id String
+  submission    MemeSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  player_id     String
+  player        Player         @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  drop_date     DateTime       @db.Date
+  shown_at      DateTime       @default(now())
+
+  @@unique([submission_id, player_id, drop_date], name: "sub_player_drop_unique")
+  @@index([player_id, drop_date])
+  @@index([submission_id])
+  @@map("meme_exposures")
+}
+
+// ---------------------------------------------------------------------------
+// 40. moderation_actions — immutable audit log for moderation decisions (Stage M3 / Phase 10G)
+// ---------------------------------------------------------------------------
+model ModerationAction {
+  id            String         @id @default(uuid())
+  submission_id String
+  submission    MemeSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  action        String         @db.VarChar(30) // 'approve' | 'reject' | 'retire' | 'takedown'
+  reason        String
+  note          String?
+  admin_id      String
+  created_at    DateTime       @default(now())
+
+  @@index([submission_id])
+  @@index([admin_id])
+  @@index([created_at])
+  @@map("moderation_actions")
 }
 
 
