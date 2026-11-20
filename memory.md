@@ -9,8 +9,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M3: Meme Lab (User Captions & Moderation Queue) — IN PROGRESS (Tasks P10G.01, P10G.02, P10G.03, and P10G.04 complete).
-- **Current Target:** Execute Phase 10G tasks (P10G.01 to P10G.09): Database migrations, Submission API, Caption Composer UI, Meme Corner Card, Wilson rating worker, Exposure engine, Moderation queue, Creator delete, and Abuse-case tests directly on `main`.
+- **Current Stage:** Stage M4: Insights Engine (Statistics Only) — COMPLETE (Tasks P10H.01 to P10H.09 complete & verified).
+- **Current Target:** Stage M5 & M6 (Phase 10I: Taste Dimension & Recognition — Orbit Subject Sync, Creator Badges, Satori Achievement Cards, Featured Memes).
 
 ---
 
@@ -1157,6 +1157,79 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
    - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow (DONE).
    - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions (DONE).
    - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass) (DONE).
-2. **Stop Condition (Rule 1 Boundary):**
    - Stage M3 completion report authored in `docs/stage-M3-report.md`.
-   - **Awaiting Founder command before proceeding to Stage M4 (Phase 10H: Insights Engine).**
+
+---
+
+## 29. Stage M4: Insights Engine — Statistics Only (Phase 10H) — Shipped Deliverables (2026-11-21)
+
+### 29.1 Tasks Completed
+- **`P10H.01`: Database Migrations (`008_insights_engine.sql` & `schema.prisma`):**
+  - `player_taste`: Consented smoothed tag affinities (`player_id`, `tag_id`, `affinity_score`, `sample_size`, `last_engaged_at`, `updated_at`).
+  - `notification_timing_stats`: Cohort hourly open rates (`cohort_key`, `hour_of_day_utc`, `open_rate`, `samples_count`).
+  - `editor_suggestions`: Drop planning recommendations (`target_drop_date`, `suggestion_type`, `tag_id`, `severity`, `message`, `dismissed`).
+  - `app_config` seeds: `insights.min_taste_samples` (20), `insights.fatigue_days_window` (4), `insights.fatigue_max_occurrences` (2), `feature.insights_engine` (true).
+- **`P10H.02`: Nightly Worker Job for `player_taste` Affinity Scores (`PlayerTasteJob`):**
+  - Implemented in `services/worker/src/jobs/player-taste.job.ts`.
+  - Recency weighting: 30-day half-life exponential decay: $w_i = \exp(-\lambda \cdot \Delta t)$.
+  - Laplace Bayesian smoothing: $\text{score} = \frac{\sum w_i \cdot \mathbb{I}(\text{funny}) + 1.0}{\sum w_i + 2.0}$.
+  - Minimum sample size threshold guard: strictly requires $n \ge 20$ ratings before deriving or storing affinity.
+  - Verified in `services/worker/src/player-taste.test.ts` (6/6 tests passing).
+- **`P10H.03`: Instant Hard Deletion Hook on Consent Withdrawal:**
+  - Implemented in `services/api/src/routes/events.ts` (`PUT /v1/consents` when `granted: false`) and `services/api/src/routes/me.ts` (`DELETE /v1/me`).
+  - Instant synchronous deletion of all corresponding rows in `player_taste` under Rule 13 and DPDP Section 12.
+  - Verified in `services/api/src/consent-taste.integration.test.ts` (1/1 passing).
+- **`P10H.04`: Category Performance Analytics Calculation:**
+  - Implemented in `services/api/src/services/insights.service.ts` and `GET /v1/admin/insights/tags/performance`.
+  - Aggregates trailing 14-day completion rate index, viral share lift relative to baseline, and median dwell times by subject tag.
+- **`P10H.05`: Question Quality Flagging Engine:**
+  - Implemented in `services/api/src/services/insights.service.ts` and `GET /v1/admin/insights/questions/flags`.
+  - Automated flags: `HIGH_FRICTION` ($p_{50} > 12\text{s}$ or toggle $> 35\%$), `HIGH_ABANDONMENT` ($> 3.0\%$), `LOPSIDED_SPLIT`, and report spikes ($\ge 3$).
+  - Sample size noise guard enforces $k \ge 20$ minimum threshold.
+- **`P10H.06`: Cohort Notification Timing Optimization Model:**
+  - Implemented in `services/worker/src/jobs/notification-timing.job.ts` and `GET /v1/admin/insights/timing`.
+  - Clusters UTC open rate distributions (0–23 UTC) strictly by macro-cohort (`region_ageband`). Falls back to `GLOBAL` cohort if local samples $< 50$.
+  - Zero individual user profiling (Rule 15). Verified in `services/worker/src/notification-timing.test.ts` (2/2 passing).
+- **`P10H.07`: Drop Planning Advisory Engine with Fatigue Warnings:**
+  - Implemented in `services/api/src/services/insights.service.ts`, `GET /v1/admin/insights/suggestions`, and `POST /v1/admin/insights/suggestions/generate`.
+  - Identifies underused tags ($> 14$ days absent), weekend viral share boosters, and warns if a tag is scheduled $> 2$ times in 4 consecutive days.
+- **`P10H.08`: Personalised Ranking on Non-Drop Surfaces:**
+  - Implemented in `services/api/src/db/memes.repo.ts`.
+  - Personalizes candidate ranking in Post-Drop Meme Corner for consented players ($n \ge 20$).
+  - Drop questions remain 100% immune to taste personalization (Rule 12).
+- **`P10H.09`: Unit & Integration Invariants Verification Suite:**
+  - Implemented in `services/api/src/insights-invariants.integration.test.ts` (6/6 passing).
+  - Proves: 1) Drop questions returned to users with opposite tastes are 100% identical; 2) Zero forbidden topic overlap in taxonomy; 3) Category analytics; 4) Question quality flags; 5) Fatigue linting; 6) Meme Corner taste boosting.
+
+### 29.2 Test Results & Verification
+- `@oddly/worker`: 8/8 test files passed, 56/56 tests (100%).
+- `@oddly/api`: 56/56 meme and insights integration tests passed (100%).
+- Monorepo: `pnpm turbo run typecheck lint` 12/12 passing with 0 errors and 0 warnings.
+- Documentation: `docs/stage-M4-report.md` authored.
+
+---
+
+## 30. Next Steps & Stage M4 Completion
+
+> **All commits pushed directly to `main` and verified.**
+
+1. **Stage M4 (Phase 10H: Insights Engine — Statistics Only) is 100% COMPLETE (9/9 tasks):**
+   - **`P10H.01`:** Database Migrations (DONE).
+   - **`P10H.02`:** Nightly worker job for smoothed `player_taste` affinity scores with recency weighting (DONE).
+   - **`P10H.03`:** Instant hard deletion hook for `player_taste` upon consent withdrawal (DONE).
+   - **`P10H.04`:** Category performance analytics calculation (DONE).
+   - **`P10H.05`:** Question quality flagging engine (DONE).
+   - **`P10H.06`:** Cohort notification timing optimization model (DONE).
+   - **`P10H.07`:** Drop planning advisory engine with fatigue linting (DONE).
+   - **`P10H.08`:** Personalised ranking for optional Meme Corner card (DONE).
+   - **`P10H.09`:** Automated invariant tests (DONE).
+   - Stage M4 completion report authored in `docs/stage-M4-report.md`.
+2. **Ready to proceed to Stage M5 & M6 (Phase 10I: Taste Dimension & Recognition):**
+   - `P10I.01`: Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold).
+   - `P10I.02`: Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view.
+   - `P10I.03`: Database migrations: `badge_definitions`, `creator_badges`, `featured_memes`.
+   - `P10I.04`: Creator badge award worker: evaluate Wilson scores and rater benchmarks.
+   - `P10I.05`: Build achievement card renderer: Satori 3D flip card with alias + macro-region ($k \ge 20$).
+   - `P10I.06`: Build featured meme showcase surface (`/featured`).
+   - `P10I.07`: Build opt-in achievement sharing sheet and creator deletion revocation flow.
+   - `P10I.08`: Integration tests proving Rule 19 compliance (zero pick vector leakage).

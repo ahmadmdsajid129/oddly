@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[████████████░░░░░░░░] 63%`                                                     |
-| **Current Active Stage**        | **Stage M3: Meme Lab (COMPLETE)**                                               |
+| **Overall Project Progress**    | `[█████████████░░░░░░░] 67%`                                                     |
+| **Current Active Stage**        | **Stage M4: Insights Engine (COMPLETE)**                                         |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 217 tasks (Proven by code, tests & integration test suite)                       |
-| **In Progress (`IN PROGRESS`)** | 4 tasks                                                                          |
+| **Completed Tasks (`DONE`)**    | 226 tasks (Proven by code, tests & integration test suite)                       |
+| **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 114 tasks                                                                        |
+| **Pending (`TODO`)**            | 105 tasks                                                                        |
 
 ---
 
@@ -44,7 +44,7 @@
 | **Phase 10E**| Meme Questions & Themed Drops               | High     | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M1 (after F4)   |
 | **Phase 10F**| Signals Foundation                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage M2 (after M1)   |
 | **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | COMPLETE   | `[##########] 100%`| 9 / 9              | Stage M3              |
-| **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | TODO      | `[----------] 0%`  | 0 / 9              | Stage M4 (Deferred)   |
+| **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M4              |
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | TODO      | `[----------] 0%`  | 0 / 8              | Stage M5/M6 (Deferred)|
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M7 (Documented) |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M8 (Documented) |
@@ -447,21 +447,21 @@ _Status: TODO | Target: User caption submissions, moderation queue API, Meme Cor
 
 ---
 
-### Phase 10H: Insights Engine (Statistics Only) (Stage M4 — Deferred)
+### Phase 10H: Insights Engine (Statistics Only) (Stage M4)
 
-_Status: TODO | Target: Consented tag affinity (`player_taste`), category performance, question quality flags, cohort notification timing, editor suggestions._
+_Status: COMPLETE | Target: Consented tag affinity (`player_taste`), category performance, question quality flags, cohort notification timing, editor suggestions._
 
-| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10H.01` | Database migrations: `player_taste`, `notification_timing_stats`, `editor_suggestions`                      | Medium   | TODO   | P10F.01        | Agent | —         | Deferred until Founder command           |
-| `[ ] P10H.02` | Nightly worker job: compute smoothed `player_taste` affinity scores with recency weighting (min 20 ratings) | Medium   | TODO   | P10H.01        | Agent | —         | Consent-gated derivation                 |
-| `[ ] P10H.03` | Implement instant hard deletion hook for `player_taste` upon `'personalisation'` consent withdrawal         | Critical | TODO   | P10H.01        | Agent | —         | Rule 13 compliance                       |
-| `[ ] P10H.04` | Build category performance analytics calculation (completion, share lift, dwell by subject tag)             | Medium   | TODO   | P10F.06        | Agent | —         | Aggregate metrics only                   |
-| `[ ] P10H.05` | Build question quality flagging engine (detect high dwell, high option changes, high abandon rate)          | High     | TODO   | P10F.06        | Agent | —         | Mission Control alert triggers           |
-| `[ ] P10H.06` | Build cohort notification timing optimization model (hourly open bucket clustering)                         | Medium   | TODO   | P10H.01        | Agent | —         | No individual profiling                  |
-| `[ ] P10H.07` | Build Drop planning advisory engine: generate `editor_suggestions` for Mission Control with fatigue warnings | Medium | TODO   | P10H.04        | Agent | —         | Advisory suggestions only                |
-| `[ ] P10H.08` | Implement personalised ranking for optional Meme Corner card and suggested share card themes                | Medium   | TODO   | P10H.02        | Agent | —         | Non-Drop surfaces only                   |
-| `[ ] P10H.09` | Unit and integration tests with synthetic fixtures proving zero sensitive inference and zero Drop variation | Critical | TODO   | P10H.02, P10H.08| Agent| —         | Invariant verification                   |
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date   | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | ----------- | ---------------------------------------- |
+| `[x] P10H.01` | Database migrations: `player_taste`, `notification_timing_stats`, `editor_suggestions`                      | Medium   | DONE   | P10F.01        | Agent | 2026-11-20  | 008_insights_engine.sql applied          |
+| `[x] P10H.02` | Nightly worker job: compute smoothed `player_taste` affinity scores with recency weighting (min 20 ratings) | Medium   | DONE   | P10H.01        | Agent | 2026-11-21  | Consent-gated derivation                 |
+| `[x] P10H.03` | Implement instant hard deletion hook for `player_taste` upon `'personalisation'` consent withdrawal         | Critical | DONE   | P10H.01        | Agent | 2026-11-21  | Rule 13 compliance                       |
+| `[x] P10H.04` | Build category performance analytics calculation (completion, share lift, dwell by subject tag)             | Medium   | DONE   | P10F.06        | Agent | 2026-11-21  | Aggregate metrics only                   |
+| `[x] P10H.05` | Build question quality flagging engine (detect high dwell, high option changes, high abandon rate)          | High     | DONE   | P10F.06        | Agent | 2026-11-21  | Mission Control alert triggers           |
+| `[x] P10H.06` | Build cohort notification timing optimization model (hourly open bucket clustering)                         | Medium   | DONE   | P10H.01        | Agent | 2026-11-21  | No individual profiling                  |
+| `[x] P10H.07` | Build Drop planning advisory engine: generate `editor_suggestions` for Mission Control with fatigue warnings | Medium | DONE   | P10H.04        | Agent | 2026-11-21  | Advisory suggestions with fatigue lint   |
+| `[x] P10H.08` | Implement personalised ranking for optional Meme Corner card and suggested share card themes                | Medium   | DONE   | P10H.02        | Agent | 2026-11-21  | Non-Drop surfaces only                   |
+| `[x] P10H.09` | Unit and integration tests with synthetic fixtures proving zero sensitive inference and zero Drop variation | Critical | DONE   | P10H.02, P10H.08| Agent| 2026-11-21  | Invariant verification                   |
 
 ---
 
@@ -776,13 +776,13 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [ ] Test Wilson score lower-bound computation ($N \ge 200$) and 20% exploration traffic share.
   - [ ] Verify candidate promotion requires two-person approval and D-2 lock before Drop scheduling.
   - [ ] Test creator deletion and moderation takedown actions.
-- **Stage M4 Checklist (Phase 10H: Insights Engine — Deferred):**
-  - [ ] Run migrations for `player_taste`, `notification_timing_stats`, `editor_suggestions`.
-  - [ ] Verify nightly worker computes smoothed `player_taste` affinity scores with recency weighting ($n \ge 20$).
-  - [ ] Test instant hard deletion of `player_taste` upon `'personalisation'` consent withdrawal.
-  - [ ] Verify question quality flagging engine detects high dwell, option changes, and abandon spikes.
-  - [ ] Test Drop planning advisory engine fatigue warnings on repeated subject tags.
-  - [ ] Verify zero personalising changes to daily Drop questions (Rule 12).
+- **Stage M4 Checklist (Phase 10H: Insights Engine — COMPLETE):**
+  - [x] Run migrations for `player_taste`, `notification_timing_stats`, `editor_suggestions`.
+  - [x] Verify nightly worker computes smoothed `player_taste` affinity scores with recency weighting ($n \ge 20$).
+  - [x] Test instant hard deletion of `player_taste` upon `'personalisation'` consent withdrawal.
+  - [x] Verify question quality flagging engine detects high dwell, option changes, and abandon spikes.
+  - [x] Test Drop planning advisory engine fatigue warnings on repeated subject tags.
+  - [x] Verify zero personalising changes to daily Drop questions (Rule 12).
 - **Stage M5/M6 Checklist (Phase 10I: Taste Dimension & Recognition — Deferred):**
   - [ ] Test Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` enforcing 5 shared questions threshold.
   - [ ] Verify Subject Sync UI renders agreement progress row inside Orbit detail view.
