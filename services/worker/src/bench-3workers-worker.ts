@@ -18,6 +18,7 @@ import {
   oddnessScore,
   classifyTier,
   type AnswerFrequency,
+  type Prisma,
 } from "@oddly/shared";
 
 const workerId = process.argv[2] || `worker_${process.pid}`;
@@ -45,7 +46,7 @@ async function runWorker() {
 
   // 1. Fetch total submissions and candidate buckets for bounded matching
   const candidateRows = await prisma.$queryRawUnsafe<
-    { id: string; player_id: string; answers: any; submitted_at: Date }[]
+    { id: string; player_id: string; answers: unknown; submitted_at: Date }[]
   >(
     `SELECT id, player_id, answers, submitted_at FROM submissions WHERE drop_id = $1 ORDER BY id ASC`,
     dropId
@@ -133,7 +134,7 @@ async function runWorker() {
     const chunkStart = Date.now();
 
     // Query submissions for this chunk
-    let chunkSubmissions: { id: string; player_id: string; answers: any; submitted_at: Date }[] = [];
+    let chunkSubmissions: { id: string; player_id: string; answers: unknown; submitted_at: Date }[] = [];
     if (chunk.cursor_from && chunk.cursor_to) {
       chunkSubmissions = await prisma.$queryRawUnsafe(
         `SELECT id, player_id, answers, submitted_at
@@ -157,8 +158,8 @@ async function runWorker() {
     }
 
     // Recompute best twins and compute oddness scores
-    const matchInserts: any[] = [];
-    const scoreInserts: any[] = [];
+    const matchInserts: Prisma.MatchCreateManyInput[] = [];
+    const scoreInserts: Prisma.OddnessScoreCreateManyInput[] = [];
 
     for (const sub of chunkSubmissions) {
       const answers: StoredAnswer[] =
@@ -195,7 +196,6 @@ async function runWorker() {
       // Best twin among candidates
       let bestTwinId: string | null = null;
       let bestScore = 0;
-      let matchedCount = 0;
 
       for (const cand of candidateList) {
         let matches = 0;
@@ -206,7 +206,6 @@ async function runWorker() {
         if (sim > bestScore) {
           bestScore = sim;
           bestTwinId = cand.player_id;
-          matchedCount = matches;
           if (sim === 1.0) break;
         }
       }
@@ -215,13 +214,12 @@ async function runWorker() {
         matchInserts.push({
           id: `match_bench_${sub.id}`,
           drop_id: dropId,
+          drop_date: new Date(`${dropDateStr}T00:00:00.000Z`),
           player_a_id: sub.player_id,
           player_b_id: bestTwinId,
           similarity_score: bestScore,
-          matched_picks_count: matchedCount,
-          total_questions_count: 5,
           is_provisional: false,
-          created_at: new Date(),
+          matched_at: new Date(),
         });
       }
 
@@ -239,7 +237,6 @@ async function runWorker() {
         raw_score: rawScore,
         percentile: pct,
         tier,
-        computed_at: new Date(),
       });
     }
 

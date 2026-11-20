@@ -267,8 +267,8 @@ describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
     expect(item.age_band).toBe("18-24"); // Player A's age band
 
     // Absolute Privacy Verification: sender player_id is NOT in the response
-    expect((item as any).from_player_id).toBeUndefined();
-    expect((item as any).player_id).toBeUndefined();
+    expect((item as Record<string, unknown>).from_player_id).toBeUndefined();
+    expect((item as Record<string, unknown>).player_id).toBeUndefined();
   });
 
   // --------------------------------------------------------------------------
@@ -383,7 +383,14 @@ describe("Stage F1 (Phase 10A): Orbit Foundation Integration Tests", () => {
 
     // Dynamically import worker method to avoid rootDir cross-package compile constraint
     const workerPath = "../../worker/src/workers/pipeline.worker.js";
-    const workerModule: any = await import(/* @vite-ignore */ workerPath);
+    const workerModule = (await import(/* @vite-ignore */ workerPath)) as {
+      PipelineWorker: {
+        computeCoStreaks: (
+          dropId: string,
+          dropDate: Date
+        ) => Promise<{ activeOrbits: number; keptCoStreak: number; resetCoStreak: number }>;
+      };
+    };
     const resultBoth = await workerModule.PipelineWorker.computeCoStreaks(testDropId, testDropDate);
     expect(resultBoth.activeOrbits).toBeGreaterThanOrEqual(1);
     expect(resultBoth.keptCoStreak).toBeGreaterThanOrEqual(1);

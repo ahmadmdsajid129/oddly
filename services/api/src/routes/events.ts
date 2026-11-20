@@ -21,6 +21,9 @@ import { DegradationManager } from "../resilience/degradation.js";
 import {
   EventsBatchRequestSchema,
   UpdateConsentRequestSchema,
+  type EventsBatchRequest,
+  type UpdateConsentRequest,
+  type Prisma,
 } from "@oddly/shared";
 
 export const eventsRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -114,7 +117,7 @@ export const eventsRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      const { events, session_id } = req.body;
+      const { events, session_id } = req.body as EventsBatchRequest;
       const analyticsId = analyticsRecord.analytics_id;
 
       // 5. Ingest into events_raw (partitioned table)
@@ -123,7 +126,7 @@ export const eventsRoutes: FastifyPluginAsyncZod = async (app) => {
         analytics_id: analyticsId,
         drop_date: new Date(`${evt.drop_date}T00:00:00.000Z`),
         event_name: evt.event_name,
-        props: (evt.props ?? {}) as any,
+        props: (evt.props ?? {}) as Prisma.InputJsonValue,
         session_id: session_id || null,
         created_at: evt.timestamp_ms ? new Date(evt.timestamp_ms) : new Date(),
       }));
@@ -236,7 +239,7 @@ export const eventsRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      const { purpose, granted, policy_version = 1 } = req.body;
+      const { purpose, granted, policy_version = 1 } = req.body as UpdateConsentRequest;
       const now = new Date();
 
       if (granted) {

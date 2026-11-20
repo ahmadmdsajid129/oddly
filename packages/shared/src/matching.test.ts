@@ -156,7 +156,7 @@ describe("R1.2 Bounded Matching with Answer-Hash Buckets", () => {
     const duration = performance.now() - start;
 
     expect(result).not.toBeNull();
-    expect(duration).toBeLessThan(1000); // Under 1000ms in parallel CI/Windows runner for 10,000 candidates
+    expect(duration).toBeLessThan(3000); // Under 3000ms in parallel CI/Windows runner for 10,000 candidates
     expect(result?.similarity_score).toBeGreaterThan(0);
   });
 

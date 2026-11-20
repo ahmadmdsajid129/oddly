@@ -21,6 +21,7 @@ import {
   isCandidatePreferred,
   type AnswerFrequency,
   type StoredAnswer,
+  type Prisma,
 } from "@oddly/shared";
 import { prisma } from "../db.js";
 import { getDropLifecyclePhase } from "../clock.js";
@@ -447,7 +448,7 @@ export class PipelineWorker {
     // 6. Pre-index full day's submissions into bounded candidate buckets (5-hash and 4-of-5 sub-hashes)
     // Uses raw SQL stream for zero-overhead JSON deserialization and reservoir sampling capped at 200 members
     const candidateSubmissions = await prisma.$queryRawUnsafe<
-      { id: string; player_id: string; answers: any; submitted_at: Date }[]
+      { id: string; player_id: string; answers: unknown; submitted_at: Date }[]
     >(
       `SELECT id, player_id, answers, submitted_at FROM submissions WHERE drop_id = $1 ORDER BY id ASC`,
       dropId
@@ -542,7 +543,7 @@ export class PipelineWorker {
       // Fetch chunk rows: chunk 0 starts at offset 0; subsequent chunks fetch 1 offset earlier
       // to capture cursor_from from the preceding chunk
       let cursorFrom: string | null = null;
-      let chunkSubmissions: { id: string; player_id: string; answers: any }[] = [];
+      let chunkSubmissions: { id: string; player_id: string; answers: unknown }[] = [];
 
       if (chunkIndex === 0) {
         chunkSubmissions = await prisma.submission.findMany({
@@ -609,7 +610,7 @@ export class PipelineWorker {
         }
 
         // 1. Recompute final twins across the full day using bounded matching strategy
-        const matchRecords: any[] = [];
+        const matchRecords: Prisma.MatchCreateManyInput[] = [];
         for (const sub of chunkSubmissions) {
           const storedAnswers = sub.answers as unknown as StoredAnswer[];
           const hashes = computeAnswerSubHashes(storedAnswers);
@@ -705,7 +706,8 @@ export class PipelineWorker {
 
         // Sort match records deterministically to guarantee monotonic index lock acquisition
         matchRecords.sort((r1, r2) =>
-          r1.player_a_id.localeCompare(r2.player_a_id) || r1.player_b_id.localeCompare(r2.player_b_id)
+          String(r1.player_a_id).localeCompare(String(r2.player_a_id)) ||
+          String(r1.player_b_id).localeCompare(String(r2.player_b_id))
         );
 
         // Bulk insert finalized matches serialized across chunk workers to prevent index lock contention

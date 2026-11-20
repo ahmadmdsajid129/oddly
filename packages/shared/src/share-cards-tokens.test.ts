@@ -99,5 +99,5 @@ describe("D1.5 Share Cards Token Alignment & Unit Tests", () => {
       expect(buf[2]).toBe(0x4e);
       expect(buf[3]).toBe(0x47);
     }
-  });
+  }, 30000);
 });

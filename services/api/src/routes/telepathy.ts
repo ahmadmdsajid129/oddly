@@ -123,15 +123,16 @@ export const telepathyRoutes: FastifyPluginAsyncZod = async (app) => {
           ok: true,
           round,
         });
-      } catch (err: any) {
-        if (err.message === "FORBIDDEN") {
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        if (errorMsg === "FORBIDDEN") {
           return reply.status(403).send({
             ok: false,
             error: "FORBIDDEN",
             message: "You are not a member of this Orbit.",
           });
         }
-        if (err.message === "ORBIT_NOT_FOUND") {
+        if (errorMsg === "ORBIT_NOT_FOUND") {
           return reply.status(404).send({
             ok: false,
             error: "ORBIT_NOT_FOUND",
@@ -231,29 +232,30 @@ export const telepathyRoutes: FastifyPluginAsyncZod = async (app) => {
           ok: true,
           round,
         });
-      } catch (err: any) {
-        if (err.message === "FORBIDDEN") {
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        if (errorMsg === "FORBIDDEN") {
           return reply.status(403).send({
             ok: false,
             error: "FORBIDDEN",
             message: "You are not a member of this Orbit.",
           });
         }
-        if (err.message === "ORBIT_NOT_FOUND") {
+        if (errorMsg === "ORBIT_NOT_FOUND") {
           return reply.status(404).send({
             ok: false,
             error: "ORBIT_NOT_FOUND",
             message: "Orbit does not exist.",
           });
         }
-        if (err.message === "SUBMISSION_REQUIRED") {
+        if (errorMsg === "SUBMISSION_REQUIRED") {
           return reply.status(422).send({
             ok: false,
             error: "SUBMISSION_REQUIRED",
             message: "Both you and your twin must complete today's Drop before playing Telepathy.",
           });
         }
-        if (err.message === "GUESS_ALREADY_LOCKED") {
+        if (errorMsg === "GUESS_ALREADY_LOCKED") {
           return reply.status(409).send({
             ok: false,
             error: "GUESS_ALREADY_LOCKED",

@@ -181,7 +181,7 @@ describe("Stage M2 (Phase 10F): Signals & DPDP Consents Integration Suite", () =
     });
     expect(rows).toHaveLength(2);
     expect(rows[0].event_name).toBe("question_shown");
-    expect((rows[0].props as any).dwell_ms).toBe(3200);
+    expect((rows[0].props as Record<string, unknown>).dwell_ms).toBe(3200);
   });
 
   it("strictly sheds 100% of telemetry at degradation level L2+ (P10F.09)", async () => {

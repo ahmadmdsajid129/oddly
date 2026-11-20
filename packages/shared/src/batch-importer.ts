@@ -13,7 +13,7 @@
 
 import { isForbiddenTag } from "./taxonomy.js";
 import { dropOpensAt, dropClosesAt } from "./dates.js";
-import type { PrismaClient } from "./db.js";
+import type { PrismaClient, Prisma, QuestionType } from "./db.js";
 
 export interface BatchOptionItem {
   value: string;
@@ -282,18 +282,18 @@ export async function importBatchJson(
           },
         },
         update: {
-          type: qItem.type as any,
+          type: qItem.type as QuestionType,
           render_variant: qItem.render_variant ?? "standard",
           template_id: templateId,
-          payload: qItem.payload as any,
+          payload: qItem.payload as Prisma.InputJsonValue,
         },
         create: {
           drop_id: drop.id,
           position: qItem.position,
-          type: qItem.type as any,
+          type: qItem.type as QuestionType,
           render_variant: qItem.render_variant ?? "standard",
           template_id: templateId,
-          payload: qItem.payload as any,
+          payload: qItem.payload as Prisma.InputJsonValue,
         },
       });
       importedQuestions++;

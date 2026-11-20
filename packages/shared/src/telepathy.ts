@@ -17,8 +17,15 @@ export interface QuestionLike {
   id: string;
   type: string;
   position?: number;
-  payload?: any;
+  payload?: unknown;
   answer_options?: Array<{
+    id?: string;
+    label: string;
+    value: string;
+    display_order?: number;
+    illustration_key?: string | null;
+  }>;
+  answerOptions?: Array<{
     id?: string;
     label: string;
     value: string;
@@ -54,14 +61,16 @@ export function isEligibleTelepathyQuestion(question: QuestionLike): boolean {
   }
 
   let optionCount = 0;
+  const opts = question.answerOptions || question.answer_options;
 
-  if (Array.isArray(question.answer_options) && question.answer_options.length > 0) {
-    optionCount = question.answer_options.length;
-  } else if (question.payload) {
-    if (question.type === "text" && Array.isArray(question.payload.options)) {
-      optionCount = question.payload.options.length;
-    } else if (question.type === "image" && Array.isArray(question.payload.illustrations)) {
-      optionCount = question.payload.illustrations.length;
+  if (Array.isArray(opts) && opts.length > 0) {
+    optionCount = opts.length;
+  } else if (question.payload && typeof question.payload === "object") {
+    const p = question.payload as Record<string, unknown>;
+    if (question.type === "text" && Array.isArray(p.options)) {
+      optionCount = p.options.length;
+    } else if (question.type === "image" && Array.isArray(p.illustrations)) {
+      optionCount = p.illustrations.length;
     }
   }
 

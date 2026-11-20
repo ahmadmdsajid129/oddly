@@ -166,7 +166,7 @@ export class TelepathyRepository {
     if (callerGuess && partnerSub && designatedQ) {
       let partnerActualPick: string | null = null;
       if (Array.isArray(partnerSub.answers)) {
-        const found = (partnerSub.answers as Array<{ question_id: string; value: any }>).find(
+        const found = (partnerSub.answers as Array<{ question_id: string; value: unknown }>).find(
           (a) => a.question_id === designatedQ!.id
         );
         if (found) {
@@ -202,8 +202,8 @@ export class TelepathyRepository {
     // Format question details
     let formattedQuestion: TelepathyRoundState["question"] = null;
     if (designatedQ) {
-      const qPayload = designatedQ.payload as any;
-      const promptText = qPayload?.prompt || "Which option did your twin pick?";
+      const qPayload = designatedQ.payload as Record<string, unknown> | null;
+      const promptText = (qPayload?.prompt as string) || "Which option did your twin pick?";
 
       let options = designatedQ.answerOptions.map((opt) => ({
         id: opt.id,
@@ -214,8 +214,10 @@ export class TelepathyRepository {
       }));
 
       // Fallback to payload options if answerOptions not materialized
-      if (options.length === 0 && qPayload?.options) {
-        options = qPayload.options.map((opt: any, i: number) => ({
+      if (options.length === 0 && Array.isArray(qPayload?.options)) {
+        options = (
+          qPayload.options as Array<{ label: string; value: string; illustration_key?: string | null }>
+        ).map((opt, i: number) => ({
           id: `opt-${i + 1}`,
           label: opt.label,
           value: opt.value,
@@ -226,7 +228,7 @@ export class TelepathyRepository {
 
       formattedQuestion = {
         id: designatedQ.id,
-        position: designatedQ.position,
+        position: designatedQ.position ?? 1,
         type: designatedQ.type as "text" | "image",
         prompt: promptText,
         answer_options: options,
@@ -351,7 +353,7 @@ export class TelepathyRepository {
     // 4. Determine partner's actual choice on the designated question
     let partnerActualPick: string | null = null;
     if (Array.isArray(partnerSub.answers)) {
-      const found = (partnerSub.answers as Array<{ question_id: string; value: any }>).find(
+      const found = (partnerSub.answers as Array<{ question_id: string; value: unknown }>).find(
         (a) => a.question_id === designatedQ!.id
       );
       if (found) {

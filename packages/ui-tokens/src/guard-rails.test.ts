@@ -1,8 +1,8 @@
-import { describe, it, expect } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { colors, radius, shadows } from "./tokens.js";
+import { radius, shadows } from "./tokens.js";
 
 describe("D1.9 Design Guard Rails & Consistency Enforcement", () => {
   it("proves approved radii set contains only the 4 allowed token sizes", () => {
