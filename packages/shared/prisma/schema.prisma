@@ -111,6 +111,7 @@ model Player {
   memeSubmissions  MemeSubmission[]
   memeRatings      MemeRating[]
   memeExposures    MemeExposure[]
+  playerTastes     PlayerTaste[]
 
   @@index([account_id])
   @@index([did])
@@ -656,6 +657,8 @@ model Tag {
 
   questionTags QuestionTag[]
   statsDaily   TagStatsDaily[]
+  playerTastes PlayerTaste[]
+  editorSuggestions EditorSuggestion[]
 
   @@index([key])
   @@index([category])
@@ -900,7 +903,59 @@ model ModerationAction {
   @@map("moderation_actions")
 }
 
+// ---------------------------------------------------------------------------
+// 41. player_taste — consented smoothed tag affinity scores (Stage M4 / Phase 10H)
+// ---------------------------------------------------------------------------
+model PlayerTaste {
+  player_id       String
+  player          Player   @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  tag_id          String
+  tag             Tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+  affinity_score  Float    @default(0.50)
+  sample_size     Int      @default(0)
+  last_engaged_at DateTime @default(now())
+  updated_at      DateTime @default(now()) @updatedAt
 
+  @@id([player_id, tag_id])
+  @@index([player_id])
+  @@index([tag_id])
+  @@index([affinity_score(sort: Desc)])
+  @@map("player_taste")
+}
 
+// ---------------------------------------------------------------------------
+// 42. notification_timing_stats — cohort-level aggregate send hour stats (Stage M4 / Phase 10H)
+// ---------------------------------------------------------------------------
+model NotificationTimingStat {
+  id               String   @id @default(uuid())
+  cohort_key       String   @db.VarChar(50)
+  hour_of_day_utc  Int      @db.SmallInt
+  open_rate        Float    @default(0.0)
+  samples_count    Int      @default(0)
+  updated_at       DateTime @default(now()) @updatedAt
 
+  @@unique([cohort_key, hour_of_day_utc], name: "cohort_hour_unique")
+  @@index([cohort_key])
+  @@map("notification_timing_stats")
+}
+
+// ---------------------------------------------------------------------------
+// 43. editor_suggestions — drop planning advisory & fatigue linting (Stage M4 / Phase 10H)
+// ---------------------------------------------------------------------------
+model EditorSuggestion {
+  id               String   @id @default(uuid())
+  target_drop_date DateTime @db.Date
+  suggestion_type  String   @db.VarChar(50) // 'underused_tag' | 'high_share_weekend' | 'fatigue_warning'
+  tag_id           String?
+  tag              Tag?     @relation(fields: [tag_id], references: [id], onDelete: SetNull)
+  severity         String   @default("info") @db.VarChar(20) // 'info' | 'warning' | 'critical'
+  message          String
+  dismissed        Boolean  @default(false)
+  created_at       DateTime @default(now())
+
+  @@index([target_drop_date])
+  @@index([suggestion_type])
+  @@index([severity])
+  @@map("editor_suggestions")
+}
 
