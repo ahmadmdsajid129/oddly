@@ -323,3 +323,4 @@ export const eventsRoutes: FastifyPluginAsyncZod = async (app) => {
     }
   );
 };
+

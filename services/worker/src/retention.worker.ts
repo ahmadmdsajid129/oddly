@@ -30,6 +30,7 @@ export interface RetentionResult {
   partitionsDetached: string[];
   partitionsDropped: string[];
   inactiveGuestsPruned: number;
+  antiTwinPruned: number;
 }
 
 export class RetentionWorker {

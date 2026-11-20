@@ -29,6 +29,13 @@ export const DegradationManager = {
   },
 
   /**
+   * Alias for setManualOverride (used in tests and runtime controls).
+   */
+  setLevel(level: number | null): void {
+    this.setManualOverride(level);
+  },
+
+  /**
    * Returns active degradation level (0 - 4), cached for 5 seconds.
    */
   async getLevel(): Promise<number> {

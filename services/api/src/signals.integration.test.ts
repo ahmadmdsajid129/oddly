@@ -33,7 +33,7 @@ describe("Stage M2 (Phase 10F): Signals & DPDP Consents Integration Suite", () =
     prisma = new PrismaClient({ datasources: { db: { url: DATABASE_URL } } });
     await prisma.$connect();
 
-    app = await buildServer({ logger: false, underPressure: false });
+    app = await buildServer({ logger: false });
     await app.ready();
 
     deviceId = `did-signals-${randomUUID().slice(0, 8)}`;
@@ -60,7 +60,7 @@ describe("Stage M2 (Phase 10F): Signals & DPDP Consents Integration Suite", () =
 
     await app.close();
     await prisma.$disconnect();
-    DegradationManager.setManualOverride(null);
+    DegradationManager.setLevel(0);
   });
 
   it("proves DPDP Default OFF: GET /v1/consents returns false for analytics and personalisation", async () => {
@@ -185,7 +185,7 @@ describe("Stage M2 (Phase 10F): Signals & DPDP Consents Integration Suite", () =
   });
 
   it("strictly sheds 100% of telemetry at degradation level L2+ (P10F.09)", async () => {
-    DegradationManager.setManualOverride(2);
+    DegradationManager.setLevel(2);
 
     const res = await app.inject({
       method: "POST",
@@ -210,7 +210,7 @@ describe("Stage M2 (Phase 10F): Signals & DPDP Consents Integration Suite", () =
     expect(json.accepted).toBe(0);
     expect(json.dropped).toBe(true);
 
-    DegradationManager.setManualOverride(null);
+    DegradationManager.setLevel(0);
   });
 
   it("executes DPDP Section 12 erasure: purges analytics_id, raw events, and consents (P10F.08)", async () => {
@@ -238,3 +238,4 @@ describe("Stage M2 (Phase 10F): Signals & DPDP Consents Integration Suite", () =
     expect(consentCount).toBe(0);
   });
 });
+
