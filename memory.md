@@ -9,8 +9,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage F4: Anti-Twin, Share Faces & Verification Gate — COMPLETE.
-- **Current Target:** Stage F4 complete and verified; awaiting Founder review and authorization to proceed to Stage M1 (Phase 10E: Meme Questions & Themed Drops).
+- **Current Stage:** Stage M3: Meme Lab (User Captions & Moderation Queue) — IN PROGRESS (Tasks P10G.01 and P10G.02 complete).
+- **Current Target:** Execute Phase 10G tasks (P10G.01 to P10G.09): Database migrations, Submission API, Caption Composer UI, Meme Corner Card, Wilson rating worker, Exposure engine, Moderation queue, Creator delete, and Abuse-case tests directly on `main`.
 
 ---
 
@@ -1001,9 +1001,53 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 27. Next Steps
+## 27. Stage M3: Meme Lab (Phase 10G) — Shipped Deliverables (2026-11-20)
 
-> **Before any admin panel work, read `docs/admin-panel-spec.md` in full, including Addendum A. It is the authoritative description of what to build in Phase 11.**
+### 27.1 Tasks Completed
+- **`P10G.01`: Database Migrations (`007_meme_lab.sql` & `schema.prisma`):**
+  - `meme_submissions`: Community caption storage enforcing Rule 18 scoped character cap ($\le 100$ characters). Initial status strictly `'queued'` (Rule 18: zero public exposure without admin moderation).
+  - `meme_ratings`: Post-Drop Meme Corner feedback (`submission_id`, `rater_player_id`, `rating` ['funny', 'not_for_me'], `drop_date`) with unique constraint on `(submission_id, rater_player_id)`.
+  - `meme_stats`: Rating counts and Wilson score lower bound (`submission_id` PK, `impressions`, `raters`, `funny_count`, `not_for_me_count`, `wilson_lb`, `last_shown_at`).
+  - `meme_exposures`: Impression tracker ensuring 20% exploration / 80% exploitation traffic balance and diversity caps.
+  - `moderation_actions`: Immutable audit log for all moderation decisions (`approve`, `reject`, `retire`, `takedown`).
+  - `app_config`: Added runtime keys `memes.max_caption_len` (100), `memes.daily_submission_cap` (2), `memes.min_raters_wilson` (200), `memes.exploration_pct` (0.20), `memes.freshness_days` (14), and `feature.meme_lab` (true).
+  - Generated Prisma Client v5.22.0.
+- **`P10G.02`: Meme Lab Submission API (`POST /v1/memes/submissions`):**
+  - Authored `@oddly/shared/src/memes.ts` with `CreateMemeSubmissionSchema`, `levenshteinDistance`, `normalizeCaption`, `isDuplicateOrNearDuplicate`, and `calculateWilsonScore` (ADR 043).
+  - Fastify route handler in `services/api/src/routes/memes.ts`:
+    - **Authentication:** `resolveAuthenticatedPlayer` guarantees verified player session.
+    - **Cloudflare Turnstile:** Human verification check returning 400 on failure.
+    - **Rule 18 Scoped Exception:** Hard limits captions to $\le 100$ characters (returns 400).
+    - **Originality Attestation:** Mandatory user attestation checkbox (returns 400).
+    - **Daily Rate Limiting:** Max 2 submissions per author per UTC day (returns 429).
+    - **Duplicate & Levenshtein Protection:** Rejects exact normalized duplicates and near-duplicates within Levenshtein distance $\le 2$ on the same template (returns 409).
+    - **Zero Public Exposure:** Submissions start strictly in `'queued'` state and initialize zeroed `meme_stats`.
+    - **Degradation Shedding:** Automatically sheds at degradation level L2+ (returns 503).
+    - `GET /v1/memes/templates`: Returns active illustration templates.
+    - `GET /v1/memes/submissions/mine`: Returns author's submissions and moderation status.
+  - Added route policies in `policy.registry.ts` and registered in `server.ts`.
+  - Authored `services/api/src/memes.integration.test.ts` (11/11 tests passing).
+  - Authored `packages/shared/src/memes.test.ts` (12/12 unit tests passing).
 
-1. **Founder Review:** Founder reviews Stage M2 Report (`docs/stage-M2-report.md`).
-2. **Proceed to Stage M3 (Phase 10G):** Upon explicit Founder command *"proceed to Stage M3"* or *"proceed to Phase 10G"*, begin Phase 10G (Meme Lab - User Captions & Moderation Queue). Per Rule 1, agent stops here.
+### 27.2 GitHub Actions CI & Build Stabilization
+- Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
+- Updated root `package.json` packageManager to `"pnpm@9.15.4"`.
+- Cleaned up ESLint explicit `any` and unused variables across all 6 monorepo packages (`turbo run lint` 6/6 passing).
+- Resilient Vitest timeouts on Satori rendering tests under heavy parallel CPU load.
+- Monorepo production build verified: `turbo run build` 100% clean.
+
+---
+
+## 28. Next Steps
+
+> **All commits pushed directly to `main` and verified.**
+
+1. **Continue Phase 10G (Stage M3: Meme Lab):**
+   - **`P10G.03`:** Build caption composer UI (`/memes/new`) with template carousel, live preview, character counter $\le 100$, and tactile sticker styling.
+   - **`P10G.04`:** Build post-drop Meme Corner card with "Funny" and "Not for me" reaction buttons.
+   - **`P10G.05`:** Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker.
+   - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps).
+   - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow.
+   - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions.
+   - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass).
+2. **Stop Condition:** Complete Stage M3, author `docs/stage-M3-report.md`, and await Founder authorization before Stage M4.
