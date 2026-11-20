@@ -19,6 +19,7 @@ export * from "./workers/closure.worker.js";
 export * from "./workers/pipeline.worker.js";
 export * from "./workers/globe.worker.js";
 export * from "./jobs/wilson-scoring.job.js";
+export * from "./jobs/player-taste.job.js";
 export * from "./db.js";
 
 const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
