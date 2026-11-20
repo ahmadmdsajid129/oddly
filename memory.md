@@ -1049,6 +1049,28 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
     - **Creator Entry Point:** Direct CTA link (`/memes/new`) inviting players to write their own captions in Meme Lab.
   - Integrated into `apps/web/src/app/recap/page.tsx`.
   - Authored `apps/web/src/meme-corner.test.ts` (5/5 unit tests passing).
+- **`P10G.05`: Rating Ingestion API & Wilson Score Calculation Worker (`POST /v1/memes/:id/rating` & `WilsonScoringJob`):**
+  - **Rating Ingestion API (`POST /v1/memes/:id/rating`):**
+    - Enforces 1 rating per player per meme submission using `meme_ratings` unique constraint on `(submission_id, rater_player_id)`, returning 409 `ALREADY_RATED` on duplicates.
+    - Requires authenticated player (`resolveAuthenticatedPlayer`), returns 401 `UNAUTHORIZED`.
+    - Validates target submission exists, returns 404 `MEME_NOT_FOUND`.
+    - Validates rating payload using `RateMemeSchema` (`"funny" | "not_for_me"`), returns 400 on invalid options.
+    - Automatic load shedding at degradation level L2+ (returns 503 `SERVICE_DEGRADED`).
+    - Atomically persists rating and updates `meme_stats` (`raters`, `funny_count`, `not_for_me_count`, `last_shown_at`).
+    - Real-time Wilson lower bound scoring with ADR 043 threshold guard: holds `wilson_lb = 0.0` when `raters < 200`; computes `calculateWilsonScore` when `raters >= 200`.
+  - **Route Policy & Client SDK:**
+    - Added policy to `policy.registry.ts` (`POST /v1/memes/:id/rating`, timeout 2000ms, rateLimitClass: "tight", priorityLane: "normal").
+    - Added `rateMeme(submissionId, rating)` to `packages/api-client/src/index.ts`.
+    - Added `memes.rate(submissionId, rating)` wrapper in `apps/web/src/lib/api.ts`.
+  - **Wilson Score Calculation Worker Job (`WilsonScoringJob`):**
+    - Authored `services/worker/src/jobs/wilson-scoring.job.ts`.
+    - Batch recalculation of Wilson lower bounds across active submissions with 200-rater threshold (`minRaters: 200`).
+    - Candidate promotion qualification tracking (`wilson_lb >= 0.70`).
+    - Exported from `services/worker/src/index.ts`.
+  - **Verification:**
+    - Expanded `services/api/src/memes.integration.test.ts` with 6 new rating tests (17/17 tests passing).
+    - Authored `services/worker/src/wilson-scoring.test.ts` (3/3 unit tests passing).
+    - Full monorepo verification: `turbo run typecheck` (6/6 passing) and `turbo run lint` (6/6 passing).
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
@@ -1064,9 +1086,11 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 > **All commits pushed directly to `main` and verified.**
 
 1. **Continue Phase 10G (Stage M3: Meme Lab):**
-   - **`P10G.03`:** Build caption composer UI (`/memes/new`) with template carousel, live preview, character counter $\le 100$, and tactile sticker styling.
-   - **`P10G.04`:** Build post-drop Meme Corner card with "Funny" and "Not for me" reaction buttons.
-   - **`P10G.05`:** Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker.
+   - **`P10G.01`:** Database Migrations (DONE).
+   - **`P10G.02`:** Submission API (DONE).
+   - **`P10G.03`:** Build caption composer UI (`/memes/new`) (DONE).
+   - **`P10G.04`:** Build post-drop Meme Corner card (DONE).
+   - **`P10G.05`:** Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker (DONE).
    - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps).
    - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow.
    - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions.

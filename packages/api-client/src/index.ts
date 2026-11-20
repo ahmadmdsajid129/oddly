@@ -832,6 +832,29 @@ export class OddlyApiClient {
       }>;
     }>("/v1/memes/submissions/mine");
   }
+
+  /** Submit rating for a post-drop meme (P10G.04, P10G.05) */
+  async rateMeme(
+    submissionId: string,
+    rating: "funny" | "not_for_me"
+  ): Promise<{
+    ok: boolean;
+    submission_id: string;
+    rating: "funny" | "not_for_me";
+    raters: number;
+    wilson_lb: number;
+  }> {
+    return this.request<{
+      ok: boolean;
+      submission_id: string;
+      rating: "funny" | "not_for_me";
+      raters: number;
+      wilson_lb: number;
+    }>(`/v1/memes/${encodeURIComponent(submissionId)}/rating`, {
+      method: "POST",
+      body: JSON.stringify({ rating }),
+    });
+  }
 }
 
 export interface AntiTwinResponse {

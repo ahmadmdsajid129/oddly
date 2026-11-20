@@ -290,4 +290,142 @@ describe("Stage M3 (Phase 10G): Meme Lab Submission API Integration Suite (P10G.
 
     DegradationManager.setLevel(0);
   });
+
+  describe("P10G.05: Rating Ingestion API (POST /v1/memes/:id/rating)", () => {
+    let testSubmissionId: string;
+    let raterPlayerId: string;
+
+    beforeAll(async () => {
+      // Create a test submission to rate
+      const sub = await prisma.memeSubmission.create({
+        data: {
+          author_player_id: playerId,
+          template_id: templateId,
+          caption_text: "Caption to test rating ingestion",
+          status: "approved",
+          stats: {
+            create: {
+              impressions: 10,
+              raters: 0,
+              funny_count: 0,
+              not_for_me_count: 0,
+              wilson_lb: 0.0,
+            },
+          },
+        },
+      });
+      testSubmissionId = sub.id;
+
+      // Create a rater player
+      const rater = await prisma.player.create({
+        data: {
+          did: `did-rater-${randomUUID().slice(0, 8)}`,
+          region: "IN",
+          age_band: "18-24",
+        },
+      });
+      raterPlayerId = rater.id;
+    });
+
+    it("rejects unauthenticated rating request with 401", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: `/v1/memes/${testSubmissionId}/rating`,
+        payload: { rating: "funny" },
+      });
+
+      expect(res.statusCode).toBe(401);
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe("UNAUTHORIZED");
+    });
+
+    it("rejects invalid rating option with 400", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: `/v1/memes/${testSubmissionId}/rating`,
+        headers: { "x-player-id": raterPlayerId },
+        payload: { rating: "hilarious" },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it("returns 404 when rating non-existent meme", async () => {
+      const missingId = randomUUID();
+      const res = await app.inject({
+        method: "POST",
+        url: `/v1/memes/${missingId}/rating`,
+        headers: { "x-player-id": raterPlayerId },
+        payload: { rating: "funny" },
+      });
+
+      expect(res.statusCode).toBe(404);
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe("MEME_NOT_FOUND");
+    });
+
+    it("successfully ingests valid 'funny' rating and updates stats", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: `/v1/memes/${testSubmissionId}/rating`,
+        headers: { "x-player-id": raterPlayerId },
+        payload: { rating: "funny" },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body);
+      expect(body.ok).toBe(true);
+      expect(body.submission_id).toBe(testSubmissionId);
+      expect(body.rating).toBe("funny");
+      expect(body.raters).toBe(1);
+      // Under 200 raters, wilson_lb must be 0.0 per ADR 043
+      expect(body.wilson_lb).toBe(0.0);
+
+      // Verify DB persistence
+      const savedStat = await prisma.memeStat.findUnique({
+        where: { submission_id: testSubmissionId },
+      });
+      expect(savedStat?.raters).toBe(1);
+      expect(savedStat?.funny_count).toBe(1);
+      expect(savedStat?.not_for_me_count).toBe(0);
+    });
+
+    it("rejects duplicate rating by same player with 409 ALREADY_RATED", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: `/v1/memes/${testSubmissionId}/rating`,
+        headers: { "x-player-id": raterPlayerId },
+        payload: { rating: "not_for_me" },
+      });
+
+      expect(res.statusCode).toBe(409);
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe("ALREADY_RATED");
+    });
+
+    it("sheds rating ingestion with 503 at degradation level L2+", async () => {
+      DegradationManager.setLevel(2);
+
+      const anotherPlayer = await prisma.player.create({
+        data: {
+          did: `did-rater-deg-${randomUUID().slice(0, 8)}`,
+          region: "IN",
+          age_band: "18-24",
+        },
+      });
+
+      const res = await app.inject({
+        method: "POST",
+        url: `/v1/memes/${testSubmissionId}/rating`,
+        headers: { "x-player-id": anotherPlayer.id },
+        payload: { rating: "funny" },
+      });
+
+      expect(res.statusCode).toBe(503);
+      const body = JSON.parse(res.body);
+      expect(body.error).toBe("SERVICE_DEGRADED");
+
+      DegradationManager.setLevel(0);
+    });
+  });
 });

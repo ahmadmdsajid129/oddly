@@ -160,6 +160,8 @@ export const api = {
     submit: (data: Parameters<typeof rawClient.submitMemeCaption>[0]) =>
       rawClient.submitMemeCaption(data),
     getMySubmissions: () => rawClient.getMyMemeSubmissions(),
+    rate: (submissionId: string, rating: "funny" | "not_for_me") =>
+      rawClient.rateMeme(submissionId, rating),
   },
 };
 

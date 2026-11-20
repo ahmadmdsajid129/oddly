@@ -338,6 +338,16 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     priorityLane: "normal",
     degradationBehavior: "Author review of submitted meme captions",
   },
+  {
+    method: "POST",
+    path: "/v1/memes/:id/rating",
+    timeoutMs: 2000,
+    rateLimitClass: "tight",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Shed at L2+; single vote per player per meme",
+  },
 ];
 
 /**

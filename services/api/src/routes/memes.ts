@@ -24,6 +24,9 @@ import { DegradationManager } from "../resilience/degradation.js";
 import {
   CreateMemeSubmissionSchema,
   type CreateMemeSubmissionInput,
+  RateMemeSchema,
+  type RateMemeInput,
+  calculateWilsonScore,
   isTurnstileValid,
   isDuplicateOrNearDuplicate,
 } from "@oddly/shared";
@@ -288,6 +291,159 @@ export const memeRoutes: FastifyPluginAsyncZod = async (app) => {
           created_at: s.created_at.toISOString(),
         })),
       });
+    }
+  );
+
+  /**
+   * POST /v1/memes/:id/rating
+   * Ingests a binary reaction ("funny" | "not_for_me") for a meme submission.
+   * Enforces 1 rating per player per submission, sheds at degradation L2+,
+   * updates raters counters, and recalculates Wilson score lower bound.
+   */
+  app.post(
+    "/v1/memes/:id/rating",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        body: RateMemeSchema,
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            submission_id: z.string(),
+            rating: z.enum(["funny", "not_for_me"]),
+            raters: z.number(),
+            wilson_lb: z.number(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      // 1. Degradation Shedding Check
+      const degradationLevel = await DegradationManager.getLevel();
+      if (degradationLevel >= 2) {
+        return reply.status(503).send({
+          ok: false,
+          error: "SERVICE_DEGRADED",
+          message: "Meme rating ingestion is temporarily paused under high traffic.",
+        });
+      }
+
+      // 2. Authentication Check
+      const player = await resolveAuthenticatedPlayer(req);
+      if (!player) {
+        return reply.status(401).send({
+          ok: false,
+          error: "UNAUTHORIZED",
+          message: "Authentication required to rate memes",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+      const { rating } = req.body as RateMemeInput;
+
+      // 3. Validate Submission Existence
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+        include: { stats: true },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      // 4. Check for Existing Rating by this Player
+      const existingRating = await prisma.memeRating.findUnique({
+        where: {
+          submission_rater_unique: {
+            submission_id: submissionId,
+            rater_player_id: player.id,
+          },
+        },
+      });
+
+      if (existingRating) {
+        return reply.status(409).send({
+          ok: false,
+          error: "ALREADY_RATED",
+          message: "You have already rated this meme submission",
+        });
+      }
+
+      // 5. Ingest Rating & Update Stats in Transaction
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      try {
+        const result = await prisma.$transaction(async (tx) => {
+          await tx.memeRating.create({
+            data: {
+              submission_id: submissionId,
+              rater_player_id: player.id,
+              rating,
+              drop_date: today,
+            },
+          });
+
+          const currentStats = await tx.memeStat.findUnique({
+            where: { submission_id: submissionId },
+          });
+
+          const newRaters = (currentStats?.raters ?? 0) + 1;
+          const newFunny = (currentStats?.funny_count ?? 0) + (rating === "funny" ? 1 : 0);
+          const newNotForMe = (currentStats?.not_for_me_count ?? 0) + (rating === "not_for_me" ? 1 : 0);
+
+          // ADR 043: Minimum 200 raters required before Wilson score activates
+          const minRatersWilson = 200;
+          const newWilson =
+            newRaters >= minRatersWilson ? calculateWilsonScore(newFunny, newRaters) : 0.0;
+
+          const updatedStats = await tx.memeStat.upsert({
+            where: { submission_id: submissionId },
+            create: {
+              submission_id: submissionId,
+              impressions: 1,
+              raters: newRaters,
+              funny_count: newFunny,
+              not_for_me_count: newNotForMe,
+              wilson_lb: newWilson,
+              last_shown_at: new Date(),
+            },
+            update: {
+              raters: newRaters,
+              funny_count: newFunny,
+              not_for_me_count: newNotForMe,
+              wilson_lb: newWilson,
+              last_shown_at: new Date(),
+            },
+          });
+
+          return updatedStats;
+        });
+
+        return reply.status(200).send({
+          ok: true,
+          submission_id: submissionId,
+          rating,
+          raters: result.raters,
+          wilson_lb: result.wilson_lb,
+        });
+      } catch (err: unknown) {
+        const error = err as { code?: string };
+        if (error.code === "P2002") {
+          return reply.status(409).send({
+            ok: false,
+            error: "ALREADY_RATED",
+            message: "You have already rated this meme submission",
+          });
+        }
+        throw err;
+      }
     }
   );
 };
