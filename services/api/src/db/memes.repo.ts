@@ -95,11 +95,27 @@ export class MemesRepository {
 
     const isExploration = Math.random() < explorationRate;
 
-    let candidate = await this.queryCandidate(isExploration, baseWhere, minRatersThreshold);
+    // Check if player has consented taste profiles for personalized ranking (P10H.08)
+    const playerTastes = await this.prisma.playerTaste.findMany({
+      where: { player_id: playerId },
+      select: { tag_id: true, affinity_score: true, sample_size: true },
+    });
+
+    let candidate = await this.queryCandidate(
+      isExploration,
+      baseWhere,
+      minRatersThreshold,
+      playerTastes
+    );
 
     // Fallback: If chosen branch has no candidate, try the other branch
     if (!candidate) {
-      candidate = await this.queryCandidate(!isExploration, baseWhere, minRatersThreshold);
+      candidate = await this.queryCandidate(
+        !isExploration,
+        baseWhere,
+        minRatersThreshold,
+        playerTastes
+      );
     }
 
     // Relax template cooldown if no candidate found but unused memes still exist
@@ -110,8 +126,8 @@ export class MemesRepository {
         ...(excludedSubmissionIds.length > 0 ? { id: { notIn: excludedSubmissionIds } } : {}),
       };
       candidate =
-        (await this.queryCandidate(isExploration, relaxedWhere, minRatersThreshold)) ||
-        (await this.queryCandidate(!isExploration, relaxedWhere, minRatersThreshold));
+        (await this.queryCandidate(isExploration, relaxedWhere, minRatersThreshold, playerTastes)) ||
+        (await this.queryCandidate(!isExploration, relaxedWhere, minRatersThreshold, playerTastes));
     }
 
     if (!candidate) {
@@ -167,7 +183,8 @@ export class MemesRepository {
   private async queryCandidate(
     exploration: boolean,
     where: Record<string, unknown>,
-    minRatersThreshold: number
+    minRatersThreshold: number,
+    playerTastes: Array<{ tag_id: string; affinity_score: number; sample_size: number }> = []
   ) {
     if (exploration) {
       // Exploration: raters < 200, order by least impressions, then newest
@@ -189,7 +206,74 @@ export class MemesRepository {
         ],
       });
     } else {
-      // Exploitation: raters >= 200, order by highest wilson_lb, then least impressions
+      // Exploitation: raters >= 200
+      // If player has consented taste affinities, query top pool and rank by taste affinity (P10H.08)
+      if (playerTastes.length > 0) {
+        const tasteMap = new Map(playerTastes.map((t) => [t.tag_id, t.affinity_score]));
+
+        const pool = await this.prisma.memeSubmission.findMany({
+          where: {
+            ...where,
+            stats: {
+              raters: { gte: minRatersThreshold },
+            },
+          },
+          include: {
+            template: true,
+            stats: true,
+          },
+          orderBy: [
+            { stats: { wilson_lb: "desc" } },
+            { stats: { impressions: "asc" } },
+          ],
+          take: 10,
+        });
+
+        if (pool.length === 0) return null;
+
+        // Query template tags for candidates in pool
+        const templateIds = pool.map((p) => p.template_id);
+        const questionsWithTags = await this.prisma.question.findMany({
+          where: { template_id: { in: templateIds } },
+          select: {
+            template_id: true,
+            questionTags: {
+              select: { tag_id: true },
+            },
+          },
+        });
+
+        const templateTagMap = new Map<string, string[]>();
+        for (const q of questionsWithTags) {
+          if (!q.template_id) continue;
+          const tags = templateTagMap.get(q.template_id) || [];
+          for (const qt of q.questionTags) {
+            tags.push(qt.tag_id);
+          }
+          templateTagMap.set(q.template_id, tags);
+        }
+
+        // Rank by personal taste boost: base Wilson score * (0.5 + average tag affinity)
+        const ranked = pool.map((sub) => {
+          const tags = templateTagMap.get(sub.template_id) || [];
+          let maxAffinity = 0.50; // neutral default
+          for (const tid of tags) {
+            const aff = tasteMap.get(tid);
+            if (aff !== undefined && aff > maxAffinity) {
+              maxAffinity = aff;
+            }
+          }
+
+          const baseWilson = sub.stats?.wilson_lb ?? 0.0;
+          const personalScore = baseWilson * (0.5 + maxAffinity);
+          return { sub, personalScore };
+        });
+
+        ranked.sort((a, b) => b.personalScore - a.personalScore);
+        return ranked[0].sub;
+      }
+
+      // Default exploitation: highest wilson_lb, then least impressions
       return this.prisma.memeSubmission.findFirst({
         where: {
           ...where,

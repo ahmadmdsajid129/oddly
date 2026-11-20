@@ -18,7 +18,7 @@ describe("Stage M2 (Phase 10F): Signals Aggregation & Retention Jobs", () => {
   let client: pg.Client;
   const testDropDate = "2026-11-20";
   const questionId = randomUUID();
-  const tagId = randomUUID();
+  let tagId = randomUUID();
   const analyticsId = randomUUID();
 
   beforeAll(async () => {
@@ -27,19 +27,23 @@ describe("Stage M2 (Phase 10F): Signals Aggregation & Retention Jobs", () => {
 
     // 1. Seed Drop, Question, and Tag
     const dropId = randomUUID();
-    await client.query(
-      `INSERT INTO drops (id, drop_date, opens_at, closes_at, status) VALUES ($1, $2::date, NOW(), NOW() + interval '16 hours', 'live') ON CONFLICT DO NOTHING;`,
+    const dropRes = await client.query(
+      `INSERT INTO drops (id, drop_date, opens_at, closes_at, status) VALUES ($1, $2::date, NOW(), NOW() + interval '16 hours', 'live') 
+       ON CONFLICT (drop_date) DO UPDATE SET status = 'live' RETURNING id;`,
       [dropId, testDropDate]
     );
+    const actualDropId = dropRes.rows[0].id;
 
-    await client.query(
-      `INSERT INTO tags (id, key, label_i18n, category) VALUES ($1, 'test_key', '{"en":"Test"}'::jsonb, 'subject') ON CONFLICT DO NOTHING;`,
+    const tagRes = await client.query(
+      `INSERT INTO tags (id, key, label_i18n, category) VALUES ($1, 'test_key', '{"en":"Test"}'::jsonb, 'subject') 
+       ON CONFLICT (key) DO UPDATE SET label_i18n = EXCLUDED.label_i18n RETURNING id;`,
       [tagId]
     );
+    tagId = tagRes.rows[0].id;
 
     await client.query(
       `INSERT INTO questions (id, drop_id, position, type, payload) VALUES ($1, $2, 1, 'text', '{"prompt":"Signal test?"}'::jsonb) ON CONFLICT DO NOTHING;`,
-      [questionId, dropId]
+      [questionId, actualDropId]
     );
 
     await client.query(
