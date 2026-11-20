@@ -163,6 +163,7 @@ export const api = {
     getMySubmissions: () => rawClient.getMyMemeSubmissions(),
     rate: (submissionId: string, rating: "funny" | "not_for_me") =>
       rawClient.rateMeme(submissionId, rating),
+    delete: (submissionId: string) => rawClient.deleteMemeSubmission(submissionId),
   },
   admin: {
     memes: {
@@ -173,6 +174,14 @@ export const api = {
         rawClient.approveDropCandidate(submissionId, note),
       rejectCandidate: (submissionId: string, reason: string) =>
         rawClient.rejectDropCandidate(submissionId, reason),
+      takedown: (submissionId: string, reason: string, note?: string) =>
+        rawClient.takedownMeme(submissionId, reason, note),
+      moderate: (
+        submissionId: string,
+        action: "approve" | "reject" | "retire" | "takedown",
+        reason: string,
+        note?: string
+      ) => rawClient.moderateMeme(submissionId, action, reason, note),
     },
   },
 };

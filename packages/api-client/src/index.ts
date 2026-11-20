@@ -965,6 +965,57 @@ export class OddlyApiClient {
       body: JSON.stringify({ reason }),
     });
   }
+
+  /** Creator self-service delete flow (P10G.08) */
+  async deleteMemeSubmission(submissionId: string): Promise<{
+    ok: boolean;
+    id: string;
+    status: string;
+    message: string;
+  }> {
+    return this.request(`/v1/memes/${encodeURIComponent(submissionId)}`, {
+      method: "DELETE",
+    });
+  }
+
+  /** Immediate moderator takedown action (P10G.08) */
+  async takedownMeme(
+    submissionId: string,
+    reason: string,
+    note?: string
+  ): Promise<{
+    ok: boolean;
+    id: string;
+    status: string;
+    action: string;
+    action_id: string;
+    message: string;
+  }> {
+    return this.request(`/v1/admin/memes/${encodeURIComponent(submissionId)}/takedown`, {
+      method: "POST",
+      body: JSON.stringify({ reason, note }),
+    });
+  }
+
+  /** General moderation action: approve, reject, retire, takedown (P10G.08) */
+  async moderateMeme(
+    submissionId: string,
+    action: "approve" | "reject" | "retire" | "takedown",
+    reason: string,
+    note?: string
+  ): Promise<{
+    ok: boolean;
+    id: string;
+    status: string;
+    action: string;
+    action_id: string;
+    message: string;
+  }> {
+    return this.request(`/v1/admin/memes/${encodeURIComponent(submissionId)}/moderate`, {
+      method: "POST",
+      body: JSON.stringify({ action, reason, note }),
+    });
+  }
 }
 
 export interface AntiTwinResponse {

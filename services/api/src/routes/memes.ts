@@ -32,6 +32,8 @@ import {
   type CandidatePromotionInput,
   CandidateApprovalSchema,
   type CandidateApprovalInput,
+  ModerationActionSchema,
+  type ModerationActionInput,
   calculateWilsonScore,
   isTurnstileValid,
   isDuplicateOrNearDuplicate,
@@ -906,6 +908,251 @@ export const memeRoutes: FastifyPluginAsyncZod = async (app) => {
         status: "candidate_rejected",
         rejected_by: admin.id,
         message: "Candidate promotion rejected.",
+      });
+    }
+  );
+
+  /**
+   * DELETE /v1/memes/:id
+   * Creator self-service delete flow (P10G.08).
+   * Enforces: Authors can delete their own meme submissions, retiring them from rotation.
+   */
+  app.delete(
+    "/v1/memes/:id",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            id: z.string(),
+            status: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const player = await resolveAuthenticatedPlayer(req);
+      if (!player) {
+        return reply.status(401).send({
+          ok: false,
+          error: "UNAUTHORIZED",
+          message: "Authentication required to delete a meme submission",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      // Author verification invariant
+      if (submission.author_player_id !== player.id) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "You can only delete your own meme submissions",
+        });
+      }
+
+      await prisma.memeSubmission.update({
+        where: { id: submissionId },
+        data: {
+          status: "retired",
+          moderation_reason: "Deleted by author",
+        },
+      });
+
+      return reply.status(200).send({
+        ok: true,
+        id: submissionId,
+        status: "retired",
+        message: "Meme submission successfully deleted by author",
+      });
+    }
+  );
+
+  /**
+   * POST /v1/admin/memes/:id/takedown
+   * Immediate moderation takedown action (P10G.08).
+   * Instantly retires submission, logs immutable audit action, and removes from rotation.
+   */
+  app.post(
+    "/v1/admin/memes/:id/takedown",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        body: z.object({
+          reason: z.string().min(1, "Takedown reason is required"),
+          note: z.string().optional(),
+        }),
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            id: z.string(),
+            status: z.string(),
+            action: z.string(),
+            action_id: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const admin = await resolveAuthenticatedAdmin(req);
+      if (!admin || !["owner", "admin", "moderator"].includes(admin.role)) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "Moderator, Admin, or Owner credentials required to perform a takedown",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+      const { reason, note } = req.body as { reason: string; note?: string };
+
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      const [actionRecord] = await prisma.$transaction([
+        prisma.moderationAction.create({
+          data: {
+            submission_id: submissionId,
+            action: "takedown",
+            reason,
+            note,
+            admin_id: admin.id,
+          },
+        }),
+        prisma.memeSubmission.update({
+          where: { id: submissionId },
+          data: {
+            status: "retired",
+            moderation_reason: reason,
+            reviewed_by: admin.id,
+            reviewed_at: new Date(),
+          },
+        }),
+      ]);
+
+      return reply.status(200).send({
+        ok: true,
+        id: submissionId,
+        status: "retired",
+        action: "takedown",
+        action_id: actionRecord.id,
+        message: "Meme submission taken down and removed from exposure rotation",
+      });
+    }
+  );
+
+  /**
+   * POST /v1/admin/memes/:id/moderate
+   * General moderation desk review action: approve, reject, retire, or takedown (P10G.08, Spec Section A5.1).
+   */
+  app.post(
+    "/v1/admin/memes/:id/moderate",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        body: ModerationActionSchema,
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            id: z.string(),
+            status: z.string(),
+            action: z.string(),
+            action_id: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const admin = await resolveAuthenticatedAdmin(req);
+      if (!admin || !["owner", "admin", "moderator"].includes(admin.role)) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "Moderator, Admin, or Owner credentials required to moderate memes",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+      const { action, reason, note } = req.body as ModerationActionInput;
+
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      const nextStatus =
+        action === "approve"
+          ? "approved"
+          : action === "reject"
+          ? "rejected"
+          : "retired";
+
+      const [actionRecord] = await prisma.$transaction([
+        prisma.moderationAction.create({
+          data: {
+            submission_id: submissionId,
+            action,
+            reason,
+            note,
+            admin_id: admin.id,
+          },
+        }),
+        prisma.memeSubmission.update({
+          where: { id: submissionId },
+          data: {
+            status: nextStatus,
+            moderation_reason: reason,
+            reviewed_by: admin.id,
+            reviewed_at: new Date(),
+          },
+        }),
+      ]);
+
+      return reply.status(200).send({
+        ok: true,
+        id: submissionId,
+        status: nextStatus,
+        action,
+        action_id: actionRecord.id,
+        message: `Meme submission successfully processed with action: ${action}`,
       });
     }
   );

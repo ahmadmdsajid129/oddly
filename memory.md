@@ -1108,6 +1108,20 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
     - Admin can reject candidate promotion from pool with logged audit reason.
   - **Client SDK:** Added `getDropCandidates()`, `promoteDropCandidate()`, `approveDropCandidate()`, `rejectDropCandidate()` in `packages/api-client` and `apps/web/src/lib/api.ts`.
   - **Verification:** Authored `services/api/src/memes-candidate.integration.test.ts` (7/7 tests passing). Full monorepo `turbo run typecheck lint` 12/12 passing with 0 warnings.
+- **`P10G.08`: Creator Delete Flow & Moderation Takedown Actions (`DELETE /v1/memes/:id` & `/v1/admin/memes/:id/*`):**
+  - **Creator Self-Service Delete Flow (`DELETE /v1/memes/:id`):**
+    - Authenticated author can soft-delete their own submission, retiring it from the exposure engine and public display (`status: 'retired'`, `moderation_reason: "Deleted by author"`).
+    - Enforces ownership: unauthorized players attempting to delete another author's meme are blocked with HTTP 403 `FORBIDDEN`.
+  - **Moderator Instant Takedown (`POST /v1/admin/memes/:id/takedown`):**
+    - Immediately retires offending submissions and purges them from the exposure rotation (`status: 'retired'`).
+    - Writes immutable audit entry to `moderation_actions` with `action: 'takedown'`, `admin_id`, and mandatory `reason`.
+  - **General Moderation Desk Action (`POST /v1/admin/memes/:id/moderate`):**
+    - Supports desk workflows: `approve` (status `'approved'`), `reject` (status `'rejected'`), `retire`, `takedown` (status `'retired'`).
+    - Enforces reviewer RBAC (requires `owner`, `admin`, or `moderator` role).
+  - **Immediate Exposure Rotation Exclusion:**
+    - Confirmed that once deleted or taken down, submissions are instantly excluded from `selectMemeForPlayer` in `MemesRepository`.
+  - **Client SDK:** Added `deleteMemeSubmission(id)`, `takedownMeme(id, reason, note)`, and `moderateMeme(id, action, reason, note)` in `packages/api-client` and `apps/web/src/lib/api.ts`.
+  - **Verification:** Authored `services/api/src/memes-takedown.integration.test.ts` (7/7 tests passing). Full monorepo `turbo run typecheck lint` 12/12 passing with 0 warnings.
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
@@ -1130,6 +1144,6 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
    - **`P10G.05`:** Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker (DONE).
    - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps) (DONE).
    - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow (DONE).
-   - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions.
+   - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions (DONE).
    - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass).
 2. **Stop Condition:** Complete Stage M3, author `docs/stage-M3-report.md`, and await Founder authorization before Stage M4.

@@ -277,3 +277,4 @@ describe("Stage M3 (Phase 10G): Mission Control Drop Candidates & Two-Person App
     expect(candidate.approved_by).toBe(admin2ApproverId);
   });
 });
+

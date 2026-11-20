@@ -398,6 +398,36 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     priorityLane: "normal",
     degradationBehavior: "Drop candidate rejection",
   },
+  {
+    method: "DELETE",
+    path: "/v1/memes/:id",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Creator self-service delete flow",
+  },
+  {
+    method: "POST",
+    path: "/v1/admin/memes/:id/takedown",
+    timeoutMs: 3000,
+    rateLimitClass: "tight",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Immediate moderator takedown and rotation exclusion",
+  },
+  {
+    method: "POST",
+    path: "/v1/admin/memes/:id/moderate",
+    timeoutMs: 3000,
+    rateLimitClass: "tight",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "General meme moderation review action",
+  },
 ];
 
 /**
