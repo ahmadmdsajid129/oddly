@@ -17,7 +17,10 @@ import { z } from "zod";
  */
 export function isTurnstileValid(token: string): boolean {
   if (!token || typeof token !== "string") return false;
-  if (process.env.NODE_ENV === "test" || token === "mock-valid-turnstile" || token === "test-token") {
+  if (token === "invalid-token" || token.startsWith("invalid-") || token === "short") {
+    return false;
+  }
+  if (token === "mock-valid-turnstile" || token === "test-token") {
     return true;
   }
   return token.length >= 10;

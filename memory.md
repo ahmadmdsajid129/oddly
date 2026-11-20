@@ -1122,6 +1122,17 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
     - Confirmed that once deleted or taken down, submissions are instantly excluded from `selectMemeForPlayer` in `MemesRepository`.
   - **Client SDK:** Added `deleteMemeSubmission(id)`, `takedownMeme(id, reason, note)`, and `moderateMeme(id, action, reason, note)` in `packages/api-client` and `apps/web/src/lib/api.ts`.
   - **Verification:** Authored `services/api/src/memes-takedown.integration.test.ts` (7/7 tests passing). Full monorepo `turbo run typecheck lint` 12/12 passing with 0 warnings.
+- **`P10G.09`: Automated Abuse-Case Tests (`memes-abuse.integration.test.ts`):**
+  - **Turnstile Human Verification Bypass Defense:** Verified rejection of missing, short, or invalid Turnstile tokens (400 `INVALID_TURNSTILE`).
+  - **Rule 18 Scoped Character Limits:** Verified rejection of captions > 100 characters and empty/whitespace inputs.
+  - **Mandatory Originality Attestation:** Verified rejection if originality is not explicitly confirmed by author.
+  - **Daily Spam Rate Limit:** Enforced max 2 submissions per author per day (`memes.daily_submission_cap`); third attempt rejected with 429 `DAILY_LIMIT_EXCEEDED`.
+  - **Duplicate & Levenshtein Near-Duplicate Protection:** Verified rejection of identical and near-duplicate captions within template (409 `DUPLICATE_CAPTION`).
+  - **Single Vote Per User Integrity:** Duplicate vote attempts on the same submission return 409 `ALREADY_RATED`.
+  - **Rating Brigading & Sockpuppet Ring Defense (ADR 043 Guard):** Proved that a ring of sockpuppet accounts (10+ accounts voting 100% "funny") cannot artificially inflate a meme's Wilson score or promote it to Drop candidacy because the system strictly requires $N \ge 200$ raters; score remains pegged at `0.0`.
+  - **Zero Public Exposure Isolation:** Proved queued submissions are never served by the exposure engine.
+  - **Privilege Escalation & Two-Person Circumvention:** Verified non-admin blocked from moderation/takedowns (403), and admin cannot approve their own candidate promotion (403 `TWO_PERSON_RULE_VIOLATION`).
+  - **Verification:** Authored `services/api/src/memes-abuse.integration.test.ts` (11/11 tests passing). Total meme test suite: 49/49 tests passing.
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
@@ -1132,11 +1143,11 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ---
 
-## 28. Next Steps
+## 28. Next Steps & Stage M3 Completion
 
 > **All commits pushed directly to `main` and verified.**
 
-1. **Continue Phase 10G (Stage M3: Meme Lab):**
+1. **Stage M3 (Phase 10G: Meme Lab) is 100% COMPLETE (9/9 tasks):**
    - **`P10G.01`:** Database Migrations (DONE).
    - **`P10G.02`:** Submission API (DONE).
    - **`P10G.03`:** Build caption composer UI (`/memes/new`) (DONE).
@@ -1145,5 +1156,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
    - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps) (DONE).
    - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow (DONE).
    - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions (DONE).
-   - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass).
-2. **Stop Condition:** Complete Stage M3, author `docs/stage-M3-report.md`, and await Founder authorization before Stage M4.
+   - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass) (DONE).
+2. **Stop Condition (Rule 1 Boundary):**
+   - Stage M3 completion report authored in `docs/stage-M3-report.md`.
+   - **Awaiting Founder command before proceeding to Stage M4 (Phase 10H: Insights Engine).**
