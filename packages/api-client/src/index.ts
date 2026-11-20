@@ -886,6 +886,85 @@ export class OddlyApiClient {
       body: JSON.stringify({ rating }),
     });
   }
+
+  /** Get Drop candidates list for Mission Control (P10G.07) */
+  async getDropCandidates(): Promise<{
+    ok: boolean;
+    count: number;
+    candidates: Array<{
+      id: string;
+      caption_text: string;
+      template_key: string;
+      illustration_registry_key: string;
+      raters: number;
+      funny_count: number;
+      funny_percentage: number;
+      wilson_lb: number;
+      status: string;
+      promoted_by: string | null;
+      promoted_at: string | null;
+      approved_by: string | null;
+      approved_at: string | null;
+      is_dual_approved: boolean;
+    }>;
+  }> {
+    return this.request("/v1/admin/memes/candidates");
+  }
+
+  /** Step 1: Promote meme candidate to Drop pool (P10G.07) */
+  async promoteDropCandidate(
+    submissionId: string,
+    reason: string,
+    targetDropDate?: string
+  ): Promise<{
+    ok: boolean;
+    submission_id: string;
+    status: string;
+    promoted_by: string;
+    action_id: string;
+    message: string;
+  }> {
+    return this.request(`/v1/admin/memes/${encodeURIComponent(submissionId)}/promote`, {
+      method: "POST",
+      body: JSON.stringify({ reason, target_drop_date: targetDropDate }),
+    });
+  }
+
+  /** Step 2: Second admin dual-approval for Drop candidate (P10G.07) */
+  async approveDropCandidate(
+    submissionId: string,
+    note: string
+  ): Promise<{
+    ok: boolean;
+    submission_id: string;
+    status: string;
+    promoted_by: string;
+    approved_by: string;
+    action_id: string;
+    message: string;
+  }> {
+    return this.request(`/v1/admin/memes/${encodeURIComponent(submissionId)}/approve-candidate`, {
+      method: "POST",
+      body: JSON.stringify({ note }),
+    });
+  }
+
+  /** Reject candidate promotion from Drop pool (P10G.07) */
+  async rejectDropCandidate(
+    submissionId: string,
+    reason: string
+  ): Promise<{
+    ok: boolean;
+    submission_id: string;
+    status: string;
+    rejected_by: string;
+    message: string;
+  }> {
+    return this.request(`/v1/admin/memes/${encodeURIComponent(submissionId)}/reject-candidate`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    });
+  }
 }
 
 export interface AntiTwinResponse {

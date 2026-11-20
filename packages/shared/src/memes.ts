@@ -165,3 +165,19 @@ export const ModerationActionSchema = z.object({
 });
 
 export type ModerationActionInput = z.infer<typeof ModerationActionSchema>;
+
+export const CandidatePromotionSchema = z.object({
+  reason: z.string().min(1, "Promotion reason is required"),
+  target_drop_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Target drop date must be YYYY-MM-DD")
+    .optional(),
+});
+
+export type CandidatePromotionInput = z.infer<typeof CandidatePromotionSchema>;
+
+export const CandidateApprovalSchema = z.object({
+  note: z.string().min(1, "Approval review note is required"),
+});
+
+export type CandidateApprovalInput = z.infer<typeof CandidateApprovalSchema>;

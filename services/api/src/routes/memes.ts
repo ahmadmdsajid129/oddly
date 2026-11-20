@@ -21,12 +21,17 @@ import { z } from "zod";
 import { prisma } from "../db/client.js";
 import { MemesRepository } from "../db/memes.repo.js";
 import { resolveAuthenticatedPlayer } from "../auth/player-auth.js";
+import { resolveAuthenticatedAdmin } from "../auth/admin-auth.js";
 import { DegradationManager } from "../resilience/degradation.js";
 import {
   CreateMemeSubmissionSchema,
   type CreateMemeSubmissionInput,
   RateMemeSchema,
   type RateMemeInput,
+  CandidatePromotionSchema,
+  type CandidatePromotionInput,
+  CandidateApprovalSchema,
+  type CandidateApprovalInput,
   calculateWilsonScore,
   isTurnstileValid,
   isDuplicateOrNearDuplicate,
@@ -507,6 +512,401 @@ export const memeRoutes: FastifyPluginAsyncZod = async (app) => {
         }
         throw err;
       }
+    }
+  );
+
+  /**
+   * GET /v1/admin/memes/candidates
+   * Lists high-scoring community memes eligible for daily Drop promotion (P10G.07, Spec Section A5.2).
+   * Threshold: raters >= 200, wilson_lb >= 0.70.
+   */
+  app.get(
+    "/v1/admin/memes/candidates",
+    {
+      schema: {
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            count: z.number(),
+            candidates: z.array(
+              z.object({
+                id: z.string(),
+                caption_text: z.string(),
+                template_key: z.string(),
+                illustration_registry_key: z.string(),
+                raters: z.number(),
+                funny_count: z.number(),
+                funny_percentage: z.number(),
+                wilson_lb: z.number(),
+                status: z.string(),
+                promoted_by: z.string().nullable(),
+                promoted_at: z.string().nullable(),
+                approved_by: z.string().nullable(),
+                approved_at: z.string().nullable(),
+                is_dual_approved: z.boolean(),
+              })
+            ),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const admin = await resolveAuthenticatedAdmin(req);
+      if (!admin || !["owner", "admin", "approver", "editor"].includes(admin.role)) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "Admin or Approver credentials required to view Drop candidates",
+        });
+      }
+
+      const minWilson = 0.70;
+      const minRaters = 200;
+
+      const candidates = await prisma.memeSubmission.findMany({
+        where: {
+          status: "approved",
+          stats: {
+            wilson_lb: { gte: minWilson },
+            raters: { gte: minRaters },
+          },
+        },
+        include: {
+          template: true,
+          stats: true,
+          moderationActions: {
+            where: {
+              action: { in: ["promote_candidate", "approve_candidate", "reject_candidate"] },
+            },
+            orderBy: { created_at: "asc" },
+          },
+        },
+        orderBy: {
+          stats: { wilson_lb: "desc" },
+        },
+      });
+
+      const items = candidates.map((c) => {
+        const promoteAction = c.moderationActions.find((a) => a.action === "promote_candidate");
+        const approveAction = c.moderationActions.find((a) => a.action === "approve_candidate");
+        const rejectAction = c.moderationActions.find((a) => a.action === "reject_candidate");
+
+        const isPromoted = !!promoteAction && !rejectAction;
+        const isDualApproved =
+          isPromoted && !!approveAction && approveAction.admin_id !== promoteAction.admin_id;
+
+        return {
+          id: c.id,
+          caption_text: c.caption_text,
+          template_key: c.template.key,
+          illustration_registry_key: c.template.illustration_registry_key,
+          raters: c.stats?.raters ?? 0,
+          funny_count: c.stats?.funny_count ?? 0,
+          funny_percentage:
+            (c.stats?.raters ?? 0) > 0
+              ? Math.round(((c.stats?.funny_count ?? 0) / (c.stats?.raters ?? 1)) * 100)
+              : 0,
+          wilson_lb: c.stats?.wilson_lb ?? 0.0,
+          status: isDualApproved
+            ? "dual_approved"
+            : isPromoted
+            ? "pending_second_approval"
+            : rejectAction
+            ? "rejected"
+            : "eligible_unpromoted",
+          promoted_by: promoteAction?.admin_id ?? null,
+          promoted_at: promoteAction?.created_at.toISOString() ?? null,
+          approved_by: approveAction?.admin_id ?? null,
+          approved_at: approveAction?.created_at.toISOString() ?? null,
+          is_dual_approved: isDualApproved,
+        };
+      });
+
+      return reply.status(200).send({
+        ok: true,
+        count: items.length,
+        candidates: items,
+      });
+    }
+  );
+
+  /**
+   * POST /v1/admin/memes/:id/promote
+   * Promotes an eligible meme into the Drop candidate pool (Step 1 of two-person workflow).
+   */
+  app.post(
+    "/v1/admin/memes/:id/promote",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        body: CandidatePromotionSchema,
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            submission_id: z.string(),
+            status: z.string(),
+            promoted_by: z.string(),
+            action_id: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const admin = await resolveAuthenticatedAdmin(req);
+      if (!admin || !["owner", "admin", "editor"].includes(admin.role)) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "Editor, Admin, or Owner credentials required to promote Drop candidates",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+      const { reason, target_drop_date } = req.body as CandidatePromotionInput;
+
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+        include: {
+          stats: true,
+          moderationActions: {
+            where: { action: { in: ["promote_candidate", "approve_candidate"] } },
+          },
+        },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      const raters = submission.stats?.raters ?? 0;
+      const wilson = submission.stats?.wilson_lb ?? 0.0;
+      if (raters < 200 || wilson < 0.70) {
+        return reply.status(400).send({
+          ok: false,
+          error: "CRITERIA_NOT_MET",
+          message: `Submission does not meet candidate criteria (requires raters >= 200 and wilson_lb >= 0.70; has raters=${raters}, wilson_lb=${wilson.toFixed(3)})`,
+        });
+      }
+
+      const existingPromotion = submission.moderationActions.find(
+        (a) => a.action === "promote_candidate"
+      );
+      if (existingPromotion) {
+        return reply.status(409).send({
+          ok: false,
+          error: "ALREADY_PROMOTED",
+          message: `Meme already promoted by admin ${existingPromotion.admin_id} on ${existingPromotion.created_at.toISOString()}`,
+        });
+      }
+
+      const note = target_drop_date ? `Target Drop: ${target_drop_date}` : undefined;
+      const action = await prisma.moderationAction.create({
+        data: {
+          submission_id: submissionId,
+          action: "promote_candidate",
+          reason: reason || "Promoted to Drop candidate pool",
+          note,
+          admin_id: admin.id,
+        },
+      });
+
+      return reply.status(200).send({
+        ok: true,
+        submission_id: submissionId,
+        status: "pending_second_approval",
+        promoted_by: admin.id,
+        action_id: action.id,
+        message: "Meme successfully promoted to candidate pool; awaiting second admin approval.",
+      });
+    }
+  );
+
+  /**
+   * POST /v1/admin/memes/:id/approve-candidate
+   * Grants the second admin approval for a Drop candidate (Two-Person Approval Rule).
+   * Enforces: Approver cannot be the admin who promoted the candidate.
+   */
+  app.post(
+    "/v1/admin/memes/:id/approve-candidate",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        body: CandidateApprovalSchema,
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            submission_id: z.string(),
+            status: z.string(),
+            promoted_by: z.string(),
+            approved_by: z.string(),
+            action_id: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const admin = await resolveAuthenticatedAdmin(req);
+      if (!admin || !["owner", "admin", "approver"].includes(admin.role)) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "Approver, Admin, or Owner credentials required to approve Drop candidates",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+      const { note } = req.body as CandidateApprovalInput;
+
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+        include: {
+          moderationActions: {
+            where: {
+              action: { in: ["promote_candidate", "approve_candidate", "reject_candidate"] },
+            },
+            orderBy: { created_at: "desc" },
+          },
+        },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      const promotion = submission.moderationActions.find(
+        (a) => a.action === "promote_candidate"
+      );
+      if (!promotion) {
+        return reply.status(400).send({
+          ok: false,
+          error: "NOT_PROMOTED",
+          message: "Meme must be promoted to the candidate pool before second approval can be granted",
+        });
+      }
+
+      // TWO-PERSON APPROVAL INVARIANT (ADR 043, Spec Section A5.2)
+      if (promotion.admin_id === admin.id) {
+        return reply.status(403).send({
+          ok: false,
+          error: "TWO_PERSON_RULE_VIOLATION",
+          message:
+            "Two-person approval violation: Approver cannot be the same admin who promoted the candidate",
+        });
+      }
+
+      const existingApproval = submission.moderationActions.find(
+        (a) => a.action === "approve_candidate"
+      );
+      if (existingApproval) {
+        return reply.status(409).send({
+          ok: false,
+          error: "ALREADY_DUAL_APPROVED",
+          message: "This candidate has already received dual-admin approval",
+        });
+      }
+
+      const action = await prisma.moderationAction.create({
+        data: {
+          submission_id: submissionId,
+          action: "approve_candidate",
+          reason: "Two-person approval confirmed",
+          note: note || "Candidate approved for Drop scheduling",
+          admin_id: admin.id,
+        },
+      });
+
+      return reply.status(200).send({
+        ok: true,
+        submission_id: submissionId,
+        status: "dual_approved",
+        promoted_by: promotion.admin_id,
+        approved_by: admin.id,
+        action_id: action.id,
+        message: "Dual-admin approval confirmed. Candidate is now verified for Drop scheduling.",
+      });
+    }
+  );
+
+  /**
+   * POST /v1/admin/memes/:id/reject-candidate
+   * Rejects a promoted Drop candidate from the pool.
+   */
+  app.post(
+    "/v1/admin/memes/:id/reject-candidate",
+    {
+      schema: {
+        params: z.object({
+          id: z.string().min(1, "Meme submission ID is required"),
+        }),
+        body: z.object({
+          reason: z.string().min(1, "Rejection reason is required"),
+        }),
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            submission_id: z.string(),
+            status: z.string(),
+            rejected_by: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const admin = await resolveAuthenticatedAdmin(req);
+      if (!admin || !["owner", "admin", "approver"].includes(admin.role)) {
+        return reply.status(403).send({
+          ok: false,
+          error: "FORBIDDEN",
+          message: "Approver, Admin, or Owner credentials required to reject Drop candidates",
+        });
+      }
+
+      const { id: submissionId } = req.params as { id: string };
+      const { reason } = req.body as { reason: string };
+
+      const submission = await prisma.memeSubmission.findUnique({
+        where: { id: submissionId },
+      });
+
+      if (!submission) {
+        return reply.status(404).send({
+          ok: false,
+          error: "MEME_NOT_FOUND",
+          message: "Meme submission not found",
+        });
+      }
+
+      await prisma.moderationAction.create({
+        data: {
+          submission_id: submissionId,
+          action: "reject_candidate",
+          reason: reason || "Rejected from Drop candidate pool",
+          admin_id: admin.id,
+        },
+      });
+
+      return reply.status(200).send({
+        ok: true,
+        submission_id: submissionId,
+        status: "candidate_rejected",
+        rejected_by: admin.id,
+        message: "Candidate promotion rejected.",
+      });
     }
   );
 };

@@ -1089,6 +1089,25 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
   - **Verification:**
     - Authored `services/api/src/memes-exposure.integration.test.ts` (7/7 tests passing).
     - Full monorepo verification: `turbo run typecheck` (6/6 passing) and `turbo run lint` (6/6 passing, 0 warnings).
+- **`P10G.07`: Mission Control Drop Candidates & Two-Person Approval Workflow (`/v1/admin/memes/*`):**
+  - **Admin Auth & RBAC (`services/api/src/auth/admin-auth.ts`):**
+    - Resolves authenticated administrators with standard roles (`owner`, `admin`, `approver`, `editor`, `moderator`, `analyst`).
+    - Enforces 403 `FORBIDDEN` when non-admin / regular player accesses admin surfaces.
+  - **Candidate List Generation (`GET /v1/admin/memes/candidates`):**
+    - Queries approved community meme submissions that meet the strict statistical promotion threshold: $N \ge 200$ raters and $\text{wilson\_lb} \ge 0.70$.
+    - Returns full candidate metadata, engagement metrics (`funny_percentage`, `wilson_lb`), and approval lifecycle tracking (`eligible_unpromoted`, `pending_second_approval`, `dual_approved`, `rejected`).
+  - **Promotion Workflow (`POST /v1/admin/memes/:id/promote`):**
+    - Step 1: Editor/Admin promotes candidate meme into the Drop candidate pool with a reason and optional target drop date.
+    - Rejects if criteria not met (400 `CRITERIA_NOT_MET`) or if already promoted (409 `ALREADY_PROMOTED`).
+    - Records immutable audit log to `moderation_actions` (`action: 'promote_candidate'`).
+  - **Two-Person Approval Workflow (`POST /v1/admin/memes/:id/approve-candidate`):**
+    - Step 2: Approver/Owner grants final approval for Drop scheduling.
+    - **Critical Invariant (Dual-Admin Rule):** The approver CANNOT be the same administrator who promoted the candidate (`promotion.admin_id !== admin.id`). Self-approval attempts are blocked with HTTP 403 `TWO_PERSON_RULE_VIOLATION`.
+    - Distinct second admin approval marks candidate as `dual_approved` and logs `approve_candidate` to `moderation_actions`.
+  - **Candidate Rejection (`POST /v1/admin/memes/:id/reject-candidate`):**
+    - Admin can reject candidate promotion from pool with logged audit reason.
+  - **Client SDK:** Added `getDropCandidates()`, `promoteDropCandidate()`, `approveDropCandidate()`, `rejectDropCandidate()` in `packages/api-client` and `apps/web/src/lib/api.ts`.
+  - **Verification:** Authored `services/api/src/memes-candidate.integration.test.ts` (7/7 tests passing). Full monorepo `turbo run typecheck lint` 12/12 passing with 0 warnings.
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
@@ -1110,7 +1129,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
    - **`P10G.04`:** Build post-drop Meme Corner card (DONE).
    - **`P10G.05`:** Build rating ingestion API `POST /v1/memes/:id/rating` and Wilson score lower bound calculation worker (DONE).
    - **`P10G.06`:** Build exposure engine (20% exploration traffic, freshness retirement, diversity caps) (DONE).
-   - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow.
+   - **`P10G.07`:** Implement Drop candidate list generation in Mission Control with two-person approval workflow (DONE).
    - **`P10G.08`:** Implement creator delete flow (`DELETE /v1/memes/:id`) and moderation takedown actions.
    - **`P10G.09`:** Author automated abuse-case tests (rating brigading, sockpuppets, rate limits, Turnstile bypass).
 2. **Stop Condition:** Complete Stage M3, author `docs/stage-M3-report.md`, and await Founder authorization before Stage M4.

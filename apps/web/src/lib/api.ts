@@ -164,6 +164,17 @@ export const api = {
     rate: (submissionId: string, rating: "funny" | "not_for_me") =>
       rawClient.rateMeme(submissionId, rating),
   },
+  admin: {
+    memes: {
+      getCandidates: () => rawClient.getDropCandidates(),
+      promoteCandidate: (submissionId: string, reason: string, targetDropDate?: string) =>
+        rawClient.promoteDropCandidate(submissionId, reason, targetDropDate),
+      approveCandidate: (submissionId: string, note: string) =>
+        rawClient.approveDropCandidate(submissionId, note),
+      rejectCandidate: (submissionId: string, reason: string) =>
+        rawClient.rejectDropCandidate(submissionId, reason),
+    },
+  },
 };
 
 export const oddlyApi = rawClient;
