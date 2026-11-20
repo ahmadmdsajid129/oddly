@@ -749,6 +749,89 @@ export class OddlyApiClient {
       }),
     });
   }
+
+  /** Get active meme templates for caption composer (P10G.02, P10G.03) */
+  async getMemeTemplates(): Promise<{
+    ok: boolean;
+    templates: Array<{
+      id: string;
+      key: string;
+      illustration_registry_key: string;
+      aspect: string;
+      alt_text_i18n: Record<string, unknown>;
+      license_note: string;
+    }>;
+  }> {
+    return this.request<{
+      ok: boolean;
+      templates: Array<{
+        id: string;
+        key: string;
+        illustration_registry_key: string;
+        aspect: string;
+        alt_text_i18n: Record<string, unknown>;
+        license_note: string;
+      }>;
+    }>("/v1/memes/templates");
+  }
+
+  /** Submit community meme caption (P10G.02, P10G.03) */
+  async submitMemeCaption(data: {
+    template_id: string;
+    caption_text: string;
+    turnstile_token: string;
+    attest_originality: boolean;
+  }): Promise<{
+    ok: boolean;
+    submission: {
+      id: string;
+      author_player_id: string;
+      template_id: string;
+      caption_text: string;
+      status: string;
+      created_at: string;
+    };
+  }> {
+    return this.request<{
+      ok: boolean;
+      submission: {
+        id: string;
+        author_player_id: string;
+        template_id: string;
+        caption_text: string;
+        status: string;
+        created_at: string;
+      };
+    }>("/v1/memes/submissions", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  /** List author's own meme submissions (P10G.02, P10G.03) */
+  async getMyMemeSubmissions(): Promise<{
+    ok: boolean;
+    submissions: Array<{
+      id: string;
+      template_id: string;
+      caption_text: string;
+      status: string;
+      moderation_reason: string | null;
+      created_at: string;
+    }>;
+  }> {
+    return this.request<{
+      ok: boolean;
+      submissions: Array<{
+        id: string;
+        template_id: string;
+        caption_text: string;
+        status: string;
+        moderation_reason: string | null;
+        created_at: string;
+      }>;
+    }>("/v1/memes/submissions/mine");
+  }
 }
 
 export interface AntiTwinResponse {

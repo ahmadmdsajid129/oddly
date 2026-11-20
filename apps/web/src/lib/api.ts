@@ -155,6 +155,12 @@ export const api = {
       policyVersion?: number
     ) => rawClient.updateConsent(purpose, granted, policyVersion),
   },
+  memes: {
+    getTemplates: () => rawClient.getMemeTemplates(),
+    submit: (data: Parameters<typeof rawClient.submitMemeCaption>[0]) =>
+      rawClient.submitMemeCaption(data),
+    getMySubmissions: () => rawClient.getMyMemeSubmissions(),
+  },
 };
 
 export const oddlyApi = rawClient;

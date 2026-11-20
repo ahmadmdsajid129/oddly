@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M3: Meme Lab (User Captions & Moderation Queue) — IN PROGRESS (Tasks P10G.01 and P10G.02 complete).
+- **Current Stage:** Stage M3: Meme Lab (User Captions & Moderation Queue) — IN PROGRESS (Tasks P10G.01, P10G.02, and P10G.03 complete).
 - **Current Target:** Execute Phase 10G tasks (P10G.01 to P10G.09): Database migrations, Submission API, Caption Composer UI, Meme Corner Card, Wilson rating worker, Exposure engine, Moderation queue, Creator delete, and Abuse-case tests directly on `main`.
 
 ---
@@ -1028,6 +1028,18 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
   - Added route policies in `policy.registry.ts` and registered in `server.ts`.
   - Authored `services/api/src/memes.integration.test.ts` (11/11 tests passing).
   - Authored `packages/shared/src/memes.test.ts` (12/12 unit tests passing).
+- **`P10G.03`: Caption Composer UI (`/memes/new` & `apps/web`):**
+  - Built `apps/web/src/app/memes/new/page.tsx`:
+    - **Template Selector Carousel:** Dynamic template loader with offline fallback seeds (`snooze-battle`, `overthinking-3am`, `chai-urgency`, `battery-anxiety`, etc.), chevron buttons with $\ge 44 \times 44\text{px}$ touch targets, indicator pills, and keyboard ArrowLeft/ArrowRight navigation.
+    - **WYSIWYG Live Preview Sticker Card:** Real-time rendering of selected template vector illustration via `DynamicIllustration` with live dynamic caption display, ink border (`2.5px solid #14123A`), and hard offset shadow (`4px 4px 0 #14123A`).
+    - **Rule 18 Character Counter:** Reactive character counting up to 100 characters with near-limit warning state ($\ge 85$ characters), maximum length enforcement, and helper copy.
+    - **Originality Attestation:** Tactile `Checkbox` component ($\ge 44\text{px}$ clickable area) requiring user attestation before submission.
+    - **Turnstile Verification:** Verified client status badge with `mock-valid-turnstile` support.
+    - **Tactile Submit Button:** Primary `Button` with tactile press-flat interaction, loading indicator, and haptic feedback.
+    - **Post-Submit Confirmation View:** Celebratory stamp badge ("QUEUED FOR REVIEW"), explanatory moderation context, submitted sticker preview, and "Write Another Caption" / "Back to Home" actions.
+  - Added meme client methods (`getMemeTemplates`, `submitMemeCaption`, `getMyMemeSubmissions`) in `packages/api-client` and `apps/web/src/lib/api.ts`.
+  - Authored `apps/web/src/meme-composer.test.ts` (9/9 unit tests passing).
+  - Prerendered cleanly in production build (`/memes/new` static route, 8.6 kB).
 
 ### 27.2 GitHub Actions CI & Build Stabilization
 - Fixed root `.github/workflows/ci.yml` to use `pnpm/action-setup@v4` with version 9, resolving the GitHub runner `npm install -g pnpm@12.18.0` package failure.
