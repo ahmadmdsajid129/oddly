@@ -133,3 +133,18 @@ The 14 seed subject tags were audited against the Section 9.1 Forbidden Topic Li
 | `quirks` | Lifestyle | Walking on cracks, checking locked doors, volume knob on even numbers | **PASS:** Lighthearted common human instincts. |
 
 **Audit Conclusion:** All 14 seed tags are strictly neutral lifestyle categories. An automated build-fail regression test in `packages/shared` will enforce that no tag key or translation string ever matches the Section 9.1 forbidden terms.
+
+---
+
+## 8. Stage L0 Amendments: Lane Dimension for Memes, Signals & Insights (2026-11-21)
+
+### 8.1 F24 (Meme Questions) vs. F35 (Memes Lane) Distinction
+- **F24 Meme Questions (Stage M1):** Defines the **question format and presentation variant** (`render_variant = 'meme'`). It pairs curated vector SVG templates with distinct text captions. Meme questions can appear as a minority in the Everyday lane (at most 1 of 5 per *config*).
+- **F35 Memes Lane (Stage L4):** Defines the **dedicated subject lane** (`lane_id`). A Memes lane Drop consists 100% of humor, meme templates, and caption choices, blending `pick1`, `pick2of6`, and `slider7` formats.
+- **Meme Lab Inflow (F26):** Community-authored memes created in Meme Lab feed **exclusively into the Memes lane**. Even after achieving top Wilson scores ($W \ge 0.70$) and dual-admin approval, community submissions are scheduled into Memes lane Drops, never Everyday Drops.
+
+### 8.2 Lane Dimension for Signals and Insights (F25, F27)
+- **Database Partitioning:** `events_raw`, `question_stats_daily`, and `tag_stats_daily` gain a `lane_id` dimension column.
+- **Category Performance:** Category analytics (completion rate index, viral share lift, median dwell time) are computed per lane to identify subject affinities.
+- **Privacy & Group Minimums:** The strict $k \ge 20$ anonymity guardrail is evaluated per lane; if a tag in a newly opened lane has fewer than 20 responses, stats remain suppressed.
+- **Personalized Ranking (F27 / F30):** Personalization in the post-drop Meme Corner applies only to consented players ($N \ge 20$) and ranks memes within that lane. Drop questions remain 100% immune to taste personalization under Rule L1.
