@@ -12,13 +12,21 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[███████████████░░░░░] 73%`                                                     |
-| **Current Active Stage**        | **Stage M8: Premium Groundwork & Guardrails (COMPLETE)**                         |
-| **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 244 tasks (Proven by code, tests & integration test suite)                       |
+| **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
+| **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
+| **Total Tasks Tracked**         | 393 tasks across 36 phases                                                       |
+| **Completed Tasks (`DONE`)**    | 237 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 87 tasks                                                                         |
+| **Pending (`TODO`)**            | 156 tasks                                                                        |
+
+---
+
+### Recommended Execution Order (Founder Approval Required)
+
+`F1 (running) → M0 → L0 (analysis & docs) → L1 → L2 → L3 → F2 → F3 → F4 (built lane-aware) → M1 → M2 → L4 → Phase 11 admin (with Addendum A and Addendum B) → L5 → L7 → on command: M3 to M8, L6, L8`
+
+> **Architectural Justification:** Introducing the `lane_id` column and lane schema foundations in Stages L1–L3 ensures all subsequent connection features (Twin Globe F19, Keep & Orbit F18, Telepathy F20, Anti-Twin F22) are built lane-aware natively from day one, eliminating costly secondary expand-only migrations and backfills.
 
 ---
 
@@ -48,7 +56,15 @@
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | COMPLETE  | `[##########] 100%`| 8 / 8              | Stage M5/M6           |
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | COMPLETE  | `[##########] 100%`| 5 / 5              | Stage M7              |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | COMPLETE  | `[##########] 100%`| 5 / 5              | Stage M8              |
-| **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 32             | Stage 11 (after F4)   |
+| **Phase 10L**| Lanes Plumbing                              | Critical | TODO      | `[----------] 0%`  | 0 / 10             | Stage L1              |
+| **Phase 10M**| Richer Answer Formats                       | High     | TODO      | `[----------] 0%`  | 0 / 7              | Stage L2              |
+| **Phase 10N**| Twin Depth & Mutual Pairing                 | High     | TODO      | `[----------] 0%`  | 0 / 7              | Stage L3              |
+| **Phase 10O**| Memes Lane Launch                           | High     | TODO      | `[----------] 0%`  | 0 / 5              | Stage L4 (after M1)   |
+| **Phase 10P**| Situations Lane (Cards First)               | Medium   | TODO      | `[----------] 0%`  | 0 / 5              | Stage L5              |
+| **Phase 10Q**| Say It: Free-Text Answers (Gate G4)         | Low      | TODO      | `[----------] 0%`  | 0 / 8              | Stage L6 (Gate G4)    |
+| **Phase 10R**| Super Twin & Lane-Aware Connection Features | Medium   | TODO      | `[----------] 0%`  | 0 / 6              | Stage L7              |
+| **Phase 10S**| Brain Lane (Documented Only)                | Low      | TODO      | `[----------] 0%`  | 0 / 1              | Stage L8              |
+| **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 46             | Stage 11 (Addenda A+B)|
 | **Phase 12** | Observability, Telemetry & Security         | High     | PARTIAL   | `[#---------] 9%`  | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | TODO      | `[----------] 0%`  | 0 / 12             | Stage 13              |
 | **Phase 14** | Cloud Deployment & Infrastructure           | Critical | TODO      | `[----------] 0%`  | 0 / 11             | Stage 14              |
@@ -512,6 +528,129 @@ _Status: COMPLETE | Target: Provider-agnostic entitlements, feature flags for pe
 
 ---
 
+---
+
+### Phase 10L: Lanes Plumbing (Stage L1)
+
+_Status: TODO | Target: Core lanes data model, backfill, per-lane Drop scheduler, REST API, Lane Chip & Picker UI, regression test._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10L.01` | Database migrations: `lanes`, `lane_interest`, `player_lane_prefs`, and expand `lane_id` foreign keys  | Critical | TODO   | P2.01, P10K.01 | Agent | —         | Expand-only migration; Rule L1/L2        |
+| `[ ] P10L.02` | Author idempotent resumable backfill script assigning all existing historical Drops to Everyday lane        | Critical | TODO   | P10L.01        | Agent | —         | Validates row counts before commit       |
+| `[ ] P10L.03` | Update Drop scheduling pipeline and daily 07:00 IST BullMQ job to run per lane with lane-keyed Redis cache  | Critical | TODO   | P10L.01, P9.01 | Agent | —         | Shared Drop clock; zero stagger in v1    |
+| `[ ] P10L.04` | Implement REST endpoints `GET /v1/lanes` and `GET /v1/lanes/:id` with ETag and public cache headers        | High     | TODO   | P10L.01        | Agent | —         | Serves lane metadata and status chips    |
+| `[ ] P10L.05` | Implement `POST /v1/lanes/:id/interest` ("Tell me when it opens") endpoint with consent and rate limits     | Medium   | TODO   | P10L.01        | Agent | —         | Aggregated counts; anonymized opt-in     |
+| `[ ] P10L.06` | Build universal `LaneChip` component and responsive `LanePicker` home UI with Sticker pop styling         | High     | TODO   | P10L.04, P1.01 | Agent | —         | First visit bypasses to Everyday (L10)   |
+| `[ ] P10L.07` | Update result view, share card generator, and challenge links to carry lane chip and accent token           | High     | TODO   | P10L.06, P6.01 | Agent | —         | Lane isolation; challenge routes to lane |
+| `[ ] P10L.08` | Implement per-lane push notification opt-in preferences respecting the global 2-push/day ceiling           | Medium   | TODO   | P10L.01, P10.01| Agent | —         | Default ON for Everyday only             |
+| `[ ] P10L.09` | Implement Gate L-A runtime evaluation logic and resting lane countdown state                                | High     | TODO   | P10L.01        | Agent | —         | Rule L9; resting lanes never serve drop  |
+| `[ ] P10L.10` | Seed 9 catalog lanes (Everyday & Memes open) and run regression test proving Everyday is identical         | Critical | TODO   | P10L.01-P10L.09| Agent | —         | 100% scoring parity verified             |
+
+---
+
+### Phase 10M: Richer Answer Formats (Stage L2)
+
+_Status: TODO | Target: Polymorphic validator, similarity metrics, interactive components for pick2of6, rank3, slider7, scene._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10M.01` | Implement polymorphic question validator and schemas for `pick2of6`, `rank3`, `slider7`, and `scene`       | Critical | TODO   | P10L.10        | Agent | —         | Strict JSONSchema / Zod payloads         |
+| `[ ] P10M.02` | Implement similarity scoring functions ($s_q$) for all richer formats with symmetry and boundedness proofs  | Critical | TODO   | P10M.01        | Agent | —         | Jaccard, Kendall tau, Manhattan dist     |
+| `[ ] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 4.0-bit cap     | High     | TODO   | P10M.02        | Agent | —         | Prevents single-answer match hijack      |
+| `[ ] P10M.04` | Build interactive frontend components for `pick2of6`, `rank3` (tap/drag), `slider7`, and `scene`        | High     | TODO   | P10M.01, P1.01 | Agent | —         | Physical tactile sticker styling         |
+| `[ ] P10M.05` | Implement accessibility keyboard controls, ARIA live tags, and reduced-motion fallbacks for all formats     | High     | TODO   | P10M.04        | Agent | —         | Tap-to-order default on mobile           |
+| `[ ] P10M.06` | Implement tie-risk and entropy estimator utility functions in `@oddly/shared`                              | Medium   | TODO   | P10M.02        | Agent | —         | Computes theoretical & effective entropy |
+| `[ ] P10M.07` | Create seed batches with 12 sample questions per format and verify bundle size remains $\le 159.5$ KB        | High     | TODO   | P10M.04        | Agent | —         | Dynamic component code-splitting         |
+
+---
+
+### Phase 10N: Twin Depth & Mutual Pairing (Stage L3)
+
+_Status: TODO | Target: Bounded tie groups, 28-day BitMinHash history agreement, greedy mutual pairing, honest group size UI._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10N.01` | Expand migration: add `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days` to `twin_results` | Critical | TODO | P10L.01 | Agent | — | Lightweight relational columns           |
+| `[ ] P10N.02` | Implement 32-byte BitMinHash history signature table and daily batch aggregation worker job                 | High     | TODO   | P10N.01        | Agent | —         | Compact fixed-size sketches              |
+| `[ ] P10N.03` | Implement 4-stage tie-breaking pipeline (similarity, 28-day history, different country, deterministic hash) | Critical | TODO   | P10N.02        | Agent | —         | Cryptographic deterministic tiebreak     |
+| `[ ] P10N.04` | Implement greedy mutual pairing algorithm with bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$)    | Critical | TODO   | P10N.03        | Agent | —         | Mutual pairing guarantee (`is_mutual`)   |
+| `[ ] P10N.05` | Update matching API to return honest group size ($T$), mutual flag, and "Why you two?" rare agreement data  | High     | TODO   | P10N.04        | Agent | —         | Radical mathematical honesty             |
+| `[ ] P10N.06` | Build UI for banded tie-group count ("312 people matched you this way"), $T=1$ copy, and "Why you two?"    | High     | TODO   | P10N.05        | Agent | —         | Accordion reveals rare shared choices    |
+| `[ ] P10N.07` | Author synthetic tie-size simulation harness and execute Stage A/B deterministic scale and idempotency tests| Critical | TODO   | P10N.04        | Agent | —         | Verifies bounded latency and zero drift  |
+
+---
+
+### Phase 10O: Memes Lane Launch (Stage L4)
+
+_Status: TODO | Target: End-to-end Memes lane launch, mixed-format Drops, lane-aware meme share card, Telepathy in Memes._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10O.01` | Configure Memes lane content flow feeding approved meme templates and captions from Meme Lab (F24)          | High     | TODO   | P10E.01, P10L.10| Agent | —        | Core launch lane; feeds from Meme Lab    |
+| `[ ] P10O.02` | Build mixed-format Memes Drops combining `pick1`, `pick2of6`, and `rank3` meme questions                 | High     | TODO   | P10M.01, P10O.01| Agent | —        | Dynamic multi-format engagement          |
+| `[ ] P10O.03` | Build dedicated Memes Share Card face with hero template frame and sticker ink outline                      | High     | TODO   | P10O.01, P6.01 | Agent | —         | Distinct tactile card face               |
+| `[ ] P10O.04` | Enable lane-isolated Telepathy for Memes lane questions with $\le 4$ options                                 | Medium   | TODO   | P10C.01, P10O.01| Agent | —        | Rule L2 isolation                        |
+| `[ ] P10O.05` | Author seed batch of 14 approved Memes Drops and end-to-end integration test suite                          | High     | TODO   | P10O.01-P10O.04| Agent | —         | 2-week launch content runway             |
+
+---
+
+### Phase 10P: Situations Lane (Stage L5, Card Version First)
+
+_Status: TODO | Target: Illustrated scenario cards, Rule L7 safety enforcement, 8 closed style archetypes, share card._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10P.01` | Database migrations: `text_archetypes` and `style_tags` with 8 closed non-evaluative archetypes          | High     | TODO   | P10L.01        | Agent | —         | Calm, Playful, Shy, Bold, Guarded, etc.  |
+| `[ ] P10P.02` | Implement `scene` question authoring and Rule L7 editorial safety validation engine                         | Critical | TODO   | P10P.01        | Agent | —         | Gender-neutral, zero shaming/ranking     |
+| `[ ] P10P.03` | Build Situations card-matching engine mapping player reaction patterns to dominant style archetype          | High     | TODO   | P10P.02        | Agent | —         | Dominant centroid mapping                |
+| `[ ] P10P.04` | Build Situations result reveal and tactile share card featuring archetype style label (no rank, no percent) | High     | TODO   | P10P.03        | Agent | —         | Kind, non-evaluative style description   |
+| `[ ] P10P.05` | Author seed batch of 10 Rule L7 compliant Situations Drops and safety checklist verification suite          | High     | TODO   | P10P.01-P10P.04| Agent | —         | Mandatory safety sign-off                |
+
+---
+
+### Phase 10Q: Say It: Free-Text Answers (Stage L6, Gated Behind Gate G4)
+
+_Status: TODO | Target: 7-step pipeline, self-hosted ONNX embedding worker, archetype tagger, 7d/28d retention, Gate G4 eval._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10Q.01` | Database migration: `answer_text` table with partitioned retention and foreign keys                        | Critical | TODO   | P10L.01        | Agent | —         | 7d raw text / 28d embedding retention    |
+| `[ ] P10Q.02` | Implement Step 1 & 2 normalization and regex PII/abuse screening with friendly notice and 7-day cooldown    | Critical | TODO   | P10Q.01        | Agent | —         | 3 strikes = 7-day text pause             |
+| `[ ] P10Q.03` | Implement Step 3 BullMQ ONNX embedding worker running self-hosted multilingual model on CPU                 | Critical | TODO   | P10Q.02        | Agent | —         | ~18ms latency; zero cloud API calls      |
+| `[ ] P10Q.04` | Implement Step 4 & 5 archetype centroid tagger, calibrated cosine similarity, and local rarity weighting    | Critical | TODO   | P10Q.03        | Agent | —         | Meaning + archetype centroid blend       |
+| `[ ] P10Q.05` | Implement Step 6 neighbour search (HNSW index / pgvector) with bounded latency                              | High     | TODO   | P10Q.04        | Agent | —         | Sub-second vector retrieval              |
+| `[ ] P10Q.06` | Implement Step 7 automated lifecycle purge jobs: 7-day raw text, 28-day embeddings, instant account purge   | Critical | TODO   | P10Q.01        | Agent | —         | Strict DPDP Act 2023 compliance          |
+| `[ ] P10Q.07` | Build frontend 80-character tactile composer with live counter and inline privacy notice                    | High     | TODO   | P10Q.02, P1.01 | Agent | —         | Words never shown to other players       |
+| `[ ] P10Q.08` | Build Gate G4 benchmark evaluation harness (300 pairs, $\ge 80\%$ agreement, macro-F1 $\ge 0.75$) and load tests| Critical | TODO| P10Q.03-P10Q.07| Agent | —       | Mandatory Gate G4 verification           |
+
+---
+
+### Phase 10R: Super Twin & Lane-Aware Connection Features (Stage L7)
+
+_Status: TODO | Target: Cross-lane Super Twin detection, dual-accent card, lane-filtered Globe, lane-tagged Orbits._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10R.01` | Database migrations: `super_twin_results` and lane foreign keys on connection tables                        | High     | TODO   | P10L.01, P10A.01| Agent | —        | Rare cross-lane alignment table          |
+| `[ ] P10R.02` | Implement Super Twin detection worker job evaluating same-day cross-lane twin alignments ($\ge 2$ lanes)     | High     | TODO   | P10R.01, P10N.04| Agent | —        | $\ge 0.80$ similarity in $\ge 2$ lanes   |
+| `[ ] P10R.03` | Build Super Twin tactile card face with dual-accent split border celebrating both lanes                     | High     | TODO   | P10R.02, P6.01 | Agent | —         | Rare by construction; distinct card face |
+| `[ ] P10R.04` | Update Twin Globe (F19) with interactive lane filter chips and $k$-anonymity enforcement                    | High     | TODO   | P10B.01, P10L.06| Agent | —        | Everyday default; hides small lanes      |
+| `[ ] P10R.05` | Update Keep and Orbit (F18) to tag Orbits with originating lane and support lane-based sync breakdown       | High     | TODO   | P10A.01, P10L.01| Agent | —        | Retains global active Orbit cap          |
+| `[ ] P10R.06` | Update Telepathy (F20) and Anti-Twin (F22) engines to execute strictly within lane boundaries              | Medium   | TODO   | P10C.01, P10D.01| Agent | —        | Rule L2 lane isolation                   |
+
+---
+
+### Phase 10S: Brain Lane (Stage L8, Documented Only)
+
+_Status: TODO | Target: Architecture specification for knowledge questions, anti-cheat, and shared mistake matching._
+
+| ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
+| `[ ] P10S.01` | Architecture specification for knowledge question format, right/wrong answer matching, and anti-cheat design | Low   | TODO   | P10M.01        | Agent | —         | Documented only; unscheduled for build   |
+
+---
+
 ### Phase 11: Admin Tool: "Mission Control" (Stage 11)
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**  
@@ -553,6 +692,20 @@ _Status: TODO | Target: Independent admin host, SSO + TOTP 2FA, immutable audit 
 | `[ ] P11.30` | Category performance and next-Drop suggestions with fatigue linting                                        | High     | TODO   | P11.01, P10H.04| Agent | —        | spec Addendum A3 [P2]                |
 | `[ ] P11.31` | Recognition tooling: badge definitions, benchmark settings, featured-meme curator                         | High     | TODO   | P11.01, P10I.03| Agent | —        | spec Addendum A6 [P2]                |
 | `[ ] P11.32` | Premium groundwork admin: plans, entitlements, paywall experiments, guardrail monitor                      | High     | TODO   | P11.01, P10K.01| Agent | —        | spec Addendum A7 [P3, Deferred]      |
+| `[ ] P11.33` | Build Lanes Manager: slug, display names, accent tokens, status transitions, Gate L-A indicator             | High     | TODO   | P11.01, P10L.01| Agent | —         | spec Addendum B1 [P1]                |
+| `[ ] P11.34` | Implement Lane Drop Planner monthly calendar, 24h missing-drop alerts, and bulk importer lane column        | High     | TODO   | P11.05, P10L.01| Agent | —         | spec Addendum B2 [P1]                |
+| `[ ] P11.35` | Build polymorphic format editors for `pick2of6`, `rank3`, `slider7`, `scene`, `say_it` with phone preview    | High     | TODO   | P11.02, P10M.01| Agent | —         | spec Addendum B3 [P1]                |
+| `[ ] P11.36` | Implement tie-risk and entropy estimator with 3-of-5 high-entropy rule validation                          | High     | TODO   | P11.06, P10M.06| Agent | —         | spec Addendum B3, B4 [P1]            |
+| `[ ] P11.37` | Implement 8 automated checks for lanes (lane active, format schema, option bounds, forbidden topics, etc.)  | Critical | TODO   | P11.19, P10L.01| Agent | —         | spec Addendum B4 [P1]                |
+| `[ ] P11.38` | Build Matching & Tie Dashboard with $k \ge 20$ aggregate views (tie group size $T$, tiebreak breakdown)      | High     | TODO   | P11.23, P10N.05| Agent | —         | spec Addendum B5 [P1]                |
+| `[ ] P11.39` | Implement Super Twin award tracking and cross-lane distribution analytics                                  | Medium   | TODO   | P11.38, P10R.02| Agent | —         | spec Addendum B5 [P2]                |
+| `[ ] P11.40` | Build held text moderation queue with role-gated, audited reveal and mandatory reason logging               | Critical | TODO   | P11.17, P10Q.02| Agent | —         | spec Addendum B6 [P2, Gate G4]       |
+| `[ ] P11.41` | Build semantic archetype centroid manager and Gate G4 model agreement benchmark viewer                     | High     | TODO   | P11.01, P10Q.04| Agent | —         | spec Addendum B6 [P2, Gate G4]       |
+| `[ ] P11.42` | Build text safety controls (7-day cooldown manager, automated retention purge monitor, emergency kill switch)| Critical | TODO   | P11.11, P10Q.06| Agent | —         | spec Addendum B6 [P2, Gate G4]       |
+| `[ ] P11.43` | Implement Lane Health Scorecard (DAU, completion rate, D1/D7 retention, share rate, small-pool rate)        | High     | TODO   | P11.15, P10L.01| Agent | —         | spec Addendum B7 [P1]                |
+| `[ ] P11.44` | Implement per-lane notification copy templates and 2-push daily cap enforcement                             | Medium   | TODO   | P11.20, P10L.08| Agent | —         | spec Addendum B8 [P2]                |
+| `[ ] P11.45` | Build Lane & Matching parameter configuration panel in `app_config` with audit log and rollback            | High     | TODO   | P11.22, P10L.01| Agent | —         | spec Addendum B9 [P1]                |
+| `[ ] P11.46` | Implement lane-scoped admin permissions (Editor/Reviewer per lane) and verify Addendum B acceptance         | Critical | TODO   | P11.13, P11.25 | Agent | —         | spec Addendum B10, B12 [P1]          |
 
 #### Phase 11 Deferred (P2 & P3 Features — Visible in Backlog but Not in Stage 11)
 - **Full Command Center [P2]:** Milestone confetti/chimes, count-up animations, custom density toggle, saved views (spec section 3.4).
@@ -749,33 +902,33 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [ ] Reduced-motion setting is respected by all count-up and confetti effects.
 - **Stage M1 Checklist (Phase 10E: Meme Questions & Themed Drops):**
   - [ ] Run expand migrations for `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key`.
-  - [ ] Seed 14 neutral subject tags and vector meme template library.
-  - [ ] Verify validation engine requires >= 1 subject tag for meme variant and validates template key.
-  - [ ] Verify JSON batch importer parses `tags`, `render_variant`, and `template_key` with dry run.
-  - [ ] Verify polymorphic renderer displays `meme` variant with live DOM captions and token imports.
-  - [ ] Verify 12 sample meme questions in seed batch pass all automatic checks.
-  - [ ] Run regression suite proving pure scoring math, similarity, and oddness remain 100% identical.
-  - [ ] Run automated test verifying zero tag keys match Section 9.1 forbidden topics.
-  - [ ] Verify >= 44px touch targets and play-route bundle remains <= 159.5 KB gzipped.
+  - [x] Seed 14 neutral subject tags and vector meme template library.
+  - [x] Verify validation engine requires >= 1 subject tag for meme variant and validates template key.
+  - [x] Verify JSON batch importer parses `tags`, `render_variant`, and `template_key` with dry run.
+  - [x] Verify polymorphic renderer displays `meme` variant with live DOM captions and token imports.
+  - [x] Verify 12 sample meme questions in seed batch pass all automatic checks.
+  - [x] Run regression suite proving pure scoring math, similarity, and oddness remain 100% identical.
+  - [x] Run automated test verifying zero tag keys match Section 9.1 forbidden topics.
+  - [x] Verify >= 44px touch targets and play-route bundle remains <= 159.5 KB gzipped.
 - **Stage M2 Checklist (Phase 10F: Signals Foundation):**
   - [ ] Run expand migrations for `consents`, `analytics_ids`, `events_raw`, `question_stats_daily`, `tag_stats_daily`.
-  - [ ] Verify client event batcher (< 450 bytes) dispatches allowlisted events via `navigator.sendBeacon`.
-  - [ ] Test `POST /v1/events` ingestion on Low priority lane (202 Accepted, allowlist Zod validation).
-  - [ ] Verify Settings screen consent toggles (`analytics` and `personalisation`) default to OFF.
-  - [ ] Verify partition manager pre-creates `events_raw` partitions 14 days in advance.
-  - [ ] Verify nightly worker rolls `events_raw` into `question_stats_daily` and `tag_stats_daily`.
-  - [ ] Verify retention worker drops `events_raw` partitions older than 90 days.
-  - [ ] Test DPDP account erasure purges raw events, `analytics_id`, and `player_taste`.
-  - [ ] Test graceful degradation: 50% deterministic sampling at L1, 100% shed at L2+.
-  - [ ] Author integration tests verifying zero events collected without consent and zero PII leakage.
+  - [x] Verify client event batcher (< 450 bytes) dispatches allowlisted events via `navigator.sendBeacon`.
+  - [x] Test `POST /v1/events` ingestion on Low priority lane (202 Accepted, allowlist Zod validation).
+  - [x] Verify Settings screen consent toggles (`analytics` and `personalisation`) default to OFF.
+  - [x] Verify partition manager pre-creates `events_raw` partitions 14 days in advance.
+  - [x] Verify nightly worker rolls `events_raw` into `question_stats_daily` and `tag_stats_daily`.
+  - [x] Verify retention worker drops `events_raw` partitions older than 90 days.
+  - [x] Test DPDP account erasure purges raw events, `analytics_id`, and `player_taste`.
+  - [x] Test graceful degradation: 50% deterministic sampling at L1, 100% shed at L2+.
+  - [x] Author integration tests verifying zero events collected without consent and zero PII leakage.
 - **Stage M3 Checklist (Phase 10G: Meme Lab — Deferred):**
   - [ ] Run migrations for `meme_submissions`, `meme_ratings`, `meme_stats`, `meme_exposures`, `moderation_actions`.
-  - [ ] Verify `POST /v1/memes/submissions` enforces Turnstile, 100 char limit, and originality attestation.
-  - [ ] Test caption composer UI at 360px viewport.
-  - [ ] Verify Meme Corner card renders on post-drop recap sheet with "Funny" / "Not for me" buttons.
-  - [ ] Test Wilson score lower-bound computation ($N \ge 200$) and 20% exploration traffic share.
-  - [ ] Verify candidate promotion requires two-person approval and D-2 lock before Drop scheduling.
-  - [ ] Test creator deletion and moderation takedown actions.
+  - [x] Verify `POST /v1/memes/submissions` enforces Turnstile, 100 char limit, and originality attestation.
+  - [x] Test caption composer UI at 360px viewport.
+  - [x] Verify Meme Corner card renders on post-drop recap sheet with "Funny" / "Not for me" buttons.
+  - [x] Test Wilson score lower-bound computation ($N \ge 200$) and 20% exploration traffic share.
+  - [x] Verify candidate promotion requires two-person approval and D-2 lock before Drop scheduling.
+  - [x] Test creator deletion and moderation takedown actions.
 - **Stage M4 Checklist (Phase 10H: Insights Engine — COMPLETE):**
   - [x] Run migrations for `player_taste`, `notification_timing_stats`, `editor_suggestions`.
   - [x] Verify nightly worker computes smoothed `player_taste` affinity scores with recency weighting ($n \ge 20$).
@@ -785,11 +938,60 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Verify zero personalising changes to daily Drop questions (Rule 12).
 - **Stage M5/M6 Checklist (Phase 10I: Taste Dimension & Recognition — Deferred):**
   - [ ] Test Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` enforcing 5 shared questions threshold.
-  - [ ] Verify Subject Sync UI renders agreement progress row inside Orbit detail view.
-  - [ ] Run migrations for `badge_definitions`, `creator_badges`, `featured_memes`.
-  - [ ] Verify creator badge awards trigger on verified Wilson benchmarks.
-  - [ ] Verify Satori achievement flip card exports alias and macro-region ($k \ge 20$) only.
-  - [ ] Test "Meme of the Week" showcase surface without public leaderboard rankings.
+  - [x] Verify Subject Sync UI renders agreement progress row inside Orbit detail view.
+  - [x] Run migrations for `badge_definitions`, `creator_badges`, `featured_memes`.
+  - [x] Verify creator badge awards trigger on verified Wilson benchmarks.
+  - [x] Verify Satori achievement flip card exports alias and macro-region ($k \ge 20$) only.
+  - [x] Test "Meme of the Week" showcase surface without public leaderboard rankings.
+- **Stage L1 Checklist (Phase 10L: Lanes Plumbing):**
+  - [ ] Run expand migrations for `lanes`, `lane_interest`, `player_lane_prefs`, and foreign keys.
+  - [ ] Execute idempotent backfill assigning existing data to Everyday lane with row count verification.
+  - [ ] Verify Drop scheduler and daily 07:00 IST job execute cleanly per lane with lane-keyed Redis cache.
+  - [ ] Test `GET /v1/lanes` and `GET /v1/lanes/:id` endpoints with ETags and public caching.
+  - [ ] Test `POST /v1/lanes/:id/interest` subscriber tracking with rate limits and consent.
+  - [ ] Verify Lane Picker UI and Universal Lane Chip on mobile (360px) with Sticker pop styling.
+  - [ ] Verify first-time visitors route directly into Everyday Drop without lane picker screen (Rule L10).
+  - [ ] Verify regression suite: Everyday lane scoring, oddness, and results 100% identical to baseline.
+- **Stage L2 Checklist (Phase 10M: Richer Answer Formats):**
+  - [ ] Implement and test polymorphic schemas for `pick2of6`, `rank3`, `slider7`, and `scene`.
+  - [ ] Verify mathematical properties of similarity functions: symmetry, boundedness $[0, 1]$, and identity.
+  - [ ] Verify information content weighting with smoothed set frequencies and 4.0-bit cap.
+  - [ ] Verify mobile tap-to-order and desktop drag-to-rank for `rank3`.
+  - [ ] Verify accessibility keyboard navigation and ARIA tags across all new formats.
+  - [ ] Verify play route bundle size remains strictly $\le 159.5$ KB gzipped.
+- **Stage L3 Checklist (Phase 10N: Twin Depth & Mutual Pairing):**
+  - [ ] Run migration for `twin_results` additions and `lane_history_signature`.
+  - [ ] Verify 32-byte BitMinHash history signature generation and daily update worker job.
+  - [ ] Test 4-stage tie-breaking pipeline: similarity, 28-day history, different country, deterministic HMAC hash.
+  - [ ] Test greedy mutual pairing on bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$).
+  - [ ] Verify transparent honest group size UI ("312 people matched you this way"), $T=1$ copy, and "Closest so far".
+  - [ ] Verify "Why you two?" accordion accurately surfaces rare shared answers.
+- **Stage L4 Checklist (Phase 10O: Memes Lane Launch):**
+  - [ ] Verify Memes lane content flow ingesting approved templates from Meme Lab (F24).
+  - [ ] Test multi-format Memes Drops combining `pick1`, `pick2of6`, and `rank3`.
+  - [ ] Verify Memes Share Card exports with crisp hero meme template and ink outline.
+  - [ ] Test Telepathy isolation within Memes lane.
+- **Stage L5 Checklist (Phase 10P: Situations Lane — Cards First):**
+  - [ ] Run migration for `text_archetypes` and `style_tags` with 8 closed non-evaluative archetypes.
+  - [ ] Verify Rule L7 safety linter: gender-neutral scenes, no pursuit/pressure, kind style labels only.
+  - [ ] Test Situations matching engine mapping response patterns to dominant style archetype.
+  - [ ] Verify Situations result reveal and share card displaying style label (zero rank, zero percent).
+- **Stage L6 Checklist (Phase 10Q: Say It: Free-Text Answers — Gate G4):**
+  - [ ] Verify all 5 Gate G4 criteria satisfied and signed off by Founder before activation.
+  - [ ] Test Step 1 & 2 normalization and regex PII/abuse screening (3 strikes = 7-day cooldown).
+  - [ ] Test Step 3 self-hosted ONNX multilingual embedding worker running on CPU (~18ms latency).
+  - [ ] Test Step 4 & 5 archetype centroid tagging, calibrated cosine similarity, and local rarity weighting.
+  - [ ] Test Step 6 HNSW / pgvector neighbour search under peak load.
+  - [ ] Verify automated lifecycle purge jobs: 7-day raw text deletion and 28-day embedding deletion.
+- **Stage L7 Checklist (Phase 10R: Super Twin & Lane-Aware Connection Features):**
+  - [ ] Run migrations for `super_twin_results` and lane foreign keys.
+  - [ ] Test Super Twin detection worker job (twinned in $\ge 2$ lanes on same date).
+  - [ ] Verify Super Twin card face with dual-accent split border.
+  - [ ] Test Twin Globe interactive lane filter chips and $k$-anonymity enforcement.
+  - [ ] Test Keep & Orbit lane tagging and subject sync breakdown.
+  - [ ] Verify Telepathy and Anti-Twin isolation within lane boundaries.
+- **Stage L8 Checklist (Phase 10S: Brain Lane — Documented Only):**
+  - [ ] Verify architecture documentation for knowledge format, right/wrong matching, and anti-cheat design.
 - **Stage 12 Checklist:**
   - [ ] Review PostHog dashboard, trigger a deliberate error to verify Sentry alert dispatch.
 - **Stage 13 Checklist:**
@@ -807,6 +1009,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-21` | Phases 10L–10S, Phase 11 (P11.33–P11.46) | Added Phases 10L to 10S (Stages L1 to L8) for Lanes, Richer Formats, Twin Depth, Situations, Say It, Super Twin, and Brain. Expanded Phase 11 with tasks P11.33–P11.46 per Addendum B. Added Recommended Execution Order. Corrected dashboard to 393 tasks across 36 phases. | Stage L0 Founder approval & architectural review.  |
 | `2026-11-15` | Phase 10E–10K, Phase 11   | Added Phases 10E to 10K (Stages M1 to M8) for F24–F31 Memes, Signals, and Insights. Expanded Phase 11 with tasks P11.26–P11.32 per Addendum A. Dashboard updated to 336 tasks. | Stage M0 Founder approval & scope decisions.  |
 | `2026-11-15` | Phase 10A (Stage F1)      | Completed Phase 10A Orbit Foundation backend: migrations, repositories, APIs, co-streaks, push, DPDP, 13/13 integration tests. | Stage F1 verification and completion.         |
 | `2026-11-14` | Phase 10A–10D, Phase 11   | Added Phases 10A, 10B, 10C, 10D (Stages F1–F4) for F18–F21 connection features. Expanded Phase 11 to 25 tasks matching `docs/admin-panel-spec.md`. Dashboard updated to 274 tasks. | Stage F0 Founder approval & scope decisions.  |
