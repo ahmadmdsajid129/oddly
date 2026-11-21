@@ -1,6 +1,6 @@
 # Living Project Memory — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-09 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-21 | Owner: Founder + AI agent
 Purpose of this file: Persistent institutional memory across coding sessions: system snapshot, real-time status, architectural decisions, defect logs, learnings, environment parameters, and next actions.
 
 ---
@@ -1342,3 +1342,53 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 2. **Ready to proceed to Stage 11 (Phase 11: Admin Tool — "Mission Control"):**
    - Read `docs/admin-panel-spec.md` first.
    - Scaffold `apps/admin` Next.js application with Google SSO, allowlist, and role guards (`P11.01`).
+
+---
+
+## 33. Stage L0: Lanes, Richer Answers, Twin Depth and Text Answers (2026-11-21)
+
+### 33.1 Core Architecture & Product Decisions
+- **Features F32 to F39 Approved:** Formalized roadmap for Lanes (F32), Richer Answer Formats (F33), Twin Depth & Mutual Pairing (F34), Memes Lane Launch (F35), Situations Lane (F36), Say It Free-Text Answers (F37), Super Twin & Lane-Aware Connection Features (F38), and Brain Lane (F39).
+- **Rules L1 to L11 Established:** Formalized in `rules.md` including Lane Drop Identity (L1), Lane Isolation (L2), Honest Small-Lane Copy (L3), Richer Answer Formats (L4), Free-Text Privacy and Machine Matching (L5), Forbidden Topics and Hot Takes (L6), Situations Safety & Kindness (L7), Lane Parity / No Paywalls (L8), Resting Lanes (L9), First-Run Promise (L10), and Daily Streak Continuity (L11).
+- **Launch Scope Invariant:** Launch strictly with **Everyday + Memes** open. All other lanes seeded as `planned`.
+- **Product Gates:**
+  - **Gate L-A:** A planned lane may open only with Founder written sign-off, $\ge 8$ approved Drops queued, safety checklist completed, and global DAU $\ge 3,000$.
+  - **Gate G4:** Free-text (`say_it`) remains strictly inactive until all 5 criteria are verified (Founder approval, Phase 11 B6 admin queue, 300-pair benchmark eval with $\ge 80\%$ agreement & macro-F1 $\ge 0.75$, legal counsel review, $10\times$ load test).
+- **Situations Card-First Launch (F36):** Launches with illustrated scenario cards (`scene`) and 8 closed non-evaluative style archetypes (*Calm, Playful, Shy, Bold, Guarded, Over-the-moon, Deflecting, Curious*). Zero evaluative ranks (no "sigma", "desperate", "loser", "alpha").
+- **Radical Honesty & Mutual Pairing (F34):** Displays honest group size ("312 people matched you this way"). Resolves ties via 4-stage pipeline: (1) Similarity, (2) 28-day BitMinHash history agreement ($\ge 5$ shared days), (3) Different country, (4) Deterministic HMAC hash. Greedily pairs players mutually on bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$).
+- **Recommended Execution Order:** `F1 (running) → M0 → L0 (analysis & docs) → L1 → L2 → L3 → F2 → F3 → F4 (built lane-aware) → M1 → M2 → L4 → Phase 11 admin (with Addendum A and Addendum B) → L5 → L7 → on command: M3 to M8, L6, L8`.
+
+### 33.2 Open Founder Questions & Recommended Defaults
+1. **Name ("Lanes"):** Recommended default: **Lanes**. Clear, intuitive, aligns with physical sticker aesthetic.
+2. **Launch Lanes:** Recommended default: **Everyday + Memes only**. Preserves matching pool density during cold start.
+3. **Gate L-A Thresholds:** Recommended default: **8 queued Drops, Early lane < 500, Closest so far < 200**.
+4. **Tie Parameters:** Recommended default: **$\epsilon = 0.01$, $K=32$, history window 28 days, min shared days 5**.
+5. **History Opt-In vs Settings Switch:** Recommended default: **ON by default with Settings toggle ("Use past answers to find closer twins")**. Legitimate interest under DPDP Act 2023 for matching refinement; one-way sketch.
+6. **Tie Group Display:** Recommended default: **Show exact group sizes below 1,000**. Radical honesty.
+7. **Legacy Formats:** Recommended default: **Keep in Everyday only, max 2 of 5 questions**.
+8. **Execution Order:** Recommended default: **Insert L1–L3 before F2**. Saves 4 secondary migrations on connection tables.
+9. **Situations:** Recommended default: **Card version first, 8 approved style labels, Founder editorial sign-off**.
+10. **Say It Architecture:** Recommended default: **Self-hosted ONNX model on CPU (paraphrase-multilingual-MiniLM-L12-v2), Hindi/Hinglish at launch, Gujarati later**.
+11. **Text Retention:** Recommended default: **7-day raw text purge, 28-day embedding purge**.
+12. **Hot Takes:** Recommended default: **Keep with harmless lifestyle topics only (zero politics)**.
+13. **Politics Exclusion:** Recommended default: **Confirmed permanently excluded**.
+14. **Lane Streaks:** Recommended default: **Leave for v1.5**; daily streak increments on $\ge 1$ completed lane Drop.
+15. **Super Twin Threshold:** Recommended default: **$\ge 2$ lanes with similarity $\ge 0.80$**.
+16. **Brain Lane:** Recommended default: **Keep documented only**.
+17. **New Rule Wording:** Recommended default: **Approved as written in `rules.md` Rules L1 to L11**.
+
+### 33.3 Unsoftened Risk Register
+| Risk | Likelihood | Impact | Mitigation Strategy | Owner |
+|---|---|---|---|---|
+| **Thin Lanes at Launch** | High | High | Launch Everyday + Memes only; enforce Gate L-A ($ge 3,000$ DAU); transparent "Closest so far" notice. | Founder + SRE |
+| **Tie-Size Collapse at Scale** | High | High | Richer formats expand outcome space from 1,024 to $>5,670$; BitMinHash history tie-break shrinks median tie to 2. | Matching Engineer |
+| **Free-Text Tone Mismatch** | High | Medium | Situations launches with cards first; text answers gated behind Gate G4; archetype centroid blending. | ML Engineer |
+| **Moderation Load from Free Text** | Medium | High | 80-char cap, regex screening, 3-strike 7-day text cooldown, audited Moderator queue in Phase 11 B6. | Trust & Safety |
+| **DPDP Legal Exposure from Text** | Medium | High | Machine comparison only; raw text never shown; 7-day raw purge; 28-day vector purge; legal review. | Legal Counsel |
+| **Scenario Content Harming Players** | Low | Critical | Rule L7 gender-neutral scenes, no pursuit/pressure, kind style labels, zero ranking, safety checklist. | Content Editor |
+| **Engagement Without Retention** | Medium | High | "Tell me when it opens" subscriber tracking, morning recap per lane, lane-tagged Orbits. | Growth Lead |
+| **Complexity Creeping into 30s Loop** | Medium | High | First visit routes straight into Everyday Drop (Rule L10); lane picker only shown post-result. | Product Designer |
+
+### 33.4 Next Actions
+- Founder review and formal confirmation of Recommended Execution Order.
+- Proceed to Stage L1 (Phase 10L: Lanes Plumbing) on Founder command.
