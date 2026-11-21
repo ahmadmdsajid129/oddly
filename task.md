@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[██████████████░░░░░░] 70%`                                                     |
-| **Current Active Stage**        | **Stage M5 & M6: Taste Dimension & Recognition (COMPLETE)**                      |
+| **Overall Project Progress**    | `[██████████████░░░░░░] 71%`                                                     |
+| **Current Active Stage**        | **Stage M7: ML Ranker for Optional Surfaces (COMPLETE)**                         |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 234 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 239 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 97 tasks                                                                         |
+| **Pending (`TODO`)**            | 92 tasks                                                                         |
 
 ---
 
@@ -46,7 +46,7 @@
 | **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | COMPLETE   | `[##########] 100%`| 9 / 9              | Stage M3              |
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M4              |
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | COMPLETE  | `[##########] 100%`| 8 / 8              | Stage M5/M6           |
-| **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M7 (Documented) |
+| **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | COMPLETE  | `[##########] 100%`| 5 / 5              | Stage M7              |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M8 (Documented) |
 | **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 32             | Stage 11 (after F4)   |
 | **Phase 12** | Observability, Telemetry & Security         | High     | PARTIAL   | `[#---------] 9%`  | 1 / 11             | Stage 12 & Stage R2   |
@@ -482,17 +482,17 @@ _Status: COMPLETE | Target: Orbit Subject Sync, creator badges, Satori achieveme
 
 ---
 
-### Phase 10J: ML Ranker for Optional Surfaces (Stage M7 — Documented Only)
+### Phase 10J: ML Ranker for Optional Surfaces (Stage M7)
 
-_Status: TODO | Target: Offline training harness, shadow-mode inference, bias/drift audit, kill switch._
+_Status: COMPLETE | Target: Offline training harness, shadow-mode inference, bias/drift audit, kill switch._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10J.01` | Build offline dataset extraction harness: generate pseudonymous training pairs from consented ratings       | Low      | TODO   | P10H.02        | Agent | —         | Gated by data scale thresholds           |
-| `[ ] P10J.02` | Train baseline statistical model benchmark (logistic regression / GBDT) to beat M4 heuristics               | Low      | TODO   | P10J.01        | Agent | —         | Explainable model; no LLMs               |
-| `[ ] P10J.03` | Build shadow-mode inference pipeline for non-Drop surfaces                                                  | Low      | TODO   | P10J.02        | Agent | —         | Zero production impact                   |
-| `[ ] P10J.04` | Author automated bias, drift, and sensitive-inference audit suite                                           | Medium   | TODO   | P10J.03        | Agent | —         | Rule 14 compliance                       |
-| `[ ] P10J.05` | Build Mission Control model performance dashboard with instant kill switch                                  | Low      | TODO   | P10J.03, P11.01| Agent | —         | One-click fallback to Wilson scores      |
+| `[x] P10J.01` | Build offline dataset extraction harness: generate pseudonymous training pairs from consented ratings       | Low      | DONE   | P10H.02        | Agent | 2026-11-21| MLDatasetExtractJob; scale threshold gate|
+| `[x] P10J.02` | Train baseline statistical model benchmark (logistic regression / GBDT) to beat M4 heuristics               | Low      | DONE   | P10J.01        | Agent | 2026-11-21| Explainable model; explicit weights; no LLMs |
+| `[x] P10J.03` | Build shadow-mode inference pipeline for non-Drop surfaces                                                  | Low      | DONE   | P10J.02        | Agent | 2026-11-21| MLShadowInferenceJob; 0 production impact|
+| `[x] P10J.04` | Author automated bias, drift, and sensitive-inference audit suite                                           | Medium   | DONE   | P10J.03        | Agent | 2026-11-21| Rule 14 audit, Four-Fifths fairness, PSI drift |
+| `[x] P10J.05` | Build Mission Control model performance dashboard with instant kill switch                                  | Low      | DONE   | P10J.03, P11.01| Agent | 2026-11-21| GET status, POST kill-switch in admin-ml |
 
 ---
 

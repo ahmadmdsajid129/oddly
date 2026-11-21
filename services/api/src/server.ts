@@ -48,6 +48,7 @@ import { eventsRoutes } from "./routes/events.js";
 import { memeRoutes } from "./routes/memes.js";
 import { insightsRoutes } from "./routes/insights.js";
 import { badgesRoutes } from "./routes/badges.js";
+import { adminMLRoutes } from "./routes/admin-ml.js";
 import { DegradationManager } from "./resilience/degradation.js";
 import { registerMetrics } from "./metrics.js";
 
@@ -323,6 +324,7 @@ export async function buildServer(
   await app.register(memeRoutes);
   await app.register(insightsRoutes);
   await app.register(badgesRoutes);
+  await app.register(adminMLRoutes);
 
   // 8. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {

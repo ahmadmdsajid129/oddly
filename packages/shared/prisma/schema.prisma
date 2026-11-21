@@ -823,6 +823,7 @@ model MemeSubmission {
   moderationActions       ModerationAction[]
   creatorBadges           CreatorBadge[]
   featuredMemes           FeaturedMeme[]
+  shadowPredictions       MLShadowPrediction[]
 
   @@index([author_player_id])
   @@index([status])
@@ -1017,4 +1018,47 @@ model FeaturedMeme {
   @@index([submission_id])
   @@map("featured_memes")
 }
+
+// ---------------------------------------------------------------------------
+// 47. ml_models — catalog of explainable ranker models (Stage M7 / Phase 10J)
+// ---------------------------------------------------------------------------
+model MLModel {
+  id                   String               @id @default(uuid())
+  version              String               @unique @db.VarChar(50)
+  algorithm            String               @default("logistic_regression") @db.VarChar(50)
+  weights              Json
+  metrics              Json
+  training_pairs_count Int                  @default(0)
+  status               String               @default("shadow") @db.VarChar(20) // 'shadow' | 'active' | 'retired' | 'killed'
+  trained_at           DateTime             @default(now())
+  created_at           DateTime             @default(now())
+
+  shadowPredictions    MLShadowPrediction[]
+
+  @@index([status])
+  @@index([version])
+  @@map("ml_models")
+}
+
+// ---------------------------------------------------------------------------
+// 48. ml_shadow_predictions — non-drop shadow inferences (Stage M7 / Phase 10J)
+// ---------------------------------------------------------------------------
+model MLShadowPrediction {
+  id            String         @id @default(uuid())
+  model_id      String
+  model         MLModel        @relation(fields: [model_id], references: [id], onDelete: Cascade)
+  submission_id String
+  submission    MemeSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  wilson_lb     Float
+  shadow_score  Float
+  wilson_rank   Int
+  shadow_rank   Int
+  created_at    DateTime       @default(now())
+
+  @@index([model_id])
+  @@index([submission_id])
+  @@index([created_at])
+  @@map("ml_shadow_predictions")
+}
+
 

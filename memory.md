@@ -9,14 +9,44 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M5 & M6: Taste Dimension & Recognition (Phase 10I) — COMPLETE (Tasks P10I.01 to P10I.08 complete & verified).
-- **Current Target:** Stage 11 (Phase 11: Admin Panel "Mission Control") or Stage M7 (Phase 10J: ML Ranker for Optional Surfaces).
+- **Current Stage:** Stage M7: ML Ranker for Optional Surfaces (Phase 10J) — COMPLETE (Tasks P10J.01 to P10J.05 complete & verified).
+- **Current Target:** Stage M8 (Phase 10K: Premium Groundwork) or Stage 11 (Phase 11: Admin Panel "Mission Control").
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage M7 (ML Ranker for Optional Surfaces — Phase 10J) is COMPLETE & VERIFIED:**
+    1. **Explainable Statistical Pointwise Ranker (P10J.02):**
+       - Implemented in `packages/shared/src/ml/explainable-ranker.ts` (`trainLogisticRanker`, `predictRankScore`, `computeLoss`, `computeAuc`).
+       - Uses pointwise logistic regression with explicit, human-auditable feature coefficients and bias ($w \in \mathbb{R}^d, b \in \mathbb{R}$).
+       - Evaluates against baseline M4 Wilson score heuristics (ROC-AUC concordance and log-loss).
+       - Strictly zero black-box neural networks, zero LLMs, zero generative hallucination.
+    2. **Offline Consented Dataset Extraction Harness (P10J.01):**
+       - Implemented in `services/worker/src/jobs/ml-dataset-extract.job.ts`.
+       - Extracts pseudonymous training pairs strictly from users with active `analytics` consent.
+       - Enforces scale threshold check (`ml_ranker.min_training_pairs`); cleanly reports `insufficient_data` when data volume is below threshold.
+    3. **Shadow-Mode Inference Pipeline (P10J.03):**
+       - Implemented in `services/worker/src/jobs/ml-shadow-inference.job.ts`.
+       - Runs on optional non-Drop surfaces (Post-Drop Meme Corner, Recap).
+       - Returns live candidates 100% sorted by M4 Wilson scores (zero production impact).
+       - Concurrently scores candidates with explainable ML model and logs comparisons to `ml_shadow_predictions`.
+    4. **Automated Bias, Drift & Sensitive-Inference Audit Suite (P10J.04):**
+       - Implemented in `packages/shared/src/ml/audit.ts`.
+       - Rule 14 Invariant: Programmatically proves zero protected attributes in model weights or features.
+       - Four-Fifths Regional Fairness: Verifies minimum disparity ratio across regional cohorts $\ge 0.80$.
+       - Population Stability Index (PSI): Calculates feature drift; flags `driftAlert` when $\text{PSI} > 0.25$.
+    5. **Mission Control Model Dashboard & Instant Kill Switch (P10J.05):**
+       - Implemented endpoints in `services/api/src/routes/admin-ml.ts`:
+         - `GET /v1/admin/ml-ranker/status`: Live model status, explainable weights, shadow prediction counts, and audit report.
+         - `POST /v1/admin/ml-ranker/kill-switch`: Instant kill switch reverting `app_config` and model status to `'off'` / `'killed'` with 100% fallback to Wilson scores.
+         - `POST /v1/admin/ml-ranker/toggle-shadow`: Enables or disables shadow evaluation mode.
+         - `POST /v1/admin/ml-ranker/train`: Trains model artifact and records live audit metrics.
+    6. **Database Migration & Prisma Schema:**
+       - Added migration `010_ml_ranker.sql` with tables `ml_models`, `ml_shadow_predictions`, and app_config seeds.
+    7. **Monorepo Invariant Verification:**
+       - All unit and integration test suites pass (`explainable-ranker.test.ts`, `ml-ranker.test.ts`, `ml-ranker-invariants.integration.test.ts`).
   - **Stage M5 & M6 (Taste Dimension & Recognition Engine — Phase 10I) is COMPLETE & VERIFIED:**
     1. **Orbit Subject Sync (P10I.01, P10I.02):**
        - Implemented `GET /v1/orbits/:id/subject-sync` calculating tag agreement percentages between mutual Orbit partners.
