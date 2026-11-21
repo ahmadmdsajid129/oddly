@@ -183,3 +183,70 @@
    - Co-streak daily pipeline step: executes during the 07:00 IST final batch via single set-based SQL update (`UPDATE orbits SET co_streak_current = co_streak_current + 1 WHERE ...`), adding < 400 ms to the batch.
 
 
+
+---
+
+## 7. Stage L0 Capacity & Volumetric Addendum: Lanes, Formats, Twin Depth and Say It (2026-11-21)
+
+### 7.1 Volumetric Matrix by DAU & Lanes Played
+
+At 10,000, 100,000, and 1,000,000 (10 Lakh) daily active players, assuming an average of 1, 2, or 4 lanes played per user per day:
+
+| Metric | 10k DAU (1L / 2L / 4L) | 100k DAU (1L / 2L / 4L) | 10 Lakh DAU (1L / 2L / 4L) |
+|---|---|---|---|
+| **Daily Submissions** | 10k / 20k / 40k | 100k / 200k / 400k | 1.0M / 2.0M / 4.0M |
+| **Daily Answers Rows** | 50k / 100k / 200k | 500k / 1.0M / 2.0M | 5.0M / 10.0M / 20.0M |
+| **Relational Storage Growth/Day** | 8 MB / 16 MB / 32 MB | 80 MB / 160 MB / 320 MB | 800 MB / 1.6 GB / 3.2 GB |
+| **Telemetry Events/Day (Consented)** | 150k / 300k / 600k | 1.5M / 3.0M / 6.0M | 15.0M / 30.0M / 60.0M |
+| **32-Byte History Signatures** | 320 KB / 640 KB / 1.28 MB | 3.2 MB / 6.4 MB / 12.8 MB | 32 MB / 64 MB / 128 MB |
+
+---
+
+### 7.2 Extra Background Jobs per Lane
+With each active lane operating its own Drop cycle:
+1. **Drop Pre-Staging (06:30 IST):** 1 worker job per lane. Compiles JSON, caches in Redis (`lane:{slug}:drop:{date}`). Takes $< 50\text{ ms}$ per lane.
+2. **Drop Live Transition (07:00 IST):** Transitions `drops.status = 'live'` across all open lanes simultaneously. Single fast SQL update.
+3. **Drop Close & Final Recap (07:00–07:05 IST):** Evaluates mutual pairing and final twin assignments per lane. At Tier 1 (10k), takes $< 400\text{ ms}$ per lane. At Tier 3 (1M across 2 lanes = 500k/lane), chunked workers finish in $< 4.5\text{ minutes}$, well within the 07:10 IST recap deadline.
+4. **Lane History Signature Roll (07:15 IST):** Nightly BitMinHash compaction job updates player signatures for active participants in that lane. Evaluates 28-day window incrementally ($< 25\text{ ms}$ per 1,000 players).
+
+---
+
+### 7.3 Redis Memory Allocation per Lane
+For each active lane:
+- Live counter (`lane:{slug}:players_today`): ~40 bytes.
+- 10-minute velocity sliding window (`lane:{slug}:answered:10m`): ~1 KB.
+- Pre-staged Drop cache (`lane:{slug}:drop:{date}`): ~12 KB.
+- Provisional candidate working sets ($K=32$ candidate IDs): ~350 bytes per active session.
+- **Total Redis Footprint per Lane:**
+  - 10k players: ~3.5 MB per lane.
+  - 100k players: ~35 MB per lane.
+  - 10 Lakh players (500k in lane): ~175 MB per lane.
+  - With 2 open launch lanes (Everyday + Memes), total Redis footprint at 10 lakh DAU is **~350 MB**, comfortably within standard 2 GB – 4 GB Redis provisioning.
+
+---
+
+### 7.4 Peak 07:00 IST Traffic Spike & Submit Hot Path Protection
+- **Shared Clock vs. Staggering:** All lanes open at 07:00 IST. Submissions remain strictly 1 single HTTP POST write per completed lane Drop (`POST /v1/answers`).
+- **No Submit Bloat:** The submit path handles validation and inserts the answer row.
+- **Hot-Path Rule:** Zero embedding inference, zero mutual pairing graph resolution, and zero history signature lookups run on the submit path. All heavy matching runs asynchronously in workers or during the 07:05 IST final batch.
+
+---
+
+### 7.5 Matching Engine Scale: Stage A, B, and C
+1. **Stage A (Brute Force Pairwise, $< 10,000$ players/lane):**
+   - Pairwise matrix inside candidate tie clusters takes $< 300\text{ ms}$ in-memory.
+2. **Stage B (Hash Bucketing, $10,000 - 100,000$ players/lane):**
+   - Players are partitioned into coarse answer buckets; mutual pairing executes within buckets. Compute time $< 2.2\text{ seconds}$.
+3. **Stage C (Approximate Nearest Neighbour, $> 100,000$ players/lane):**
+   - HNSW / BitMinHash signature indexing bounds comparison to top $K=32$ candidates per user. Time complexity is strictly $O(N \cdot K \log K)$. Evaluates 500,000 lane participants in $< 45\text{ seconds}$ on 4 parallel worker cores.
+
+---
+
+### 7.6 Free-Text "Say It" Model & Vector Index Cost (Stage L6 / Gate G4)
+- **Model Profile:** `paraphrase-multilingual-MiniLM-L12-v2` (or `multilingual-e5-small`) exported to 8-bit quantized ONNX.
+- **Model Size on Disk / RAM:** ~118 MB.
+- **Inference Latency on CPU:** Measured benchmark on 2.4 GHz vCPU: **~18 ms per 80-character sentence** on single core.
+- **Worker Concurrency:** At 100k DAU with 20% participating in `say_it` (20,000 text submissions spread across 24h = ~0.23 submits/sec average, ~15 submits/sec peak):
+  - 2 worker threads easily process 100 inferences/sec (providing $6.6\times$ peak headroom).
+- **Index Memory:** Storing 384-dimensional float32 embeddings for 20,000 daily answers = $20,000 \times 384 \times 4\text{ bytes} \approx 30.7\text{ MB}$ RAM.
+- **Purge Impact:** 7-day raw text purge and 28-day embedding drop run via partitioned metadata drops in $< 10\text{ ms}$.
