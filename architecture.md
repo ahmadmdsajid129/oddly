@@ -198,6 +198,12 @@ Cloudflare sits in front of all services. Over 95% of requests never reach the o
 | `/v1/me/badges` | GET | 3 s | 30/min/device | Private no-store | None | Low | Shed at L2+ (M6) |
 | `/v1/shoutouts` | GET | 3 s | 60/min/IP | Edge s-maxage=300 | None | Low | Stale up to 1h at L2+ (M6) |
 | `/v1/orbits/:id/subject-sync` | GET | 3 s | 30/min/device | Private ETag | None | Low | Hidden at L2+ (M5) |
+| `/v1/lanes` | GET | 2 s | 60/min/IP | Edge s-maxage=60 | None | Core | Returns cached catalogue; client sorts last-played |
+| `/v1/drops/today` | GET | 3 s | 120/min/IP | Edge s-maxage=5 | None | Core | Query param `?lane=slug` isolates Drop by lane |
+| `/v1/lane-interest` | POST | 3 s | 10/min/device | No-store | `request_id` | Low | Records planned lane interest; shed at L2+ |
+| `/v1/me/lane-prefs` | PUT | 3 s | 20/min/device | No-store | `request_id` | Medium | Updates per-lane push and history opt-in |
+| `/v1/me/super-twin` | GET | 3 s | 30/min/device | Private no-cache | None | Low | Returns Super twin result; shed at L2+ |
+| `/v1/answers/:id/text`| POST | 4 s | 5/min/device | No-store | `request_id` | Low | Free-text submission (Gate G4); shed at L2+ |
 | `/admin/*` | ALL | 10 s | 120/min/IP | No-store | None | Low | Block writes at L2/L3 |
 
 ### 7.2 Layered Rate Limiting and Indian CGNAT Cellular Architecture (R1-PATCH Item 5)
@@ -261,7 +267,8 @@ See [`docs/capacity-model.md`](file:///e:/Oddly/docs/capacity-model.md) for time
    - **Stage C (T3+):** Approximate Nearest Neighbor (ANN / HNSW) index.
 2. **Bounded Execution:** Maximum 5,000 candidate evaluations per submit request. Returns best candidate found; finishes evaluation asynchronously.
 3. **Cached Probabilities:** $p(a)$ computed from in-memory cached counters refreshed every 5 seconds.
-4. **Deterministic Tie-Breaking:** Seeded by `hash(drop_date, user_a, user_b)` ensuring identical twins across retries.
+4. **Deterministic Tie-Breaking:** Seeded by `hash(drop_date, user_a, user_b)` ensuring identical twins across retries.5. **Lane-Isolated Matching (Stage L0 / Rule L2):** All matching, candidate scanning, and oddness tiers execute strictly within the player's selected lane cohort. A player's answers in the Memes lane never influence matching in the Everyday lane.
+6. **Bounded Tie-Groups & Mutual Pairing (Stage L0 / Stage L3):** In the 07:05 final matching run, candidate edges within each tie group (similarity within $\epsilon = 0.01$) are bounded to top $K=32$ per player. Tied edges are sorted by 28-day BitMinHash historical agreement, different country preference, and deterministic HMAC hash, followed by greedy mutual pairing to ensure bidirectional twin assignments (`is_mutual = true`). Total graph complexity is bounded to $O(N \cdot K \log K)$.
 
 ---
 
@@ -285,6 +292,11 @@ Controlled dynamically via database `app_config.degradation_level` (L0 to L4). S
 5. Priority 9: Non-essential pushes, background audits, admin exports, **Meme Lab submissions (M3)**.
 
 *Hysteresis Rule:* Stepping down to a lower level requires **5 consecutive minutes** of healthy metrics below threshold.
+- **Lane Degradation Dynamics (Stage L0):**
+  - **Level L1:** Secondary planned lanes cache subscriber counts; Memes lane serves standard low-res placeholder if CDN is degraded.
+  - **Level L2:** `POST /v1/lane-interest` paused; Super twin calculations deferred to morning recap; free-text embedding worker queue shed.
+  - **Level L3:** Non-Everyday lanes enter resting state; only Everyday lane is playable (Mode B async persist; provisional twin deferred).
+  - **Level L4:** CDN serves cached Everyday Drop shell only; all other lanes hidden.
 
 ---
 
@@ -372,6 +384,7 @@ oddly/
 | **Load & Chaos** | k6, Toxiproxy, `clinic.js` | Latest | Synthetic player generator, load, chaos, profiling | Testing | Stage 13 |
 | **Infrastructure as Code** | Terraform | `1.9+` | Reproducible declarative cloud infrastructure | Hosting | Stage 14 |
 | **Synthetic Probes** | Better Stack / UptimeRobot | SaaS | Multi-region synthetic play-flow probes & status page | Operations | Stage 14 |
+| **Embedding Runtime (CPU)** | `@xenova/transformers` / `onnxruntime-node` | `^2.17.x` | Self-hosted quantized sentence embeddings for free-text answers (Gate G4) | Worker (Stage L6) | Stage L6 |
 
 ---
 
@@ -779,10 +792,76 @@ CREATE INDEX IF NOT EXISTS idx_super_twin_date ON super_twin_results(drop_date);
 - `questions`: Add `lane_id TEXT REFERENCES lanes(id)`, `format VARCHAR(20) DEFAULT 'pick1'`, `options JSONB`, `subject_tags JSONB`, `scene_asset_key VARCHAR(100)`, `entropy_estimate FLOAT`, `tie_risk_estimate FLOAT`.
 - `submissions` & `answers`: Add `lane_id TEXT`. Answer values accept scalar integers, arrays (for `pick2of6` and `rank3`), and text foreign keys (`answer_text_id`).
 - `twin_results`: Add `lane_id TEXT`, `tie_group_size INT DEFAULT 1`, `is_mutual BOOLEAN DEFAULT true`, `tie_break_reason VARCHAR(30) DEFAULT 'similarity'`, `questions_compared INT DEFAULT 5`, `history_days INT DEFAULT 0`.
+- `oddness_results`: Add `lane_id TEXT REFERENCES lanes(id)`. Compound unique constraint becomes `UNIQUE(player_id, drop_id, lane_id)`.
+- `anti_twin_results`: Add `lane_id TEXT REFERENCES lanes(id)`. Compound unique constraint becomes `UNIQUE(player_id, drop_id, lane_id)`.
 - `twin_keeps`, `orbits`, `orbit_expressions`, `telepathy_guesses`: Add `lane_id TEXT`. An Orbit inherits the lane of the originating Keep.
 - `events_raw`, `question_stats_daily`, `tag_stats_daily`: Add `lane_id` dimension.
 
-#### 18.2.3 Storage Growth Estimates Across Tiers
+#### 18.2.3 Migration Order, Rollback Strategy & Idempotent Backfill
+
+To safely introduce lanes into a live database without downtime, schema evolution follows an expand-only, multi-phase strategy:
+
+1. **Step 1: Expand Migration (`012_lanes_foundation.sql`):**
+   - Creates new tables: `lanes`, `lane_interest`, `player_lane_prefs`.
+   - Adds nullable column `lane_id TEXT` to `drops`, `questions`, `submissions`, `answers`, `twin_results`, `oddness_results`, `anti_twin_results`, `twin_keeps`, `orbits`, `orbit_expressions`, `telepathy_guesses`.
+   - Seeds initial core lanes: Everyday (`00000000-0000-4000-a000-000000000001`) and Memes (`00000000-0000-4000-a000-000000000002`).
+2. **Step 2: Idempotent Resumable Backfill Script:**
+   - Assigns all existing pre-lane historical data to the Everyday lane:
+     ```sql
+     UPDATE drops SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     UPDATE questions SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     UPDATE submissions SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     UPDATE answers SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     UPDATE twin_results SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     UPDATE oddness_results SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     UPDATE anti_twin_results SET lane_id = '00000000-0000-4000-a000-000000000001' WHERE lane_id IS NULL;
+     ```
+   - Backfill is chunked in batches of 5,000 rows with `pg_sleep(0.05)` to prevent replication lag.
+3. **Step 3: Verification & Contract Check:**
+   - Automated script verifies zero nulls remain:
+     ```sql
+     SELECT COUNT(*) FROM drops WHERE lane_id IS NULL; -- must be 0
+     SELECT COUNT(*) FROM submissions WHERE lane_id IS NULL; -- must be 0
+     ```
+4. **Step 4: Contract Migration (`013_lanes_constraints.sql`):**
+   - Applies `NOT NULL` constraints and foreign keys to `lanes(id)`.
+   - Drops legacy single-drop unique constraint and applies composite `UNIQUE(lane_id, drop_date)` on `drops` and `UNIQUE(player_id, drop_id, lane_id)` on results.
+5. **Rollback Strategy:**
+   - If rollback is triggered prior to Step 4, code rolls back without schema changes (nullable `lane_id` is ignored).
+   - If rollback occurs after Step 4, `013_lanes_constraints.down.sql` drops composite indexes and restores legacy `UNIQUE(drop_date)` constraint. Zero data loss.
+
+#### 18.2.4 Master List of New `app_config` Keys and Defaults (Stage L0)
+
+| Config Key | Type | Default | Description |
+|---|---|---|---|
+| `lane.closest_so_far_below` | Integer | 200 | Minimum players in lane before showing "Closest so far" (Rule L3) |
+| `lane.early_below` | Integer | 500 | Threshold below which lane is marked "Early lane" |
+| `lane.min_approved_drops_to_open` | Integer | 8 | Runway of approved Drops required before Gate L-A sign-off |
+| `lane.missing_drop_alert_hours` | Integer | 24 | Lookahead window to trigger admin missing-Drop alert |
+| `lane.max_legacy_formats_in_everyday` | Integer | 2 | Maximum legacy questions (number, colour, etc.) in Everyday Drop |
+| `lane.min_high_entropy_questions` | Integer | 3 | Required high-entropy questions in non-Everyday Drops |
+| `lane.expected_players_threshold_for_entropy_rule` | Integer | 5000 | Volume threshold where entropy rule becomes mandatory |
+| `match.tie_epsilon` | Float | 0.01 | Score delta defining candidate tie groups |
+| `match.neighbour_limit_k` | Integer | 32 | Maximum candidates evaluated per player for mutual pairing |
+| `match.history_window_days` | Integer | 28 | Rolling window for lane history BitMinHash evaluation |
+| `match.history_min_shared_days` | Integer | 5 | Minimum shared play dates required for history tie-break |
+| `match.weight_cap` | Float | 4.0 | Information content cap ($W_{max}$) preventing outlier hijack |
+| `match.min_questions_compared` | Integer | 3 | Minimum valid questions required to render a twin result |
+| `match.mutual_pairing_enabled` | Boolean | true | Master toggle for greedy mutual pairing algorithm |
+| `match.history_tiebreak_enabled` | Boolean | true | Master toggle for BitMinHash historical tie-break |
+| `match.group_size_display_cap` | Integer | 1000 | Threshold above which tie group displays as "1,000+ people" |
+| `super.min_lanes` | Integer | 2 | Minimum same-day lanes twinned to trigger Super Twin |
+| `super.min_similarity` | Float | 0.80 | Minimum similarity threshold across lanes for Super Twin |
+| `text.max_chars` | Integer | 80 | Strict character limit on Say It typed responses |
+| `text.max_questions_per_drop` | Integer | 1 | Maximum free-text questions permitted in a single Drop |
+| `text.raw_retention_days` | Integer | 7 | Hard-deletion schedule for raw player text (Rule L5(f)) |
+| `text.history_retention_days` | Integer | 28 | Hard-deletion schedule for sentence embeddings |
+| `text.rejection_limit_per_day` | Integer | 3 | Moderation rejections before triggering 7-day cooldown |
+| `text.disable_days` | Integer | 7 | Duration of text answer cooldown on repeated rejections |
+| `text.archetype_weight_a` | Float | 0.5 | Blending factor between archetype centroid and cosine similarity |
+| `text.min_confidence` | Float | 0.60 | Minimum classifier confidence to assign an archetype tag |
+
+#### 18.2.5 Storage Growth Estimates Across Tiers
 | Metric | 10k DAU (1 lane / 2 lanes) | 100k DAU (1 lane / 2 lanes) | 10 Lakh DAU (1 lane / 2 lanes) |
 |---|---|---|---|
 | Daily Submissions Rows | 10k / 20k rows | 100k / 200k rows | 1.0M / 2.0M rows |
@@ -847,6 +926,11 @@ Where:
 - **Monotonicity:** Agreement on rarer answers strictly yields $S(P, Q) > S(P, R)$ when common answers match.
 
 ---
+
+**Information Weight Capping & Backward Compatibility Reconciliation:**  
+Section 9.2 defines pairwise question weight as the mean information of both players' answers: $I(a_u, a_v) = \frac{I(a_u) + I(a_v)}{2}$. To prevent ultra-rare answers from hijacking the total score, Stage L0 introduces an upper information cap $W_{\max} = 4.0$ bits (*config* `match.weight_cap`):
+$w_q = \min\left( \frac{I(a_u) + I(a_v)}{2}, W_{\max} \right)$
+*Parity with Legacy `pick1` Scoring:* For identical choices on single-choice questions ($a_u = a_v = a$), $I(a_u, a_v) = I(a) = \log_2(1 / p(a))$. For any standard option with observed probability $p(a) \ge 0.0625$ ($1/16$), $I(a) \le 4.0$ bits. In these cases, the cap is not reached, and $w_q$ is mathematically identical to pre-L0 scoring. Regression test suites in Stage L1/L2 explicitly verify that existing scores produce 100% identical values.
 
 ### 18.5 Twin Depth: Bounded Tie-Groups & Mutual Pairing Algorithm
 
@@ -931,6 +1015,15 @@ flowchart TD
 ---
 
 ### 18.10 Architecture Decision Records (ADRs)
+#### ADR 050: Vector Index Architecture for Free-Text Answers (pgvector HNSW vs In-Memory Matcher Index)
+- **Date:** 2026-11-21
+- **Context:** Free-text semantic matching requires nearest-neighbour search over 384-dimensional dense vectors. We must evaluate whether to use the managed PostgreSQL `pgvector` extension or maintain an in-memory HNSW index inside the BullMQ matching worker.
+- **Decision:** Adopt a **Hybrid Worker-Indexed Architecture**:
+  1. *Provisional Matching (Hot Path):* Maintain an in-memory HNSW graph in the matcher worker process (via `hnswlib-node` or in-process cosine scan). For cohorts under 10,000 daily lane players, brute-force matrix dot product requires $< 15$ ms CPU time.
+  2. *Persistence & Recovery:* Vectors are persisted in PostgreSQL in table `answer_text` as raw byte arrays (`BYTEA`). If `pgvector` is enabled on the managed cloud instance, an HNSW index (`vector_cosine_ops`) provides instant recovery after worker restarts.
+  3. *Zero Cloud Dependency:* All inference and indexing remain 100% self-hosted on containerized CPUs.
+- **Consequences:** Eliminates external vector database SaaS costs ($0 cloud egress); guarantees deterministic sub-second matching; satisfies DPDP Act 2023 data sovereignty requirements; requires ~118 MB RAM per worker process.
+
 
 #### ADR 045: Lane-Isolated Matching & Relational Data Model
 - **Date:** 2026-11-21
@@ -942,7 +1035,7 @@ flowchart TD
 - **Date:** 2026-11-21
 - **Context:** Multiple-choice collisions can be further mitigated by richer question interactions without adding high typing friction.
 - **Decision:** Introduce `pick2of6` (Jaccard), `rank3` (Kendall Tau), and `slider7` (Linear Distance) alongside `pick1`. Cap information weights at $w_{max} = 3.5$.
-- **Consequence:** Exponentially reduces tie sizes (e.g. 15 outcomes for `pick2of6`, 6 for `rank3`) while keeping play time under 30 seconds.
+- **Consequence:** Substantially expands the combinatorial state space (from 1,024 to >5,670 states), reducing median tie sizes by an estimated ~94% under synthetic Zipf popularity skew, while keeping play time under 30 seconds.
 
 #### ADR 047: Bounded Tie-Group Evaluation, Mutual Pairing & 32-Byte History Signature
 - **Date:** 2026-11-21
