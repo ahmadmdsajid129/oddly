@@ -20,4 +20,9 @@ Admin work: read `docs/admin-panel-spec.md` first. It is the authoritative descr
 
 Never personalise Drop questions; analytics only with consent; no sensitive inference.
 
+## Lanes & Matching Isolation Rule
+
+Lanes isolate matching; Drops are identical within a lane; typed answers only behind Gate G4; no politics; never shame a player.
+
+
 
