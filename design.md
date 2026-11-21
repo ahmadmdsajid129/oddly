@@ -471,6 +471,150 @@ All components strictly use existing `@oddly/ui-tokens` constants, 4 approved ra
    - Achievement cards use instant cross-fade instead of 3D card flip.
 4. **Color Tokens:** Zero custom hex literals; all fills, outlines, and text use imported `@oddly/ui-tokens`.
 
+
+---
+
+## 12C. Lanes, Formats, Twin Depth & Say It (Stage L0 UI Specifications)
+
+### 12C.1 Design Token Invariants
+- **Visual Metaphor:** Physical paper stickers on a warm cream desk (`#FFF8F0`).
+- **Cream-Only:** Zero dark mode (`html { background: #FFF8F0; }`).
+- **Tactile Signature:** Ink outline (`2.5px solid #14123A`), hard offset sticker shadow (`4px 4px 0 #14123A`, blur 0).
+- **Press Flat:** Active state translates flat (`translate(4px, 4px)`, shadow `0 0 0`).
+- **Touch Targets:** Minimum $44 \times 44\text{ px}$ for all interactive elements.
+- **Tokens Only:** Strictly zero hex literals outside `packages/ui-tokens`.
+
+---
+
+### 12C.2 Lane Picker (Home View)
+1. **Layout & Placement:**
+   - Displayed on returning visits below the header date/countdown.
+   - Grid on desktop (`grid-cols-2 gap-4 max-w-xl mx-auto`), vertical stack on mobile (`flex flex-col gap-3.5 px-4`).
+2. **Lane Card Anatomy (Sticker Pop):**
+   - Container: `bg-paper border-[2.5px] border-ink shadow-card rounded-l p-4 flex flex-col gap-2 relative transition-all active:translate-x-1 active:translate-y-1 active:shadow-none`.
+   - Accent Edge: Left border or top pill using lane accent token (`bg-violet`, `bg-sun`, `bg-mint`, `bg-coral`).
+   - Header Row:
+     - Lane Icon (`w-6 h-6` from illustration registry).
+     - Lane Title: `font-display text-xl font-extrabold text-ink`.
+     - Status Chip:
+       - Open: `bg-mint text-ink border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-xs font-bold`.
+       - Early Lane: `bg-sun text-ink border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-xs font-bold`.
+       - Resting: `bg-cream text-muted border-[1.5px] border-muted rounded-pill px-2 py-0.5 text-xs font-bold`.
+       - Played: `bg-lavender text-ink border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-xs font-bold flex items-center gap-1`: *"Played ✓"*.
+   - Description: `font-sans text-sm text-muted line-clamp-2`.
+   - Time Remaining Pill: `text-xs font-mono text-muted`: *"Closes in 14h 22m"*.
+3. **"Coming Soon" Tile (Planned Lanes):**
+   - Container: `bg-cream border-[2px] border-dashed border-ink/40 rounded-l p-4 flex flex-col gap-2 opacity-80`.
+   - Title: `font-display text-lg font-bold text-muted`: e.g. *"Gaming (Coming Soon)"*.
+   - Action: "Tell me when it opens" button (`bg-paper hover:bg-cream border-[2px] border-ink rounded-pill px-3 py-1.5 text-xs font-bold text-ink min-h-[44px] flex items-center justify-center`).
+4. **Ordering & Personalization:**
+   - Order: Last-played lane card rendered first; remaining open lanes sorted by `sort_order` (the only personalized element per Rule L1).
+
+---
+
+### 12C.3 Lane Chip (Universal Indicator)
+- **Visuals:** `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill border-[1.5px] border-ink text-xs font-extrabold shadow-sticker` with background matching lane accent (`bg-violet`, `bg-sun`, `bg-mint`, etc.).
+- **Usage Surfaces:**
+  - Result view header.
+  - Satori share cards (top-left sticker badge).
+  - Challenge links (preview card).
+  - Twin Globe filter pills.
+  - Orbit header tag.
+
+---
+
+### 12C.4 Richer Format Components
+
+#### 1. `pick2of6` (Multi-Selection Option Grid)
+- **Grid Layout:** `grid grid-cols-2 gap-2.5 max-w-sm mx-auto`.
+- **Item State:**
+  - Unselected: `bg-paper border-[2.5px] border-ink shadow-sticker rounded-m p-3 text-center font-display font-bold text-body min-h-[56px] flex items-center justify-center active:translate-x-1 active:translate-y-1 active:shadow-none`.
+  - Selected (Max 2): `bg-sun border-[2.5px] border-ink shadow-none translate-x-1 translate-y-1 font-extrabold`.
+  - Disabled (when 2 are already picked): Unpicked items drop opacity to 50% with `pointer-events-none`.
+- **Status Indicator & Clear Action:**
+  - Selection Counter: `text-sm font-mono font-bold text-ink`: *"Pick 2 of 6 (1/2 selected)"*.
+  - Clear Button: `text-xs text-muted underline min-h-[44px] flex items-center`: *"Clear picks"*.
+
+#### 2. `rank3` (Drag & Tap-to-Order Ranking)
+- **Stack Layout:** Vertical column of 3 reorderable cards (`space-y-2.5 max-w-sm mx-auto`).
+- **Card Anatomy:**
+  - Container: `bg-paper border-[2.5px] border-ink shadow-sticker rounded-m p-3 flex items-center justify-between min-h-[56px]`.
+  - Rank Badge: `w-7 h-7 rounded-circle bg-violet text-paper font-mono font-black text-sm flex items-center justify-center`: e.g. `#1`, `#2`, `#3`.
+  - Label: `font-display font-bold text-body text-ink flex-1 px-3`.
+  - Reorder Controls (Accessible Default): Up/Down tap buttons (`min-w-[44px] min-h-[44px] flex items-center justify-center text-ink`).
+- **Drag Interaction:** Optional pointer drag handle with tactile spring feedback. ARIA live region announces: *"Option moved to position 1 of 3"*.
+
+#### 3. `slider7` (Labelled Spectrum Slider)
+- **Spectrum Layout:** `max-w-sm mx-auto space-y-3 px-2`.
+- **Track & Thumb:**
+  - Track: `h-3 bg-cream border-[2px] border-ink rounded-pill relative`.
+  - 7 Discrete Tick Marks: `w-2 h-2 rounded-circle bg-ink/30 -top-0.5`.
+  - Thumb: `w-9 h-9 rounded-circle bg-violet border-[2.5px] border-ink shadow-sticker cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet active:scale-95`.
+- **Endpoint Labels:**
+  - Left Label: `text-xs font-bold text-muted`: e.g. *"Plan every detail"*.
+  - Right Label: `text-xs font-bold text-muted`: e.g. *"Wing it completely"*.
+  - Center indicator shows chosen position words, **never numeric scores** (Rule F33).
+- **Keyboard Navigation:** Left/Right arrow keys adjust position by 1 point with tactile haptic tick.
+
+#### 4. `scene` (Illustrated Reaction Cards)
+- **Scene Hero Illustration:** Centered vector asset (`w-full max-h-48 rounded-m border-[2px] border-ink bg-cream overflow-hidden`).
+- **Scenario Text:** `font-display text-lg font-bold text-ink text-center px-2 py-3`.
+- **Reaction Options:** 3 to 5 reaction cards rendered as full-width interactive sticker buttons with style tag mapping.
+
+---
+
+### 12C.5 Say It Composer (Stage L6 / Gate G4 — Documented Only)
+- **Container:** `bg-paper border-[2.5px] border-ink shadow-card rounded-l p-4 space-y-3 max-w-sm mx-auto`.
+- **Input Area:** Textarea (`w-full h-24 p-3 bg-cream border-[2px] border-ink rounded-m font-sans text-body text-ink resize-none focus:outline-none focus:ring-2 focus:ring-violet`).
+- **Character Counter:** `text-xs font-mono text-muted text-right`: *"42/80 characters"*. Warning in coral when $>80$.
+- **Privacy Notice:** Inline callout (`text-xs text-muted flex items-start gap-1.5 p-2 bg-cream/60 rounded-s border-[1px] border-ink/20`):
+  *"Nobody else reads this. Our system only compares how answers sound. Deleted automatically after 7 days."*
+- **States:**
+  - *Idle / Typing:* Standard counter.
+  - *Screening Rejection:* Coral toast: *"That one can't be used. Try saying it another way."*
+  - *Processing (Provisional):* Banner on results: *"Analyzing your typed answer... match improves when ready."*
+
+---
+
+### 12C.6 Result View & Tie-Group Presentation
+1. **Honest Group Size Display (Rule L4):**
+   - Subtitle below Twin avatar:
+     - $T = 1$: `font-bold text-sm text-ink`: *"You and this person were the only ones who answered like this today."*
+     - $2 \le T \le 999$: `font-bold text-sm text-ink`: *"4 of 5 with a person in Lagos, 18 to 24. 312 people matched you this way."*
+     - $T \ge 1,000$: `font-bold text-sm text-ink`: *"4 of 5 with 1,000+ people. Meet one of them."*
+     - Sparse Lane ($N < 200$): `font-bold text-sm text-sun`: *"Closest so far in [Lane Name]. More people are playing."*
+2. **"Why You Two?" Disclosure Row:**
+   - Accordion trigger: *"Why you two?"*
+   - Expanded state reveals the specific questions where both players agreed on rare choices (rarest first), strictly adhering to Rule 4.
+3. **Mutual Pairing Indicator:**
+   - `is_mutual` state is baked into backend logic and **never displayed as raw jargon** to the player.
+
+---
+
+### 12C.7 Super Twin Card Face (Stage L7 — Built on Command)
+- **Anatomy:** Distinct holographic sticker treatment using dual-accent border (`bg-paper border-[3px] border-ink shadow-card rounded-xl p-5`).
+- **Header:** `bg-sun border-[1.5px] border-ink rounded-pill px-3 py-1 text-xs font-black text-ink inline-flex items-center gap-1.5`: *"⚡ SUPER TWIN"*.
+- **Body:** *"You and [Alias] matched in both Everyday and Memes today!"*
+- **Flip Behavior:** Standard 3D CSS card flip revealing joint rarity metrics on back.
+
+---
+
+### 12C.8 Resting & Early Lane States
+- **Resting Lane Screen:**
+  - Illustration: Resting coffee cup vector from registry.
+  - Title: *"Resting today."*
+  - Copy: *"[Lane Name] doesn't have a Drop today. Check out Everyday or Memes!"*
+  - Action Button: *"Play Everyday Drop"*.
+- **Early Lane Pill:** `bg-sun text-ink border-[1.5px] border-ink rounded-pill px-2.5 py-0.5 text-xs font-bold`: *"Early Lane"*.
+
+---
+
+### 12C.9 Bundle Size Budget Guardrails
+- **Play-Route Budget Constraint:** Maximum $\le 159.5\text{ KB}$ gzipped.
+- **Code-Splitting Strategy:**
+  - Core `/play` route imports only `pick1` renderer.
+  - `pick2of6`, `rank3`, `slider7`, and `scene` components are dynamic imports (`next/dynamic`) loaded on-demand based on question `format`.
+  - Non-default lane cards and Say It composer are lazy-loaded outside the initial critical path.
 ---
 
 # PART B: STAGE D1: UI REDESIGN PROMPT
