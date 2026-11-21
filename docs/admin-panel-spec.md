@@ -564,3 +564,141 @@ All write endpoints take a `reason` and an idempotency key, and return the audit
 - [ ] No community meme can be promoted into a live Drop without passing through the two-person approval workflow.
 - [ ] All admin routes strictly require SSO + mandatory 2FA and operate on an isolated admin origin.
 
+
+
+---
+
+# Addendum B: Lanes, Formats, Twin Depth and Text Answers (Stage L0)
+
+## B1. Lanes Manager [P1]
+- **Purpose:** Full lifecycle control of subject lanes.
+- **Capabilities:**
+  - Create and edit lanes: slug, display name keys, description keys, accent color token (from existing palette only), and icon key (from illustration registry).
+  - Manage status transitions: `planned`, `preview` ("Early lane"), `open`, `resting`, and `retired`.
+  - Allowed interaction formats multiselect (`pick1`, `pick2of6`, `rank3`, `slider7`, `scene`, `say_it`).
+  - Flags: `text_enabled` (Gate G4 gated), `super_twin_enabled`.
+  - Set sort order on home picker.
+  - **Gate L-A Verification Panel:** Displays real-time progress for lane opening:
+    1. Founder written sign-off status.
+    2. Count of approved Drops queued in calendar (requires $\ge 8$).
+    3. Scenario and moderation safety checklist sign-off.
+    4. Current player volume indicator (under 500 = "Early lane"; under 200 = "Closest so far").
+  - "Tell me when it opens" subscriber counts displayed in aggregate ($k \ge 20$).
+
+---
+
+## B2. Lane Drop Planner & Missing-Drop Alerts [P1]
+- **Per-Lane Calendar Matrix:** Dedicated monthly view filtered by lane. Drops tracked by status: draft, review, approved, scheduled, live, resting.
+- **Missing-Drop Alert Banner:** Triggers warning in Mission Control at least 24 hours before any open lane would run out of scheduled Drops, preventing unintentional resting states (Rule L9).
+- **Bulk Import with Lane Column:** Importer parses JSON batches containing `lane` slug attribute.
+- **Two-Person Approval Workflow:** Dual-admin verification applies per lane Drop before scheduling lock.
+- **Emergency Action:** "Pull a question" or "Rest lane today" with mandatory reason code and audit log entry.
+
+---
+
+## B3. Format Editor & Entropy Estimator [P1]
+- **Polymorphic Editors:** Custom authoring forms for all 6 formats:
+  - `pick1`: 2 to 4 options with text and illustration keys.
+  - `pick2of6`: Exactly 6 options; preview enforces 2-choice constraint.
+  - `rank3`: 3 items; preview allows drag and tap-to-order verification.
+  - `slider7`: 7 spectrum points with descriptive text endpoints (zero numbers).
+  - `scene`: Illustrated scene asset selection with 3 to 5 reaction cards mapped to closed style tags.
+  - `say_it`: Prompt text with character limit (80) and test evaluation phrases.
+- **Live Phone-Sized Preview:** Renders components with identical sticker tokens and layout.
+- **Tie-Risk & Entropy Estimator:** Calculates theoretical outcome count and effective entropy based on recent lane frequency distributions. Warns if a Drop in a lane expecting $>5,000$ players has $<3$ high-entropy questions.
+
+---
+
+## B4. Automatic Checks Extension [P1]
+Extends existing automated pre-publish validation with 8 new checks:
+1. **Lane Active Check:** Target lane exists and is in `open` or `preview` state.
+2. **Format Validity:** Question payload matches format-specific JSON schema.
+3. **Option Count Bounds:** Enforces strict min/max options per format.
+4. **Forbidden-Topics Linter:** Regex scan across prompt text, option labels, scene text, alt text, style tags, and archetype labels against Section 9.1 list (Rule L6).
+5. **Situations Safety Checklist:** Requires affirmative confirmation of all Rule L7 criteria for `scene` questions.
+6. **Translation Completeness:** Verifies i18n copy keys across all supported locales for that lane.
+7. **Entropy Threshold:** Verifies Drop entropy score exceeds minimum tie-risk barrier.
+8. **Meme Asset Licensing:** Verifies meme template SVG exists in approved local asset registry.
+
+---
+
+## B5. Matching & Tie Dashboard [P1 Basics, P2 Drill-Down]
+- **Aggregated Matching Health:** Visualizes distribution of similarity scores and tie groups per lane per day.
+- **Metrics Tracked:**
+  - Median, p90, and max tie group size ($T$).
+  - Percentage of matches decided by similarity vs. history signature vs. cross-country vs. deterministic hash.
+  - Percentage of mutual pairings (`is_mutual = true`) vs. asymmetric leftovers.
+  - Percentage of matches tagged "Closest so far".
+  - Super twin award counts and distribution across lane pairs.
+- **Privacy Guarantee:** All visualisations are strictly aggregate ($k \ge 20$); zero individual user IDs or answer choices.
+
+---
+
+## B6. Text Answers Operations (Stage L6 / Gate G4 — Documented Only) [P2]
+- **Held Content Moderation Queue:** Displays text submissions flagged for ambiguous phrasing or potential personal data.
+  - *Strict Access Control:* Visible exclusively to the **Moderator** role.
+  - *Audit-Enforced Reveal:* Viewing raw text requires entering an explicit business reason; every view logs an immutable audit event.
+- **Blocklist Manager:** Curated word and phrase filters for English, Hindi (Devanagari), and Hinglish (Latin script).
+- **Archetype Manager:** Create, edit, and version closed archetype labels, descriptions, and editor-written example centroid vectors.
+- **Gate G4 Evaluation Viewer:** Tracks human-vs-model agreement scores on the 300-pair benchmark set.
+- **Text Safety Controls:** 7-day text disable manager for repeated violations; automated retention purge monitoring; emergency per-lane text kill switch.
+
+---
+
+## B7. Lane Health & Gate Progress [P1]
+- **Lane Performance Scorecard:** Daily active players, completion rate, D1/D7 retention, share rate, median time-to-complete, and question-level abandonment per lane.
+- **Gate L-A Monitoring:** Visual indicators tracking whether planned or preview lanes meet player volume and Drop runway thresholds.
+
+---
+
+## B8. Per-Lane Notifications [P2]
+- Manage morning Drop and recap notification copy templates per lane.
+- Enforce cross-lane frequency caps (maximum 2 pushes per player per day) across all lanes.
+
+---
+
+## B9. Lane Configuration & Flags [P1]
+- Dedicated interface for editing lane and matching parameters in `app_config`:
+  - `lane.closest_so_far_below` (200), `lane.early_below` (500), `lane.min_approved_drops_to_open` (8).
+  - `match.tie_epsilon` (0.01), `match.neighbour_limit_k` (32), `match.history_window_days` (28), `match.history_min_shared_days` (5).
+  - `match.weight_cap` (3.5), `match.min_questions_compared` (3), `match.mutual_pairing_enabled` (true).
+  - `super.min_lanes` (2), `super.min_similarity` (0.8).
+  - `text.max_chars` (80), `text.raw_retention_days` (7), `text.history_retention_days` (28).
+- Every change records an immutable audit log row with before/after state and one-click rollback.
+
+---
+
+## B10. Roles & Scoped Permissions [P1]
+- **Editor:** Can be scoped to specific assigned lanes (e.g., Memes Editor vs. Everyday Editor).
+- **Reviewer:** Can approve Drops for assigned lanes.
+- **Moderator:** Can access held Meme Lab captions and held text answers (with audited reason).
+- **Admin:** Can create lanes, adjust configuration, and view system health.
+- **Founder Only:** Sole authority permitted to transition a lane to `open` (Gate L-A) and activate Gate G4 for free text.
+
+---
+
+## B11. Admin API Additions for Addendum B
+
+| Endpoint | Method | Role | Description |
+|---|---|---|---|
+| `/v1/admin/lanes` | GET/POST | Editor, Admin | List and create subject lanes |
+| `/v1/admin/lanes/:id` | PUT | Admin, Founder | Update lane configuration, accent, formats, and status |
+| `/v1/admin/lanes/:id/gate-status` | GET | Admin, Founder | Verify Gate L-A readiness criteria |
+| `/v1/admin/lanes/drops` | GET/POST | Editor, Approver | List and schedule per-lane Drops |
+| `/v1/admin/lanes/entropy-check` | POST | Editor, Approver | Evaluate tie risk and entropy score for draft Drop |
+| `/v1/admin/lanes/matching-stats` | GET | Analyst, Admin | Retrieve tie group size and mutual pairing distributions |
+| `/v1/admin/text/held-queue` | GET | Moderator, Admin | Review held free-text submissions (audited) |
+| `/v1/admin/text/archetypes` | GET/POST/PUT | Editor, Admin | Manage semantic archetype centroids and examples |
+| `/v1/admin/text/evaluation` | GET | Admin, Founder | Review Gate G4 model agreement benchmarks |
+| `/v1/admin/text/purge-status` | GET | Admin | Verify 7-day raw text and 28-day embedding deletion runs |
+
+---
+
+## B12. Addendum B Acceptance Checklist
+
+- [ ] All per-lane matching and tie metrics enforce $k \ge 20$ group reporting; zero individual vectors displayed.
+- [ ] Every lane status change and configuration edit is immutably logged with admin ID and reason.
+- [ ] Missing-Drop alerts trigger automatically 24 hours before an open lane exhausts approved Drops.
+- [ ] Two-person approval workflow is strictly enforced per lane Drop prior to scheduling.
+- [ ] Viewing held user text in B6 strictly requires Moderator role and mandatory reason entry, logged to audit table.
+- [ ] Automated pre-publish checks reject any Drop containing forbidden topics, safety violations, or low entropy.
