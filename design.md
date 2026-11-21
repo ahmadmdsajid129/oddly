@@ -580,7 +580,8 @@ All components strictly use existing `@oddly/ui-tokens` constants, 4 approved ra
 1. **Honest Group Size Display (Rule L4):**
    - Subtitle below Twin avatar:
      - $T = 1$: `font-bold text-sm text-ink`: *"You and this person were the only ones who answered like this today."*
-     - $2 \le T \le 999$: `font-bold text-sm text-ink`: *"4 of 5 with a person in Lagos, 18 to 24. 312 people matched you this way."*
+     - $2 \le T \le 5$: `font-bold text-sm text-ink`: *"4 of 5 with a person in Lagos, 18 to 24. You matched with them and a few others."*
+     - $6 \le T \le 999$: `font-bold text-sm text-ink`: *"4 of 5 with a person in Lagos, 18 to 24. 312 people matched you this way."*
      - $T \ge 1,000$: `font-bold text-sm text-ink`: *"4 of 5 with 1,000+ people. Meet one of them."*
      - Sparse Lane ($N < 200$): `font-bold text-sm text-sun`: *"Closest so far in [Lane Name]. More people are playing."*
 2. **"Why You Two?" Disclosure Row:**
@@ -606,6 +607,55 @@ All components strictly use existing `@oddly/ui-tokens` constants, 4 approved ra
   - Copy: *"[Lane Name] doesn't have a Drop today. Check out Everyday or Memes!"*
   - Action Button: *"Play Everyday Drop"*.
 - **Early Lane Pill:** `bg-sun text-ink border-[1.5px] border-ink rounded-pill px-2.5 py-0.5 text-xs font-bold`: *"Early Lane"*.
+
+---
+
+---
+
+### 12C.10 Situations Style Label Card & Share Card Face (Stage L5)
+- **Result Card Face (`SituationsStyleCard`):**
+  - Container: `bg-paper border-[2.5px] border-ink shadow-card rounded-xl p-5 text-center flex flex-col items-center gap-3`.
+  - Lane Indicator: Universal Lane Chip with Situations accent.
+  - Archetype Icon: 64x64 SVG sticker from illustration registry (e.g. `icon-calm-anchor`, `icon-playful-spark`).
+  - Style Label Title: `text-xl font-black text-ink uppercase tracking-wide` (e.g. *"The Calm Anchor"*, *"The Playful Spark"*).
+  - Descriptive Tone Copy: `text-sm font-medium text-ink/80 max-w-[280px]` (e.g. *"Unfazed, steady, lets the storm pass."*).
+  - **Strict Negative Design Invariants:**
+    - Absolutely NO percentage numbers (never *"85% Sigma"*, never *"Score: 92%"*).
+    - Absolutely NO evaluative or shaming words (no *"simp"*, *"desperate"*, *"loser"*, *"alpha"*).
+    - Zero ranking badges, zero leaderboard styling, zero competitiveness.
+- **Satori Share Card Export (`SituationsShareCard`):**
+  - Canvas: 1200x630 PNG, warm cream background (`#FFF8F0`), physical desk sticker aesthetic.
+  - Ink Border: `2.5px solid #14123A` with `4px 4px 0 #14123A` offset shadow.
+  - Hero Display: Prominent archetype name and SVG sticker.
+  - Subtitle: *"My Reaction Style in Today's Situations Drop"*.
+  - Footer: *"Oddly / Play today's Drop at oddly.club"*.
+
+---
+
+### 12C.11 Globe Lane Filter Chips & Orbit Lane Tags
+- **Globe Lane Filter Chips (`GlobeLaneFilter`):**
+  - Placement: Horizontal scrollable chip bar anchored 16px above the 3D Globe viewport.
+  - Active Chip: `bg-ink text-paper border-[2px] border-ink rounded-pill px-3.5 py-1.5 text-xs font-black shadow-none`.
+  - Inactive Chip: `bg-paper text-ink border-[2px] border-ink rounded-pill px-3.5 py-1.5 text-xs font-bold shadow-sticker hover:translate-x-[1px] hover:translate-y-[1px]`.
+  - Arc Count Badge: Small circle inside chip displaying active arc count (`bg-cream text-ink text-[10px] px-1.5 rounded-full`).
+  - Low-Volume Empty State: If selected lane has $< 20$ arcs, displays honest status banner: *"Showing past arcs for [Lane] (quiet today)"*.
+- **Orbit Lane Tag (`OrbitLaneTag`):**
+  - Rendered in Orbit list items, detail sheets, and sync views.
+  - Styling: Mini badge `bg-cream border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-[10px] font-black uppercase text-ink inline-flex items-center gap-1`.
+  - Interaction: Tapping chip opens popover detailing: *"Orbit formed in [Lane Name] on [Date]"* and that lane's mutual sync rate.
+
+---
+
+### 12C.12 Reduced-Motion Fallbacks for All New Components
+When `@media (prefers-reduced-motion: reduce)` is active:
+- **`LanePicker`:** Cards render statically with zero hover translation (`translate(0, 0)`) and fixed `4px 4px 0 #14123A` shadow.
+- **`pick2of6`:** Selection instantly applies ink border and background fill without scale pulse or ripple effect.
+- **`rank3`:** Drag-and-drop animation is disabled; tap-to-order provides instantaneous DOM index swap.
+- **`slider7`:** Slider thumb snaps directly to discrete notches without spring dampening or sliding easing.
+- **`scene`:** Card selection highlights border immediately without accordion expansion easing.
+- **`SayItComposer`:** Validation error shake animation is replaced by a static red ink border (`2.5px solid #FF6B5E`) and assistive text.
+- **`SuperTwinCard`:** 3D CSS flip animation is replaced by an immediate tabbed face swap.
+- **`ResultView`:** Numerical count-up animations are bypassed; final match percentage and group size render immediately.
 
 ---
 
@@ -727,6 +777,7 @@ Write `design-d1/REPORT.md` containing: what changed per step D1.1 to D1.8, the 
 
 ## 22. Change log
 
+- 2026-11-21: v1.3. Added Section 12C (Lanes, Richer Formats, Twin Depth, Situations style cards, Say It composer, Globe lane filters, Orbit lane tags, reduced-motion fallbacks, and v1.3 bundle budget). Zero new colors outside ui-tokens.
 - 2026-11-15: v1.2. Added Section 12B (detailed design specifications for F24-F31: Meme question card, Meme Corner card, consent notice and Settings toggles, Meme Lab composer & status cards, creator badges and achievement cards, featured memes, Orbit subject-sync rows, touch targets $\ge 44\text{px}$, and accessibility). Zero new colours.
 - 2026-11-14: v1.1. Added Section 12A (detailed design specifications for F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin, touch targets, accessibility, and Satori share faces). Reconciled core color tokens: verified `packages/ui-tokens` matches Section 2.1 WCAG AA palette (`#3DDBB0` mint, `#FF6B5E` coral, `#FFD23F` sun, `#EEEAFE` lavender).
 - 2026-11-14: v1.0. Sticker pop direction chosen by the owner. Palette, type, buttons, flip card, and D1 redesign stage defined.
