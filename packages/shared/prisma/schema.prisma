@@ -113,6 +113,8 @@ model Player {
   memeExposures    MemeExposure[]
   playerTastes     PlayerTaste[]
   creatorBadges    CreatorBadge[]
+  subscriptions    Subscription[]
+  paywallEvents    PaywallEvent[]
 
   @@index([account_id])
   @@index([did])
@@ -1060,5 +1062,85 @@ model MLShadowPrediction {
   @@index([created_at])
   @@map("ml_shadow_predictions")
 }
+
+// ---------------------------------------------------------------------------
+// 49. plans — subscription plan catalogue (Stage M8 / Phase 10K)
+// ---------------------------------------------------------------------------
+model Plan {
+  id               String        @id @default(uuid())
+  key              String        @unique @db.VarChar(50)
+  name_i18n        Json
+  description_i18n Json
+  price_inr_cents  Int           @default(7900)
+  duration_days    Int           @default(30)
+  status           String        @default("active") @db.VarChar(20) // 'active' | 'retired'
+  created_at       DateTime      @default(now())
+
+  entitlements     Entitlement[]
+  subscriptions    Subscription[]
+
+  @@index([key])
+  @@index([status])
+  @@map("plans")
+}
+
+// ---------------------------------------------------------------------------
+// 50. entitlements — feature gates gated by plan (Stage M8 / Phase 10K)
+// ---------------------------------------------------------------------------
+model Entitlement {
+  id          String   @id @default(uuid())
+  plan_id     String
+  plan        Plan     @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+  feature_key String   @db.VarChar(50) // 'streak_freeze', 'historical_archive', 'bespoke_themes'
+  config      Json     @default("{}")
+  created_at  DateTime @default(now())
+
+  @@unique([plan_id, feature_key], name: "plan_feature_unique")
+  @@index([plan_id])
+  @@index([feature_key])
+  @@map("entitlements")
+}
+
+// ---------------------------------------------------------------------------
+// 51. subscriptions — player subscription records (Stage M8 / Phase 10K)
+// ---------------------------------------------------------------------------
+model Subscription {
+  id                       String    @id @default(uuid())
+  player_id                String
+  player                   Player    @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  plan_id                  String
+  plan                     Plan      @relation(fields: [plan_id], references: [id], onDelete: Restrict)
+  status                   String    @default("active") @db.VarChar(20) // 'active' | 'cancelled' | 'expired' | 'past_due'
+  started_at               DateTime  @default(now())
+  current_period_end       DateTime
+  cancelled_at             DateTime?
+  provider                 String    @default("mock") @db.VarChar(30)
+  provider_subscription_id String?   @db.VarChar(100)
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @default(now()) @updatedAt
+
+  @@index([player_id])
+  @@index([status])
+  @@index([current_period_end])
+  @@map("subscriptions")
+}
+
+// ---------------------------------------------------------------------------
+// 52. paywall_events — impressions & dismissals for frequency capping (Stage M8 / Phase 10K)
+// ---------------------------------------------------------------------------
+model PaywallEvent {
+  id         String   @id @default(uuid())
+  player_id  String
+  player     Player   @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  surface    String   @db.VarChar(50) // 'me_settings', 'archive_view', 'recap_perks'
+  event_type String   @db.VarChar(20) // 'offer_shown', 'dismissed', 'converted'
+  created_at DateTime @default(now())
+
+  @@index([player_id])
+  @@index([event_type])
+  @@index([created_at])
+  @@map("paywall_events")
+}
+
 
 

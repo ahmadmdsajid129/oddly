@@ -1278,12 +1278,67 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
    - **`P10H.08`:** Personalised ranking for optional Meme Corner card (DONE).
    - **`P10H.09`:** Automated invariant tests (DONE).
    - Stage M4 completion report authored in `docs/stage-M4-report.md`.
-2. **Ready to proceed to Stage M5 & M6 (Phase 10I: Taste Dimension & Recognition):**
-   - `P10I.01`: Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold).
-   - `P10I.02`: Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view.
-   - `P10I.03`: Database migrations: `badge_definitions`, `creator_badges`, `featured_memes`.
-   - `P10I.04`: Creator badge award worker: evaluate Wilson scores and rater benchmarks.
-   - `P10I.05`: Build achievement card renderer: Satori 3D flip card with alias + macro-region ($k \ge 20$).
-   - `P10I.06`: Build featured meme showcase surface (`/featured`).
-   - `P10I.07`: Build opt-in achievement sharing sheet and creator deletion revocation flow.
-   - `P10I.08`: Integration tests proving Rule 19 compliance (zero pick vector leakage).
+2. **Stage M5 & M6 (Phase 10I: Taste Dimension & Recognition) is 100% COMPLETE (8/8 tasks):**
+   - Implemented Orbit Subject Sync API and UI, badge definitions, creator badge award worker, achievement cards, featured meme showcase, and pick vector protection tests.
+3. **Stage M7 (Phase 10J: ML Ranker for Optional Surfaces) is 100% COMPLETE (5/5 tasks):**
+   - Implemented offline dataset extract job, explainable logistic ranker, shadow mode inference worker, fairness and bias audit engine, and Mission Control status/kill-switch endpoints.
+
+---
+
+## 31. Stage M8: Premium Groundwork & Guardrail Engine (Phase 10K) — Shipped Deliverables (2026-11-21)
+
+### 31.1 Tasks Completed
+- **`P10K.01`: Database Migrations (`011_premium_groundwork.sql` & `schema.prisma`):**
+  - `plans`: Provider-agnostic catalog of plans (`key`, `name_i18n`, `description_i18n`, `price_inr_cents`, `duration_days`, `status`).
+  - `entitlements`: Feature gates tied to plans (`plan_id`, `feature_key`, `config`), unique on `(plan_id, feature_key)`.
+  - `subscriptions`: Player subscription records (`player_id`, `plan_id`, `status` ['active' | 'cancelled' | 'expired' | 'past_due'], `started_at`, `current_period_end`, `cancelled_at`, `provider`, `provider_subscription_id`).
+  - `paywall_events`: Tracks impressions and dismissals for frequency capping (`player_id`, `surface`, `event_type` ['offer_shown' | 'dismissed' | 'converted'], `created_at`).
+  - Seeded initial `app_config`:
+    - `feature.premium = false`
+    - `premium.offer_cooldown_days = 14`
+    - `premium.dismiss_halt_days = 90`
+  - Seeded default plan `oddly_plus_monthly` (₹79.00/mo) with entitlements:
+    - `streak_freeze`: 2 monthly freezes (`{"monthly_freezes": 2}`)
+    - `historical_archive`: full archive access (`{"full_access": true}`)
+    - `bespoke_themes`: colorways access (`{"colorways": ["holo_night", "midnight_sun"]}`)
+- **`P10K.02`: Feature Flag Entitlements Engine:**
+  - Implemented in `packages/shared/src/entitlements/entitlements.ts`.
+  - `checkEntitlement(db, playerId, featureKey)`: Evaluates whether a player is entitled to a specific perk. Evaluates `feature.premium` global flag, active/cancelled subscriptions, expiration dates, and plan feature definitions.
+  - `getPlayerEntitlements(db, playerId)`: Returns a unified key-value map of all active feature perks for a player.
+  - **Grace Period Invariant:** Cancelled subscriptions retain all entitlements until `current_period_end`.
+- **`P10K.03` & `P10K.04`: Paywall Guardrail Monitor & Dark Pattern Linter:**
+  - Implemented in `packages/shared/src/entitlements/guardrails.ts`.
+  - `canShowPaywallOffer(db, playerId, surface)`:
+    - **Rule 12 Check:** Rejects Drop surfaces (`drop`, `drop_flow`, etc.) with `rule_12_drop_surface_forbidden`.
+    - **Rule 17 Check:** Rejects broken streak surfaces (`broken_streak`, `streak_loss`) with `rule_17_broken_streak_forbidden`.
+    - **Already Subscribed Check:** Prevents showing upsells to players with active subscriptions.
+    - **Rule 17 Dismissal Halt:** Looks back 90 days; if >= 2 dismissals exist, halts all offers with `dismissal_halt_90d`.
+    - **Rule 17 Frequency Cap:** Looks back 14 days; if an `offer_shown` event exists within 14 days, halts offers with `frequency_cap_14d`.
+  - `recordPaywallEvent(db, playerId, surface, eventType)`: Enforces surface restrictions and logs paywall telemetry.
+  - `lintDarkPatternCopy(copyText)`: Lints marketing/copy strings against urgency words (`hurry`, `expires in`, `act now`, `clock is ticking`), guilt words (`you'll regret`, `don't let down`, `missing out`), and streak extortion words (`streak will die`, `lose your streak`).
+- **`P10K.05`: Self-Service Single-Tap Cancellation & Webhooks API:**
+  - Implemented in `services/api/src/routes/subscriptions.ts`.
+  - `GET /v1/plans`: Returns active subscription plans, INR pricing, and localized descriptions.
+  - `GET /v1/me/subscription`: Returns player's subscription status, active plan, entitlements, and cancellation eligibility.
+  - `POST /v1/subscriptions/subscribe`: Test/mock subscription activation endpoint.
+  - `POST /v1/subscriptions/cancel`: **Single-tap cancellation API**. No survey, no retention hurdles. Immediately sets `status = "cancelled"` and `cancelled_at = NOW()`, preserving `current_period_end`.
+  - `POST /v1/subscriptions/webhook`: Handles payment provider lifecycle events (`subscription.charged`, `subscription.cancelled`, `subscription.halted`).
+  - `GET /v1/paywall/eligibility`: Public evaluation endpoint for surface offer eligibility.
+  - `POST /v1/paywall/event`: Telemetry endpoint for recording impressions and dismissals.
+  - Registered routes in `services/api/src/server.ts` and added route policies in `services/api/src/routes/policy.registry.ts`.
+
+### 31.2 Test Results & Verification
+- `packages/shared/src/entitlements/entitlements.test.ts`: 14/14 unit tests passed (100%).
+- `services/api/src/subscriptions-invariants.integration.test.ts`: 10/10 integration tests passed (100%).
+- Monorepo: `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm test` (180 tests), and `pnpm test:integration` all 100% passing.
+- Documentation: `docs/stage-M8-report.md` authored.
+- Task tracking: `task.md` updated (244/336 tasks complete, 73%).
+
+---
+
+## 32. Next Steps & Stage 11 Ready
+
+1. **Stage M8 (Phase 10K: Premium Groundwork) is 100% COMPLETE (5/5 tasks).**
+2. **Ready to proceed to Stage 11 (Phase 11: Admin Tool — "Mission Control"):**
+   - Read `docs/admin-panel-spec.md` first.
+   - Scaffold `apps/admin` Next.js application with Google SSO, allowlist, and role guards (`P11.01`).

@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[██████████████░░░░░░] 71%`                                                     |
-| **Current Active Stage**        | **Stage M7: ML Ranker for Optional Surfaces (COMPLETE)**                         |
+| **Overall Project Progress**    | `[███████████████░░░░░] 73%`                                                     |
+| **Current Active Stage**        | **Stage M8: Premium Groundwork & Guardrails (COMPLETE)**                         |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 239 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 244 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 92 tasks                                                                         |
+| **Pending (`TODO`)**            | 87 tasks                                                                         |
 
 ---
 
@@ -47,7 +47,7 @@
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M4              |
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | COMPLETE  | `[##########] 100%`| 8 / 8              | Stage M5/M6           |
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | COMPLETE  | `[##########] 100%`| 5 / 5              | Stage M7              |
-| **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M8 (Documented) |
+| **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | COMPLETE  | `[##########] 100%`| 5 / 5              | Stage M8              |
 | **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 32             | Stage 11 (after F4)   |
 | **Phase 12** | Observability, Telemetry & Security         | High     | PARTIAL   | `[#---------] 9%`  | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | TODO      | `[----------] 0%`  | 0 / 12             | Stage 13              |
@@ -498,15 +498,15 @@ _Status: COMPLETE | Target: Offline training harness, shadow-mode inference, bia
 
 ### Phase 10K: Premium Groundwork (Stage M8 — Documented Only, After Gate G3)
 
-_Status: TODO | Target: Provider-agnostic entitlements, feature flags for perks, paywall experiments, guardrail monitor._
+_Status: COMPLETE | Target: Provider-agnostic entitlements, feature flags for perks, paywall experiments, guardrail monitor._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10K.01` | Scaffold provider-agnostic entitlements data model: `plans`, `entitlements`, `subscriptions`               | Low      | TODO   | P8.01          | Agent | —         | Gated by Gate G3                         |
-| `[ ] P10K.02` | Build feature flag entitlements engine gating streak freezes, archive access, and bespoke themes           | Low      | TODO   | P10K.01        | Agent | —         | Oddly Plus feature gates                 |
-| `[ ] P10K.03` | Build paywall experiment framework restricted to non-Drop surfaces                                          | Low      | TODO   | P10K.02        | Agent | —         | Non-Drop surfaces only                   |
-| `[ ] P10K.04` | Implement guardrail monitor: frequency cap (max 1 offer/14d) and dismissal halt (90d freeze after 2)       | Medium   | TODO   | P10K.03        | Agent | —         | Rule 17 compliance                       |
-| `[ ] P10K.05` | Build self-service single-tap subscription cancellation API and webhook listener                            | Medium   | TODO   | P10K.01        | Agent | —         | Zero dark patterns                       |
+| `[x] P10K.01` | Scaffold provider-agnostic entitlements data model: `plans`, `entitlements`, `subscriptions`               | Low      | DONE   | P8.01          | Agent | 2026-11-21| 011_premium_groundwork.sql, Prisma schema|
+| `[x] P10K.02` | Build feature flag entitlements engine gating streak freezes, archive access, and bespoke themes           | Low      | DONE   | P10K.01        | Agent | 2026-11-21| checkEntitlement, getPlayerEntitlements  |
+| `[x] P10K.03` | Build paywall experiment framework restricted to non-Drop surfaces                                          | Low      | DONE   | P10K.02        | Agent | 2026-11-21| canShowPaywallOffer (Rule 12 non-drop)   |
+| `[x] P10K.04` | Implement guardrail monitor: frequency cap (max 1 offer/14d) and dismissal halt (90d freeze after 2)       | Medium   | DONE   | P10K.03        | Agent | 2026-11-21| Rule 17 compliance, copy linter          |
+| `[x] P10K.05` | Build self-service single-tap subscription cancellation API and webhook listener                            | Medium   | DONE   | P10K.01        | Agent | 2026-11-21| Single-tap cancellation, zero dark patterns|
 
 ---
 

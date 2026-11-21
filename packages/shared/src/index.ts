@@ -21,6 +21,7 @@ export * from "./antitwin.js";
 export * from "./taxonomy.js";
 export * from "./memes.js";
 export * from "./batch-importer.js";
+export * from "./entitlements/index.js";
 export * from "./ml/explainable-ranker.js";
 export * from "./ml/audit.js";
 export * from "./redis/keys.js";
