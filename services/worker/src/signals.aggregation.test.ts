@@ -25,6 +25,11 @@ describe("Stage M2 (Phase 10F): Signals Aggregation & Retention Jobs", () => {
     client = new pg.Client({ connectionString: DATABASE_URL });
     await client.connect();
 
+    // Clean any leftover records for test drop date
+    await client.query(`DELETE FROM question_stats_daily WHERE drop_date = $1::date;`, [testDropDate]);
+    await client.query(`DELETE FROM tag_stats_daily WHERE drop_date = $1::date;`, [testDropDate]);
+    await client.query(`DELETE FROM events_raw WHERE drop_date = $1::date;`, [testDropDate]);
+
     // 1. Seed Drop, Question, and Tag
     const dropId = randomUUID();
     const dropRes = await client.query(

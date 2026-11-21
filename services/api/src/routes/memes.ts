@@ -41,6 +41,108 @@ import {
 
 export const memeRoutes: FastifyPluginAsyncZod = async (app) => {
   /**
+   * GET /v1/memes/featured
+   * Public curated Meme of the Week showcase surface (P10I.06).
+   * Invariant: Zero public leaderboards, zero competitive ranking walls.
+   */
+  app.get(
+    "/v1/memes/featured",
+    {
+      schema: {
+        tags: ["Memes", "Recognition"],
+        summary: "Get curated Meme of the Week and archive",
+        response: {
+          200: z.object({
+            ok: z.literal(true),
+            current_week: z
+              .object({
+                id: z.string(),
+                week_start_date: z.string(),
+                caption_text: z.string(),
+                curator_notes: z.string().nullable(),
+                template: z.object({
+                  illustration_registry_key: z.string(),
+                  alt_text_i18n: z.record(z.string()),
+                }),
+                author_region: z.string(),
+                raters_count: z.number(),
+                funny_percentage: z.number(),
+                published_at: z.string(),
+              })
+              .nullable(),
+            archive: z.array(
+              z.object({
+                id: z.string(),
+                week_start_date: z.string(),
+                caption_text: z.string(),
+                curator_notes: z.string().nullable(),
+                template: z.object({
+                  illustration_registry_key: z.string(),
+                  alt_text_i18n: z.record(z.string()),
+                }),
+                author_region: z.string(),
+                raters_count: z.number(),
+                funny_percentage: z.number(),
+                published_at: z.string(),
+              })
+            ),
+          }),
+        },
+      },
+    },
+    async (_req, reply) => {
+      const featured = await prisma.featuredMeme.findMany({
+        where: {
+          submission: {
+            status: "approved",
+          },
+        },
+        include: {
+          submission: {
+            include: {
+              template: true,
+              author: true,
+              stats: true,
+            },
+          },
+        },
+        orderBy: { week_start_date: "desc" },
+      });
+
+      const mapFeaturedItem = (f: (typeof featured)[number]) => {
+        const stats = f.submission.stats;
+        const raters = stats?.raters ?? 0;
+        const funnyCount = stats?.funny_count ?? 0;
+        const funnyPct = raters > 0 ? Math.round((funnyCount / raters) * 100) : 0;
+
+        return {
+          id: f.id,
+          week_start_date: f.week_start_date.toISOString().split("T")[0]!,
+          caption_text: f.submission.caption_text,
+          curator_notes: f.curator_notes,
+          template: {
+            illustration_registry_key: f.submission.template.illustration_registry_key,
+            alt_text_i18n: f.submission.template.alt_text_i18n as Record<string, string>,
+          },
+          author_region: f.submission.author.region || "IN",
+          raters_count: raters,
+          funny_percentage: funnyPct,
+          published_at: f.published_at.toISOString(),
+        };
+      };
+
+      const current = featured[0] ? mapFeaturedItem(featured[0]) : null;
+      const archive = featured.slice(1).map(mapFeaturedItem);
+
+      return reply.send({
+        ok: true,
+        current_week: current,
+        archive,
+      });
+    }
+  );
+
+  /**
    * GET /v1/memes/templates
    * Lists active meme illustration templates available for captioning.
    */
@@ -967,13 +1069,18 @@ export const memeRoutes: FastifyPluginAsyncZod = async (app) => {
         });
       }
 
-      await prisma.memeSubmission.update({
-        where: { id: submissionId },
-        data: {
-          status: "retired",
-          moderation_reason: "Deleted by author",
-        },
-      });
+      await prisma.$transaction([
+        prisma.memeSubmission.update({
+          where: { id: submissionId },
+          data: {
+            status: "retired",
+            moderation_reason: "Deleted by author",
+          },
+        }),
+        prisma.featuredMeme.deleteMany({
+          where: { submission_id: submissionId },
+        }),
+      ]);
 
       return reply.status(200).send({
         ok: true,

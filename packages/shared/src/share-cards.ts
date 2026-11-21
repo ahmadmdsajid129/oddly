@@ -2424,3 +2424,496 @@ export async function renderOrbitCardPng(data: OrbitShareCardData): Promise<Buff
   return resvg.render().asPng();
 }
 
+export interface AchievementShareCardData {
+  badgeTitle: string;
+  badgeDescription: string;
+  badgeIconKey?: string;
+  creatorAlias: string;
+  macroRegion?: string;
+  awardedDateStr: string;
+  shortId: string;
+  appDomain?: string;
+  side?: "front" | "back";
+  statLabel?: string;
+  statValue?: string;
+}
+
+export function buildAchievementFrontTree(
+  data: AchievementShareCardData,
+  qrDataUrl: string
+): Record<string, unknown> {
+  const regionLabel = data.macroRegion ? `REGION: ${data.macroRegion.toUpperCase()}` : "COMMUNITY CREATOR";
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: colors.cream,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: colors.paper,
+              border: `10px solid ${colors.ink}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${colors.ink}`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "70px 60px",
+            },
+            children: [
+              // Top Bar
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.violet,
+                          color: colors.paper,
+                          border: `3px solid ${colors.ink}`,
+                          borderRadius: "999px",
+                          padding: "10px 24px",
+                          fontSize: "20px",
+                          fontWeight: "800",
+                          boxShadow: `4px 4px 0px ${colors.ink}`,
+                        },
+                        children: "★ ODDLY RECOGNITION",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.cream,
+                          color: colors.ink,
+                          border: `3px solid ${colors.ink}`,
+                          borderRadius: "999px",
+                          padding: "10px 24px",
+                          fontSize: "18px",
+                          fontWeight: "700",
+                        },
+                        children: regionLabel,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Center Hero Badge
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "24px",
+                    width: "100%",
+                  },
+                  children: [
+                    // Badge Emblem Circle
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          width: "160px",
+                          height: "160px",
+                          borderRadius: "999px",
+                          backgroundColor: colors.sun,
+                          border: `8px solid ${colors.ink}`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "72px",
+                          boxShadow: `10px 10px 0px ${colors.ink}`,
+                        },
+                        children: "🏆",
+                      },
+                    },
+                    // Badge Title
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "56px",
+                          fontWeight: "900",
+                          color: colors.ink,
+                          textAlign: "center",
+                          lineHeight: "1.1",
+                        },
+                        children: data.badgeTitle,
+                      },
+                    },
+                    // Alias pill
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.coral,
+                          color: colors.paper,
+                          border: `4px solid ${colors.ink}`,
+                          borderRadius: "999px",
+                          padding: "12px 32px",
+                          fontSize: "24px",
+                          fontWeight: "800",
+                          boxShadow: `6px 6px 0px ${colors.ink}`,
+                        },
+                        children: `Honoring ${data.creatorAlias}`,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Bottom Details Bar
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    borderTop: `4px dashed ${colors.ink}`,
+                    paddingTop: "32px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "16px",
+                                fontWeight: "800",
+                                color: colors.muted,
+                                textTransform: "uppercase",
+                              },
+                              children: "Awarded On",
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "22px",
+                                fontWeight: "800",
+                                color: colors.ink,
+                              },
+                              children: data.awardedDateStr,
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                fontSize: "15px",
+                                fontWeight: "700",
+                                color: colors.muted,
+                              },
+                              children: "Verified by Community Consensus",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    // QR Code
+                    {
+                      type: "img",
+                      props: {
+                        src: qrDataUrl,
+                        width: "140",
+                        height: "140",
+                        style: {
+                          border: `4px solid ${colors.ink}`,
+                          borderRadius: "16px",
+                          backgroundColor: colors.paper,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+export function buildAchievementBackTree(
+  data: AchievementShareCardData
+): Record<string, unknown> {
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        backgroundColor: colors.cream,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "60px",
+        fontFamily: "Noto Sans, sans-serif",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "960px",
+              height: "1370px",
+              backgroundColor: colors.paper,
+              border: `10px solid ${colors.ink}`,
+              borderRadius: "44px",
+              boxShadow: `16px 16px 0px ${colors.ink}`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "70px 60px",
+            },
+            children: [
+              // Top Bar
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          backgroundColor: colors.sun,
+                          color: colors.ink,
+                          border: `3px solid ${colors.ink}`,
+                          borderRadius: "999px",
+                          padding: "10px 24px",
+                          fontSize: "20px",
+                          fontWeight: "800",
+                          boxShadow: `4px 4px 0px ${colors.ink}`,
+                        },
+                        children: "★ BENCHMARK AUDIT",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "18px",
+                          fontWeight: "700",
+                          color: colors.muted,
+                        },
+                        children: `#${data.shortId}`,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Benchmark Details
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "24px",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "44px",
+                          fontWeight: "900",
+                          color: colors.ink,
+                          lineHeight: "1.2",
+                        },
+                        children: data.badgeTitle,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "24px",
+                          color: colors.ink,
+                          lineHeight: "1.5",
+                          backgroundColor: colors.cream,
+                          border: `3px solid ${colors.ink}`,
+                          borderRadius: "20px",
+                          padding: "28px",
+                        },
+                        children: data.badgeDescription,
+                      },
+                    },
+                    ...(data.statLabel && data.statValue
+                      ? [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                backgroundColor: colors.paper,
+                                border: `3px solid ${colors.ink}`,
+                                borderRadius: "20px",
+                                padding: "20px 28px",
+                                boxShadow: `6px 6px 0px ${colors.ink}`,
+                              },
+                              children: [
+                                {
+                                  type: "div",
+                                  props: {
+                                    style: {
+                                      fontSize: "20px",
+                                      fontWeight: "800",
+                                      color: colors.muted,
+                                    },
+                                    children: data.statLabel,
+                                  },
+                                },
+                                {
+                                  type: "div",
+                                  props: {
+                                    style: {
+                                      fontSize: "28px",
+                                      fontWeight: "900",
+                                      color: colors.violet,
+                                    },
+                                    children: data.statValue,
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                        ]
+                      : []),
+                  ],
+                },
+              },
+
+              // Bottom Rule Sign-off
+              {
+                type: "div",
+                props: {
+                  style: {
+                    borderTop: `4px dashed ${colors.ink}`,
+                    paddingTop: "24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "6px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "16px",
+                          fontWeight: "800",
+                          color: colors.ink,
+                        },
+                        children: "Oddly Consensus Recognition Protocol",
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          fontSize: "14px",
+                          color: colors.muted,
+                        },
+                        children: "Compliant with Rule 14 (No Sensitive Inference) and Rule 15 (No Profiling).",
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+/**
+ * Renders Achievement Satori share card PNG (P10I.05).
+ */
+export async function renderAchievementCardPng(
+  data: AchievementShareCardData
+): Promise<Buffer> {
+  const fontBuffer = getFontBuffer();
+  const shortUrl = `https://${data.appDomain || "oddly.app"}/b/${data.shortId}`;
+  const qrDataUrl = await generateQrCodeDataUrl(shortUrl, {
+    width: 200,
+    color: {
+      dark: colors.ink,
+      light: "#00000000",
+    },
+  });
+
+  const vdom =
+    data.side === "back"
+      ? buildAchievementBackTree(data)
+      : buildAchievementFrontTree(data, qrDataUrl);
+
+  const svg = await satori(vdom as unknown as Parameters<typeof satori>[0], {
+    width: 1080,
+    height: 1490,
+    fonts: [
+      {
+        name: "Noto Sans",
+        data: fontBuffer,
+        weight: 400,
+        style: "normal",
+      },
+    ],
+  });
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1080 },
+  });
+
+  return resvg.render().asPng();
+}
+
+

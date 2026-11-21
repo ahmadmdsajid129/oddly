@@ -332,6 +332,67 @@ export interface EndOrbitResponse {
   message: string;
 }
 
+export interface OrbitSubjectSyncItem {
+  tag_id: string;
+  tag_key: string;
+  label_i18n: Record<string, string>;
+  category: string;
+  status: "unlocked" | "locked";
+  shared_questions: number;
+  agreement_count: number | null;
+  agreement_percentage: number | null;
+  lock_reason: string | null;
+}
+
+export interface OrbitSubjectSyncResponse {
+  ok: boolean;
+  orbit_id: string;
+  min_shared_threshold: number;
+  sync_items: OrbitSubjectSyncItem[];
+}
+
+export interface BadgeDefinitionDto {
+  id: string;
+  key: string;
+  name_i18n: Record<string, string>;
+  description_i18n: Record<string, string>;
+  icon_key: string;
+  status: string;
+}
+
+export interface CreatorBadgeDto {
+  id: string;
+  badge: BadgeDefinitionDto;
+  meme_id: string | null;
+  awarded_at: string;
+}
+
+export interface MyBadgesResponse {
+  ok: boolean;
+  badges: CreatorBadgeDto[];
+}
+
+export interface FeaturedMemeItem {
+  id: string;
+  week_start_date: string;
+  caption_text: string;
+  curator_notes: string | null;
+  template: {
+    illustration_registry_key: string;
+    alt_text_i18n: Record<string, string>;
+  };
+  author_region: string;
+  raters_count: number;
+  funny_percentage: number;
+  published_at: string;
+}
+
+export interface FeaturedMemesResponse {
+  ok: boolean;
+  current_week: FeaturedMemeItem | null;
+  archive: FeaturedMemeItem[];
+}
+
 export interface GlobeArc {
   id: string;
   from_region: string;
@@ -630,6 +691,21 @@ export class OddlyApiClient {
   /** Get single Orbit detail and expressions (P10A.05) */
   async getOrbit(id: string): Promise<OrbitDetailResponse> {
     return this.request<OrbitDetailResponse>(`/v1/orbits/${id}`);
+  }
+
+  /** Get aggregate subject sync rates for an Orbit (P10I.01, Rule 19) */
+  async getOrbitSubjectSync(id: string): Promise<OrbitSubjectSyncResponse> {
+    return this.request<OrbitSubjectSyncResponse>(`/v1/orbits/${id}/subject-sync`);
+  }
+
+  /** Get player earned creator recognition badges (P10I.04) */
+  async getMyBadges(): Promise<MyBadgesResponse> {
+    return this.request<MyBadgesResponse>("/v1/badges/mine");
+  }
+
+  /** Get curated Meme of the Week and archive (P10I.06) */
+  async getFeaturedMemes(): Promise<FeaturedMemesResponse> {
+    return this.request<FeaturedMemesResponse>("/v1/memes/featured");
   }
 
   /** Send daily tactile expression (The Wave) in Orbit (P10A.05, P10B.04) */

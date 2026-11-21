@@ -38,6 +38,18 @@ export interface SanitizedOrbitPartner {
   };
 }
 
+export interface OrbitSubjectSyncItem {
+  tag_id: string;
+  tag_key: string;
+  label_i18n: Record<string, string>;
+  category: string;
+  status: "unlocked" | "locked";
+  shared_questions: number;
+  agreement_count: number | null;
+  agreement_percentage: number | null;
+  lock_reason: string | null;
+}
+
 export class OrbitsRepository {
   /**
    * Count how many active Orbits a player currently has.
@@ -221,6 +233,85 @@ export class OrbitsRepository {
       data: {
         co_streak_current: 0,
       },
+    });
+  }
+
+  /**
+   * Calculate Aggregate Subject Sync across mutual tags for an Orbit.
+   * Invariant (Rule 19): Zero pick vector leakage. Only aggregate percentages.
+   * If shared questions < minThreshold (default 5), returns locked state.
+   */
+  static async getSubjectSyncForOrbit(
+    orbitId: string,
+    callerPlayerId: string,
+    minThreshold = 5
+  ): Promise<OrbitSubjectSyncItem[]> {
+    const orbit = await prisma.orbit.findUnique({
+      where: { id: orbitId },
+    });
+
+    if (!orbit) {
+      throw new Error("ORBIT_NOT_FOUND");
+    }
+
+    if (orbit.player_a_id !== callerPlayerId && orbit.player_b_id !== callerPlayerId) {
+      throw new Error("UNAUTHORIZED_ORBIT_ACCESS");
+    }
+
+    const playerAId = orbit.player_a_id;
+    const playerBId = orbit.player_b_id;
+
+    interface RawSyncRow {
+      tag_id: string;
+      tag_key: string;
+      label_i18n: Record<string, string>;
+      category: string;
+      shared_questions: number;
+      agreement_count: number;
+    }
+
+    const rows = await prisma.$queryRaw<RawSyncRow[]>`
+      SELECT 
+        t.id AS tag_id,
+        t.key AS tag_key,
+        t.label_i18n,
+        t.category,
+        COUNT(*)::int AS shared_questions,
+        COUNT(*) FILTER (WHERE sa_a.value = sa_b.value)::int AS agreement_count
+      FROM submission_answers sa_a
+      JOIN submission_answers sa_b 
+        ON sa_a.drop_date = sa_b.drop_date 
+        AND sa_a.question_id = sa_b.question_id
+      JOIN question_tags qt ON qt.question_id = sa_a.question_id
+      JOIN tags t ON t.id = qt.tag_id
+      WHERE sa_a.player_id = ${playerAId} 
+        AND sa_b.player_id = ${playerBId} 
+        AND t.is_active = true
+      GROUP BY t.id, t.key, t.label_i18n, t.category
+      ORDER BY t.category ASC, t.key ASC
+    `;
+
+    return rows.map((r) => {
+      const isUnlocked = r.shared_questions >= minThreshold;
+      const tagLabel =
+        (r.label_i18n as Record<string, string>)?.en ||
+        r.tag_key.charAt(0).toUpperCase() + r.tag_key.slice(1);
+
+      return {
+        tag_id: r.tag_id,
+        tag_key: r.tag_key,
+        label_i18n: r.label_i18n as Record<string, string>,
+        category: r.category,
+        status: isUnlocked ? "unlocked" : "locked",
+        shared_questions: r.shared_questions,
+        agreement_count: isUnlocked ? r.agreement_count : null,
+        agreement_percentage: isUnlocked
+          ? Math.round((r.agreement_count / Math.max(1, r.shared_questions)) * 100)
+          : null,
+        lock_reason: isUnlocked
+          ? null
+          : `Play more drops together to unlock ${tagLabel} sync.`,
+      };
     });
   }
 }

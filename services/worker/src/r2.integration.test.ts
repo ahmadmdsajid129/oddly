@@ -307,8 +307,8 @@ describe("Stage R2.0 Worker Real-Infrastructure Integration Proofs (Postgres 16 
       await realPrisma.batchRun.deleteMany({ where: { drop_id: benchDropId } });
       await realPrisma.match.deleteMany({ where: { drop_id: benchDropId } });
       await realPrisma.oddnessScore.deleteMany({ where: { drop_date: new Date(`${benchDateStr}T00:00:00.000Z`) } });
-      await realPrisma.submission.deleteMany({ where: { drop_id: benchDropId } });
-      await realPrisma.drop.deleteMany({ where: { id: benchDropId } });
+      await realPrisma.submission.deleteMany({ where: { OR: [{ drop_id: benchDropId }, { drop_date: new Date(`${benchDateStr}T00:00:00.000Z`) }] } });
+      await realPrisma.drop.deleteMany({ where: { OR: [{ id: benchDropId }, { drop_date: new Date(`${benchDateStr}T00:00:00.000Z`) }] } });
 
       // 2. Create Drop
       await realPrisma.drop.create({

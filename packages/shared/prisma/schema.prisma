@@ -112,6 +112,7 @@ model Player {
   memeRatings      MemeRating[]
   memeExposures    MemeExposure[]
   playerTastes     PlayerTaste[]
+  creatorBadges    CreatorBadge[]
 
   @@index([account_id])
   @@index([did])
@@ -820,6 +821,8 @@ model MemeSubmission {
   ratings                 MemeRating[]
   exposures               MemeExposure[]
   moderationActions       ModerationAction[]
+  creatorBadges           CreatorBadge[]
+  featuredMemes           FeaturedMeme[]
 
   @@index([author_player_id])
   @@index([status])
@@ -957,5 +960,61 @@ model EditorSuggestion {
   @@index([suggestion_type])
   @@index([severity])
   @@map("editor_suggestions")
+}
+
+// ---------------------------------------------------------------------------
+// 44. badge_definitions — catalogue of creator recognition badges (Stage M5 & M6 / Phase 10I)
+// ---------------------------------------------------------------------------
+model BadgeDefinition {
+  id               String         @id @default(uuid())
+  key              String         @unique @db.VarChar(50)
+  name_i18n        Json
+  description_i18n Json
+  icon_key         String         @db.VarChar(50)
+  benchmark_config Json
+  status           String         @default("active") @db.VarChar(20)
+  created_at       DateTime       @default(now())
+
+  creatorBadges    CreatorBadge[]
+
+  @@index([key])
+  @@index([status])
+  @@map("badge_definitions")
+}
+
+// ---------------------------------------------------------------------------
+// 45. creator_badges — player awarded recognition badges (Stage M5 & M6 / Phase 10I)
+// ---------------------------------------------------------------------------
+model CreatorBadge {
+  id         String          @id @default(uuid())
+  player_id  String
+  player     Player          @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  badge_id   String
+  badge      BadgeDefinition @relation(fields: [badge_id], references: [id], onDelete: Cascade)
+  meme_id    String?
+  meme       MemeSubmission? @relation(fields: [meme_id], references: [id], onDelete: SetNull)
+  awarded_at DateTime        @default(now())
+
+  @@unique([player_id, badge_id], name: "player_badge_unique")
+  @@index([player_id])
+  @@index([badge_id])
+  @@index([meme_id])
+  @@map("creator_badges")
+}
+
+// ---------------------------------------------------------------------------
+// 46. featured_memes — curated Meme of the Week showcase (Stage M5 & M6 / Phase 10I)
+// ---------------------------------------------------------------------------
+model FeaturedMeme {
+  id              String         @id @default(uuid())
+  submission_id   String
+  submission      MemeSubmission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
+  week_start_date DateTime       @unique @db.Date
+  curator_notes   String?
+  published_at    DateTime       @default(now())
+
+  @@index([week_start_date])
+  @@index([submission_id])
+  @@map("featured_memes")
 }
 

@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[█████████████░░░░░░░] 67%`                                                     |
-| **Current Active Stage**        | **Stage M4: Insights Engine (COMPLETE)**                                         |
+| **Overall Project Progress**    | `[██████████████░░░░░░] 70%`                                                     |
+| **Current Active Stage**        | **Stage M5 & M6: Taste Dimension & Recognition (COMPLETE)**                      |
 | **Total Tasks Tracked**         | 336 tasks across 27 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 226 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 234 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 105 tasks                                                                        |
+| **Pending (`TODO`)**            | 97 tasks                                                                         |
 
 ---
 
@@ -45,7 +45,7 @@
 | **Phase 10F**| Signals Foundation                          | High     | COMPLETE  | `[##########] 100%`| 10 / 10            | Stage M2 (after M1)   |
 | **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | COMPLETE   | `[##########] 100%`| 9 / 9              | Stage M3              |
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | COMPLETE  | `[##########] 100%`| 9 / 9              | Stage M4              |
-| **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | TODO      | `[----------] 0%`  | 0 / 8              | Stage M5/M6 (Deferred)|
+| **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | COMPLETE  | `[##########] 100%`| 8 / 8              | Stage M5/M6           |
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M7 (Documented) |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | TODO      | `[----------] 0%`  | 0 / 5              | Stage M8 (Documented) |
 | **Phase 11** | Admin Panel ("Mission Control")             | High     | TODO      | `[----------] 0%`  | 0 / 32             | Stage 11 (after F4)   |
@@ -465,20 +465,20 @@ _Status: COMPLETE | Target: Consented tag affinity (`player_taste`), category pe
 
 ---
 
-### Phase 10I: Taste Dimension & Recognition (Stage M5 & M6 — Deferred)
+### Phase 10I: Taste Dimension & Recognition (Stage M5 & M6)
 
-_Status: TODO | Target: Orbit Subject Sync, creator badges, Satori achievement cards, featured memes showcase._
+_Status: COMPLETE | Target: Orbit Subject Sync, creator badges, Satori achievement cards, featured memes showcase._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10I.01` | Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold)          | High     | TODO   | P10A.04, P10E.01| Agent| —         | Rule 19 agreement percentage             |
-| `[ ] P10I.02` | Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view             | Medium   | TODO   | P10I.01        | Agent | —         | Warm, celebratory microcopy              |
-| `[ ] P10I.03` | Database migrations: `badge_definitions`, `creator_badges`, `featured_memes`                               | Medium   | TODO   | P10G.01        | Agent | —         | Recognition schema                       |
-| `[ ] P10I.04` | Creator badge award worker: evaluate Wilson scores and rater benchmarks (e.g. 500 raters, 70% Funny)       | Medium   | TODO   | P10I.03        | Agent | —         | Automated benchmark awards               |
-| `[ ] P10I.05` | Build achievement card renderer: Satori 3D flip card with alias + macro-region ($k \ge 20$)                 | High     | TODO   | P10I.04, P6.01 | Agent | —         | Token palette; flip anatomy              |
-| `[ ] P10I.06` | Build featured meme showcase surface (`/featured`): curated "Meme of the Week"                              | Medium   | TODO   | P10I.03        | Agent | —         | Editorial showcase; no leaderboards      |
-| `[ ] P10I.07` | Build opt-in achievement sharing sheet and creator deletion revocation flow                                 | High     | TODO   | P10I.05        | Agent | —         | Opt-in sharing only                      |
-| `[ ] P10I.08` | Author integration tests proving zero raw answer vector exposure and zero public leaderboard rankings       | Critical | TODO   | P10I.01, P10I.06| Agent| —         | Privacy & brand invariant suite          |
+| `[x] P10I.01` | Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold)          | High     | DONE   | P10A.04, P10E.01| Agent| 2026-11-21| Rule 19 agreement percentage; 0 pick leakage |
+| `[x] P10I.02` | Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view             | Medium   | DONE   | P10I.01        | Agent | 2026-11-21| SubjectSyncCard.tsx warm celebratory copy|
+| `[x] P10I.03` | Database migrations: `badge_definitions`, `creator_badges`, `featured_memes`                               | Medium   | DONE   | P10G.01        | Agent | 2026-11-21| 009_recognition_engine.sql & Prisma schema|
+| `[x] P10I.04` | Creator badge award worker: evaluate Wilson scores and rater benchmarks (e.g. 500 raters, 70% Funny)       | Medium   | DONE   | P10I.03        | Agent | 2026-11-21| CreatorBadgeJob runs benchmarks idempotently|
+| `[x] P10I.05` | Build achievement card renderer: Satori 3D flip card with alias + macro-region ($k \ge 20$)                 | High     | DONE   | P10I.04, P6.01 | Agent | 2026-11-21| Token palette; 3D flip Satori PNG card   |
+| `[x] P10I.06` | Build featured meme showcase surface (`/featured`): curated "Meme of the Week"                              | Medium   | DONE   | P10I.03        | Agent | 2026-11-21| Editorial showcase; zero leaderboards    |
+| `[x] P10I.07` | Build opt-in achievement sharing sheet and creator deletion revocation flow                                 | High     | DONE   | P10I.05        | Agent | 2026-11-21| DELETE /v1/memes cleans featured_memes   |
+| `[x] P10I.08` | Author integration tests proving zero raw answer vector exposure and zero public leaderboard rankings       | Critical | DONE   | P10I.01, P10I.06| Agent| 2026-11-21| 6/6 tests passing in recognition suite   |
 
 ---
 

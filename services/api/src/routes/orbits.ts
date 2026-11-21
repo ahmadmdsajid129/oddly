@@ -16,6 +16,7 @@ import { OrbitsRepository, APPROVED_EXPRESSIONS } from "../db/orbits.repo.js";
 import { resolveAuthenticatedPlayer } from "../auth/player-auth.js";
 import { DegradationManager } from "../resilience/degradation.js";
 import { sendOrbitNotification } from "../notifications/orbit-push.js";
+import { getOrbitConfig } from "../config/orbit.config.js";
 import { prisma } from "../db/client.js";
 
 export const orbitsRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -177,6 +178,96 @@ export const orbitsRoutes: FastifyPluginAsyncZod = async (app) => {
           })),
           can_express_today: !mySentToday && orbit.status === "active",
         },
+      });
+    }
+  );
+
+  /**
+   * GET /v1/orbits/:id/subject-sync
+   * Aggregate taste and subject agreement rates per tag (Rule 19).
+   * Min 5 shared questions threshold to unlock.
+   * Zero raw pick vector exposure.
+   */
+  app.get<{
+    Params: { id: string };
+  }>(
+    "/v1/orbits/:id/subject-sync",
+    {
+      schema: {
+        tags: ["Orbit"],
+        summary: "Get aggregate subject agreement sync rates",
+        params: z.object({
+          id: z.string(),
+        }),
+        response: {
+          200: z.object({
+            ok: z.literal(true),
+            orbit_id: z.string(),
+            min_shared_threshold: z.number(),
+            sync_items: z.array(
+              z.object({
+                tag_id: z.string(),
+                tag_key: z.string(),
+                label_i18n: z.record(z.string()),
+                category: z.string(),
+                status: z.enum(["unlocked", "locked"]),
+                shared_questions: z.number(),
+                agreement_count: z.number().nullable(),
+                agreement_percentage: z.number().nullable(),
+                lock_reason: z.string().nullable(),
+              })
+            ),
+          }),
+          401: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+          }),
+          403: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+          }),
+          404: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const player = await resolveAuthenticatedPlayer(req);
+      if (!player) {
+        return reply.status(401).send({
+          ok: false,
+          error: "UNAUTHORIZED",
+          message: "Authentication required to view Orbit sync.",
+        });
+      }
+
+      const { id } = req.params;
+      const orbit = await OrbitsRepository.getOrbitForPlayer(id, player.id);
+      if (!orbit) {
+        return reply.status(404).send({
+          ok: false,
+          error: "ORBIT_NOT_FOUND",
+          message: "Orbit not found or access denied.",
+        });
+      }
+
+      const orbitConfig = await getOrbitConfig();
+      const syncItems = await OrbitsRepository.getSubjectSyncForOrbit(
+        orbit.id,
+        player.id,
+        orbitConfig.tasteSyncMinShared
+      );
+
+      return reply.send({
+        ok: true,
+        orbit_id: orbit.id,
+        min_shared_threshold: orbitConfig.tasteSyncMinShared,
+        sync_items: syncItems,
       });
     }
   );

@@ -81,10 +81,11 @@ export class SignalsAggregationJob {
           0.0::float AS report_rate,
           0.0::float AS entropy,
           NOW() AS updated_at
-        FROM events_raw
-        WHERE drop_date = $1::date
-          AND props->>'question_id' IS NOT NULL
-        GROUP BY (props->>'question_id')
+        FROM events_raw e
+        JOIN questions q ON q.id = (e.props->>'question_id')
+        WHERE e.drop_date = $1::date
+          AND e.props->>'question_id' IS NOT NULL
+        GROUP BY (e.props->>'question_id')
         ON CONFLICT (drop_date, question_id) DO UPDATE SET
           shown_count = EXCLUDED.shown_count,
           answered_count = EXCLUDED.answered_count,

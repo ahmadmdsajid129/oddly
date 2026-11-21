@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { ProceduralAvatar } from "@/components/orbit/ProceduralAvatar";
 import { StagedUnlocks } from "@/components/orbit/StagedUnlocks";
 import { TelepathyGameCard } from "@/components/orbit/TelepathyGameCard";
+import { SubjectSyncCard } from "@/components/orbit/SubjectSyncCard";
 import { ExpressionTray, APPROVED_EXPRESSIONS } from "@/components/orbit/ExpressionTray";
 import { ResponsiveDialog } from "@/components/ui/Dialogs";
 import { useToast } from "@/components/ui/Toast";
@@ -192,6 +193,11 @@ export default function OrbitDetailPage() {
             orbitId={orbitId}
             onSyncUpdated={() => void loadOrbit()}
           />
+        )}
+
+        {/* Mutual Subject Sync (Rule 19) */}
+        {!isEnded && (
+          <SubjectSyncCard orbitId={orbitId} />
         )}
 
         {/* Daily Expression Tray (The Wave) */}

@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "vitest run --exclude \"src/r2.integration.test.ts\"",
+    "test": "vitest run --exclude \"src/r2.integration.test.ts\" --fileParallelism=false",
     "test:integration": "vitest run src/r2.integration.test.ts"
   },
   "dependencies": {

@@ -9,14 +9,38 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M4: Insights Engine (Statistics Only) — COMPLETE (Tasks P10H.01 to P10H.09 complete & verified).
-- **Current Target:** Stage M5 & M6 (Phase 10I: Taste Dimension & Recognition — Orbit Subject Sync, Creator Badges, Satori Achievement Cards, Featured Memes).
+- **Current Stage:** Stage M5 & M6: Taste Dimension & Recognition (Phase 10I) — COMPLETE (Tasks P10I.01 to P10I.08 complete & verified).
+- **Current Target:** Stage 11 (Phase 11: Admin Panel "Mission Control") or Stage M7 (Phase 10J: ML Ranker for Optional Surfaces).
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage M5 & M6 (Taste Dimension & Recognition Engine — Phase 10I) is COMPLETE & VERIFIED:**
+    1. **Orbit Subject Sync (P10I.01, P10I.02):**
+       - Implemented `GET /v1/orbits/:id/subject-sync` calculating tag agreement percentages between mutual Orbit partners.
+       - Enforces min 5 shared answered questions threshold before showing agreement percentage (`tasteSyncMinShared = 5`).
+       - **Rule 19 Zero Pick Leakage:** Raw question answers and pick vectors are strictly scrubbed; only category-level aggregate agreement stats are exposed.
+       - Created frontend component `apps/web/src/components/orbit/SubjectSyncCard.tsx` adhering to Section 12B.7 design spec with unlocked sync badges (`80% Sync`), progress bars, and locked state microcopy (`Play X more drops together to unlock Y sync`).
+    2. **Recognition Schema & Migrations (P10I.03):**
+       - Applied `009_recognition_engine.sql` adding `badge_definitions`, `creator_badges`, `featured_memes`, seed badge definitions (`certified_wit`, `absurd_instinct`, `prolific_creator`), and feature flags.
+       - Updated Prisma client schema across monorepo.
+    3. **Creator Badge Award Worker (P10I.04):**
+       - Created `CreatorBadgeJob.runBadgeAwards()` in `services/worker/src/jobs/creator-badge.job.ts`.
+       - Idempotently evaluates Wilson score lower bound benchmarks (`certified_wit`: 500+ raters, 70%+ Funny, Wilson lb >= 0.65; `absurd_instinct`: 200+ raters, Wilson lb >= 0.75; `prolific_creator`: 10+ approved memes).
+       - Unit tested in `services/worker/src/creator-badge.test.ts` (4/4 passing).
+    4. **Satori Achievement Card Renderer (P10I.05):**
+       - Built `renderAchievementCardPng` in `packages/shared/src/share-cards.ts` rendering 3D flip achievement cards with alias + macro-region ($k \ge 20$).
+       - Added endpoint `GET /v1/cards/achievement/:badgeId` with macro-region privacy guard.
+    5. **Featured Meme Showcase Surface (P10I.06):**
+       - Built public endpoint `GET /v1/memes/featured` and showcase page `apps/web/src/app/featured/page.tsx`.
+       - Editorial curation of "Meme of the Week" without competitive leaderboards or public ranking tables.
+    6. **Creator Deletion Revocation & Badges API (P10I.07):**
+       - `DELETE /v1/memes/:id` cleans up linked `featured_memes` records inside the soft-delete transaction.
+       - Built `GET /v1/badges/mine` endpoint in `services/api/src/routes/badges.ts`.
+    7. **Invariant Suite (P10I.08):**
+       - `services/api/src/recognition-invariants.integration.test.ts` passes 6/6 tests against real PostgreSQL 16 & Redis 7.
   - **Stage F0 (New Features Analysis & Documentation) is COMPLETE & VERIFIED:**
     1. **Founder Scope Decisions Codified:**
        - **F18 (Twin Globe):** Approved for v1. Flat SVG map on `/globe`, regional k-anonymity ($k \ge 20$), Live/Replay modes, zero synthetic arcs, zero 3D libraries.

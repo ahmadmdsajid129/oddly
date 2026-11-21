@@ -125,6 +125,7 @@ export const api = {
   orbits: {
     list: () => rawClient.getOrbits(),
     get: (id: string) => rawClient.getOrbit(id),
+    subjectSync: (id: string) => rawClient.getOrbitSubjectSync(id),
     express: (id: string, expressionKey: string) =>
       rawClient.sendOrbitExpression(id, expressionKey),
     end: (id: string) => rawClient.endOrbit(id),
@@ -164,6 +165,10 @@ export const api = {
     rate: (submissionId: string, rating: "funny" | "not_for_me") =>
       rawClient.rateMeme(submissionId, rating),
     delete: (submissionId: string) => rawClient.deleteMemeSubmission(submissionId),
+    getFeatured: () => rawClient.getFeaturedMemes(),
+  },
+  badges: {
+    getMine: () => rawClient.getMyBadges(),
   },
   admin: {
     memes: {

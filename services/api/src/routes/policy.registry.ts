@@ -489,6 +489,47 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     priorityLane: "normal",
     degradationBehavior: "Dismiss editorial advisory suggestion",
   },
+  // Taste Dimension & Recognition Routes (Stage M5 & M6 / Phase 10I)
+  {
+    method: "GET",
+    path: "/v1/orbits/:id/subject-sync",
+    timeoutMs: 3000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Aggregate subject sync agreement rates without pick leakage",
+  },
+  {
+    method: "GET",
+    path: "/v1/memes/featured",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "public, max-age=300, s-maxage=600, stale-while-revalidate=1200",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Curated Meme of the Week showcase surface",
+  },
+  {
+    method: "GET",
+    path: "/v1/badges/mine",
+    timeoutMs: 2000,
+    rateLimitClass: "standard",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Earned creator recognition badges for authenticated player",
+  },
+  {
+    method: "GET",
+    path: "/v1/cards/achievement/:badgeId",
+    timeoutMs: 4000,
+    rateLimitClass: "standard",
+    cacheControl: "public, max-age=3600, s-maxage=86400",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Satori 3D flip card visual achievement renderer",
+  },
 ];
 
 /**

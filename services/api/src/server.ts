@@ -47,6 +47,7 @@ import { antiTwinRoutes } from "./routes/antitwin.js";
 import { eventsRoutes } from "./routes/events.js";
 import { memeRoutes } from "./routes/memes.js";
 import { insightsRoutes } from "./routes/insights.js";
+import { badgesRoutes } from "./routes/badges.js";
 import { DegradationManager } from "./resilience/degradation.js";
 import { registerMetrics } from "./metrics.js";
 
@@ -177,7 +178,7 @@ export async function buildServer(
 
   await app.register(rateLimit, {
     redis: redis.status === "ready" ? redis : undefined,
-    max: 120, // 120 requests per minute default
+    max: process.env.NODE_ENV === "test" ? 10000 : 120, // 120 requests per minute default (relaxed for test suites)
     timeWindow: "1 minute",
     keyGenerator: (req) => {
       const deviceId =
@@ -321,6 +322,7 @@ export async function buildServer(
   await app.register(eventsRoutes);
   await app.register(memeRoutes);
   await app.register(insightsRoutes);
+  await app.register(badgesRoutes);
 
   // 8. Global error handler mapping Zod errors cleanly
   app.setErrorHandler((error, request, reply) => {

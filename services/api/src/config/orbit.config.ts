@@ -16,6 +16,8 @@ export interface OrbitConfig {
   cooldownDays: number;
   maxIncomingPerDay: number;
   expressions: string[];
+  tasteSyncMinShared: number;
+  tasteSyncEnabled: boolean;
 }
 
 export const DEFAULT_ORBIT_CONFIG: OrbitConfig = {
@@ -25,6 +27,8 @@ export const DEFAULT_ORBIT_CONFIG: OrbitConfig = {
   cooldownDays: 30,
   maxIncomingPerDay: 3,
   expressions: ["wave_hand", "sparkle", "nod", "coffee", "high_five", "eyes"],
+  tasteSyncMinShared: 5,
+  tasteSyncEnabled: true,
 };
 
 let cachedConfig: { data: OrbitConfig; expiresAt: number } | null = null;
@@ -64,6 +68,8 @@ export async function getOrbitConfig(): Promise<OrbitConfig> {
             "orbit.cooldown_days",
             "orbit.max_incoming_per_day",
             "orbit.expressions",
+            "orbit.taste_sync_min_shared",
+            "feature.orbit_subject_sync",
           ],
         },
       },
@@ -74,6 +80,10 @@ export async function getOrbitConfig(): Promise<OrbitConfig> {
     for (const row of rows) {
       if (row.key === "feature.orbit" || row.key === "features.orbit") {
         config.enabled = row.value === true || row.value === "true" || row.value === 1;
+      } else if (row.key === "feature.orbit_subject_sync") {
+        config.tasteSyncEnabled = row.value === true || row.value === "true" || row.value === 1;
+      } else if (row.key === "orbit.taste_sync_min_shared") {
+        config.tasteSyncMinShared = Number(row.value) || 5;
       } else if (row.key === "orbit.max_active_per_player") {
         config.maxActivePerPlayer = Number(row.value) || 3;
       } else if (row.key === "orbit.keep_expiry_hours") {

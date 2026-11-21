@@ -4,6 +4,7 @@ import {
   renderShareCardPng,
   renderAntiTwinCardPng,
   renderOrbitCardPng,
+  renderAchievementCardPng,
   computeCardContentHash,
   computeCardStorageKey,
   getCardStorage,
@@ -307,6 +308,89 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
         partnerAgeBand: partner?.age_band || "18+",
         shortId: `orb-${id.slice(0, 6)}`,
         side: side || "front",
+      });
+
+      reply.header("Content-Type", "image/png");
+      reply.header("Cache-Control", "public, max-age=86400, s-maxage=604800, immutable");
+      return reply.send(png);
+    }
+  );
+
+  /**
+   * GET /v1/cards/achievement/:badgeId
+   * On-demand renders Satori 3D flip card visual achievement renderer (P10I.05).
+   * Invariant: macro-region only exposed if k >= 20.
+   */
+  app.get<{
+    Params: { badgeId: string };
+    Querystring: { side?: "front" | "back" };
+  }>(
+    "/v1/cards/achievement/:badgeId",
+    {
+      schema: {
+        tags: ["Cards", "Recognition"],
+        summary: "Render Satori achievement badge card PNG",
+        params: z.object({ badgeId: z.string() }),
+        querystring: z.object({
+          side: z.enum(["front", "back"]).default("front"),
+        }),
+      },
+    },
+    async (req, reply) => {
+      const { badgeId } = req.params;
+      const { side } = req.query;
+
+      const badgeAward = await prisma.creatorBadge.findUnique({
+        where: { id: badgeId },
+        include: {
+          badge: true,
+          player: true,
+          meme: {
+            include: { stats: true },
+          },
+        },
+      });
+
+      if (!badgeAward) {
+        return reply.status(404).send({ error: "NotFound", message: "Achievement badge award not found." });
+      }
+
+      // Check macro-region k >= 20 privacy rule
+      // Regional player counts
+      const playerRegion = badgeAward.player.region || "IN";
+      const regionCount = await prisma.player.count({
+        where: { region: playerRegion },
+      });
+      const safeRegion = regionCount >= 20 ? playerRegion : undefined;
+
+      const badgeTitle =
+        ((badgeAward.badge.name_i18n as Record<string, string>)?.en) ||
+        badgeAward.badge.key;
+      const badgeDesc =
+        ((badgeAward.badge.description_i18n as Record<string, string>)?.en) ||
+        "";
+
+      let statLabel: string | undefined;
+      let statValue: string | undefined;
+
+      if (badgeAward.meme?.stats) {
+        statLabel = "Community Ratings";
+        statValue = `${badgeAward.meme.stats.raters} Raters (${Math.round(
+          (badgeAward.meme.stats.funny_count / Math.max(1, badgeAward.meme.stats.raters)) * 100
+        )}% Funny)`;
+      }
+
+      const png = await renderAchievementCardPng({
+        badgeTitle,
+        badgeDescription: badgeDesc,
+        badgeIconKey: badgeAward.badge.icon_key,
+        creatorAlias: `Twin #${badgeAward.player.id.slice(0, 4)}`,
+        macroRegion: safeRegion,
+        awardedDateStr: badgeAward.awarded_at.toISOString().split("T")[0]!,
+        shortId: `ach-${badgeAward.id.slice(0, 6)}`,
+        side: side || "front",
+        statLabel,
+        statValue,
       });
 
       reply.header("Content-Type", "image/png");
