@@ -96,20 +96,19 @@ Oddly turns the **result itself into the entire product**. By stripping away cha
 - **NO image uploads from users:** Users never upload photos, memes, avatars, or media. In Meme Lab (M3), players write captions for app-provided vector templates only.
 - **NO selling or sharing user-level data:** Data is never sold, brokered, or shared with third parties.
 - **NO propensity-to-buy model in v1:** No behavioural monetization profiling or dynamic pricing algorithms.
-- **NO per-user change to Drop questions:** The five questions of a Drop within any given lane are identical for every player across the globe. Personalisation never touches Drop questions.
-- **NO politics lane or political questions (Founder-approved, L0):** No parties, leaders, elections, legislation, caste, religion, or nationality debates. "Hot Takes" is strictly restricted to harmless daily life preferences (e.g. food choices).
-- **NO showing one player's typed text to another player in v1 (Founder-approved, L0):** Free-text answers (`say_it`) are compared exclusively by machine embeddings and are never shown to any other player.
-- **NO paywalled lanes or matching advantage (Founder-approved, L0, Rule L8):** Lanes cannot be paywalled, and no paid feature may change who matches whom or provide priority in matching.
-- **NO ranking humans by attractiveness, status, or "worth" (Founder-approved, L0, Rule L7):** Situations results describe playful styles of reacting, never value judgments, rankings, or shaming.
-- **NO dating or contact features (Founder-approved, L0):** No contact path or matching for romantic intent.
-- **NO free-text longer than 80 characters (Founder-approved, L0):** Strict 80-character limit (*config*).
-- **Scope approvals recorded on 2026-11-14, 2026-11-15 & 2026-11-21:**
-  - Founder approved adding F18 (Twin Globe), F19 (Keep & Orbit), F20 (Telepathy), and F21 (Anti-twin) to v1.0. F22 (Oddly Deck) and F23 (Friend-invite Orbit) are approved for documentation only (v1.5). F12 (Wave) is superseded by F19.
+- **NO per-user change to Drop questions:** The five questions of the daily Drop are identical for every player across the globe. Personalisation never touches Drop questions.
+- **Scope approvals recorded on 2026-11-14 & 2026-11-15:**
+  - Founder approved adding F18 (Twin Globe), F19 (Keep this twin & Orbit), F20 (Telepathy), and F21 (Anti-twin) to v1.0. F22 (Oddly Deck) and F23 (Friend-invite Orbit) are approved for documentation only (v1.5). F12 (Wave) is superseded by F19.
   - Founder approved adding F24 (Meme questions & themed Drops, Stage M1) and F25 (Signals foundation, Stage M2) to v1.0.
-  - F26 (Meme Lab, Stage M3), F27 (Insights engine, Stage M4), F28 (Taste dimension: Sync by subject, Stage M5), and F29 (Recognition, Stage M6) are documented fully.
-  - F30 (ML ranker, Stage M7) and F31 (Premium groundwork, Stage M8) are complete and documented.
-  - Founder approved Stage L0 (Lanes & Richer Answers, 2026-11-21): F32 (Lanes), F33 (Richer answer formats), F34 (Twin depth), F35 (Memes lane launch) approved for v1.0; F36 (Situations lane) card version on command (Stage L5); F37 (Say it free text) gated behind Gate G4 (Stage L6); F38 (Super twin) on command (Stage L7); F39 (Brain lane) documented only (Stage L8).
+  - F26 (Meme Lab, Stage M3), F27 (Insights engine, Stage M4), F28 (Taste dimension: Sync by subject, Stage M5), and F29 (Recognition, Stage M6) are documented fully and will be built only upon Founder command.
+  - F30 (ML ranker, Stage M7) and F31 (Premium groundwork, Stage M8) are documented only.
   - All other Non-Goals remain strictly immutable.
+
+- **Politics is NOT a lane:** Oddly will never host a Politics lane or allow political, electoral, party, religious, or caste questions anywhere in the product. "Hot Takes" is strictly limited to non-sensitive lifestyle debates (e.g. food, daily habits).
+- **No Showing Raw User Text:** Typed answers in "Say It" (F37) are strictly machine-compared. Raw text is never exposed to twins, in share cards, or on public surfaces.
+- **No Paywalled Lanes (Rule L8):** Lanes cannot be locked behind paywalls. Every open lane is accessible to all players with equal matching quality.
+- **No Ranking of Human Value:** In the Situations lane (F36), results are descriptive behavioral style labels (e.g. Calm, Playful, Shy), never ranking or evaluative scores (no "sigma", "desperate", "loser", "alpha").
+- **Maximum 80 Characters for Free Text:** Free-text responses are strictly capped at 80 characters.
 
 ### 4.3 Success Metrics
 
@@ -125,28 +124,14 @@ Oddly turns the **result itself into the entire product**. By stripping away cha
 - **Meme Question Quality:** Meme questions (`render_variant = "meme"`) must maintain equal or higher completion rate and at least +5% higher share rate compared to text questions after 2 weeks of live data.
 - **Signals Pipeline Reliability:** 99.9% event ingestion reliability via beacon/batching with zero impact on submit-path latency.
 - **Consent Strictness:** 100% adherence to zero-event ingestion prior to explicit, granular DPDP consent.
-- **Lane Adoption & Secondary Play:** > 20% of first-session completing players choose to play a second lane on the same day.
-- **Lane Completion Rate:** > 80% across all open lanes.
-- **Tie Group Transparency:** 100% adherence to displaying real group size counts and honest "Closest so far" labels below 200 daily lane players.
 
-### 4.6 Product Gates & Launch Criteria (Updated Stage L0)
 
-Oddly enforces five formal Product & Quality Gates:
-- **Gate G0 (Foundation):** Core loop, guest play, and deterministic scoring operational.
-- **Gate G1 (Connection Features):** F18–F21 approved for v1; zero PII leakage.
-- **Gate G2 (Signals & Meme Lab):** Neutral taxonomies, consent enforcement, zero sensitive inference.
-- **Gate G3 (Monetisation):** Premium groundwork, single-tap cancellation, zero dark patterns.
-- **Gate L-A (A Lane May Open, Stage L0):** A lane may transition from `planned` or `preview` to `open` ONLY when:
-  1. Founder approval in writing.
-  2. At least *config* 8 approved Drops queued in Admin.
-  3. Moderation and scenario safety checklist completed.
-  4. Daily lane players threshold met (lanes below *config* 500 labeled "Early lane"; below *config* 200 labeled "Closest so far").
-- **Gate G4 (Free-Text "Say it" Answers, Stage L0):** Free-text typed answers may be built ONLY when:
-  1. Founder approval in writing.
-  2. Admin text moderation queue and archetype manager built (Phase 11 B6).
-  3. Labelled evaluation set of at least *config* 300 reply pairs rated by Founder/trusted testers, with embedding-plus-archetype similarity agreeing with humans at $ge 80%$, and archetype tagger reaching macro-F1 $ge 0.75$ on at least 200 labelled replies.
-  4. Legal counsel review of notice and retention complete.
-  5. Load test showing embedding worker handles $10\times$ volume without submit-path impact.
+- **Lane Expansion Metrics (Stage L0 / F32):**
+  - **Second-Lane Discovery:** $\ge 25\%$ of first-session players complete a second lane on day 1.
+  - **Lane Completion Rate:** $\ge 85\%$ of started lane Drops are completed.
+  - **D1 Return Per Lane:** $\ge 35\%$ 1-day retention within individual open lanes.
+  - **Lane Share Rate:** $\ge 12\%$ of lane results generate an exported or shared result card.
+  - **Small-Pool Rate:** $\le 5\%$ of lane Drops end in "Closest so far" in production open lanes.
 
 ### 4.4 Reliability Promises & Product Operating Principles
 
@@ -172,13 +157,12 @@ When traffic surges trigger the Graceful Degradation Ladder, the user experience
   > *"We are having trouble reaching our servers. Your picks are safely saved on this device and will send automatically the moment we are back."*
 
 ### 4.6 Go/No-Go Decision Gates
-
-1. **Gate G0 (Weekend Prototype Test):** 100 organic players. Day-1 return ≥ 25%, share rate ≥ 15%. If below 15%, iterate on questions and card design.
-2. **Gate G1 (Web MVP Beta — Week 4):** 200 beta users. Day-7 return ≥ 12%, drop completion ≥ 85%, crash-free sessions > 99%.
-3. **Gate G2 (Campus Cohort — Week 8):** 1,000 active players. Day-30 return ≥ 8%, K-factor > 0.3.
-4. **Gate G3 (Monetisation Feasibility — Week 12):** Evaluate premium features (streak freezes, archive access) only if D30 remains stable.
-
----
+- **G0 (Private Alpha):** 50 players over 1 weekend. Metric: D1 retention $\ge 40\%$, zero crash reports, zero unhandled errors in telemetry.
+- **G1 (Public Beta):** 1,000 players over 14 days. Metric: D7 retention $\ge 25\%$, share rate $\ge 15\%$, matching latency p95 < 2.0s.
+- **G2 (Campus Launch):** 5,000 players across 3 campuses. Metric: D30 retention $\ge 18\%$, referral coefficient $K \ge 0.3$.
+- **G3 (Monetisation Gate):** 25,000 MAU before introducing any paid features or brand drops. (Phase-1 is strictly non-monetised).
+- **Gate L-A (Lane Opening Gate):** A planned lane may transition to `open` only when: (1) Founder approval in writing, (2) At least *config* 8 approved Drops queued in `admin_lane_drops`, (3) Moderation and safety checklist signed off, (4) Sustained global DAU $\ge 3,000$ to prevent candidate pool collapse. When daily lane players drop below *config* 500, marked "Early lane"; below *config* 200, results show "Closest so far".
+- **Gate G4 (Free-Text / Say It Gate):** Free-text typed answers (`say_it`) remain strictly inactive in v1 and can only be enabled when all 5 criteria are verified: (1) Founder written approval, (2) Admin text moderation queue & archetype manager built (Phase 11 B6), (3) Labelled eval set of $\ge 300$ reply pairs with $\ge 80\%$ human agreement and macro-F1 $\ge 0.75$ on $\ge 200$ replies, (4) Legal counsel review of notice and retention, (5) Load test showing embedding queue handles $10\times$ volume with zero submit path latency impact.
 
 ## 5. Brand Identity and Voice
 
@@ -226,61 +210,53 @@ When traffic surges trigger the Graceful Degradation Ladder, the user experience
 
 ---
 
+- **Lane:** A thematic subject track (e.g. Everyday, Memes, Gaming). Drops and matching are isolated within each lane.
+- **Everyday:** The default, universal lane played by all first-time visitors without login or picker screens.
+- **Memes:** The meme-culture lane powered by meme templates and caption choices (F24/F35).
+- **Early Lane:** A live lane with fewer than *config* 500 daily players, labelled honestly with an Early Lane chip.
+- **Resting Lane:** A lane with no approved Drop scheduled for today; displays time until next Drop (Rule L9).
+- **Tie Group:** The set of candidate players whose similarity score is within $\epsilon = 0.01$ of the best match. Real size is $T$.
+- **Honest Group Size:** Transparent copy showing the exact or banded count of tied twins ("312 people matched you this way").
+- **Mutual Twin:** A pairing where player A is B's twin and player B is A's twin (`is_mutual = true`).
+- **Super Twin:** Rare cross-lane occurrence where two players are twinned in 2 or more distinct lanes on the same calendar day.
+- **Say It:** Free-text question format (up to 80 chars) compared via semantic embeddings, gated behind Gate G4.
+- **Style Archetype:** Descriptive behavioral style label in the Situations lane (e.g. Calm, Playful, Shy), never an evaluative rank.
+
 ## 6. Core Loop and Daily Timeline
 
 ### 6.1 The Player Core Loop
+Oddly operates on a fast, tactile daily habit loop designed for rapid completion (~30 seconds) and high shareability, now lane-aware:
 
 ```
-[Notification / Shared Link / Morning Habit]
-             │
-             ▼
-      [Open Web App] (Zero login barrier)
-             │
-             ▼
-  [Age Gate Check] (18+ confirmation on 1st visit)
-             │
-             ▼
-  [Answer 5 Picks] (30 seconds, instinct-driven)
-             │
-             ▼
-       [Review & Lock] (Idempotent submission)
-             │
-             ▼
-  [Searching Animation] (1.5s visual map journey)
-             │
-             ▼
-  [Provisional Twin Reveal] (Coarse region, age band, matched picks)
-             │
-             ▼
-    [Oddness Percentile & Tier] (Rarity celebration)
-             │
-             ▼
-   [Share Card / Challenge] (Instagram Story, WhatsApp, link)
-             │
-             ▼
-[Soft Sign-in Prompt] ("Save your streak with Google")
-             │
-             ▼
-[Next Morning Recap & New Drop] (07:05 IST)
+1. DISCOVERY & FIRST RUN
+   First visit -> Age gate check (18+) -> Straight into Everyday Drop (Rule L10)
+   (No login wall, no onboarding survey, no lane picker screen)
+   
+2. LANE DROP PLAY (Everyday or Player-Chosen Lane)
+   5 tactile questions -> One at a time -> Sticker pop UI -> Haptic feedback
+   
+3. INSTANT LANE REVEAL
+   Lane Chip & Accent -> Percentage match -> Honest group size ("312 people matched you this way")
+   -> Oddness tier -> Anti-twin -> Tactile Share Card
+   
+4. LANE EXPLORATION (Post-Result)
+   "Try another lane" carousel -> Open lanes (Memes) & "Coming Soon" planned tiles
+   -> Optional "Tell me when it opens" opt-in
+   
+5. RETURNING VISITOR HOME
+   Home screen displays active lane cards sorted with last played lane first (Rule L1)
+   -> Lane status chips (Open, Early lane, Resting, Played) -> Pick any unplayed lane
+   
+6. MORNING RECAP & REVISIT (07:05 IST)
+   Push notification per lane (max 2/day total) -> Final mutual twin reveal
+   -> "Why you two?" rare agreement accordion -> Streak update (\ge 1 completed lane Drop)
 ```
 
 ### 6.2 The Daily "Twin Day" Timeline (All times IST, stored in UTC)
-
-| Time (IST)        | System / User Event   | Technical Operations                                                                                   |
-| ----------------- | --------------------- | ------------------------------------------------------------------------------------------------------ |
-| **D - 2 days**    | Drop Curation & Lock  | Two-person editorial approval in Admin tool locks the Drop. Questions are immutable.                   |
-| **06:30**         | Drop Pre-Staging      | Scheduler pre-compiles Drop JSON, caches it in Redis and warms CDN edge origins.                       |
-| **07:00**         | Drop Goes Live        | `drops.status` transitions from `scheduled` to `live`. Staggered web push batches begin (5k/batch).    |
-| **07:00 – 07:30** | Morning Peak Traffic  | High-concurrency submissions. Instant Stage A provisional twin calculated in memory/Redis.             |
-| **Every 5 min**   | Background Refinement | Worker re-evaluates provisional pairings as the pool of players grows.                                 |
-| **12:00 / 20:00** | Smart Nudge           | At most one gentle reminder for unplayed users with notifications enabled (respects quiet hours).      |
-| **20:00**         | Streak at Risk Alert  | Users with streaks ≥ 3 receive a reminder if they haven't submitted today.                             |
-| **21:00**         | Twin Upgrade Push     | Sent ONLY if a player's similarity improves by ≥ 0.10 or matches jump from 3 to 4/5 (max 1/day).       |
-| **06:59 (D+1)**   | Window Closes         | `drops.status` set to `closed`. Further submissions rejected with HTTP 409.                            |
-| **07:00 – 07:05** | Final Batch Job       | BullMQ finalizes exact probabilities $p(a)$, locks final twins, computes world stats, updates streaks. |
-| **07:05**         | Recap Live & New Drop | Recap notifications sent; today's new Drop goes live simultaneously.                                   |
-
----
+- **07:00 IST — Unified Daily Drop Open:** All open lanes release their daily Drop simultaneously. All Drops share the exact same 24-hour cycle. No staggered drop clocks in v1 to protect capacity and prevent duplicate peak load spikes.
+- **07:00 to 23:00 IST — Active Play Window:** Peak traffic windows (07:00-09:30 morning commute, 12:30-14:00 lunch, 20:00-22:30 evening). Provisional twin matching runs on-demand via the BullMQ pipeline with sub-second response times.
+- **07:00 IST (+1 Day) — Drop Close & Freeze:** The 24-hour play window closes. Unfinished Drops expire.
+- **07:05 IST (+1 Day) — Final Matching & Morning Recap:** Final batch matching job runs per lane: builds $K=32$ candidate subgraphs, applies 28-day BitMinHash history tie-breaking, executes greedy mutual pairing, computes Super Twins across lanes, and dispatches Morning Recap notifications.
 
 ## 7. Dynamic Question System and Content Architecture
 
@@ -292,17 +268,20 @@ No content, questions, palettes, illustrations, UI copy, notification templates,
 - All UI strings live in `app_content` (PostgreSQL), served via a fast, cached endpoint `GET /v1/content/:locale`.
 - Pure functions and generic components render questions dynamically based on schemas defined in `@oddly/shared`.
 
-### 7.2 The Five Question Types
+### 7.2 The Five Question Types and Richer Answer Formats
 
-Every Drop contains **exactly five questions**, always combining lower and higher entropy choices:
+Oddly questions are designed for rapid, visceral reactions. In addition to legacy single-choice formats, richer answer formats expand the answer space to reduce tie collisions while maintaining the 30-second completion target:
 
-| Slot / Type                  | Answer Format                   | Answer Space        | Matching Rule                                                                                               |
-| ---------------------------- | ------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Type 1: Pick One (Text)**  | 2 to 4 text option tiles        | Low cardinality     | Exact match: 1.0 if identical, 0.0 otherwise.                                                               |
-| **Type 2: Number**           | Visual dial & snapping strip    | 1 to 50             | Fuzzy match: Exact = 1.0, $\Delta = 1 \implies 0.5$, $\Delta = 2 \implies 0.25$, $\Delta > 2 \implies 0.0$. |
-| **Type 3: Colour**           | 12-swatch grid with text labels | 12 distinct colours | Exact match: 1.0 if identical, 0.0 otherwise. Accessible text labels prevent colour-blindness exclusion.    |
-| **Type 4: Pick One (Image)** | 2x2 grid of custom SVG tiles    | 4 image options     | Exact match: 1.0 if identical, 0.0 otherwise. Illustrated with clean vector assets.                         |
-| **Type 5: Word**             | 2x3 grid of pill chips          | 6 curated words     | Exact match: 1.0 if identical, 0.0 otherwise. Instinctive mood association.                                 |
+| Format Key | Name | Player Interaction | State Space | Similarity Metric $s_q$ | Notes & Usage |
+|---|---|---|---|---|---|
+| `pick1` | Single Choice | Tap 1 of 2 to 4 options | 2 to 4 | $1$ if equal, else $0$ | Core format across all lanes; simple, immediate |
+| `pick2of6` | Pick 2 of 6 | Tap exactly 2 of 6 options | $\binom{6}{2} = 15$ | Jaccard: $\frac{|A \cap B|}{|A \cup B|} \in \{0, \frac{1}{3}, 1\}$ | Ideal for taste, hobbies, and media preferences |
+| `rank3` | Rank 3 | Drag or tap 3 items into order | $3! = 6$ | $1 - \frac{\text{KendallTau}(A, B)}{3}$ | Tap-to-order default on mobile; drag-and-drop accessible |
+| `slider7` | Spectrum Slider | Select 1 to 7 on a labelled spectrum | 7 | $1 - \frac{|a - b|}{6}$ | Endpoints labelled with words; no raw numbers shown as "scores" |
+| `scene` | Scenario Card | Pick 1 of 3 to 5 illustrated reaction cards | 3 to 5 | $1$ if equal, else $0$ | Used in Situations lane (F36); gender-neutral illustrated dilemmas |
+| `say_it` | Say It | Type up to 80 characters | Open | $a \cdot [\text{archetype}] + (1-a) \cdot \text{cos}_{\text{cal}}$ | Gated behind Gate G4; machine-compared only; never shown to others |
+
+**Legacy Formats Rule:** Legacy question formats (number 1-50, hex colour picker, picture tap, mood selector) are strictly restricted to the **Everyday** lane and may comprise at most 2 of 5 questions in any daily Drop. All non-Everyday lanes use modern formats (`pick1`, `pick2of6`, `rank3`, `slider7`, `scene`).
 
 ### 7.3 Editorial Rules for Writing a Drop
 
@@ -332,27 +311,17 @@ _Seeded dynamically via JSON importer in `seed/oddly_batch_001_first_14_days.jso
 ## 8. Result System and Honesty Rules
 
 ### 8.1 The Three-Stage Reveal Sequence
-
-1. **Your Twin:**
-   - Score header: _"You matched 4 of 5 picks with someone in Lagos, age 18 to 24."_
-   - Interactive pick comparison: 5 visual indicators (mint for matches, dimmed for differences).
-2. **Your Oddness:**
-   - Percentile headline: _"Your picks were rarer than 84% of today's players. Tier: Rare."_
-   - Highlighted outlier: _"Your rarest pick: Lime for Monday Morning (only 2.1% chose it)."_
-   - Verified 1-in-N count: Only displayed when calculated from real, observed database frequency.
-3. **Your Actions:**
-   - Share Card generator (Story 9:16, Square 1:1, Link Preview 1.91:1).
-   - "Challenge a Friend" viral link (`/c/:shortId?challenge=1`).
-   - "Save your streak with Google" non-blocking prompt.
+Results are revealed with playful suspense, emphasizing the tactile physical sticker metaphor:
+1. **Stage 1: The Lane Match Stamp:** Universal Lane Chip and accent color animate in with a tactile ink stamp. Displays headline match percentage ($S \in [0, 100]\%$) and honest group size ("4 of 5 with someone in Lagos. 312 people matched you this way").
+2. **Stage 2: Oddness & Twin Profile:** Shows the player's rarity percentile within that lane's daily cohort, the provisional twin's age band and country, and the Anti-twin.
+3. **Stage 3: Deep Match Breakdown & "Why You Two?":** Displays question-by-question agreement indicators. For tied twins, reveals the "Why you two?" accordion listing rare answers shared by both players. Below the card, a "Play another lane" row invites immediate exploration of remaining open lanes.
 
 ### 8.2 Strict Honesty Protocol
-
-- **Under 200 Players (Early Day):** If fewer than 200 submissions exist when a user finishes, display: _"Closest so far: N of 5. More people are still playing. Your final twin locks in tomorrow at 07:00 AM."_
-- **Weak Matches:** If the closest match is $\le 2/5$, Oddly does not pretend it is a cosmic soulmate. It displays: _"You are one of a kind today! Closest so far is 2 of 5. Check back tomorrow."_
-- **No Identical Twin Found:** If nobody has chosen your exact 5-vector, say honestly: _"Nobody else picked all five the way you did today."_
-- **Zero Synthetic Data:** Under no circumstance will the system create fake AI profiles, fake submissions, or fabricated rarity numbers in production mode.
-
----
+Oddly's central brand promise is **radical mathematical honesty**. We never fabricate, inflate, or manipulate match data:
+- **No Hallucinated Twins:** If fewer than *config* 200 players have completed the lane, the UI honestly displays "Closest so far". We never synthesize bot twins or fake accounts.
+- **Honest Group Size:** When multiple players share identical similarity scores, we state the exact or banded group size ($T$). We never tell a player "You found your one and only soulmate" when 300 others gave the exact same answers.
+- **Unique Twin Copy ($T=1$):** Only when exactly one person in the cohort produced that match profile does the UI state: "You and this person were the only ones who answered like this today."
+- **Lane Isolation (Rule L2):** Oddness percentiles, twins, and recap statistics are computed strictly within each lane cohort. A player's Memes twin has no influence on their Everyday twin.
 
 ## 9. Mathematical Foundations and Matching Engine
 
@@ -405,12 +374,30 @@ $$\text{Percentile}(u) = 100 \times \frac{\#\{v \in \text{Players} \mid \text{Od
 3. **Stage C (> 200,000 Daily Players):**
    - Vector embeddings + Approximate Nearest Neighbors (ANN via pgvector HNSW index) followed by top-K exact rescoring.
 
-### 9.6 Tie-Breaking and Exclusions
+### 9.6 Tie-Breaking, History Agreement, and Mutual Pairing
 
-- **Exclusion Filters:** Never match a player with themselves, with another session on the same device/IP cluster, with blocked accounts, or with accounts flagged for bot behavior.
-- **Tie-Breaking:** If two candidate twins have identical $S(u, v)$:
-  1. Prefer the candidate from a **different country** (celebrates global connection).
-  2. If still tied, use a deterministic pseudo-random hash seeded by `hash(drop_id, min(user_u, user_v), max(user_u, user_v))`. Never favor who submitted first.
+When thousands of players complete 5 questions, tie collisions naturally occur. Oddly resolves ties through a strictly deterministic, privacy-preserving, and mutual multi-stage process:
+
+1. **Step 1: Top Similarity Score:** Candidates are initially filtered to those sharing the maximum similarity score $S(u, v)$. The tie group $T$ contains all candidates within $\epsilon = 0.01$ of this peak score.
+2. **Step 2: 28-Day Lane History Agreement:**
+   - For candidates in the tie group, the engine compares historical agreement over the past 28 days in that specific lane.
+   - Evaluated using a compact, precomputed 32-byte BitMinHash signature (`lane_history_signature`).
+   - Requires at least *config* 5 shared play dates. If fewer than 5 shared days exist, history agreement defaults to 0.
+   - Requires player consent: players who toggle off "Use past answers to find closer twins" are assigned 0 history weight.
+3. **Step 3: Different Country Preference:** If ties remain, candidates from a different country than the player are preferred to encourage delightful cross-cultural serendipity.
+4. **Step 4: Deterministic Cryptographic Hash:**
+   - Remaining ties are broken via a reproducible pseudorandom hash:
+     $$\text{tiebreak}(u, v) = \text{HMAC\_SHA256}(\text{drop\_id}, \min(u, v) \parallel \max(u, v))$$
+   - Guarantees full auditability and mathematical determinism across batch re-runs.
+5. **Step 5: Greedy Mutual Pairing:**
+   - In the 07:05 final matching run, candidate edges within each tie region are sorted by (similarity, history, different-country, hash).
+   - The engine greedily pairs players mutually so that if player A is assigned twin B, player B is also assigned twin A (`is_mutual = true`).
+   - Any leftover odd player receives their highest available candidate with `is_mutual = false`.
+   - Edge candidates are bounded to top $K=32$ per player, keeping total graph matching complexity strictly linear at $O(N \cdot K \log K)$.
+6. **Exclusions Protocol:**
+   - Players are never paired with themselves.
+   - Accounts sharing the same IP subnet, device fingerprint, or network signature are excluded by the anti-self engine.
+   - Blocked players (via the Safety & Shield feature) are strictly excluded from mutual and provisional candidate pools.
 
 ### 9.7 Privacy via $k$-Anonymity
 
@@ -829,339 +816,250 @@ To prevent deanonymisation of players:
 
 ---
 
+## 11C. Lanes, Twin Depth and Text Answers (F32 to F39)
 
----
+### Master Lane Catalogue
 
-## 11C. Lanes, Twin Depth and Text Answers, F32 to F39 (Stage L0)
+Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an isolated universe of Drops, matching, streaks, and statistics (Rule L2).
 
-### 11C.1 Overview and Lane Catalogue
-Lanes isolate daily Drops by subject matter while preserving the universal 07:00 IST daily clock. Questions within a lane are identical for all players of that lane (Rule L1). A player selects their preferred lane, is matched exclusively within that lane, and may play multiple open lanes per day.
-
-#### Master Lane Catalogue
-
-| Lane Slug | Display Name | Core Subject Matter | Allowed Formats | Text Enabled | Status at v1 |
+| Lane ID | Display Name | Theme & Content Style | Formats Used | Status at Launch | Opening Criteria |
 |---|---|---|---|---|---|
-| `everyday` | **Everyday** | Light daily choices, food, habits, dilemmas, "would you rather" | `pick1`, `pick2of6`, `slider7`, legacy (max 2/5) | false | **Open** (Default, always open) |
-| `memes` | **Memes** | Meme-template questions and caption picks (F24) | `pick1`, `pick2of6`, `slider7` | false | **Open** (Launch with v1) |
-| `gaming` | **Gaming** | Game habits, genres, playstyle, rage moments; no esports betting | `pick1`, `pick2of6`, `rank3`, `slider7` | false | Planned |
-| `screen_sound` | **Screen and Sound** | Shows, films, music moods; no real-person judgments | `pick1`, `pick2of6`, `rank3` | false | Planned |
-| `food_habits` | **Food and Habits** | Taste preferences, daily routines, sleep, work quirks | `pick1`, `pick2of6`, `slider7` | false | Planned |
-| `hot_takes` | **Hot Takes** | Harmless debates ("pineapple on pizza"); NO politics/religion | `pick1`, `slider7` | false | Planned |
-| `how_you_think` | **How You Think** | Decision-style quirks ("fast vs careful"); never diagnostic | `pick1`, `slider7` | false | Planned |
-| `situations` | **Situations** | "What would you do" scenes (F36); archetype style results | `scene`, `pick1` (`say_it` v2) | false (v1) | Planned (Card version first) |
-| `brain` | **Brain** | Knowledge questions; twin = same right & wrong answers (F39) | `pick1`, `rank3` | false | Documented only |
+| `everyday` | Everyday | Daily life dilemmas, food, small habits, light "would you rather" | `pick1`, `pick2of6`, `rank3`, `slider7`, legacy (max 2) | **Open** | Universal default; always open; first visit route (Rule L10) |
+| `memes` | Memes | Internet culture, meme templates, caption pairing (F24/F35) | `pick1`, `pick2of6`, `rank3` | **Open** | Core launch lane; feeds from Meme Lab |
+| `gaming` | Gaming | Playstyles, genres, rage moments, gaming debates (no real brands) | `pick1`, `pick2of6`, `rank3`, `slider7` | Planned | Gate L-A ($\ge 3,000$ global DAU, 8 queued Drops) |
+| `screen_sound` | Screen & Sound | Films, television, music moods, fandom-neutral preferences | `pick1`, `pick2of6`, `rank3`, `slider7` | Planned | Gate L-A |
+| `food_habits` | Food & Habits | Taste nuances, daily routines, sleep, study/work quirks | `pick1`, `pick2of6`, `rank3`, `slider7` | Planned | Gate L-A |
+| `hot_takes` | Hot Takes | Harmless debates (pineapple on pizza, reply vs seen); zero politics | `pick1`, `slider7` | Planned | Gate L-A; strict editorial non-politics enforcement |
+| `how_you_think`| How You Think | Playful decision styles (fast vs careful, plan vs wing it); non-clinical | `pick1`, `slider7`, `rank3` | Planned | Gate L-A; strict non-diagnostic disclaimer |
+| `situations` | Situations | "What would you do" scenes; illustrated cards; style archetypes | `scene` (v1), `say_it` (v2 behind G4) | Planned | Gate L-A; Rule L7 safety review; cards first |
+| `brain` | Brain | Knowledge & trivia dilemmas; twin means "made the same mistakes" | `pick1`, `pick2of6` | Documented | Unscheduled; documented for architecture parity |
 
 ---
 
-### 11C.2 F32: Lanes (v1, Stage L1)
-- **Purpose:** Let players choose the topic they enjoy and be matched exclusively with players who chose the same lane.
+### F32 Lanes (v1, Stage L1)
+
+- **Purpose:** Allow players to choose the subject matter they enjoy, matching them exclusively with players who chose the same subject, while preserving the 30-second loop and no-login first run.
 - **Player Journey:**
-  1. *First visit:* Age gate (18+) $\rightarrow$ direct entry into **Everyday** Drop. Zero friction, no lane screen (Rule L10).
-  2. *First result:* Result card reveals twin and honest tie group size, followed by a "Try another lane" card showcasing open lanes and "Coming soon" tiles.
-  3. *Returning visit:* Home screen presents today's lane cards. Cards display lane name, accent token, icon, status chip, time remaining, and "Last played" indicator. The last played lane appears first (the only personalized element per Rule L1).
-  4. *Play & Results:* Player taps a lane, answers its 5 questions, submits, and receives that lane's twin and share card.
-  5. *Morning Recap:* 07:05 IST recap is per-lane. Push notifications respect the 2/day cross-lane ceiling.
-  6. *Streaks:* Completing at least one lane Drop counts for the global daily streak (Rule L11).
-- **Behavioral Rules:** One Drop per lane per day (`lane_id`, `drop_date`). All lanes open at 07:00 IST and close after 24 hours. Under 500 players = "Early lane"; under 200 = "Closest so far". No lane without a Drop: missing Drops display "Resting today" with kind copy (Rule L9).
-- **Out of Scope for v1:** Lane-specific streaks (v1.5), paid lanes (Rule L8), changing lane questions per user.
+  1. *First Visit:* Age gate check (18+), then routed directly into the Everyday Drop. No lane picker or account creation screen (Rule L10).
+  2. *First Result:* After viewing results, a "Try another lane" carousel introduces open lanes (Memes) and planned lanes with a "Tell me when it opens" opt-in button.
+  3. *Returning Visit:* The home screen presents today's lane cards: lane name, accent color, icon, status chip (Open, Early lane, Resting, Played, Closed), time remaining, and "Last played" hint. The last played lane appears first (Rule L1).
+  4. *Playing a Lane:* Tap a lane card -> play that lane's 5 questions -> instant reveal with Universal Lane Chip, percentage match, honest group size, oddness tier, and share card.
+  5. *Recap:* Morning Recap at 07:05 IST provides lane-specific recaps (max 2 push notifications per day total).
+  6. *Streak:* Daily streak increments when at least one lane Drop is completed (Rule L11).
+- **Exact Copy Keys (`app_content`):**
+  - `lane.picker.title`: "Pick Your Lane"
+  - `lane.picker.subtitle`: "5 questions. One twin who gets you."
+  - `lane.status.open`: "Open"
+  - `lane.status.early`: "Early lane"
+  - `lane.status.resting`: "Resting"
+  - `lane.status.played`: "Played"
+  - `lane.status.closed`: "Closed"
+  - `lane.interest.button`: "Tell me when it opens"
+  - `lane.interest.saved`: "We'll let you know"
+  - `lane.result.play_another`: "Play another lane"
+- **States and Edge Cases:**
+  - *Lane Retires Mid-Orbit:* If a lane is retired, existing Orbits remain visible in read-only mode; new Keeps for that lane are disabled.
+  - *Device Switch Mid-Drop:* In-progress answers are synced to server for authenticated players; guest progress is held in local storage.
+  - *Concurrent Multi-Device Play:* First submitted Drop wins; subsequent submissions on the same lane date reject with 409 Conflict.
+  - *Partial Drop Failure:* If 4 of 5 questions are approved but 1 fails, the lane enters `resting` status; partial Drops are never served.
+  - *Timezone Handling:* Drop dates are anchored strictly to 07:00 IST globally.
+- **Privacy Rules:** Lane interest votes (`lane_interest`) store only an aggregated counter per lane and an anonymized player opt-in ID. No tracking cookies or external analytics.
+- **Data Produced:** `lanes`, `lane_interest`, `player_lane_prefs`, plus `lane_id` foreign keys on `drops`, `questions`, `answers`, `twin_results`, `oddness_results`, `anti_twin_results`.
+- **Degradation Behaviour:** If Redis is down (L2), lane picker serves cached metadata with 5-minute TTL. If DB fails (L3), serves offline static Everyday Drop.
+- **Feature Flags & Config:** `lanes_enabled` (bool), `lane_min_players_early` (default: 500), `lane_min_players_honest` (default: 200).
+- **Success Metrics:** $\ge 25\%$ first-session players play a second lane; $\ge 85\%$ completion rate; $\ge 35\%$ D1 lane return.
+- **Out of Scope:** Paywalled lanes (Rule L8), politics lanes, user-generated custom lanes, cross-lane ranking.
 
 ---
 
-### 11C.3 F33: Richer Answer Formats (v1, Stage L2)
-Adds rich interaction primitives to the polymorphic question renderer while preserving existing formats:
-1. `pick1`: Tap 1 of 2 to 4 options (2–4 outcomes; similarity 1 if equal else 0).
-2. `pick2of6`: Tap exactly 2 of 6 options (15 outcomes; Jaccard similarity $|A \cap B| / |A \cup B| \in \{0, 1/3, 1\}$).
-3. `rank3`: Drag or tap 3 items into order (6 outcomes; similarity $1 - d_{Kendall}/3$). Tap-to-order default for small screens/a11y.
-4. `slider7`: Choose 1 to 7 on a labelled spectrum (7 outcomes; similarity $1 - |v_1 - v_2|/6$). Words on endpoints; no numbers shown.
-5. `scene`: Pick 1 of 3 to 5 illustrated reaction cards (3–5 outcomes; similarity as `pick1`).
-6. `say_it`: Type up to 80 characters (open text, semantic similarity; gated behind Gate G4, Stage L6).
-- **Matching Math:** Similarity is the information-weighted average of per-question similarities: $S(P, Q) = \frac{\sum w_i \cdot s_i}{\sum w_i}$, where $w_i = \min(I(a_i), w_{max})$ and $I(a) = \log_2(1/p(a))$.
-- **Entropy Planning:** Drops in lanes expecting $>5,000$ players must include $ge 3$ high-entropy questions ($ge 6$ outcomes).
+### F33 Richer Answer Formats (v1, Stage L2)
+
+- **Purpose:** Expand the combinatorial outcome space of questions to drastically reduce tie collisions while maintaining instant, visceral playability.
+- **Player Journey:**
+  1. *Pick 1 of N (`pick1`):* Tap 1 option. Immediate selection state.
+  2. *Pick 2 of 6 (`pick2of6`):* Tap first option (highlighted); tap second option (both locked; submit button enables). Tap selected to unselect.
+  3. *Rank 3 (`rank3`):* Three items presented. On mobile, tap items in order 1-2-3 (or drag handles on desktop). Displays numerical badge (1st, 2nd, 3rd). Reset button allows re-ordering.
+  4. *Spectrum Slider (`slider7`):* 7-stop discrete physical slider. Tactile ticks on each stop. Endpoints labelled with words (e.g. "Never" vs "Always"). No raw numbers shown.
+  5. *Scenario Cards (`scene`):* 3 to 5 illustrated reaction cards. Tapping a card expands brief contextual preview; double tap or confirm button submits.
+- **Exact Copy Keys (`app_content`):**
+  - `format.pick2of6.instruction`: "Pick exactly 2"
+  - `format.rank3.instruction`: "Rank your top 3 (tap in order)"
+  - `format.rank3.reset`: "Reset order"
+  - `format.slider7.instruction`: "Where do you stand?"
+  - `format.scene.instruction`: "How do you react?"
+- **States and Edge Cases:**
+  - *Rapid Tapping:* Double-tapping options in `pick2of6` handles debouncing cleanly without state desync.
+  - *Accessibility / Screen Readers:* `rank3` provides accessible up/down button controls for non-pointer users. `slider7` supports standard arrow keys.
+  - *Incomplete Input:* Submit is disabled until exact required inputs are satisfied (e.g. exactly 2 selected).
+- **Privacy Rules:** Formats generate categorical IDs or discrete integer indices (0-6). Zero personal data captured.
+- **Data Produced:** Stored polymorphically in `answers.answer_value` as JSON (`{"selected": [1, 4]}`, `{"ranking": [2, 0, 1]}`, `{"stop": 5}`).
+- **Degradation Behaviour:** If format assets fail to load, falls back to plain text list options.
+- **Feature Flags & Config:** `rich_formats_enabled` (bool), `format_information_cap` (default: 4.0 bits).
+- **Success Metrics:** $\ge 90\%$ format completion rate without abandonment; format understanding error rate $< 1%$.
+- **Out of Scope:** Free-form text in v1 (reserved for F37 behind G4), multi-select of variable length, continuous non-discrete sliders.
 
 ---
 
-### 11C.4 F34: Twin Depth (v1, Stage L3)
-- **Purpose:** Make "twin" meaningful when thousands of players collide on identical choices, and guarantee mutual pairing.
-- **Tie Group Definition:** All candidate twins whose similarity to player $P$ is within *config* $\epsilon = 0.01$ of $P and Monetisation Philosophy
+### F34 Twin Depth & Mutual Pairing (v1, Stage L3)
 
-### 12.1 Phase-1: Pure Focus on Retention
-
-For the first six months, Oddly generates zero revenue. Success is measured purely by completion rates, organic K-factor, and D7/D30 retention. Daily play will **always remain 100% free**. Under Rule L8 (Lane Parity), all lanes are 100% free and unpaywalled. No paid feature may alter matching, provide priority, or reveal twins. Premium (M8) remains strictly limited to non-play perks (streak freezes, historical archive, card colorways).
-
-### 12.2 Future Monetisation (v1.5+)
-
-- **Oddly Plus (Subscription):** Hypothesized at ₹79/month (~$0.99/mo). Includes 2 monthly streak freezes, full historical archive access, and bespoke share card colorways.
-- **Sponsored Daily Questions (v2.0):** At > 20,000 DAU, offer a single, tasteful, clearly labelled sponsored question per week (e.g., _"Filter coffee vs. Cold brew"_ sponsored by a coffee roaster).
-- **Aggregate Insights (v2.0):** Anonymized cultural trend reports at > 100,000 DAU.
-
-### 12.3 What Oddly Will NEVER Sell
-
-1. Individual user answers or pick vectors.
-2. Identifiable user records, email addresses, phone numbers, or device IDs.
-3. Precise geolocation data.
-4. Any demographic segment representing fewer than 1,000 individuals.
-
----
-
-## 13. Safety, Legal, and Privacy Framework
-
-> **DISCLAIMER:** _This document does not constitute formal legal advice. A formal review by qualified legal counsel is required prior to public commercial launch._
-
-### 13.1 Compliance with India's DPDP Act 2023
-
-- **Age Restriction (18+):** Under the Digital Personal Data Protection Act 2023, processing data of minors requires verifiable parental consent. Oddly restricts service strictly to users aged 18 and older via explicit gatekeeping.
-- **Data Minimisation:** No real names, avatars, free-text chats, or exact GPS coordinates are gathered.
-- **Purpose Limitation & Consent:** Granular, separate opt-in consent for notifications and analytics.
-- **Right to Erasure & Portability:** Native in-app buttons for one-click JSON data export and account deletion.
-
-### 13.2 Online Gaming Regulations (India 2025)
-
-Oddly involves zero real-money stakes, zero entry fees, and zero financial payouts. It is classified as an entertainment micro-game, exempt from real-money gaming restrictions.
+- **Purpose:** Eliminate identical-answer tie dilution, make twin relationships genuinely mutual, and present transparent, honest group sizes.
+- **Definitions:**
+  - *Tie Group ($T$):* Candidates within $epsilon = 0.01$ of the top similarity score.
+  - *Top Neighbour List ($K=32$):* Bounded candidate list per player to maintain $O(N cdot K log K)$ graph matching performance.
+- **Selection & Pairing Order:**
+  1. *Similarity:* Maximum score $S(u, v)$ on today's Drop.
+  2. *28-Day Lane History:* Information-weighted historical agreement over past 28 days ($\ge 5$ shared days required) via 32-byte BitMinHash signature.
+  3. *Different Country:* Candidate from different country preferred.
+  4. *Deterministic Hash:* $	ext{HMAC_SHA256}(	ext{drop_id}, min(u, v) parallel max(u, v))$.
+  5. *Greedy Mutual Pairing:* Edge pairing algorithm assigns pairs mutually (`is_mutual = true`). Odd leftover gets best twin with `is_mutual = false`.
+- **What the Player Sees:**
+  - Standard Group: "4 of 5 with a person in Lagos, 18 to 24. **312 people** matched you this way."
+  - Unique Match ($T=1$): "You and this person were the only ones who answered like this today."
+  - Small Cohort ($< 200$): "Closest so far."
+  - Accordion: "Why you two?" reveals rare shared answers without revealing full profiles.
+- **Exact Copy Keys (`app_content`):**
+  - `twin.group_size.band`: "{{count}} people matched you this way"
+  - `twin.group_size.unique`: "You and this person were the only ones who answered like this today"
+  - `twin.small_pool`: "Closest so far"
+  - `twin.why_you_two.title`: "Why you two?"
+  - `twin.why_you_two.rare_item`: "You both picked '{{option}}' (only {{percent}}% chose this)"
+  - `twin.mutual.badge`: "Mutual Twin"
+- **States and Edge Cases:**
+  - *Odd Count of Players:* The single unpartnered player receives their best available candidate marked `is_mutual = false`.
+  - *Zero Shared History:* When $< 5$ shared days exist, history weight is 0; ties fall back cleanly to country and hash.
+  - *History Opt-Out:* Players who disable "Use my past answers" have history term set to 0.
+- **Privacy Rules:** The 32-byte BitMinHash signature is a one-way mathematical summary. Cannot be reversed into individual answers. Purged immediately on account deletion.
+- **Data Produced:** `twin_results` gains `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days`. New table `lane_history_signature`.
+- **Degradation Behaviour:** If batch mutual job times out, falls back to greedy provisional twin assignments.
+- **Feature Flags & Config:** `twin_depth_enabled` (bool), `history_tiebreak_enabled` (bool), `tie_epsilon` (0.01), `tie_candidate_k` (32), `history_window_days` (28), `min_shared_history_days` (5).
+- **Success Metrics:** Median tie group size reduced by $> 80%$; $\ge 98\%$ of paired twins are mutual; zero duplicate pairings across devices.
+- **Out of Scope:** Infinite candidate graphs ($K > 32$), cross-lane history mixing (Rule L2).
 
 ---
 
-## 14. Risks Register and Open Founder Decisions
+### F35 Memes Lane Launch (v1, Stage L4)
 
-### 14.1 Key Risks & Mitigations
-
-1. **Low Density at Launch (Cold Start Problem):** If only 50 people play, twins will feel weak.
-   _Mitigation:_ Honest UI messaging (_"Closest so far"_) and emphasis on the personal Oddness rarity score.
-2. **Bot Infiltration & Timing Attacks:** Scripted bots flooding the API to distort probability weights.
-   _Mitigation:_ Cloudflare Turnstile bot challenges, rate limiting, and minimum-answer-time thresholds (< 3 seconds flagged).
-3. **Launch-Spike Outage at 07:00 IST:** Simultaneous countdown expiration and push notification openings causing a severe connection storm.
-   _Mitigation:_ Immutable Drop JSON pre-staged at 06:30 IST; Cloudflare origin shielding; client-side randomized jitter (0 to 4 s); staggered push dispatch in 5k slices.
-4. **Viral Surge Overload:** Sudden spike when a prominent influencer shares a card (up to 500,000 visitors in 10 minutes).
-   _Mitigation:_ Static share landing pages (`/c/:shortId`) cached at edge for 24h with > 95% edge hit ratio; origin processing strictly bounded.
-5. **Client Retry Storms:** Network hiccup causing tens of thousands of mobile clients to retry simultaneously in lockstep.
-   _Mitigation:_ Exponential backoff with full jitter on client; `@fastify/under-pressure` load shedding; strict adherence to HTTP `Retry-After`.
-6. **Cost Runaway:** Command-priced cloud services or unmonitored autoscaling generating bill shock.
-   _Mitigation:_ Hard autoscaling instance caps per tier; fixed-price Redis instances; strict telemetry sampling (1–5%); automated budget alerts at 150% of forecast.
-7. **Bad Deploy During Morning Peak:** Uncoordinated release during the 07:00 IST window taking down the live drop.
-   _Mitigation:_ Mandatory **deploy freeze** from 06:30 to 08:30 IST daily and anytime system is at L2+; automated canary analysis with instant rollback.
-8. **Submission Data Loss:** Database crash during high-concurrency ingestion.
-   _Mitigation:_ Strict idempotency via `request_id`; client persistence in localStorage until acknowledged; dual-mode ingestion (Mode B async persist at peak); continuous PITR database backups.
-
-### 14.2 Open Decisions for the Founder
-
-1. **Brand Trademark & Domain:** Formal availability clearance for "Oddly" (vs. "Twinly" or "SameHere").
-2. **SMS Provider Selection (for Phone OTP):** Approval of SMS gateway (e.g., Twilio, Gupshup) and DLT registration in India when Phone OTP is unflagged.
-3. **Legal Counsel Sign-Off:** Review of Draft Privacy Notice and Terms of Service.
+- **Purpose:** Provide a high-engagement, dedicated culture lane using meme templates and caption choices, directly utilizing the F24 question infrastructure developed in Stage M1.
+- **Relationship to F24:** F24 defines the Meme Question format and Meme Lab authoring engine. F35 is the **dedicated live lane** on the home screen that runs daily meme Drops.
+- **Player Journey:**
+  1. Player selects the Memes lane from the lane picker.
+  2. Encounters 5 meme-centric questions: visual templates paired with relatable dilemmas and humorous reaction choices.
+  3. Receives instant Memes Twin reveal and custom Memes Share Card featuring the day's hero meme template with sticker outline.
+- **Exact Copy Keys (`app_content`):**
+  - `lane.memes.name`: "Memes"
+  - `lane.memes.tagline`: "Relatable takes & internet culture"
+  - `lane.memes.card_footer`: "Oddly / Memes Drop"
+- **States and Edge Cases:**
+  - *Asset Loading:* Meme image assets are pre-cached and delivered via CDN with responsive WebP formatting. If image fails, fallback accessible text displays.
+  - *Content Moderation:* All meme templates and captions pass the Stage M3 moderation pipeline before scheduling.
+- **Privacy Rules:** Full compliance with Rule M3 (no sensitive inference, no facial recognition, no biometric data).
+- **Data Produced:** Uses standard `drops`, `questions`, and `answers` with `lane_id = 'memes'`.
+- **Degradation Behaviour:** If CDN degrades, serves low-resolution placeholder with crisp high-contrast SVG sticker border.
+- **Feature Flags & Config:** `lane_memes_enabled` (bool).
+- **Success Metrics:** $\ge 30\%$ of active daily players play Memes Drop; share rate $\ge 15\%$.
+- **Out of Scope:** User-submitted memes in v1 (editorial curation only), video memes, audio clips.
 
 ---
 
-## 15. Product Glossary
+### F36 Situations Lane (Stage L5, Card Version First)
 
-- **Drop:** Daily set of five questions released at 07:00 IST.
-- **Picks:** A user's five chosen answers.
-- **Twin:** Closest matching player for that Drop.
-- **Oddness:** Total information content $I = \sum -\log_2(p(a))$ of a player's choices.
-- **Rarity Percentile:** Percentage of players today with lower oddness.
-- **Recap:** Final locked summary of yesterday's Drop.
-- **Twin Day:** The 24-hour cycle from 07:00 IST to 06:59:59 IST.
-- **Stage A Matching:** In-memory brute-force pairwise calculation for up to 10k players.
-- **Lane:** Player-selected daily subject Drop with isolated matching (e.g. Everyday, Memes, Gaming).
-- **Tie Group:** Bounded set of candidate twins whose similarity is within $\epsilon = 0.01$ of the top score.
-- **Super Twin:** Rare occurrence where two players twin in two or more lanes on the same day.
-- **Say It:** Short typed answer ($le 80$ chars) compared semantically by self-hosted embedding model.
-- **Early Lane:** An open lane with under 500 daily players.
-- **Closest So Far:** Honest matching label displayed when a lane has under 200 daily players.
-s top score.
-- **Bounded Top-Neighbour List:** Engine maintains top $K = 32$ candidates per player.
-- **Selection & Tie-Break Order:**
-  1. *Highest similarity* on today's Drop.
-  2. *History tie-break:* Candidate with highest 28-day lane history agreement (information-weighted similarity over $ge 5$ shared days in that lane). Evaluated via compact 32-byte lane history signature.
-  3. *Different country preferred* (existing invariant).
-  4. *Deterministic hash:* Reproducible hash seeded by `drop_id` and both player IDs.
-- **Mutual Pairing:** Within each tie region, players are greedily paired so that player $A and Monetisation Philosophy
-
-### 12.1 Phase-1: Pure Focus on Retention
-
-For the first six months, Oddly generates zero revenue. Success is measured purely by completion rates, organic K-factor, and D7/D30 retention. Daily play will **always remain 100% free**.
-
-### 12.2 Future Monetisation (v1.5+)
-
-- **Oddly Plus (Subscription):** Hypothesized at ₹79/month (~$0.99/mo). Includes 2 monthly streak freezes, full historical archive access, and bespoke share card colorways.
-- **Sponsored Daily Questions (v2.0):** At > 20,000 DAU, offer a single, tasteful, clearly labelled sponsored question per week (e.g., _"Filter coffee vs. Cold brew"_ sponsored by a coffee roaster).
-- **Aggregate Insights (v2.0):** Anonymized cultural trend reports at > 100,000 DAU.
-
-### 12.3 What Oddly Will NEVER Sell
-
-1. Individual user answers or pick vectors.
-2. Identifiable user records, email addresses, phone numbers, or device IDs.
-3. Precise geolocation data.
-4. Any demographic segment representing fewer than 1,000 individuals.
+- **Purpose:** Present relatable, playful social scenarios ("What would you do?") yielding a descriptive behavioral style label, without ranking, shaming, or evaluating human worth.
+- **Card-First Launch Architecture:** In accordance with Founder decisions, Situations launches with **illustrated scenario cards (`scene`)**, completely avoiding free-text NLP risks until Gate G4.
+- **Rule L7 Safety & Editorial Mandates:**
+  - All scenes are strictly **gender-neutral**.
+  - No pursuit, romantic pressure, harassment, or non-consensual dynamics.
+  - Strictly 18+ contextual dilemmas (e.g. workplace etiquette, friend dilemmas, social awkwardness).
+  - Descriptive behavioral style labels only: **Calm, Playful, Shy, Bold, Guarded, Over-the-moon, Deflecting, Curious**.
+  - Absolutely NO toxic or evaluative archetypes (no "sigma", "desperate", "simp", "loser", "alpha").
+  - Zero ranking, zero percent scores of "attractiveness", zero leaderboard mechanics.
+- **Exact Copy Keys (`app_content`):**
+  - `lane.situations.name`: "Situations"
+  - `lane.situations.tagline`: "How do you react when life gets weird?"
+  - `archetype.calm.title`: "The Calm Anchor"
+  - `archetype.calm.desc`: "Unfazed, steady, lets the storm pass."
+  - `archetype.playful.title`: "The Playful Spark"
+  - `archetype.playful.desc`: "Finds the joke, keeps it light, disarms with humor."
+  - `archetype.bold.title`: "The Direct Mover"
+  - `archetype.bold.desc`: "Speaks plainly, cuts through hesitation, acts first."
+  - `archetype.shy.title`: "The Quiet Observer"
+  - `archetype.shy.desc`: "Reads the room first, speaks when ready, observant."
+- **States and Edge Cases:**
+  - *Mixed Responses:* If answers span multiple archetypes, the dominant centroid is selected; ties broken deterministically by question order.
+- **Privacy Rules:** Answers are strictly confidential. Twin card displays behavioral style label only; individual scenario choices are never shown.
+- **Data Produced:** `drops`, `questions` with format `scene`, `text_archetypes`, `style_tags`.
+- **Degradation Behaviour:** Falls back to standard single-choice display if scenario illustration fails.
+- **Feature Flags & Config:** `lane_situations_enabled` (bool).
+- **Success Metrics:** $\ge 80\%$ positive sentiment on style labels; zero safety complaints or takedown requests.
+- **Out of Scope:** Free-text typing in v1 (deferred to F37 behind Gate G4), dating or romance matching.
 
 ---
 
-## 13. Safety, Legal, and Privacy Framework
+### F37 Say It: Free-Text Answers (Stage L6, Gated Behind Gate G4)
 
-> **DISCLAIMER:** _This document does not constitute formal legal advice. A formal review by qualified legal counsel is required prior to public commercial launch._
-
-### 13.1 Compliance with India's DPDP Act 2023
-
-- **Age Restriction (18+):** Under the Digital Personal Data Protection Act 2023, processing data of minors requires verifiable parental consent. Oddly restricts service strictly to users aged 18 and older via explicit gatekeeping.
-- **Data Minimisation:** No real names, avatars, free-text chats, or exact GPS coordinates are gathered.
-- **Purpose Limitation & Consent:** Granular, separate opt-in consent for notifications and analytics.
-- **Right to Erasure & Portability:** Native in-app buttons for one-click JSON data export and account deletion.
-
-### 13.2 Online Gaming Regulations (India 2025)
-
-Oddly involves zero real-money stakes, zero entry fees, and zero financial payouts. It is classified as an entertainment micro-game, exempt from real-money gaming restrictions.
-
----
-
-## 14. Risks Register and Open Founder Decisions
-
-### 14.1 Key Risks & Mitigations
-
-1. **Low Density at Launch (Cold Start Problem):** If only 50 people play, twins will feel weak.
-   _Mitigation:_ Honest UI messaging (_"Closest so far"_) and emphasis on the personal Oddness rarity score.
-2. **Bot Infiltration & Timing Attacks:** Scripted bots flooding the API to distort probability weights.
-   _Mitigation:_ Cloudflare Turnstile bot challenges, rate limiting, and minimum-answer-time thresholds (< 3 seconds flagged).
-3. **Launch-Spike Outage at 07:00 IST:** Simultaneous countdown expiration and push notification openings causing a severe connection storm.
-   _Mitigation:_ Immutable Drop JSON pre-staged at 06:30 IST; Cloudflare origin shielding; client-side randomized jitter (0 to 4 s); staggered push dispatch in 5k slices.
-4. **Viral Surge Overload:** Sudden spike when a prominent influencer shares a card (up to 500,000 visitors in 10 minutes).
-   _Mitigation:_ Static share landing pages (`/c/:shortId`) cached at edge for 24h with > 95% edge hit ratio; origin processing strictly bounded.
-5. **Client Retry Storms:** Network hiccup causing tens of thousands of mobile clients to retry simultaneously in lockstep.
-   _Mitigation:_ Exponential backoff with full jitter on client; `@fastify/under-pressure` load shedding; strict adherence to HTTP `Retry-After`.
-6. **Cost Runaway:** Command-priced cloud services or unmonitored autoscaling generating bill shock.
-   _Mitigation:_ Hard autoscaling instance caps per tier; fixed-price Redis instances; strict telemetry sampling (1–5%); automated budget alerts at 150% of forecast.
-7. **Bad Deploy During Morning Peak:** Uncoordinated release during the 07:00 IST window taking down the live drop.
-   _Mitigation:_ Mandatory **deploy freeze** from 06:30 to 08:30 IST daily and anytime system is at L2+; automated canary analysis with instant rollback.
-8. **Submission Data Loss:** Database crash during high-concurrency ingestion.
-   _Mitigation:_ Strict idempotency via `request_id`; client persistence in localStorage until acknowledged; dual-mode ingestion (Mode B async persist at peak); continuous PITR database backups.
-
-### 14.2 Open Decisions for the Founder
-
-1. **Brand Trademark & Domain:** Formal availability clearance for "Oddly" (vs. "Twinly" or "SameHere").
-2. **SMS Provider Selection (for Phone OTP):** Approval of SMS gateway (e.g., Twilio, Gupshup) and DLT registration in India when Phone OTP is unflagged.
-3. **Legal Counsel Sign-Off:** Review of Draft Privacy Notice and Terms of Service.
+- **Purpose:** Match players on short, typed responses (up to 80 chars) based on semantic meaning using a self-hosted ONNX model, without exposing text to other players.
+- **The 7-Step Processing Pipeline:**
+  1. *Normalize:* Unicode NFKC normalization, strip non-printable characters, collapse whitespace, lowercase.
+  2. *Screen PII & Abuse:* Regex screening for phone numbers, email addresses, social handles, and abuse blocklist. If rejected: friendly notice ("That one can't be used. Try saying it another way.") and one allowed retry. Three rejections in 24 hours trigger a 7-day text cooldown (play remains enabled).
+  3. *Embed:* BullMQ worker embeds text using a self-hosted ONNX multilingual model (`paraphrase-multilingual-MiniLM-L12-v2` or `multilingual-e5-small`) running on CPU (~18ms latency, zero cloud API calls, zero third-party data egress).
+  4. *Tag Archetype:* Nearest centroid over pre-labelled archetype exemplar vectors. Yields archetype ID and confidence score.
+  5. *Calibrate Similarity:*
+     $$s = a \cdot [\text{same archetype}] + (1 - a) \cdot \text{calibrate}(\cos(\mathbf{u}, \mathbf{v}))$$
+     Where $a = 0.5$ (*config*), and $\text{calibrate}$ maps raw cosine into $[0, 1]$ based on empirical distribution. Local rarity weighting applies: rare phrasing has higher match weight than common phrasing.
+  6. *Search:* Top-$K$ neighbour search via pgvector HNSW or in-memory worker index.
+  7. *Retention:* Raw text is hard-deleted after **7 days** (Rule L5(f)). Embeddings and archetype tags are hard-deleted after **28 days**. Immediate hard deletion upon account erasure.
+- **Abuse Cases & Threat Matrix:**
+  - *Prompt Injection:* Harmless by design; text is solely fed into an embedding vectorizer, never into a generative LLM.
+  - *Copycat Farming:* Players copying famous quotes or lyrics match many users; rarity weighting dampens common phrases, and duplicate collision monitors flag anomalous clusters.
+  - *PII Probing:* Players cannot discover what others typed because raw text is never rendered to twins.
+- **Honest Limit of Semantic Models:** Meaning models match **topic and wording far better than tone or emotional attitude**. Two answers with similar words but opposite emotional valence may score artificially high. The archetype centroid layer mitigates this limitation, and card-based options remain the primary fallback.
+- **Gate G4 Requirements (Strictly Inactive until all 5 verified):**
+  1. Founder written approval.
+  2. Admin text moderation queue and archetype manager built (Phase 11 B6).
+  3. Labelled eval dataset of $\ge 300$ reply pairs with $\ge 80\%$ human agreement and macro-F1 $\ge 0.75$ on $\ge 200$ replies.
+  4. Legal counsel review of notice, DPDP Act 2023 compliance, and retention schedule.
+  5. Load test verifying embedding worker handles $10\times$ projected peak volume with zero latency impact on submission path.
+- **Exact Copy Keys (`app_content`):**
+  - `format.say_it.placeholder`: "Type your reaction (up to 80 chars)..."
+  - `format.say_it.counter`: "{{count}}/80"
+  - `format.say_it.rejected`: "That one can't be used. Try saying it another way."
+  - `format.say_it.cooldown`: "Text answers paused for 7 days. You can still play all card lanes."
+  - `format.say_it.privacy_hint`: "Your words are never shown to other players. Compared privately by AI."
+- **Data Produced:** `answer_text` table (`player_id`, `drop_id`, `question_id`, `raw_text` [7d purge], `embedding` [28d purge], `archetype_id`, `moderation_status`).
+- **Feature Flags & Config:** `say_it_enabled` (false in v1), `raw_text_retention_days` (7), `embedding_retention_days` (28), `say_it_max_chars` (80).
+- **Success Metrics:** Human-model agreement $\ge 80\%$; zero PII leakage incidents; embedding queue p95 $< 100$ms.
+- **Out of Scope:** Generative AI responses, chatbot twins, displaying text to twins, audio/voice input.
 
 ---
 
-## 15. Product Glossary
+### F38 Super Twin and Lane-Aware Connection Features (Stage L7)
 
-- **Drop:** Daily set of five questions released at 07:00 IST.
-- **Picks:** A user's five chosen answers.
-- **Twin:** Closest matching player for that Drop.
-- **Oddness:** Total information content $I = \sum -\log_2(p(a))$ of a player's choices.
-- **Rarity Percentile:** Percentage of players today with lower oddness.
-- **Recap:** Final locked summary of yesterday's Drop.
-- **Twin Day:** The 24-hour cycle from 07:00 IST to 06:59:59 IST.
-- **Stage A Matching:** In-memory brute-force pairwise calculation for up to 10k players.
-s twin is $B$ and $B and Monetisation Philosophy
-
-### 12.1 Phase-1: Pure Focus on Retention
-
-For the first six months, Oddly generates zero revenue. Success is measured purely by completion rates, organic K-factor, and D7/D30 retention. Daily play will **always remain 100% free**.
-
-### 12.2 Future Monetisation (v1.5+)
-
-- **Oddly Plus (Subscription):** Hypothesized at ₹79/month (~$0.99/mo). Includes 2 monthly streak freezes, full historical archive access, and bespoke share card colorways.
-- **Sponsored Daily Questions (v2.0):** At > 20,000 DAU, offer a single, tasteful, clearly labelled sponsored question per week (e.g., _"Filter coffee vs. Cold brew"_ sponsored by a coffee roaster).
-- **Aggregate Insights (v2.0):** Anonymized cultural trend reports at > 100,000 DAU.
-
-### 12.3 What Oddly Will NEVER Sell
-
-1. Individual user answers or pick vectors.
-2. Identifiable user records, email addresses, phone numbers, or device IDs.
-3. Precise geolocation data.
-4. Any demographic segment representing fewer than 1,000 individuals.
+- **Purpose:** Recognize the rare, delightful occurrence when two players match as twins across multiple distinct lanes on the same calendar day, and adapt connection features (Globe, Keep/Orbit, Telepathy, Anti-twin) to be lane-aware.
+- **Super Twin Mechanics:**
+  - Triggered when player A and player B are paired as twins in **2 or more lanes** on the same date, or achieve $\ge 0.80$ similarity across $\ge 2$ lanes.
+  - Distinct tactile card face: dual-accent split border celebrating both lanes (e.g. Everyday Cream + Memes Electric Yellow).
+  - Copy explicitly celebrates the intersection: "Super Twin: Twinned in Memes and Everyday!"
+  - Rare by construction: never forced or artificially inflated.
+- **Lane-Aware Connection Features:**
+  - *Globe (F19):* Arcs are lane-specific. Interactive lane filter chips (Everyday default). Small lanes hide arcs to maintain $k$-anonymity.
+  - *Keep & Orbit (F18):* A Keep request is made from a specific lane Drop. The resulting Orbit displays a Universal Lane Chip. Subject sync (F28) reflects the originating lane. Overall active Orbit cap remains unchanged.
+  - *Telepathy (F20):* Operates across any lane for questions with $\le 4$ options (`pick1`, `scene`).
+  - *Anti-Twin (F22):* Computed strictly within the lane cohort.
+- **Exact Copy Keys (`app_content`):**
+  - `supertwin.badge`: "Super Twin"
+  - `supertwin.headline`: "Double Alignment!"
+  - `supertwin.copy`: "You and this person were twins in both {{lane1}} and {{lane2}} today."
+  - `globe.filter.all_lanes`: "All Lanes"
+- **Data Produced:** `super_twin_results` (`player_a_id`, `player_b_id`, `drop_date`, `lane_ids`, `mean_similarity`).
+- **Feature Flags & Config:** `super_twin_enabled` (bool), `super_twin_min_lanes` (2), `super_twin_threshold` (0.80).
+- **Success Metrics:** Super twin card share rate $\ge 35\%$; zero false positive lane collisions.
+- **Out of Scope:** Paid super twin boosts, guaranteed super twins.
 
 ---
 
-## 13. Safety, Legal, and Privacy Framework
+### F39 Brain Lane (Stage L8, Documented Only)
 
-> **DISCLAIMER:** _This document does not constitute formal legal advice. A formal review by qualified legal counsel is required prior to public commercial launch._
-
-### 13.1 Compliance with India's DPDP Act 2023
-
-- **Age Restriction (18+):** Under the Digital Personal Data Protection Act 2023, processing data of minors requires verifiable parental consent. Oddly restricts service strictly to users aged 18 and older via explicit gatekeeping.
-- **Data Minimisation:** No real names, avatars, free-text chats, or exact GPS coordinates are gathered.
-- **Purpose Limitation & Consent:** Granular, separate opt-in consent for notifications and analytics.
-- **Right to Erasure & Portability:** Native in-app buttons for one-click JSON data export and account deletion.
-
-### 13.2 Online Gaming Regulations (India 2025)
-
-Oddly involves zero real-money stakes, zero entry fees, and zero financial payouts. It is classified as an entertainment micro-game, exempt from real-money gaming restrictions.
-
----
-
-## 14. Risks Register and Open Founder Decisions
-
-### 14.1 Key Risks & Mitigations
-
-1. **Low Density at Launch (Cold Start Problem):** If only 50 people play, twins will feel weak.
-   _Mitigation:_ Honest UI messaging (_"Closest so far"_) and emphasis on the personal Oddness rarity score.
-2. **Bot Infiltration & Timing Attacks:** Scripted bots flooding the API to distort probability weights.
-   _Mitigation:_ Cloudflare Turnstile bot challenges, rate limiting, and minimum-answer-time thresholds (< 3 seconds flagged).
-3. **Launch-Spike Outage at 07:00 IST:** Simultaneous countdown expiration and push notification openings causing a severe connection storm.
-   _Mitigation:_ Immutable Drop JSON pre-staged at 06:30 IST; Cloudflare origin shielding; client-side randomized jitter (0 to 4 s); staggered push dispatch in 5k slices.
-4. **Viral Surge Overload:** Sudden spike when a prominent influencer shares a card (up to 500,000 visitors in 10 minutes).
-   _Mitigation:_ Static share landing pages (`/c/:shortId`) cached at edge for 24h with > 95% edge hit ratio; origin processing strictly bounded.
-5. **Client Retry Storms:** Network hiccup causing tens of thousands of mobile clients to retry simultaneously in lockstep.
-   _Mitigation:_ Exponential backoff with full jitter on client; `@fastify/under-pressure` load shedding; strict adherence to HTTP `Retry-After`.
-6. **Cost Runaway:** Command-priced cloud services or unmonitored autoscaling generating bill shock.
-   _Mitigation:_ Hard autoscaling instance caps per tier; fixed-price Redis instances; strict telemetry sampling (1–5%); automated budget alerts at 150% of forecast.
-7. **Bad Deploy During Morning Peak:** Uncoordinated release during the 07:00 IST window taking down the live drop.
-   _Mitigation:_ Mandatory **deploy freeze** from 06:30 to 08:30 IST daily and anytime system is at L2+; automated canary analysis with instant rollback.
-8. **Submission Data Loss:** Database crash during high-concurrency ingestion.
-   _Mitigation:_ Strict idempotency via `request_id`; client persistence in localStorage until acknowledged; dual-mode ingestion (Mode B async persist at peak); continuous PITR database backups.
-
-### 14.2 Open Decisions for the Founder
-
-1. **Brand Trademark & Domain:** Formal availability clearance for "Oddly" (vs. "Twinly" or "SameHere").
-2. **SMS Provider Selection (for Phone OTP):** Approval of SMS gateway (e.g., Twilio, Gupshup) and DLT registration in India when Phone OTP is unflagged.
-3. **Legal Counsel Sign-Off:** Review of Draft Privacy Notice and Terms of Service.
-
----
-
-## 15. Product Glossary
-
-- **Drop:** Daily set of five questions released at 07:00 IST.
-- **Picks:** A user's five chosen answers.
-- **Twin:** Closest matching player for that Drop.
-- **Oddness:** Total information content $I = \sum -\log_2(p(a))$ of a player's choices.
-- **Rarity Percentile:** Percentage of players today with lower oddness.
-- **Recap:** Final locked summary of yesterday's Drop.
-- **Twin Day:** The 24-hour cycle from 07:00 IST to 06:59:59 IST.
-- **Stage A Matching:** In-memory brute-force pairwise calculation for up to 10k players.
-s twin is $A$. Leftover players receive their best twin with `is_mutual = false`.
-- **Honest Group Size Display:** Copy states: *"4 of 5 with a person in Lagos, 18 to 24. 312 people matched you this way."* Never claim a unique twin when $T > 1$. Exact counts shown below 1,000; "1,000+" above.
-
----
-
-### 11C.5 F35: Memes Lane Launch (v1, Stage L4)
-- **Purpose:** First non-Everyday lane at launch. Consumes F24 meme templates, caption picks, and rating questions.
-- **Structure:** Daily Drop blends `pick1` caption picks, `pick2of6` template pairings, and `slider7` humor ratings.
-- **Distinction:** F24 defines the meme question type; F35 defines the dedicated subject lane.
-
----
-
-### 11C.6 F36: Situations Lane (Stage L5, Built on Founder Command)
-- **Purpose:** "What would you do" social dilemmas exploring reaction styles safely (Rule L7).
-- **Version 1 (Cards):** Illustrated scenes with 3–5 reaction cards mapping to closed neutral style tags (*Calm, Playful, Shy, Bold, Guarded, Over-the-moon, Deflecting, Curious*).
-- **Safety Invariants:** No gender/orientation assumptions, no persistent pursuit or pressure, playful non-judgmental style labels (never "simp", "desperate", "loser", or "sigma"), no romantic/dating contact paths, mandatory admin scenario safety checklist.
-
----
-
-### 11C.7 F37: Say It — Typed Answers Matched by Meaning (Stage L6, Gated by Gate G4)
-- **Purpose:** Allow short typed answers ($le 80$ characters) compared purely by meaning using a self-hosted multilingual model.
-- **Pipeline:** Normalization $\rightarrow$ PII/Abuse screening $\rightarrow$ CPU ONNX embedding (e.g. `paraphrase-multilingual-MiniLM-L12-v2`) $\rightarrow$ Closed archetype centroid tagger $\rightarrow$ Calibrated cosine similarity $\rightarrow$ Neighbour search.
-- **Privacy & Retention (Rule L5):** Raw text purged after 7 days; embeddings and archetypes purged after 28 days; never sent to third-party APIs; never shown to other players.
-- **Gate G4 Pre-conditions:** Founder approval, admin queue (B6), $ge 300$ evaluation pairs ($ge 80\%$ human agreement, macro-F1 $ge 0.75$), legal review, load test.
-
----
-
-### 11C.8 F38: Super Twin & Lane-Aware Connection Features (Stage L7, Built on Command)
-- **Super Twin:** Awarded when two players complete 2 or more shared lanes on the same day and are twins in both (or achieve $ge 0.8$ similarity in both). Features a distinct card face naming the shared lanes (*"Twins in Memes and Everyday"*).
-- **Lane-Aware Features:** Globe displays lane filter chips; Keep requests and Orbits are tagged with `lane_id`; Telepathy functions in any lane for $le 4$-option questions; Anti-twin computed per lane.
-
----
-
-### 11C.9 F39: Brain Lane (Stage L8, Documented Only)
-- Knowledge-based questions where twin matches on shared right and wrong answers.
-- Documented only due to anti-cheat, search-engine lookups, and question verification complexity.
+- **Purpose:** Knowledge and trivia dilemma lane where "twin" means something unique: you made the **same intuitive leaps and the exact same mistakes**.
+- **Status:** Documented only; unscheduled for implementation. Preserved for architectural completeness and future roadmap evaluation.
 
 ## 12. Business Model and Monetisation Philosophy
 
@@ -1184,6 +1082,13 @@ For the first six months, Oddly generates zero revenue. Success is measured pure
 
 ---
 
+### 12.4 Lane Parity Rule (Rule L8)
+Under no circumstances will Oddly paywall any lane or offer paid matching advantages:
+- Every open lane is 100% free to play for all users.
+- Paid subscribers never receive preferential matching, larger candidate pools, or artificial twin boosts.
+- Monetisation is strictly limited to cosmetic tactile customization, archive exploration, and supporter badges (Phase 10K).
+
+
 ## 13. Safety, Legal, and Privacy Framework
 
 > **DISCLAIMER:** _This document does not constitute formal legal advice. A formal review by qualified legal counsel is required prior to public commercial launch._
@@ -1232,11 +1137,27 @@ Oddly involves zero real-money stakes, zero entry fees, and zero financial payou
 
 ## 15. Product Glossary
 
-- **Drop:** Daily set of five questions released at 07:00 IST.
-- **Picks:** A user's five chosen answers.
-- **Twin:** Closest matching player for that Drop.
-- **Oddness:** Total information content $I = \sum -\log_2(p(a))$ of a player's choices.
-- **Rarity Percentile:** Percentage of players today with lower oddness.
-- **Recap:** Final locked summary of yesterday's Drop.
-- **Twin Day:** The 24-hour cycle from 07:00 IST to 06:59:59 IST.
-- **Stage A Matching:** In-memory brute-force pairwise calculation for up to 10k players.
+| Term | Definition |
+|---|---|
+| **Anti-Twin** | The player whose answers across today's Drop were mathematically most dissimilar to yours ($S \le 0.20$), celebrating cosmic opposites. |
+| **BitMinHash Signature** | A 32-byte compact sketch used to evaluate 28-day historical agreement between players without storing or comparing raw answer matrices. |
+| **Daily Drop** | The synchronized 5-question experience released daily at 07:00 IST for each active lane. |
+| **Early Lane** | A live lane with fewer than *config* 500 daily active players, transparently flagged with an Early Lane chip. |
+| **Everyday Lane** | The default, universal Oddly lane accessible to first-time visitors with zero friction or account creation. |
+| **Gate L-A** | The mandatory product gate requiring Founder sign-off, $\ge 8$ approved Drops, safety audit, and $\ge 3,000$ global DAU before opening a new lane. |
+| **Gate G4** | The strict readiness gate governing the introduction of free-text (`say_it`) questions. |
+| **Honest Group Size ($T$)** | The exact or banded count of players who achieved identical top similarity scores with a player ("312 people matched you this way"). |
+| **Information Content ($I(a)$)** | The rarity metric of an answer option: $I(a) = \log_2(1 / p(a))$. Rarer answers carry higher matching weight. |
+| **Lane** | A dedicated thematic subject track (e.g. Everyday, Memes, Situations). All questions, Drops, twins, and stats are strictly lane-isolated. |
+| **Mutual Twin** | A twin relationship where player A is player B's top match and player B is player A's top match (`is_mutual = true`). |
+| **Oddness Tier** | The rarity percentile of a player's answer combination compared to all daily players in that lane (Tier 1: 0-20% Common through Tier 5: 95-100% Cosmic Unicorn). |
+| **Orbit** | A persistent mutual connection between two players formed via reciprocal Keeps, allowing ongoing mutual sync tracking. |
+| **Provisional Twin** | The best available twin match computed instantly upon Drop submission, refined during morning recap. |
+| **Resting Lane** | A lane that has no approved Drop scheduled for the current calendar day; displays countdown to next release. |
+| **Richer Formats** | The polymorphic question formats (`pick1`, `pick2of6`, `rank3`, `slider7`, `scene`, `say_it`) designed to expand the answer outcome space. |
+| **Say It** | The 80-character free-text question format compared via self-hosted sentence embeddings, gated behind Gate G4. |
+| **Situations** | The reaction-style lane exploring social scenarios through illustrated cards and behavioral style archetypes. |
+| **Style Archetype** | A non-evaluative, descriptive behavioral style label in the Situations lane (e.g. Calm, Playful, Shy). |
+| **Super Twin** | The rare occurrence where two players match as twins in two or more distinct lanes on the exact same date. |
+| **Telepathy** | Real-time live synchronization reveal when two players in an active Orbit answer a question identically. |
+| **Tie Group** | The cohort of players whose similarity score to a given player falls within $\epsilon = 0.01$ of the top match. |
