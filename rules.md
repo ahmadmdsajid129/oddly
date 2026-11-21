@@ -1,6 +1,6 @@
 # Rules and Operating Standards — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-07 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-21 | Owner: Founder + AI agent
 Purpose of this file: Immutable operational rules, coding standards, error-handling protocols, security policies, and Definition of Done for all development.
 
 ---
@@ -9,7 +9,7 @@ Purpose of this file: Immutable operational rules, coding standards, error-handl
 
 1. **Stop After Every Stage:** You must NEVER build multiple stages in one turn. Complete the assigned stage, update `task.md` and `memory.md`, emit the Stage Report, and immediately STOP. Wait for the Founder's explicit instruction (e.g., _"proceed to Stage N"_).
 2. **Never Fake Data or Matches:** Never synthesize fake players, simulated twins, fabricated odds, or deceptive countdown timers in production code. If data is sparse (< 200 players), declare it openly (_"Closest so far: N of 5. More people are playing."_).
-3. **No Free-Text User Input:** Prevent abuse architecturally. Users choose exclusively from structured options (tiles, numbers, colours, words, images). The only allowed user-submitted text is the optional 140-character report note on `/v1/reports`, strictly accessible to administrators.
+3. **No Free-Text User Input:** Prevent abuse architecturally. Users choose exclusively from structured options (tiles, numbers, colours, words, images). The only allowed user-submitted text is the optional 140-character report note on `/v1/reports`, strictly accessible to administrators. *(Cross-reference: See Rule 18 for the Meme Lab user caption exception [Stage M3] and Rule L5 for the Say It free-text semantic matching exception [Stage L6 / Gate G4].)*
 4. **Never Expose Identifiers or Vectors:** Never expose another user's user ID, IP address, device ID, push subscription, raw answer vector, or exact GPS coordinates via any API route, card, or public view. Twin views display only coarse region (k-anonymity $\ge 20$), age band ($\ge 20$), and the matched pick labels. *Exception:* Within an active Orbit, and only for the single designated Telepathy question after the viewer's own guess is locked, the partner's pick label may be shown to the viewer. No other pick, identifier or vector is ever exposed.
 5. **Never Commit Secrets:** API keys, database credentials, VAPID private keys, and Turnstile secrets must strictly reside in `.env` (gitignored). Provide dummy placeholder values in `.env.example` only.
 6. **Strict MVP Scope Boundaries:** Never build features in the OUT OF SCOPE list (chat, user profiles, leaderboards, real-money betting, native mobile apps, friends groups, wave, premium billing) without explicit written Founder approval. *(Founder approval recorded 2026-11-14: F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin approved for v1; F22 Oddly Deck and F23 Friend-invite Orbit documented for v1.5; handle swap, DMs, contact exchange permanently Not Planned; F12 Wave superseded by F19).*
@@ -217,7 +217,7 @@ The question curation tool and JSON importer reject or flag questions touching:
 1. **Religion & Faith:** Beliefs, rituals, deities, religious holidays, sacred texts.
 2. **Caste & Community:** Caste distinctions, reservations, community stereotypes.
 3. **Electoral & Partisan Politics:** Political parties, leaders, elections, government policies.
-4. **Sexuality & Romance:** Sexual habits, relationship history, adult content.
+4. **Sexuality & Romance:** Sexual habits, relationship history, adult content. *(Situations Lane Clarification: Social dilemma scenes—such as "someone you have been noticing at work or campus walks up to talk to you"—must maintain strictly platonic, social, and conversational framing. Zero romantic pursuit, zero dating framing, zero sexual subtext. Scenarios focus purely on social reaction style and conversational etiquette, strictly preserving compliance with this rule.)*
 5. **Medical & Mental Health:** Diagnoses, medication, physical ailments, disabilities.
 6. **Body Image & Physical Appearance:** Weight, height, skin tone, beauty standards.
 7. **Living Individuals:** Real celebrities, influencers, public figures.
