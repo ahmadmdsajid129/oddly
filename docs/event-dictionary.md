@@ -42,6 +42,20 @@
 | `push_optin` | `status: "granted" \| "denied"` | Push notification opt-in funnel | `push_stats` |
 | `perf_vitals` | `lcp_ms: number`, `inp_ms: number`, `cls: number`, `device_class: "low" \| "mid" \| "high"`, `connection_type: "4g" \| "3g" \| "wifi"` | Real-user performance monitoring on target budget devices | `performance_vitals_daily` |
 | `meme_rated` (M3+) | `meme_id: string (uuid)`, `rating: "funny" \| "not_for_me"` | Community humor taste and Wilson score calculation | `meme_stats`, `player_taste` |
+| `lane_viewed` | `open_lanes_count: number`, `last_played_lane: string \| null` | Home lane picker impressions and lane exposure | `lane_funnel_stats` |
+| `lane_selected` | `lane_slug: string`, `position_index: number` | Lane selection preference and picker rank conversion | `lane_funnel_stats` |
+| `lane_switched` | `from_lane: string`, `to_lane: string` | Cross-lane exploration and secondary play | `lane_funnel_stats` |
+| `lane_interest_tapped` | `lane_slug: string` | Demand signal for planned/coming-soon lanes | `lane_interest_stats` |
+| `lane_resting_seen` | `lane_slug: string` | Frequency of resting-state encounters | `lane_health_stats` |
+| `format_interacted` | `format: "pick1" \| "pick2of6" \| "rank3" \| "slider7" \| "scene" \| "say_it"`, `duration_bucket: "0-5s" \| "5-15s" \| "15-30s" \| ">30s"` | Interaction engagement across polymorphic formats | `format_performance_stats` |
+| `rank_reordered_count` | `moves_count: number` | Rank3 interaction depth and drag vs. tap usability | `format_performance_stats` |
+| `slider_moved_count` | `adjustments_count: number` | Slider7 precision and thumb movement frequency | `format_performance_stats` |
+| `text_started` | `lane_slug: string` | Say it composer initiation (strictly ZERO text content) | `say_it_funnel_stats` |
+| `text_submitted` | `length_bucket: "1-20" \| "21-50" \| "51-80"` | Say it answer length distribution (strictly ZERO text content) | `say_it_funnel_stats` |
+| `text_rejected` | `reason_class: "pii" \| "blocklist" \| "length"` | Moderation screening filter efficacy | `say_it_moderation_stats` |
+| `tie_group_seen` | `size_band: "1" \| "2-10" \| "11-50" \| "51-200" \| "201-1000" \| "1000+"` | Honest tie-group size exposure to players | `tie_group_telemetry` |
+| `why_you_two_opened` | `rare_matches_count: number` | Player interest in rare-answer tie-break explanations | `result_depth_stats` |
+| `super_twin_seen` | `shared_lanes_count: number`, `lanes_list: string[]` | Super twin celebration card views and virality | `super_twin_stats` |
 
 ---
 
