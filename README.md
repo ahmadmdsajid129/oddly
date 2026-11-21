@@ -7,9 +7,9 @@
 
 ## 1. What Oddly Is
 
-Oddly drops five instinct-driven questions every day at 07:00 IST—the exact same five for everyone on Earth. You answer with no profiles, no quizzes to study for, and no followers to chase. Immediately, Oddly computes your **Twin**: the one stranger anywhere in the world who answered most like you today. It also computes your **Oddness**: an information-theoretic rarity score based on real observed probability.
+Oddly drops five instinct-driven questions every day at 07:00 IST per subject **Lane** (Everyday, Memes, and future planned tracks). Within a lane, questions are identical for all players globally (Rule L1). First-time visitors route straight into the Everyday Drop in ~30 seconds with zero login or survey (Rule L10). Returning players can pick any open lane. Matching is strictly lane-isolated (Rule L2): your Memes twin is someone who also played Memes today.
 
-Oddly intentionally eliminates chat, public leaderboards, direct messages, and user photos. The result itself is the product. Approved v1 features also include the **Twin Globe** (F18: ambient map of twins forming worldwide), **Keep & Orbit** (F19: mutual anonymous connection to preserve twin bonds across daily drops), **Telepathy** (F20: daily instinct sync inside an Orbit), **Anti-Twin** (F21: discovering your playful opposite today), **Meme Questions & Themed Drops** (F24: culturally resonant instinct prompts), and **Signals Foundation** (F25: consented first-party question-quality telemetry). Handle swaps, DMs, image uploads, and contact exchange are permanently Not Planned.
+Richer question formats (`pick2of6`, `rank3`, `slider7`, `scene`) expand the answer outcome space, while 28-day BitMinHash history tie-breaking and greedy mutual pairing ensure authentic, bidirectional twins and transparent honest group sizes ("312 people matched you this way"). Approved connection features include the **Twin Globe** (F19: ambient map of twins forming worldwide), **Keep & Orbit** (F18: mutual anonymous connection preserving twin bonds across daily drops), **Telepathy** (F20: daily instinct sync inside an Orbit), **Anti-Twin** (F22: discovering your playful opposite today), **Super Twin** (F38: rare same-day cross-lane alignment), and **Signals Foundation** (F25: consented first-party question-quality telemetry). Handle swaps, DMs, image uploads, dating/contact features, and political topics are permanently Not Planned.
 
 ---
 
@@ -77,6 +77,10 @@ The architecture and operational standards are fully articulated across six foun
 | **Connection Features**    | [`docs/connection-features.md`](./docs/connection-features.md) | Architectural analysis, DPDP compliance, scale projections, and threat models for F18–F23.            |
 | **Event Dictionary**       | [`docs/event-dictionary.md`](./docs/event-dictionary.md) | Allowlisted event dictionary, telemetry schemas, priority lanes, and DPDP consent policies for F25.    |
 | **Memes & Insights Features** | [`docs/meme-and-insights-features.md`](./docs/meme-and-insights-features.md) | Feasibility analysis, legal review requirements, Wilson scoring, and capacity math for F24–F31.        |
+| **Lanes & Matching Specification** | [`docs/lanes-and-matching.md`](./docs/lanes-and-matching.md) | Full mathematical derivations, format similarity functions, synthetic tie-size simulation tables, and greedy mutual pairing algorithm for F32–F34. |
+| **Say It Text Answers Specification** | [`docs/say-it-text-answers.md`](./docs/say-it-text-answers.md) | End-to-end 7-step pipeline, self-hosted ONNX model benchmarks, Gate G4 criteria, and DPDP retention lifecycle for F37. |
+| **Situations Lane Guidelines** | [`docs/situations-lane-guidelines.md`](./docs/situations-lane-guidelines.md) | Rule L7 editorial guide, scenario checklist, approved style labels, and zero-shaming invariants for F36. |
+| **Stage L0 Report** | [`docs/stage-L0-report.md`](./docs/stage-L0-report.md) | Authoritative analysis and delivery report for Stage L0 (Lanes, Richer Formats, Twin Depth, and Text Answers). |
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**
 
