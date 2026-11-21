@@ -122,3 +122,36 @@ In alignment with Oddly's core brand promise (*"Real numbers only"*):
 3. **Zero Fabricated Opposites in Anti-Twin:**
    - If today's player pool is under 200 submissions, Anti-twin is gracefully hidden with honest copy: *"Not enough players yet today to find a genuine opposite. Check back this evening."*
 
+
+---
+
+## 8. Stage L0 Amendments: Lane-Aware Connection Features (2026-11-21)
+
+### 8.1 Rule L2 Lane Isolation Invariant
+Under Rule L2 (Founder-approved, L0), every connection artifact—Twin Globe arc, Keep request, Orbit relationship, Telepathy round, and Anti-twin comparison—belongs to **exactly one lane**, and that lane is explicitly displayed. The only cross-lane construct in Oddly is the **Super Twin** (F38).
+
+### 8.2 Per-Feature Lane Adaptations
+
+1. **F18 Twin Globe:**
+   - Visualizes live and replayed connection arcs with a top **Lane Filter Bar** (Everyday default, Memes, etc.).
+   - Arcs and counts are strictly lane-isolated.
+   - If a lane has fewer than 50 submissions in the trailing 5-minute window, arcs for that lane are suppressed or switch to that lane's yesterday replay buffer in compliance with $k \ge 20$ anonymity.
+
+2. **F19 Keep & Orbit:**
+   - A player can send 1 Keep request per completed lane Drop (e.g. if playing Everyday and Memes, up to 1 Keep each).
+   - The resulting Orbit relationship record stores `lane_id`.
+   - The global player cap of **3 active Orbits** remains strictly enforced at the account level across all lanes combined, preventing social sprawl.
+   - Subject-Sync (F28) utilizes the Orbit's originating lane as its primary anchor.
+
+3. **F20 Telepathy (Instinct Alignment):**
+   - Operates independently within any lane for questions conforming to $\le 4$ options (`pick1`, `scene`).
+   - Agreement scores and luck baselines are computed from that lane's specific answer distribution.
+
+4. **F21 Anti-Twin:**
+   - Anti-twin search scans a bounded sample of 2,000 candidates strictly within the **same lane pool**.
+   - Answers and difference counts ("You differed on N of 5") reflect only that lane's Drop.
+
+5. **F38 Super Twin (Cross-Lane Feature):**
+   - Evaluated during the 07:05 IST final recap for players completing 2 or more shared lanes on the same calendar date.
+   - Awarded when two players achieve twin status (or $\ge 0.8$ similarity) in at least 2 distinct lanes.
+   - Generates a distinct holographic dual-accent share card naming both lanes explicitly (*"Twins in Everyday & Memes"*).
