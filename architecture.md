@@ -633,3 +633,331 @@ All daily tables are range-partitioned by `drop_date` from day one, matching exi
 - **Context:** Personalising secondary surfaces must not violate the core product principle that the daily five questions are globally identical.
 - **Decision:** Personalisation applies exclusively to non-Drop surfaces (optional Meme Corner card ordering, notification send-hour cohorts, suggested share card themes). The daily Drop questions remain 100% identical worldwide. Derive taste affinities purely through explainable statistics (smoothed rating percentages), never opaque ML models or sensitive attribute inferences. Enforce instant hard deletion of `player_taste` records upon consent withdrawal.
 - **Consequence:** Protects the collective shared cultural ritual of the Drop while providing personalized utility on secondary screens in full compliance with privacy rules.
+
+
+---
+
+## 18. Lanes, Richer Formats, Twin Depth and Text Answers (Stage L0)
+
+### 18.1 Architectural Overview & Core Invariants
+Stage L0 expands Oddly from a single monolithic daily Drop into subject-isolated **Lanes** (`lanes`). The system maintains a shared global clock (07:00 IST open, 24-hour window, 07:05 IST recap) while evaluating matching independently within each lane.
+
+1. **Rule L1 (Lane Drop Identity):** Within a lane, all five questions of a Drop are identical for every player across the globe. Personalization never changes questions or their order within a lane.
+2. **Rule L2 (Lane Isolation):** Twins, Anti-twins, Globe arcs, and Orbits belong strictly to one lane. Cross-lane matching occurs solely via **Super Twin** (F38).
+3. **Rule L8 (Lane Parity):** All lanes are 100% free and unpaywalled. Paid features cannot alter matching.
+4. **Rule L10 (First-Run Promise):** New visitors bypass lane pickers and enter the **Everyday** lane directly.
+5. **Rule L5 & Gate G4:** Free-text answers (`say_it`) run on a self-hosted CPU ONNX embedding model and are gated behind Gate G4 (inactive in v1).
+
+---
+
+### 18.2 Relational Data Model Proposal
+
+#### 18.2.1 New Tables
+
+```sql
+-- 1. lanes — Subject Drop Catalog & Configuration
+CREATE TABLE IF NOT EXISTS lanes (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  slug VARCHAR(50) UNIQUE NOT NULL, -- 'everyday', 'memes', 'gaming', etc.
+  name_key VARCHAR(100) NOT NULL,
+  description_key VARCHAR(150) NOT NULL,
+  accent_token VARCHAR(50) NOT NULL, -- e.g. 'violet', 'sun', 'mint', 'coral'
+  icon_key VARCHAR(50) NOT NULL,     -- from illustration registry
+  status VARCHAR(20) NOT NULL DEFAULT 'planned', -- 'planned', 'preview', 'open', 'resting', 'retired'
+  sort_order INT NOT NULL DEFAULT 100,
+  age_rating VARCHAR(10) NOT NULL DEFAULT '18+',
+  locale_set JSONB NOT NULL DEFAULT '["en", "hi"]'::jsonb,
+  formats_allowed JSONB NOT NULL DEFAULT '["pick1", "pick2of6", "slider7"]'::jsonb,
+  text_enabled BOOLEAN NOT NULL DEFAULT false,
+  super_twin_enabled BOOLEAN NOT NULL DEFAULT true,
+  gate_notes TEXT,
+  opened_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_lanes_status ON lanes(status);
+
+-- 2. lane_interest — Aggregate Opt-In for Planned Lanes ("Tell me when it opens")
+CREATE TABLE IF NOT EXISTS lane_interest (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  player_id TEXT REFERENCES players(id) ON DELETE CASCADE,
+  guest_id VARCHAR(100),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_lane_interest_player UNIQUE (lane_id, player_id)
+);
+CREATE INDEX IF NOT EXISTS idx_lane_interest_lane ON lane_interest(lane_id);
+
+-- 3. player_lane_prefs — Notification & History Toggles per Lane
+CREATE TABLE IF NOT EXISTS player_lane_prefs (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  notify BOOLEAN NOT NULL DEFAULT false,
+  last_played_at TIMESTAMPTZ,
+  plays_count INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_player_lane_prefs UNIQUE (player_id, lane_id)
+);
+CREATE INDEX IF NOT EXISTS idx_player_lane_prefs_player ON player_lane_prefs(player_id);
+
+-- 4. lane_history_signature — Compact 32-Byte Rolling Agreement Signature
+CREATE TABLE IF NOT EXISTS lane_history_signature (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  window_end DATE NOT NULL,
+  days_counted INT NOT NULL DEFAULT 0,
+  signature BYTEA NOT NULL, -- 32-byte BitMinHash compact signature
+  model_version INT NOT NULL DEFAULT 1,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_lane_history_signature UNIQUE (player_id, lane_id)
+);
+CREATE INDEX IF NOT EXISTS idx_lane_history_sig_lookup ON lane_history_signature(lane_id, player_id);
+
+-- 5. answer_text (Stage L6 / Gate G4 — Documented Only)
+CREATE TABLE IF NOT EXISTS answer_text (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  answer_id TEXT NOT NULL UNIQUE,
+  lang VARCHAR(10) NOT NULL DEFAULT 'en',
+  moderation_status VARCHAR(20) NOT NULL DEFAULT 'ok', -- 'ok', 'held', 'rejected_pii', 'rejected_abuse'
+  raw_text VARCHAR(100), -- purged after 7 days
+  embedding BYTEA,       -- 384-dim float32 / int8 quantized vector (purged after 28 days)
+  embedding_model_version VARCHAR(50) NOT NULL DEFAULT 'paraphrase-multilingual-minilm-l12-v2',
+  archetype_id TEXT,
+  archetype_confidence FLOAT,
+  purge_raw_at TIMESTAMPTZ NOT NULL,
+  purge_all_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_answer_text_purge_raw ON answer_text(purge_raw_at) WHERE raw_text IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_answer_text_purge_all ON answer_text(purge_all_at);
+
+-- 6. text_archetypes (Stage L6 / Gate G4 — Documented Only)
+CREATE TABLE IF NOT EXISTS text_archetypes (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  question_scope VARCHAR(50),
+  key VARCHAR(50) NOT NULL,
+  label_key VARCHAR(100) NOT NULL,
+  description_key VARCHAR(150) NOT NULL,
+  centroid BYTEA NOT NULL,
+  example_replies JSONB NOT NULL DEFAULT '[]'::jsonb,
+  version INT NOT NULL DEFAULT 1,
+  status VARCHAR(20) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_text_archetypes_key UNIQUE (lane_id, key, version)
+);
+
+-- 7. style_tags (Stage L5 — Situations Cards)
+CREATE TABLE IF NOT EXISTS style_tags (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  key VARCHAR(50) NOT NULL, -- e.g. 'calm', 'playful', 'shy', 'bold'
+  label_key VARCHAR(100) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_style_tags_key UNIQUE (lane_id, key)
+);
+
+-- 8. super_twin_results (Stage L7 — Built on Command)
+CREATE TABLE IF NOT EXISTS super_twin_results (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  partner_player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  drop_date DATE NOT NULL,
+  lanes JSONB NOT NULL, -- ['everyday', 'memes']
+  score FLOAT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_super_twin UNIQUE (player_id, drop_date)
+);
+CREATE INDEX IF NOT EXISTS idx_super_twin_date ON super_twin_results(drop_date);
+```
+
+#### 18.2.2 Altered Tables (Expand-Only)
+- `drops`: Add `lane_id TEXT REFERENCES lanes(id)`. Unique constraint changed from `UNIQUE(drop_date)` to `UNIQUE(lane_id, drop_date)`. Backfilled to Everyday lane (`lane_id = '00000000-0000-4000-a000-000000000001'`).
+- `questions`: Add `lane_id TEXT REFERENCES lanes(id)`, `format VARCHAR(20) DEFAULT 'pick1'`, `options JSONB`, `subject_tags JSONB`, `scene_asset_key VARCHAR(100)`, `entropy_estimate FLOAT`, `tie_risk_estimate FLOAT`.
+- `submissions` & `answers`: Add `lane_id TEXT`. Answer values accept scalar integers, arrays (for `pick2of6` and `rank3`), and text foreign keys (`answer_text_id`).
+- `twin_results`: Add `lane_id TEXT`, `tie_group_size INT DEFAULT 1`, `is_mutual BOOLEAN DEFAULT true`, `tie_break_reason VARCHAR(30) DEFAULT 'similarity'`, `questions_compared INT DEFAULT 5`, `history_days INT DEFAULT 0`.
+- `twin_keeps`, `orbits`, `orbit_expressions`, `telepathy_guesses`: Add `lane_id TEXT`. An Orbit inherits the lane of the originating Keep.
+- `events_raw`, `question_stats_daily`, `tag_stats_daily`: Add `lane_id` dimension.
+
+#### 18.2.3 Storage Growth Estimates Across Tiers
+| Metric | 10k DAU (1 lane / 2 lanes) | 100k DAU (1 lane / 2 lanes) | 10 Lakh DAU (1 lane / 2 lanes) |
+|---|---|---|---|
+| Daily Submissions Rows | 10k / 20k rows | 100k / 200k rows | 1.0M / 2.0M rows |
+| Daily Answers Rows | 50k / 100k rows | 500k / 1.0M rows | 5.0M / 10.0M rows |
+| Daily Database Size Growth | ~8 MB / ~16 MB | ~80 MB / ~160 MB | ~800 MB / ~1.6 GB |
+| History Signatures (32B/user) | 320 KB / 640 KB | 3.2 MB / 6.4 MB | 32 MB / 64 MB |
+
+---
+
+### 18.3 Redis Key Architecture & Eviction Policies
+
+| Redis Key Pattern | Role | TTL | Purpose |
+|---|---|---|---|
+| `lane:{slug}:players_today` | Counters | 24h | Approximate live player counter for lane header |
+| `lane:{slug}:answered:10m` | Counters | 10m | Sliding 10-minute rate counter for velocity spikes |
+| `lane:{slug}:drop:{date}` | Cache | 24h | Serialized Drop payload pre-staged for edge ingestion |
+| `lane:{slug}:top_neighbours:{playerId}` | Cache | 2h | Bounded $K=32$ candidate buffer during provisional matching |
+| `lane:{slug}:entropy:{date}` | Cache | 24h | Pre-computed option frequency distributions for information weighting |
+
+---
+
+### 18.4 Matching Mathematics & Worked Examples
+
+#### 18.4.1 Generalized Information-Weighted Similarity
+The overall similarity $S(P, Q)$ between two players on a lane Drop is the weighted mean of per-question similarities:
+$$S(P, Q) = \frac{\sum_{i=1}^{m} w_i \cdot s_i(a_{P,i}, a_{Q,i})}{\sum_{i=1}^{m} w_i}$$
+Where:
+- $w_i = \min\left(I(a_{P,i}), w_{max}\right)$ with $I(a) = \log_2(1 / p(a))$ and $w_{max} = 3.5$ (*config*).
+- $m$ is the number of valid compared questions (minimum 3 required).
+- If either player skipped or was rejected on question $i$, $w_i = 0$.
+
+#### 18.4.2 Format-Specific Similarity Functions ($s_i$)
+1. **`pick1` & `scene`:**
+   $$s(a_1, a_2) = \begin{cases} 1 & \text{if } a_1 = a_2 \\ 0 & \text{otherwise} \end{cases}$$
+2. **`pick2of6` (Jaccard Similarity over 2-item sets):**
+   $$s(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
+   Possible outcomes:
+   - Identical sets (2 shared): $|A \cap B| = 2, |A \cup B| = 2 \implies s = 1.0$
+   - Partial overlap (1 shared): $|A \cap B| = 1, |A \cup B| = 3 \implies s = 1/3 \approx 0.333$
+   - Disjoint sets (0 shared): $|A \cap B| = 0, |A \cup B| = 4 \implies s = 0.0$
+3. **`rank3` (Kendall Tau Distance Normalized):**
+   For rankings $R_1, R_2$ of 3 items, the Kendall distance $d_K(R_1, R_2) \in \{0, 1, 2, 3\}$:
+   $$s(R_1, R_2) = 1 - \frac{d_K(R_1, R_2)}{3}$$
+   - Identical ranking $[A, B, C]$ vs $[A, B, C]$: $d_K = 0 \implies s = 1.0$
+   - Single adjacent swap $[A, B, C]$ vs $[B, A, C]$: $d_K = 1 \implies s = 2/3 \approx 0.667$
+   - Two swaps $[A, B, C]$ vs $[B, C, A]$: $d_K = 2 \implies s = 1/3 \approx 0.333$
+   - Complete reversal $[A, B, C]$ vs $[C, B, A]$: $d_K = 3 \implies s = 0.0$
+4. **`slider7` (Linear Distance on 7-Point Spectrum):**
+   For points $v_1, v_2 \in \{1, 2, 3, 4, 5, 6, 7\}$:
+   $$s(v_1, v_2) = 1 - \frac{|v_1 - v_2|}{6}$$
+   - $v_1 = 4, v_2 = 4 \implies s = 1.0$
+   - $v_1 = 4, v_2 = 5 \implies s = 1 - 1/6 \approx 0.833$
+   - $v_1 = 1, v_2 = 7 \implies s = 1 - 6/6 = 0.0$
+5. **`say_it` (Semantic Calibrated Cosine + Archetype Match):**
+   $$s(t_1, t_2) = a \cdot \mathbb{I}(\text{arch}_1 = \text{arch}_2) + (1 - a) \cdot \text{calibrate}(\cos(e_1, e_2))$$
+   Where $a = 0.5$ (*config*), $\cos(e_1, e_2)$ is cosine similarity between 384-dimensional ONNX sentence embeddings, and $\text{calibrate}(c) = \max\left(0, \frac{c - c_{baseline}}{1 - c_{baseline}}\right)$.
+
+#### 18.4.3 Mathematical Properties Guaranteed
+- **Symmetry:** $s_i(a_1, a_2) = s_i(a_2, a_1) \implies S(P, Q) = S(Q, P)$.
+- **Boundedness:** $0.0 \le s_i \le 1.0 \implies 0.0 \le S(P, Q) \le 1.0$.
+- **Reflexivity:** $s_i(a, a) = 1.0 \implies S(P, P) = 1.0$.
+- **Monotonicity:** Agreement on rarer answers strictly yields $S(P, Q) > S(P, R)$ when common answers match.
+
+---
+
+### 18.5 Twin Depth: Bounded Tie-Groups & Mutual Pairing Algorithm
+
+#### 18.5.1 Tie-Group Resolution Pipeline
+When thousands of players complete a lane Drop, multiple candidates achieve identical top similarity. The engine evaluates candidates through a strict 4-step hierarchy:
+1. **Top Similarity Filter:** Select all candidates within $\epsilon = 0.01$ of the maximum similarity score.
+2. **Lane History Agreement Term:**
+   $$H(P, Q) = \frac{\sum_{d \in D_{shared}} S_{history}(P, Q, d)}{|D_{shared}|}$$
+   Evaluated efficiently via compact 32-byte BitMinHash signatures. Only computed if $|D_{shared}| \ge 5$ days in that lane; otherwise $H = 0$.
+3. **Cross-Country Preference:** Candidates from different countries are prioritized.
+4. **Deterministic Hash Tie-Breaker:** Reproducible hash:
+   $$\text{HashTie}(P, Q) = \text{HMAC-SHA256}\left(\text{drop\_id}, \min(P, Q) \parallel \max(P, Q)\right)$$
+
+#### 18.5.2 Mutual Pairing Algorithm (Greedy Maximum-Weight Pairing)
+To eliminate asymmetric "A twinned with B, but B twinned with C" anomalies, the final batch worker executes mutual pairing inside each candidate tie component:
+1. Construct candidate graph $G = (V, E)$ where vertices are players and edge weights $W(u, v) = S(u, v) + 0.1 \cdot H(u, v) + 0.01 \cdot \text{diffCountry} + 0.001 \cdot \text{hash}$.
+2. Sort edges $E$ in descending order of weight $W$.
+3. Maintain paired set $M = \emptyset$ and visited set $U = \emptyset$.
+4. For each edge $(u, v) \in E$:
+   - If $u \notin U$ and $v \notin U$:
+     - Pair $u$ with $v$ (`is_mutual = true`).
+     - Mark $u, v \in U$.
+5. Leftover unpaired vertices (odd count) pair with their best available top candidate from neighbour buffer with `is_mutual = false`.
+6. Time complexity: $O(|V| \cdot K \log K)$ with $K = 32$. Bounded and linear with respect to player count.
+
+---
+
+### 18.6 Compact 32-Byte Lane History Signature
+Rather than querying 28 days of historical answers across millions of pairs at 07:05 IST, each player's 28-day lane history is condensed into a 32-byte **BitMinHash Signature** updated nightly:
+- 256 hash buckets (32 bytes = 256 bits).
+- Each day's answer set is weighted by information content and hashed into signature bits.
+- Comparing two signatures requires a single 64-bit XOR + POPCNT instruction across 4 words:
+  $$\text{Sim}_{history} \approx 1 - \frac{\text{popcount}(sig_P \oplus sig_Q)}{256}$$
+- Computation time: $< 5$ nanoseconds per pair, enabling evaluation of 100,000 tie candidates in $< 1$ millisecond.
+
+---
+
+### 18.7 Free-Text "Say It" Pipeline Architecture (Stage L6 / Gate G4)
+
+```mermaid
+flowchart TD
+    A["Player Types Answer (<= 80 chars)"] --> B["Normalisation & Unicode Clean"]
+    B --> C{"PII & Abuse Screen"}
+    C -- "URL / Phone / Email Found" --> D["Reject: Personal Data (No storage)"]
+    C -- "Forbidden Topic / Blocklist" --> E["Reject or Route to Admin Held Queue"]
+    C -- "Clean Content" --> F["BullMQ Embedding Worker (CPU ONNX)"]
+    F --> G["Extract 384-dim Sentence Embedding"]
+    G --> H["Closed Archetype Centroid Tagger"]
+    H --> I["Store in answer_text (Raw text TTL: 7 days)"]
+    I --> J["Neighbour Search (Cosine + Archetype Calibrated)"]
+    J --> K["Compute Information-Weighted Match"]
+```
+
+---
+
+### 18.8 Degradation Behavior for Lanes
+
+| Level | System State | Lane Engine Shedding Actions |
+|---|---|---|
+| **L0 (Normal)** | Latency < 200ms, CPU < 50% | All open lanes active; mutual pairing, history tie-break, full tie group counts. |
+| **L1 (Conserve)** | Latency > 300ms, event loop > 50ms | Live counters updated every 2m. History tie-break window reduced from 28d to 14d. |
+| **L2 (Protect Core)** | Latency > 800ms, event loop > 150ms | Home picker highlights Everyday and last played lane. Super twin computation shed. |
+| **L3 (Survive)** | Queue saturated, memory > 80% | Mode B async ingestion active. History tie-break disabled (falls back to deterministic hash). Top neighbour buffer reduced from $K=32$ to $K=16$. |
+| **L4 (Static)** | Database down or origin read-only | Edge serves cached Everyday Drop only. Lane submissions queued in client storage. |
+
+---
+
+### 18.9 Per-Route Policy Registry Additions (Stage L0)
+
+| Method | Path | Timeout (ms) | Rate Limit Class | Cache-Control | Idempotent | Priority Lane | Degradation Behavior |
+|---|---|---|---|---|---|---|---|
+| `GET` | `/v1/lanes` | 1000 | standard | `public, max-age=60` | false | normal | Returns cached lane catalogue; client sorts last-played |
+| `GET` | `/v1/drops/today?lane=slug` | 2000 | standard | `public, max-age=120` | false | normal | Returns signed Drop JSON for lane; returns 200 with resting state if Drop missing |
+| `POST` | `/v1/answers` | 3000 | tight | `no-store` | true | high | Accepts lane submission; validates format payloads; core submit path |
+| `GET` | `/v1/results/:dropId` | 2000 | standard | `private, max-age=30` | false | normal | Returns lane twin, honest tie group size, and questions compared count |
+| `POST` | `/v1/lane-interest` | 2000 | tight | `no-store` | true | normal | Records player interest in planned lane; requires notification consent |
+| `PUT` | `/v1/me/lane-prefs` | 2000 | standard | `no-store` | true | normal | Updates per-lane push opt-in and history tie-break toggle |
+| `GET` | `/v1/me/super-twin` | 2000 | standard | `private, no-cache` | false | background | Returns Super twin result for date; shed at Level L2+ |
+| `GET` | `/v1/globe?lane=slug` | 2000 | standard | `public, max-age=60` | false | normal | Returns lane-filtered arcs adhering to $k \ge 20$ anonymity |
+| `POST` | `/v1/answers/:id/text` | 3000 | tight | `no-store` | true | background | Submits typed `say_it` answer; strictly unlogged; shed at Level L2+ |
+
+---
+
+### 18.10 Architecture Decision Records (ADRs)
+
+#### ADR 045: Lane-Isolated Matching & Relational Data Model
+- **Date:** 2026-11-21
+- **Context:** Collisions on five simple questions demand subject segregation so players find authentic peers.
+- **Decision:** Introduce `lanes` table and denormalize `lane_id` onto `drops`, `questions`, `submissions`, and `twin_results`. All matching is strictly isolated by lane.
+- **Consequence:** Solves collision dilution; enables modular community expansion; zero impact on universal 07:00 IST drop cycle.
+
+#### ADR 046: Richer Answer Formats & Entropy-Aware Information Weighting
+- **Date:** 2026-11-21
+- **Context:** Multiple-choice collisions can be further mitigated by richer question interactions without adding high typing friction.
+- **Decision:** Introduce `pick2of6` (Jaccard), `rank3` (Kendall Tau), and `slider7` (Linear Distance) alongside `pick1`. Cap information weights at $w_{max} = 3.5$.
+- **Consequence:** Exponentially reduces tie sizes (e.g. 15 outcomes for `pick2of6`, 6 for `rank3`) while keeping play time under 30 seconds.
+
+#### ADR 047: Bounded Tie-Group Evaluation, Mutual Pairing & 32-Byte History Signature
+- **Date:** 2026-11-21
+- **Context:** When hundreds of players tie on identical scores, picking a random twin feels arbitrary and asymmetric.
+- **Decision:** Maintain top $K=32$ candidate list per player. Break ties using 28-day lane history agreement evaluated via a 32-byte BitMinHash signature. Execute greedy mutual pairing so that matched twins are bidirectional. Display honest group counts ("4 of 5 with 312 people").
+- **Consequence:** Eliminates asymmetric twin confusion, rewards daily loyalty with deeper historical matching, and bounds worst-case compute to $O(N \cdot K \log K)$.
+
+#### ADR 048: Self-Hosted Multilingual CPU ONNX Embedding & Archetype Tagger for "Say It"
+- **Date:** 2026-11-21
+- **Context:** Matching short typed answers requires semantic text comprehension without sending private user text to external third-party cloud APIs.
+- **Decision:** Deploy a lightweight, self-hosted multilingual model (`paraphrase-multilingual-MiniLM-L12-v2` or `multilingual-e5-small`, ~118 MB ONNX quantized) running CPU inference in worker threads. Couple continuous embeddings with a closed-centroid archetype classifier. Gate all code behind Gate G4.
+- **Consequence:** Full semantic comprehension across English, Hindi, and Hinglish; 0% third-party cloud dependency; absolute adherence to DPDP Act privacy invariants.
+
+#### ADR 049: Multi-Tiered Answer Text Deletion & Embedding Purge Lifecycle
+- **Date:** 2026-11-21
+- **Context:** User-authored text poses severe long-term privacy and regulatory liabilities if retained indefinitely.
+- **Decision:** Implement multi-tiered retention: raw user text is hard-deleted from `answer_text` after 7 days; derived embeddings and archetypes are purged after 28 days (history window); complete cryptographic erasure occurs upon account deletion.
+- **Consequence:** Strict data minimisation under DPDP Act Section 12 while maintaining sufficient historical matching depth.
