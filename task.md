@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[████████████░░░░░░░░] 60%`                                                     |
+| **Overall Project Progress**    | `[███████████░░░░░░░░░] 58%`                                                     |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
-| **Total Tasks Tracked**         | 393 tasks across 36 phases                                                       |
+| **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
 | **Completed Tasks (`DONE`)**    | 237 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 156 tasks                                                                        |
+| **Pending (`TODO`)**            | 173 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -30,7 +30,7 @@
 
 ### Recommended Execution Order (Founder Approval Required)
 
-`F1 (running) → M0 → L0 (analysis & docs) → L1 → L2 → L3 → F2 → F3 → F4 (built lane-aware) → M1 → M2 → L4 → Phase 11 admin (with Addendum A and Addendum B) → L5 → L7 → on command: M3 to M8, L6, L8`
+`F1 → M0 → L0 → L0-FIX → L0-ADD → L1 → L2 → L3 → F2 → F3 → F4 → M1 → M2 → L4 → L9 → Phase 11 admin → L5 → L7 → L10 → on command: M3 to M8, L6, L8`
 
 <!-- visual:start roadmap-visual -->
 ![Recommended Execution Order Stage Roadmap](docs/assets/roadmap-stages.svg)
@@ -78,7 +78,9 @@
 | **Phase 10Q**| Say It: Free-Text Answers (Gate G4)         | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 8              | Stage L6 (Gate G4)    |
 | **Phase 10R**| Super Twin & Lane-Aware Connection Features | Medium   | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 6              | Stage L7              |
 | **Phase 10S**| Brain Lane (Documented Only)                | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 1              | Stage L8              |
-| **Phase 11** | Admin Panel ("Mission Control")             | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 46             | Stage 11 (Addenda A+B)|
+| **Phase 10T**| Bonus Rounds (Stage L9)                     | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L9              |
+| **Phase 10U**| Badges (Stage L10)                           | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 6              | Stage L10             |
+| **Phase 11** | Admin Panel ("Mission Control")             | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 50             | Stage 11 (Addenda A+B+C)|
 | **Phase 12** | Observability, Telemetry & Security         | High     | 🟡 PARTIAL  | `🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜ 9%` | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 12             | Stage 13              |
 | **Phase 14** | Cloud Deployment & Infrastructure           | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 11             | Stage 14              |
@@ -665,6 +667,41 @@ _Status: TODO | Target: Architecture specification for knowledge questions, anti
 
 ---
 
+### Phase 10T: Bonus Rounds (Stage L9, Built After Stage L4)
+
+<!-- visual:start mini-progress-p10t -->
+`⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` (0 / 7 tasks)
+<!-- visual:end mini-progress-p10t -->
+
+| Task ID | Description | Priority | Status | Depends On | Assignee | Output Artifact | Verification Note |
+|---|---|---|---|---|---|---|---|
+| `[ ] P10T.01` | Relational data model for bonus rounds (`bonus_pool_questions`, `bonus_rounds`, partitioned `bonus_answers`, alter `twin_results`) | 🔴 Critical | ⚪ TODO | P10L.01, P10N.01 | Agent | — | Migration expands schema, creates indexes and partition tables |
+| `[ ] P10T.02` | Admin Evergreen Question Pool Editor (P11.47) and Pool Runway Alerting (P11.48) | 🟠 High | ⚪ TODO | P10T.01, P11.01 | Agent | — | Admin manages questions, calculates entropy, enforces 40-question min |
+| `[ ] P10T.03` | Post-recap round opener worker job `bonus.open_rounds` with deterministic HMAC seed | 🔴 Critical | ⚪ TODO | P10T.01, P10N.05 | Agent | — | Emits round for eligible tie groups >= 2, verifies zero personalization |
+| `[ ] P10T.04` | Public Bonus API routes (`GET /v1/bonus/:dropId`, `POST /v1/bonus/:roundId/answers`, `GET /v1/bonus/:roundId/result`) | 🔴 Critical | ⚪ TODO | P10T.01, P10T.03 | Agent | — | Idempotent with request_id, 24h play window, rate limited |
+| `[ ] P10T.05` | Post-window rematch worker job `bonus.close_and_rematch` | 🔴 Critical | ⚪ TODO | P10T.04 | Agent | — | Combines base and bonus similarity, executes greedy mutual rematching, handles alone state |
+| `[ ] P10T.06` | Result screen Bonus Offer Card, 3-question bonus runner, and result line UI | 🟠 High | ⚪ TODO | P10T.04, P01.01 | Agent | — | Reuses 12C.4 components, sticker styling, no countdowns or pressure |
+| `[ ] P10T.07` | Deterministic tie-break unit tests and end-to-end idempotency test suite | 🧪 Testing | ⚪ TODO | P10T.05, P10T.06 | Agent | — | Proves identical questions inside tie group, verified greedy rematching, 28-day retention purge |
+
+---
+
+### Phase 10U: Badges (Stage L10, Built After Stage L7)
+
+<!-- visual:start mini-progress-p10u -->
+`⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` (0 / 6 tasks)
+<!-- visual:end mini-progress-p10u -->
+
+| Task ID | Description | Priority | Status | Depends On | Assignee | Output Artifact | Verification Note |
+|---|---|---|---|---|---|---|---|
+| `[ ] P10U.01` | Relational data model for badges (`badge_definitions`, `user_badges` with JSONB evidence) | 🔴 Critical | ⚪ TODO | P10L.01, P10R.01 | Agent | — | DB migration creates tables, unique constraints, and audit indexes |
+| `[ ] P10U.02` | Post-recap worker job `badges.evaluate` with idempotent evaluation | 🔴 Critical | ⚪ TODO | P10U.01, P10R.03 | Agent | — | Evaluates Collector I-III, All-Lanes, and Super Twin xN with evidence |
+| `[ ] P10U.03` | Player Badges API route (`GET /v1/me/badges`) | 🟠 High | ⚪ TODO | P10U.01, P10U.02 | Agent | — | Serves own badges and empty slots, cached response, unranked |
+| `[ ] P10U.04` | Sticker badge components, unlock toast (< 600ms), and "My badges" showcase page | 🟠 High | ⚪ TODO | P10U.03, P01.01 | Agent | — | Sticker pop styling, empty slots for unearned lanes, honors reduced motion |
+| `[ ] P10U.05` | Admin Badge Definitions Editor (P11.49) and Tamper-Evident Revoke Tool (P11.50) | 🟡 Medium | ⚪ TODO | P10U.01, P11.01 | Agent | — | Admin configures thresholds and copy, revokes with mandatory audit reason |
+| `[ ] P10U.06` | Badge evaluation test suite and anti-cheat verification | 🧪 Testing | ⚪ TODO | P10U.02, P10U.05 | Agent | — | Tests prove cumulative retention, Super Twin rolling window, zero public rank exposure |
+
+---
+
 ### Phase 11: Admin Tool: "Mission Control" (Stage 11)
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**  
@@ -720,6 +757,10 @@ _Status: TODO | Target: Independent admin host, SSO + TOTP 2FA, immutable audit 
 | `[ ] P11.44` | Implement per-lane notification copy templates and 2-push daily cap enforcement                             | 🟡 Medium    | ⚪ TODO         | P11.20, P10L.08| Agent | —         | spec Addendum B8 [P2]                |
 | `[ ] P11.45` | Build Lane & Matching parameter configuration panel in `app_config` with audit log and rollback            | 🟠 High      | ⚪ TODO         | P11.22, P10L.01| Agent | —         | spec Addendum B9 [P1]                |
 | `[ ] P11.46` | Implement lane-scoped admin permissions (Editor/Reviewer per lane) and verify Addendum B acceptance         | 🔴 Critical  | ⚪ TODO         | P11.13, P11.25 | Agent | —         | spec Addendum B10, B12 [P1]          |
+| `[ ] P11.47` | Build Evergreen Question Pool Editor with entropy meter and safety checklist | 🟠 High | ⚪ TODO | P11.01, P10T.01 | Agent | — | spec Addendum C1 [P2] |
+| `[ ] P11.48` | Implement Evergreen Pool Runway Monitor and 7-day low-stock alerting | 🟡 Medium | ⚪ TODO | P11.47 | Agent | — | spec Addendum C1 [P2] |
+| `[ ] P11.49` | Build Bonus Round Monitoring Dashboard (tie-group sizes, participation rate, zero raw answers) | 🟠 High | ⚪ TODO | P11.01, P10T.03 | Agent | — | spec Addendum C2 [P2] |
+| `[ ] P11.50` | Build Badge Definitions Editor & Tamper-Evident Revoke Tool with audit reason logging | 🟠 High | ⚪ TODO | P11.01, P10U.01 | Agent | — | spec Addendum C3 [P2] |
 
 #### Phase 11 Deferred (P2 & P3 Features — Visible in Backlog but Not in Stage 11)
 - **Full Command Center [P2]:** Milestone confetti/chimes, count-up animations, custom density toggle, saved views (spec section 3.4).
@@ -1096,6 +1137,27 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/1 verification items verified)
   <!-- visual:end -stage-l8-checklist-phase-10s-brain-lane-documented-only--bar -->
   - [ ] Verify architecture documentation for knowledge format, right/wrong matching, and anti-cheat design.
+- **Stage L9 Checklist (Phase 10T: Bonus Rounds — Stage L9):**
+  <!-- visual:start -stage-l9-checklist-phase-10t-bonus-rounds-stage-l9--bar -->
+  > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/7 verification items verified)
+  <!-- visual:end -stage-l9-checklist-phase-10t-bonus-rounds-stage-l9--bar -->
+  - [ ] P10T.01: Relational data model for bonus rounds and partitioned answers deployed.
+  - [ ] P10T.02: Admin Evergreen Question Pool Editor and runway alerting active.
+  - [ ] P10T.03: Post-recap round opener worker job running with deterministic seed.
+  - [ ] P10T.04: Bonus API routes validated and rate-limited.
+  - [ ] P10T.05: Post-window rematch worker job running with greedy mutual rematching.
+  - [ ] P10T.06: Bonus Offer Card, question runner, and result line UI verified.
+  - [ ] P10T.07: Deterministic tie-break and idempotency test suite passing cleanly.
+- **Stage L10 Checklist (Phase 10U: Badges — Stage L10):**
+  <!-- visual:start -stage-l10-checklist-phase-10u-badges-stage-l10--bar -->
+  > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/6 verification items verified)
+  <!-- visual:end -stage-l10-checklist-phase-10u-badges-stage-l10--bar -->
+  - [ ] P10U.01: Relational data model for badges and tamper-evident evidence deployed.
+  - [ ] P10U.02: Post-recap worker job evaluating collector and super-twin conditions.
+  - [ ] P10U.03: Player Badges API route serving unranked badge state.
+  - [ ] P10U.04: Sticker badge artwork, unlock toast, and My Badges showcase page verified.
+  - [ ] P10U.05: Admin Badge Definitions Editor and Revocation Tool operational.
+  - [ ] P10U.06: Badge evaluation test suite and anti-cheat verification passing.
 - **Stage 12 Checklist:**
   <!-- visual:start -stage-12-checklist--bar -->
   > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/1 verification items verified)
@@ -1128,6 +1190,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phases 10T, 10U, Phase 11 (P11.47–P11.50) | Added Phase 10T (Bonus Rounds, Stage L9, 7 tasks), Phase 10U (Badges, Stage L10, 6 tasks), and Phase 11 admin tasks P11.47–P11.50 per Addendum C. Updated execution order to include L9 and L10. Updated dashboard to 410 tasks across 38 phases. | Stage L0-ADD Founder approval. |
 | `2026-11-21` | Phases 10L–10S, Phase 11 (P11.33–P11.46) | Added Phases 10L to 10S (Stages L1 to L8) for Lanes, Richer Formats, Twin Depth, Situations, Say It, Super Twin, and Brain. Expanded Phase 11 with tasks P11.33–P11.46 per Addendum B. Added Recommended Execution Order. Corrected dashboard to 393 tasks across 36 phases. | Stage L0 Founder approval & architectural review.  |
 | `2026-11-15` | Phase 10E–10K, Phase 11   | Added Phases 10E to 10K (Stages M1 to M8) for F24–F31 Memes, Signals, and Insights. Expanded Phase 11 with tasks P11.26–P11.32 per Addendum A. Dashboard updated to 336 tasks. | Stage M0 Founder approval & scope decisions.  |
 | `2026-11-15` | Phase 10A (Stage F1)      | Completed Phase 10A Orbit Foundation backend: migrations, repositories, APIs, co-streaks, push, DPDP, 13/13 integration tests. | Stage F1 verification and completion.         |
