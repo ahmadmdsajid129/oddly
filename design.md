@@ -612,6 +612,15 @@ All components strictly use existing `@oddly/ui-tokens` constants, 4 approved ra
 
 ---
 
+### 12C.9 Bundle Size Budget Guardrails
+- **Play-Route Budget Constraint:** Maximum `<= 159.5 KB` gzipped.
+- **Code-Splitting Strategy:**
+  - Core `/play` route imports only `pick1` renderer.
+  - `pick2of6`, `rank3`, `slider7`, and `scene` components are dynamic imports (`next/dynamic`) loaded on-demand based on question `format`.
+  - Non-default lane cards and Say It composer are lazy-loaded outside the initial critical path.
+
+---
+
 ### 12C.10 Situations Style Label Card & Share Card Face (Stage L5)
 - **Result Card Face (`SituationsStyleCard`):**
   - Container: `bg-paper border-[2.5px] border-ink shadow-card rounded-xl p-5 text-center flex flex-col items-center gap-3`.
@@ -656,15 +665,6 @@ When `@media (prefers-reduced-motion: reduce)` is active:
 - **`SayItComposer`:** Validation error shake animation is replaced by a static red ink border (`2.5px solid #FF6B5E`) and assistive text.
 - **`SuperTwinCard`:** 3D CSS flip animation is replaced by an immediate tabbed face swap.
 - **`ResultView`:** Numerical count-up animations are bypassed; final match percentage and group size render immediately.
-
----
-
-### 12C.9 Bundle Size Budget Guardrails
-- **Play-Route Budget Constraint:** Maximum $\le 159.5\text{ KB}$ gzipped.
-- **Code-Splitting Strategy:**
-  - Core `/play` route imports only `pick1` renderer.
-  - `pick2of6`, `rank3`, `slider7`, and `scene` components are dynamic imports (`next/dynamic`) loaded on-demand based on question `format`.
-  - Non-default lane cards and Say It composer are lazy-loaded outside the initial critical path.
 ---
 
 # PART B: STAGE D1: UI REDESIGN PROMPT
