@@ -1,6 +1,6 @@
 # Oddly: design.md (design system and UI redesign prompt)
 
-Direction: **Sticker pop**, with a subtle holographic sheen on the share card front.
+Direction: **Sticker pop** (v1.4), with a subtle holographic sheen on the share card front.
 Status: this file is the single source of truth for how Oddly looks and moves. It is also the prompt for Stage D1 (full UI redesign).
 
 > Rule for every future stage: before touching any UI, read this file. After touching UI, confirm in your stage report that you followed it. If a request conflicts with this file, say so and stop; do not silently drift.
@@ -691,15 +691,15 @@ When `@media (prefers-reduced-motion: reduce)` is active:
 - **Placement:** Positioned on the result screen beneath the Twin Reveal card, rendered only after final recap for eligible tie groups (size >= `bonus.min_tie_size` [2]).
 - **Visual Structure:** Physical paper sticker card:
   ```
-  bg-paper border-[2.5px] border-ink rounded-radius-m shadow-sticker p-4
+  bg-paper border-[2.5px] border-ink rounded-m shadow-sticker p-4
   ```
 - **Header:** `bonus.offer.title` ("Break the tie?") in Display 700 `16px` ink.
 - **Body:** `bonus.offer.body` ("{{count}} people matched you. 3 quick extra questions can find the closest one. Totally optional.") in Inter 400 `14px` ink.
 - **Action Controls:**
   - Primary button: *"Play 3 extra"* (`bg-violet text-paper border-[2.5px] border-ink shadow-sticker`, presses flat to `translate(4px, 4px)` with `0 0 0` shadow).
-  - Secondary button: *"Not now"* (`bg-paper text-ink border-[2.5px] border-ink shadow-sticker-flat`).
+  - Secondary button: *"Not now"* (`bg-paper text-ink border-[2.5px] border-ink shadow-sticker`, presses flat to `translate(4px, 4px)` with `0 0 0` shadow).
   - Target Dimensions: Minimum touch targets strictly >= 44 x 44 px.
-- **Anti-Urgency Invariants:** Absolutely no countdown timers, no pulsing alert rings, and no "your twin is waiting" copy (Rule 17, Rule B2).
+- **Anti-Urgency Invariants:** Absolutely no countdown timers, no pulsing alert rings, and no "your twin is waiting" copy (Rule 17, Rule B6, Never Do list).
 
 ### 12D.2 Bonus Question Flow (Reusing 12C.4 Components)
 - **Modal / Container:** Full-screen tactile overlay with cream background (`#FFF8F0`) and paper question card (`#FFFFFF`).
@@ -717,7 +717,7 @@ When `@media (prefers-reduced-motion: reduce)` is active:
 ### 12D.4 Badge Face Specification
 - **Sticker Aesthetic:** Procedural collectible sticker card:
   ```
-  w-28 h-36 bg-paper border-[2.5px] border-ink rounded-radius-m shadow-sticker flex flex-col items-center justify-between p-3
+  w-28 h-36 bg-paper border-[2.5px] border-ink rounded-m shadow-sticker flex flex-col items-center justify-between p-3
   ```
 - **Tier Accents & Foil Frames:**
   - *Collector I (2 lanes):* Lavender corner accent pill (`#EEEAFE`).
@@ -858,6 +858,7 @@ Write `design-d1/REPORT.md` containing: what changed per step D1.1 to D1.8, the 
 
 ## 22. Change log
 
+- 2026-11-22: v1.4. Added Section 12D (Bonus Rounds and Badges UI). Zero new colours.
 - 2026-11-21: v1.3. Added Section 12C (Lanes, Richer Formats, Twin Depth, Situations style cards, Say It composer, Globe lane filters, Orbit lane tags, reduced-motion fallbacks, and v1.3 bundle budget). Zero new colors outside ui-tokens.
 - 2026-11-15: v1.2. Added Section 12B (detailed design specifications for F24-F31: Meme question card, Meme Corner card, consent notice and Settings toggles, Meme Lab composer & status cards, creator badges and achievement cards, featured memes, Orbit subject-sync rows, touch targets $\ge 44\text{px}$, and accessibility). Zero new colours.
 - 2026-11-14: v1.1. Added Section 12A (detailed design specifications for F18 Twin Globe, F19 Keep and Orbit, F20 Telepathy, F21 Anti-twin, touch targets, accessibility, and Satori share faces). Reconciled core color tokens: verified `packages/ui-tokens` matches Section 2.1 WCAG AA palette (`#3DDBB0` mint, `#FF6B5E` coral, `#FFD23F` sun, `#EEEAFE` lavender).

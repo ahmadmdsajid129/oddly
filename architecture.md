@@ -3,7 +3,7 @@
 > **The Reliability Promise:**  
 > *"No acknowledged submission is ever lost, the Drop is always reachable, and when we are overloaded we shed non-essential work first and say so honestly."*
 
-**Project:** Oddly v1 | **Last updated:** 2026-11-10 | **Owner:** Senior System Designer & SRE + Founder  
+**Project:** Oddly v1 | **Last updated:** 2026-11-22 | **Owner:** Senior System Designer & SRE + Founder  
 **Purpose of this file:** System architecture, complete tech stack, scaling plan, edge caching, data models, Redis schema, API specifications, component lifecycles, degradation ladder, and deployment infrastructure.
 
 ---
@@ -1213,6 +1213,9 @@ flowchart TD
 ### 18.11 Bonus Rounds & Badges Infrastructure (Stage L0-ADD)
 
 #### 18.11.1 Relational Data Model
+
+> [!WARNING]
+> **Open issue (Schema Type & Relation Verification):** Documentation in 18.2.1 and 18.11.1 currently references TEXT IDs and mixes `players(id)` and `users(id)`. Before writing migrations at Stage L1, verify against the actual Prisma schema whether the primary player table is `players` or `users`, and whether IDs are UUID or TEXT. Align documentation before migration code.
 
 ```sql
 -- 1. bonus_pool_questions — Evergreen Question Pool for Tie-Breaks

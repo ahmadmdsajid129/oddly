@@ -3,7 +3,7 @@
 > **The Reliability Promise:**  
 > *"No acknowledged submission is ever lost, the Drop is always reachable, and when we are overloaded we shed non-essential work first and say so honestly."*
 
-**Project:** Oddly v1 | **Last updated:** 2026-11-10 | **Owner:** Senior System Designer & SRE + Founder  
+**Project:** Oddly v1 | **Last updated:** 2026-11-22 | **Owner:** Senior System Designer & SRE + Founder  
 **Purpose of this file:** Authoritative project roadmap, task tracking, progress bars, phase dependencies, scale readiness gates, and verification criteria across all 17 phases (Phase 0 to Phase 16).
 
 ---
@@ -12,7 +12,7 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `[███████████░░░░░░░░░] 58%`                                                     |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 58%`                                                       |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
 | **Completed Tasks (`DONE`)**    | 237 tasks (Proven by code, tests & integration test suite)                       |
@@ -552,7 +552,7 @@ _Status: TODO | Target: Core lanes data model, backfill, per-lane Drop scheduler
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10L.01` | Database migrations: `lanes`, `lane_interest`, `player_lane_prefs`, and expand `lane_id` foreign keys  | 🔴 Critical  | ⚪ TODO         | P2.01, P10K.01 | Agent | —         | Expand-only migration; Rule L1/L2        |
+| `[ ] P10L.01` | Database migrations: `lanes`, `lane_interest`, `player_lane_prefs`, and expand `lane_id` foreign keys  | 🔴 Critical  | ⚪ TODO         | P2.01, P10K.01 | Agent | —         | Expand-only migration; Rule L1/L2. Verification note: Before writing the migration, confirm against the real Prisma schema: (a) whether the player table is `players` or `users`; (b) the id type (UUID or TEXT) used by `drops`, `questions`, and the player table. Lane, bonus and badge tables in `architecture.md` 18.2.1 and 18.11.1 currently mix `players(id)` and `users(id)` and use TEXT ids. Fix the docs to match reality first. |
 | `[ ] P10L.02` | Author idempotent resumable backfill script assigning all existing historical Drops to Everyday lane        | 🔴 Critical  | ⚪ TODO         | P10L.01        | Agent | —         | Validates row counts before commit       |
 | `[ ] P10L.03` | Update Drop scheduling pipeline and daily 07:00 IST BullMQ job to run per lane with lane-keyed Redis cache  | 🔴 Critical  | ⚪ TODO         | P10L.01, P9.01 | Agent | —         | Shared Drop clock; zero stagger in v1    |
 | `[ ] P10L.04` | Implement REST endpoints `GET /v1/lanes` and `GET /v1/lanes/:id` with ETag and public cache headers        | 🟠 High      | ⚪ TODO         | P10L.01        | Agent | —         | Serves lane metadata and status chips    |
@@ -696,7 +696,7 @@ _Status: TODO | Target: Architecture specification for knowledge questions, anti
 | `[ ] P10U.01` | Relational data model for badges (`collector_badge_definitions`, `collector_badges` with JSONB evidence) | 🔴 Critical | ⚪ TODO | P10L.01, P10R.01 | Agent | — | DB migration creates tables, unique constraints, and audit indexes |
 | `[ ] P10U.02` | Post-recap worker job `badges.evaluate` with idempotent evaluation | 🔴 Critical | ⚪ TODO | P10U.01, P10R.03 | Agent | — | Evaluates Collector I-III, All-Lanes, and Super Twin xN with evidence |
 | `[ ] P10U.03` | Collector Badges API route (`GET /v1/me/collector-badges`) | 🟠 High | ⚪ TODO | P10U.01, P10U.02 | Agent | — | Serves own badges and empty slots, cached response, unranked |
-| `[ ] P10U.04` | Sticker badge components, unlock toast (< 600ms), and "My badges" showcase page | 🟠 High | ⚪ TODO | P10U.03, P01.01 | Agent | — | Sticker pop styling, empty slots for unearned lanes, honors reduced motion |
+| `[ ] P10U.04` | Sticker badge components, unlock toast (< 600ms), and "My badges" showcase page | 🟠 High | ⚪ TODO | P10U.03, P1.01 | Agent | — | Sticker pop styling, empty slots for unearned lanes, honors reduced motion |
 | `[ ] P10U.05` | Admin Collector Badge Definitions Editor (P11.49) and Tamper-Evident Revoke Tool (P11.50) | 🟡 Medium | ⚪ TODO | P10U.01, P11.01 | Agent | — | Admin configures thresholds and copy, revokes with mandatory audit reason |
 | `[ ] P10U.06` | Badge evaluation test suite and anti-cheat verification | 🧪 Testing | ⚪ TODO | P10U.02, P10U.05 | Agent | — | Tests prove cumulative retention, Super Twin rolling window, zero public rank exposure |
 
