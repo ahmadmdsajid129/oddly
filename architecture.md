@@ -1146,7 +1146,7 @@ flowchart TD
 | `GET` | `/v1/bonus/:dropId` | 2000 | standard | `private, max-age=30` | false | 🟡 normal | Returns bonus round eligibility, tie-group size, and questions |
 | `POST` | `/v1/bonus/:roundId/answers` | 3000 | tight | `no-store` | true | 🟠 high | Submits answers for active bonus round; requires `request_id` |
 | `GET` | `/v1/bonus/:roundId/result` | 2000 | standard | `private, max-age=30` | false | 🟡 normal | Returns bonus tie-break result; falls back to original twin |
-| `GET` | `/v1/me/badges` | 2000 | standard | `private, max-age=60` | false | 🟡 normal | Returns player's earned badges and open slots; unranked |
+| `GET` | `/v1/me/collector-badges` | 2000 | standard | `private, max-age=60` | false | 🟡 normal | Returns player's earned collector badges and open slots; unranked |
 
 ---
 
@@ -1203,8 +1203,8 @@ flowchart TD
 - **Date:** 2026-11-22
 - **Context:** Badges reward multi-lane exploration and Super Twins without competitive leaderboards or public ranking. The evaluation must be idempotent, cheat-resistant, and strictly auditable.
 - **Decision:** Implement **Post-Recap Worker Evaluation with Tamper-Evident Evidence**:
-  1. *Worker Evaluation:* `badges.evaluate` job executes post-final recap, scanning final verified `twin_results` against `badge_definitions`.
-  2. *Evidence Storage:* Badges store full audit evidence (`lane_ids`, `drop_ids`, similarity scores, and rule version) as immutable JSONB in `user_badges`.
+  1. *Worker Evaluation:* `badges.evaluate` job executes post-final recap, scanning final verified `twin_results` against `collector_badge_definitions`.
+  2. *Evidence Storage:* Badges store full audit evidence (`lane_ids`, `drop_ids`, similarity scores, and rule version) as immutable JSONB in `collector_badges`.
   3. *Revocation Protocol:* Suspended or duplicate-device accounts have badges revoked with an explicit timestamp, reason, and audit trail.
 - **Consequences:** Zero client-side trust; badges are completely tamper-evident; guarantees unranked privacy per Rule B5.
 
@@ -1256,8 +1256,11 @@ CREATE TABLE IF NOT EXISTS bonus_answers (
 -- Schema Evolution for twin_results
 ALTER TABLE twin_results ADD COLUMN IF NOT EXISTS bonus_round_count INT NOT NULL DEFAULT 0;
 
--- 4. badge_definitions — Master Badge Registry
-CREATE TABLE IF NOT EXISTS badge_definitions (
+##### Relation to M6 creator badges
+Creator badges (M6) are earned by caption quality and have their own table (`badge_definitions`, `creator_badges`) and API route (`GET /v1/badges/mine` / `/v1/me/badges`); collector badges (L10) are earned by lane twins and live in `collector_badge_definitions` and `collector_badges` accessed via `GET /v1/me/collector-badges`. They share only the `/me/badges` UI page. They never share tables or a unified score.
+
+-- 4. collector_badge_definitions — Master Collector Badge Registry
+CREATE TABLE IF NOT EXISTS collector_badge_definitions (
   key VARCHAR(50) PRIMARY KEY, -- 'collector_1', 'collector_2', 'collector_3', 'all_lanes', 'super_twin'
   tier VARCHAR(20) NOT NULL,   -- 'tier1', 'tier2', 'tier3', 'all_lanes', 'special'
   rule_version INT NOT NULL DEFAULT 1,
@@ -1266,19 +1269,19 @@ CREATE TABLE IF NOT EXISTS badge_definitions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 5. user_badges — Private Player Badges & Audit Evidence
-CREATE TABLE IF NOT EXISTS user_badges (
+-- 5. collector_badges — Private Player Collector Badges & Audit Evidence
+CREATE TABLE IF NOT EXISTS collector_badges (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  badge_key VARCHAR(50) NOT NULL REFERENCES badge_definitions(key) ON DELETE CASCADE,
+  collector_badge_key VARCHAR(50) NOT NULL REFERENCES collector_badge_definitions(key) ON DELETE CASCADE,
   tier VARCHAR(20) NOT NULL,
   earned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   evidence JSONB NOT NULL, -- {"lane_ids": [...], "drop_ids": [...], "rule_version": 1}
   revoked_at TIMESTAMPTZ,
   revoke_reason TEXT,
-  UNIQUE(user_id, badge_key, tier)
+  UNIQUE(user_id, collector_badge_key, tier)
 );
-CREATE INDEX IF NOT EXISTS idx_user_badges_user ON user_badges(user_id) WHERE revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_collector_badges_user ON collector_badges(user_id) WHERE revoked_at IS NULL;
 ```
 
 #### 18.11.2 Worker Jobs & Redis Key Architecture
@@ -1286,7 +1289,7 @@ CREATE INDEX IF NOT EXISTS idx_user_badges_user ON user_badges(user_id) WHERE re
 1. **Worker Jobs (`services/worker`):**
    - `bonus.open_rounds`: Scheduled at 07:05 IST post-recap. Identifies tie groups with $\ge 2$ members, queries `bonus_pool_questions` (min 40 questions), builds rounds seeded by HMAC-SHA256, and emits eligible player states.
    - `bonus.close_and_rematch`: Scheduled 24 hours post-open. Collects participants from `bonus_answers`. If $\ge 2$ players answered, scores bonus similarity, combines with base score, re-runs greedy mutual rematching, and updates `twin_results` (`tie_break_reason = 'bonus'`). If 1 player, records alone state.
-   - `badges.evaluate`: Post-recap worker job. Evaluates active users against collector and super-twin conditions. Performs idempotent inserts into `user_badges`.
+   - `badges.evaluate`: Post-recap worker job. Evaluates active users against collector and super-twin conditions. Performs idempotent inserts into `collector_badges`.
 2. **Redis Key Architecture:**
    - `bonus:round:{roundId}:state` (Hash, TTL 36h): Cached round status, questions, and expiration timestamp.
    - `bonus:round:{roundId}:participants` (Set, TTL 36h): User IDs participating in the tie-break round.

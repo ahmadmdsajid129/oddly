@@ -729,6 +729,7 @@ When `@media (prefers-reduced-motion: reduce)` is active:
 
 ### 12D.5 "My Badges" Showcase Page
 - **Route:** `/me/badges` (accessible from user drawer and recap badge toasts).
+- **Data Sources:** Consolidates creator badges (M6, `GET /v1/badges/mine`) and collector badges (L10, `GET /v1/me/collector-badges`) into distinct album sections.
 - **Layout:** Responsive 3-column sticker album grid on warm cream desk (`#FFF8F0`).
 - **Strict Privacy Rule (Rule B5):** Visible solely to the authenticated account. No public profile URL, no follower views, no global rarity percentages, and no leaderboards.
 

@@ -120,8 +120,8 @@ CREATE TABLE IF NOT EXISTS bonus_answers (
   PRIMARY KEY (round_id, user_id, question_id, drop_date)
 ) PARTITION BY RANGE (drop_date);
 
--- Badge Registry & User Badges
-CREATE TABLE IF NOT EXISTS badge_definitions (
+-- Collector Badge Registry & Collector Badges
+CREATE TABLE IF NOT EXISTS collector_badge_definitions (
   key VARCHAR(50) PRIMARY KEY,
   tier VARCHAR(20) NOT NULL,
   rule_version INT NOT NULL DEFAULT 1,
@@ -130,17 +130,18 @@ CREATE TABLE IF NOT EXISTS badge_definitions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS user_badges (
+CREATE TABLE IF NOT EXISTS collector_badges (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  badge_key VARCHAR(50) NOT NULL REFERENCES badge_definitions(key) ON DELETE CASCADE,
+  collector_badge_key VARCHAR(50) NOT NULL REFERENCES collector_badge_definitions(key) ON DELETE CASCADE,
   tier VARCHAR(20) NOT NULL,
   earned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   evidence JSONB NOT NULL,
   revoked_at TIMESTAMPTZ,
   revoke_reason TEXT,
-  UNIQUE(user_id, badge_key, tier)
+  UNIQUE(user_id, collector_badge_key, tier)
 );
+CREATE INDEX IF NOT EXISTS idx_collector_badges_user ON collector_badges(user_id) WHERE revoked_at IS NULL;
 ```
 
 ### 4.2 Per-Route Policy Summary
@@ -149,7 +150,7 @@ CREATE TABLE IF NOT EXISTS user_badges (
 | `/v1/bonus/:dropId` | GET | 2000 ms | 60/min | private, max-age=30 | 🟡 normal | Shed at L2+ |
 | `/v1/bonus/:roundId/answers` | POST | 3000 ms | 20/min | no-store (req_id) | 🟠 high | Shed at L2+ |
 | `/v1/bonus/:roundId/result` | GET | 2000 ms | 60/min | private, max-age=30 | 🟡 normal | Fallback to original twin |
-| `/v1/me/badges` | GET | 2000 ms | 60/min | private, max-age=60 | 🟡 normal | Cached memory response |
+| `/v1/me/collector-badges` | GET | 2000 ms | 60/min | private, max-age=60 | 🟡 normal | Cached memory response |
 
 ---
 

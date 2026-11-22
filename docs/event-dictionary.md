@@ -34,7 +34,7 @@
 | `bonus_offered` | `drop_id: string`, `lane_id: string`, `tie_group_size: number`, `round_no: number` | Track bonus round offer rate | `bonus_stats_daily` |
 | `bonus_started` | `drop_id: string`, `lane_id: string`, `round_id: string` | Track bonus round start conversion | `bonus_stats_daily` |
 | `bonus_submitted` | `drop_id: string`, `lane_id: string`, `round_id: string`, `question_count: number` | Track bonus round completion | `bonus_stats_daily` |
-| `badge_earned` | `badge_key: string`, `tier: string`, `rule_version: number` | Track badge distribution and milestone progress | `user_badge_summary` |
+| `badge_earned` | `collector_badge_key: string`, `tier: string`, `rule_version: number` | Track badge distribution and milestone progress | `collector_badge_summary` |
 | `badge_page_viewed` | `earned_count: number`, `unearned_count: number` | Track engagement with private badge showcase | `engagement_daily` |
 | `drop_viewed` | `drop_date: string (YYYY-MM-DD)`, `source: "notification" \| "challenge_link" \| "direct" \| "pwa_launch"` | Top of daily funnel conversion tracking | `daily_funnel_stats` |
 | `question_shown` | `drop_date: string`, `question_id: string (uuid)`, `position: number (1-5)` | Denominator for dwell, change, and abandon calculations | `question_stats_daily.shown_count` |

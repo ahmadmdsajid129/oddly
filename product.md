@@ -1251,6 +1251,8 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
   - "My badges" page: Private showcase displaying earned sticker badges and empty slots for unearned lanes. No public badge display, no leaderboards, no count of other players holding a badge, and no comparison between players (Rule B5).
   - Share card: Optional tactile sticker share card showing badge artwork with no player count and no rank.
 - **Rules Invariants:** Rules B5, B6, B7. Badges are private, unranked, unbuyable, and tamper-evidenced with stored lane IDs, Drop IDs, and rule version. Revoked upon account suspension for abuse.
+- **Data Touched:** `collector_badge_definitions`, `collector_badges`.
+- **API Route:** `GET /v1/me/collector-badges` (integrated with M6 `GET /v1/badges/mine` on `/me/badges` screen).
 - **Config & Flags:** `badge.min_similarity` (0.6), `badge.tier1_lanes` (2), `badge.tier2_lanes` (3), `badge.tier3_lanes` (5), `badge.super_window_days` (7), flag `feature.badges` (default false).
 - **Success Metrics & Guardrails:** Share of active players who open "My badges", multi-lane play rate. Guardrail: If multi-lane play rises while next-day return falls, review immediately (badges must never become a chore).
 

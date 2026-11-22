@@ -693,11 +693,11 @@ _Status: TODO | Target: Architecture specification for knowledge questions, anti
 
 | Task ID | Description | Priority | Status | Depends On | Assignee | Output Artifact | Verification Note |
 |---|---|---|---|---|---|---|---|
-| `[ ] P10U.01` | Relational data model for badges (`badge_definitions`, `user_badges` with JSONB evidence) | 🔴 Critical | ⚪ TODO | P10L.01, P10R.01 | Agent | — | DB migration creates tables, unique constraints, and audit indexes |
+| `[ ] P10U.01` | Relational data model for badges (`collector_badge_definitions`, `collector_badges` with JSONB evidence) | 🔴 Critical | ⚪ TODO | P10L.01, P10R.01 | Agent | — | DB migration creates tables, unique constraints, and audit indexes |
 | `[ ] P10U.02` | Post-recap worker job `badges.evaluate` with idempotent evaluation | 🔴 Critical | ⚪ TODO | P10U.01, P10R.03 | Agent | — | Evaluates Collector I-III, All-Lanes, and Super Twin xN with evidence |
-| `[ ] P10U.03` | Player Badges API route (`GET /v1/me/badges`) | 🟠 High | ⚪ TODO | P10U.01, P10U.02 | Agent | — | Serves own badges and empty slots, cached response, unranked |
+| `[ ] P10U.03` | Collector Badges API route (`GET /v1/me/collector-badges`) | 🟠 High | ⚪ TODO | P10U.01, P10U.02 | Agent | — | Serves own badges and empty slots, cached response, unranked |
 | `[ ] P10U.04` | Sticker badge components, unlock toast (< 600ms), and "My badges" showcase page | 🟠 High | ⚪ TODO | P10U.03, P01.01 | Agent | — | Sticker pop styling, empty slots for unearned lanes, honors reduced motion |
-| `[ ] P10U.05` | Admin Badge Definitions Editor (P11.49) and Tamper-Evident Revoke Tool (P11.50) | 🟡 Medium | ⚪ TODO | P10U.01, P11.01 | Agent | — | Admin configures thresholds and copy, revokes with mandatory audit reason |
+| `[ ] P10U.05` | Admin Collector Badge Definitions Editor (P11.49) and Tamper-Evident Revoke Tool (P11.50) | 🟡 Medium | ⚪ TODO | P10U.01, P11.01 | Agent | — | Admin configures thresholds and copy, revokes with mandatory audit reason |
 | `[ ] P10U.06` | Badge evaluation test suite and anti-cheat verification | 🧪 Testing | ⚪ TODO | P10U.02, P10U.05 | Agent | — | Tests prove cumulative retention, Super Twin rolling window, zero public rank exposure |
 
 ---
@@ -760,7 +760,7 @@ _Status: TODO | Target: Independent admin host, SSO + TOTP 2FA, immutable audit 
 | `[ ] P11.47` | Build Evergreen Question Pool Editor with entropy meter and safety checklist | 🟠 High | ⚪ TODO | P11.01, P10T.01 | Agent | — | spec Addendum C1 [P2] |
 | `[ ] P11.48` | Implement Evergreen Pool Runway Monitor and 7-day low-stock alerting | 🟡 Medium | ⚪ TODO | P11.47 | Agent | — | spec Addendum C1 [P2] |
 | `[ ] P11.49` | Build Bonus Round Monitoring Dashboard (tie-group sizes, participation rate, zero raw answers) | 🟠 High | ⚪ TODO | P11.01, P10T.03 | Agent | — | spec Addendum C2 [P2] |
-| `[ ] P11.50` | Build Badge Definitions Editor & Tamper-Evident Revoke Tool with audit reason logging | 🟠 High | ⚪ TODO | P11.01, P10U.01 | Agent | — | spec Addendum C3 [P2] |
+| `[ ] P11.50` | Build Collector Badge Definitions Editor & Tamper-Evident Revoke Tool with audit reason logging | 🟠 High | ⚪ TODO | P11.01, P10U.01 | Agent | — | spec Addendum C3 [P2] |
 
 #### Phase 11 Deferred (P2 & P3 Features — Visible in Backlog but Not in Stage 11)
 - **Full Command Center [P2]:** Milestone confetti/chimes, count-up animations, custom density toggle, saved views (spec section 3.4).
@@ -1154,7 +1154,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   <!-- visual:end -stage-l10-checklist-phase-10u-badges-stage-l10--bar -->
   - [ ] P10U.01: Relational data model for badges and tamper-evident evidence deployed.
   - [ ] P10U.02: Post-recap worker job evaluating collector and super-twin conditions.
-  - [ ] P10U.03: Player Badges API route serving unranked badge state.
+  - [ ] P10U.03: Collector Badges API route (`GET /v1/me/collector-badges`) serving unranked badge state.
   - [ ] P10U.04: Sticker badge artwork, unlock toast, and My Badges showcase page verified.
   - [ ] P10U.05: Admin Badge Definitions Editor and Revocation Tool operational.
   - [ ] P10U.06: Badge evaluation test suite and anti-cheat verification passing.

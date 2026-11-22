@@ -729,7 +729,7 @@ Extends existing automated pre-publish validation with 8 new checks:
 - **Privacy Enforcement:** Strictly aggregate metrics. Individual answers submitted by players are zero-accessible in admin views.
 - **Emergency Controls:** Master kill switch for `feature.bonus_rounds`.
 
-### C.3 Badge Definitions & Revocation Tool (P11.49, P11.50)
-- **Badge Registry Editor:** Interface for managing `badge_definitions` (thresholds, tier names, copy keys in `app_content`, and rule versions).
-- **Tamper-Evident Revoke Tool:** Search user by ID to inspect earned badges and attached cryptographic evidence. Allows revocation with mandatory structured reason code and audit log entry.
+### C.3 Collector Badge Definitions & Revocation Tool (P11.49, P11.50)
+- **Badge Registry Editor:** Interface for managing `collector_badge_definitions` (thresholds, tier names, copy keys in `app_content`, and rule versions).
+- **Tamper-Evident Revoke Tool:** Search user by ID to inspect earned badges and attached cryptographic evidence in `collector_badges`. Allows revocation with mandatory structured reason code and audit log entry.
 - **Aggregate Analytics:** $k \ge 20$ anonymous distribution of badges across lanes. Zero individual user profiling.
