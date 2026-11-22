@@ -1425,3 +1425,58 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
   - **Technical Architecture (Section B4):** Mermaid system topology diagram; scale tiers T0–T4 flow diagram and color dots; degradation ladder L0–L4 color indicators (`🟢/🟡/🟠/🔴/⚫`); submit path Mode A vs Mode B Mermaid sequence diagram; Section 18 lanes `erDiagram`; 4-step database migration flowchart; Per-Route Policy table priority indicators.
   - **Design System (Section B5):** Embedded `palette.svg` token preview; oddness tier chip previews; typography specimen table; component states table with tactile interaction emojis.
   - **Rules & Standards (Section B6):** Rule 1 callout (`> [!IMPORTANT]`); Absolute Rules theme legend and rule prefixes (`🛑/🔒/🧪/🗄️/🎨/💸/🛤️`); Rule 17 "No Pressure to Pay" callout; Section 9.1 Forbidden Topics callout; Error Matrix log level indicators (`🟢/🟡/🔴`).
+
+---
+
+## 36. Stage L0-ADD: Bonus Rounds & Badges Documentation (2026-11-22)
+
+- **Completed:** Stage L0-ADD (Bonus Rounds F40 and Badges F41 — documentation only).
+- **Core Principle Maintained:** Documentation only. Zero production code, migrations, seeds, or npm dependencies added.
+- **Key Architectural Decisions:**
+  1. **Decoupled Asynchronous Bonus Rounds (F40 / Stage L9):** Tied players after recap may optionally narrow their match by answering 3 extra questions from an evergreen pool without affecting the shared Drop.
+  2. **Deterministic Evergreen Question Selection (ADR 051):** Questions selected using `HMAC_SHA256(drop_id || tie_group_id || round_number)` over high-entropy, pre-screened questions. Everyone in a tie group receives identical questions.
+  3. **No Side-Effects for Bonus Responses (Rule B3):** Bonus answers affect solely the twin choice for that specific Drop. They do not alter oddness, percentiles, tiers, streaks, or badges. Retained only for 28 days.
+  4. **Private, Unranked Badges (F41 / Stage L10 / Rule B5):** Badges celebrate multi-lane exploration (Collector I–III, All-Lanes) and Super Twins without leaderboards, competition, or public counters. Visible only on private `/me/badges` view.
+  5. **Tamper-Evident Evidence Storage (ADR 052 / Rule B7):** Every badge stores verified lane IDs and Drop IDs as JSONB. Badges on suspended/duplicate accounts are revoked with an audit trail.
+
+### 36.1 Open Founder Questions & Recommended Defaults
+
+1. **Question 1 (Bonus Window Timing):** Is the bonus round async over 24 hours (recommended) or only live when both players are online simultaneously?
+   - *Recommended Default:* Async over 24 hours (`bonus.window_hours = 24`).
+   - *Reason:* Synchronous presence turns Oddly into a real-time lobby, creating scheduling friction across time zones and destroying the asynchronous 30-second habit loop.
+2. **Question 2 (Maximum Rounds per Tie Group):** Should maximum rounds be capped at 2 (recommended) or 1?
+   - *Recommended Default:* 2 rounds (`bonus.max_rounds = 2`, max 6 total bonus questions).
+   - *Reason:* For large tie groups (e.g. $T = 312$), 1 round (3 questions) often leaves a tie group around 39–78 players. A second round can reduce the pool to $< 5$, whereas $> 2$ rounds feels like homework and depletes evergreen pools.
+3. **Question 3 (Non-Participant Twin Stability):** Should a non-participant keep their original twin if other members narrowed their match?
+   - *Recommended Default:* Yes.
+   - *Reason:* Fairness and honesty. Non-participants opted out of extra questions; their initial twin was verified mathematically on the 5 Drop questions and should never be downgraded or stripped.
+4. **Question 4 (Evergreen Pool Threshold per Lane):** Should the minimum evergreen pool size per lane be 40 (recommended) or higher before opening the feature?
+   - *Recommended Default:* 40 approved questions (`bonus.pool_min_per_lane = 40`).
+   - *Reason:* 40 questions provides over 13 distinct 3-question rounds per lane without reuse, giving sufficient runway while remaining realistically curatable by editors.
+5. **Question 5 (Lane Twin Similarity Threshold):** Does `badge.min_similarity = 0.6` feel right, or should a lane twin require a stricter match?
+   - *Recommended Default:* `0.6` (`badge.min_similarity = 0.60`).
+   - *Reason:* 0.6 corresponds to matching on roughly 3 of 5 questions with average information weights, representing genuine commonality without demanding impossible 5/5 perfection in diverse lanes.
+6. **Question 6 (Public Profile Placement):** Should badges ever appear on future public profiles?
+   - *Recommended Default:* Defer decision until the future user profile design stage. Default to private in v1.
+   - *Reason:* Rule B5 prevents comparative ranking and social gamification. Keeping badges private preserves Oddly's relaxed, introspective spirit.
+7. **Question 7 (All-Lanes Badge Scope):** Is the All-Lanes badge defined against lanes open on the day earned (recommended) or at all times?
+   - *Recommended Default:* Defined against lanes open on the day the final qualifying lane twin was earned.
+   - *Reason:* Cumulative permanence. Once a player achieves All-Lanes across today's open catalog, launching a new lane tomorrow should not retroactively strip their earned achievement.
+
+### 36.2 Unsoftened Risk Register
+
+1. **Risk 1: Low Asynchronous Participation Collapsing Bonus Rounds:**
+   - *Impact:* High. If only 1 person in a tie group of 10 opens the bonus round, they always receive the "Nobody else from your group played" alone message, creating an anti-climactic feeling of emptiness.
+   - *Mitigation:* Require tie groups to have at least 2 members; only offer bonus rounds on healthy lanes (>= 200 players); set guardrail review if participation falls below 10% for 14 days without coercive nagging.
+2. **Risk 2: Multi-Lane "Badge Farming" Fatigue:**
+   - *Impact:* High. Players seeking Collector or All-Lanes badges may feel obligated to play 5+ lanes daily, shifting Oddly from a 30-second daily joy into an exhausting checklist.
+   - *Mitigation:* Explicitly decouple daily streak increment from multi-lane play (streaks require only >= 1 lane Drop per day); badges are unranked with zero countdowns or "one lane away" nudges.
+3. **Risk 3: Evergreen Question Answer Leakage & Cheating:**
+   - *Impact:* Medium. Unlike daily Drops which expire after 24 hours, evergreen pool questions persist across months, making them vulnerable to memorization or online crowdsourcing.
+   - *Mitigation:* Track 28-day historical exposure per user and strictly exclude previously answered questions; alert admins when pools drop below 40 questions to stimulate rotation.
+4. **Risk 4: Creeping Comparison Pressure If Badges Become Public:**
+   - *Impact:* Severe. If badges are exposed on public URLs or profiles, players will compare counts, demand streak-freeze badges, and complain about RNG matching.
+   - *Mitigation:* Absolute architectural enforcement of Rule B5 (badges visible strictly on `/me/badges` with zero public API routes or social graph joining).
+
+### 36.3 Next Actions
+- Stand ready for Stage L1 (Phase 10L: Lanes Plumbing) on Founder command.
