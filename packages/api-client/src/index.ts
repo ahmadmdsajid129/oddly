@@ -238,6 +238,13 @@ export interface IncomingKeepItem {
   created_at: string;
 }
 
+export interface ServerTimeResponse {
+  server_time_utc: string;
+  server_time_ms: number;
+  ist_date: string;
+  seconds_until_next_drop: number;
+}
+
 export interface IncomingKeepsResponse {
   ok: boolean;
   incoming: IncomingKeepItem[];
@@ -523,6 +530,11 @@ export class OddlyApiClient {
   /** Public runtime configuration and tier definitions */
   async getPublicConfig(): Promise<PublicConfigResponse> {
     return this.request<PublicConfigResponse>("/v1/config/public");
+  }
+
+  /** Precise server time synchronization for client countdowns (P4.14) */
+  async getServerTime(): Promise<ServerTimeResponse> {
+    return this.request<ServerTimeResponse>("/v1/time");
   }
 
   /** Register or verify a guest device */

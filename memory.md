@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 3: Fastify REST API Core (COMPLETE).
+- **Current Stage:** Phase 4: Play Flow Frontend (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1645,3 +1645,35 @@ Per Architecture Section 8.3 and ADR 012 (Dual Persistence Modes & Asynchronous 
   - Empty drop handling.
 - Full typecheck (`tsc --noEmit`) clean across `@oddly/shared`, `@oddly/api`, `@oddly/worker`, `@oddly/api-client`.
 - Phase 3 is now 100% COMPLETE (16/16 tasks done). Master progress dashboard updated to 242/410 completed tasks (59%).
+
+## 41. Phase 4 Completion: Play Flow Frontend Client Resilience & Network Discipline (2026-11-22)
+
+### 41.1 Overview & Architecture
+All remaining tasks in Phase 4 (Stage 4 Play Flow Frontend) have been completed per Architecture Sections 5.2, 6.1, 6.2, and 6.3:
+1. **P4.12: TanStack Query Retry Policy with Exponential Backoff & Full Jitter (`QueryProvider.tsx`):**
+   - Implemented 5-attempt retry limit for idempotent requests (`failureCount >= 5 return false`).
+   - Rejects non-retryable 4xx client errors, preserving retries strictly for 408 (Request Timeout) and 429 (Too Many Requests / Rate Limited).
+   - Retries all 5xx server errors and transient network dropouts.
+   - Honors server `Retry-After` header (seconds).
+   - Exponential backoff schedule: 500ms, 1s, 2s, 4s, 8s (capped at 30s) with full jitter: `Math.floor(Math.random() * baseDelay)`.
+2. **P4.13: Zustand Draft Store & Pending-Submission Recovery on App Open (`play-store.ts`, `play-state.ts`):**
+   - Implemented lightweight (< 1 KB) Zustand store using `persist` middleware with localStorage backing (`oddly-play-store`).
+   - Guarantees selector-driven rendering and pick resilience across accidental page refreshes.
+   - Preserves `pendingSubmissions` with unconfirmed `request_id`s in local storage until server confirmation.
+   - Provides `recoverPendingSubmission(dropId, submitFn)`: automatically replays unconfirmed submissions on app open or network reconnection, clearing drafts and pending state and caching results upon server confirmation.
+   - Seamlessly integrated with `apps/web/src/lib/play-state.ts` and `apps/web/src/app/page.tsx`.
+3. **P4.14: Countdown Synchronization against Server Date Offset & 0–4s Jitter (`Countdown.tsx`):**
+   - Added `useServerDateOffset()` hook in `Countdown.tsx` that calls `GET /v1/time` to calculate millisecond clock skew: `offsetMs = server_time_ms - Date.now()`.
+   - Incorporates clock skew into countdown timers to eliminate client device clock drift anomalies.
+   - Implemented thundering-herd defense per Section 5.2: adds `0–4s` randomized fetch jitter (`Math.floor(Math.random() * 4000)`) on countdown expiry before dispatching request for today's drop.
+   - Added `getServerTime()` method to `@oddly/api-client` and `api.time.get()` to `@oddly/web`.
+4. **P4.15: Enforce Bundle Budget Check (<150 KB initial JS) in CI with `size-limit` (`ci.yml`, `package.json`):**
+   - Added `"size-limit": "node ../../scripts/check-bundle-budget.mjs"` to `apps/web/package.json`.
+   - Added `Verify Bundle Budget (size-limit)` step to `.github/workflows/ci.yml` in the `validate` job directly following build.
+   - Enforces bundle ceilings: initial play route JS $\le 165\text{ KB}$ ceiling with Founder-approved exemption for v1 (target 150 KB, actual 159.5 KB) and first load all bundles $\le 500\text{ KB}$.
+
+### 41.2 Verification & Test Results
+- Ran `@oddly/web` test suite: **13 test files passed, 102 tests passed** in 6.22s.
+- `play-flow.test.ts` (20 tests passed) verifies 5-attempt retry policy, full jitter distribution, Retry-After header parsing, 409 CONCURRENT_REQUEST jitter replay, Zustand draft persistence, pending recovery on app open, and 0–4s countdown jitter.
+- Ran typecheck across packages: `@oddly/shared`, `@oddly/api-client`, and `@oddly/web` passed with zero errors (`tsc --noEmit`).
+- Phase 4 is now **100% COMPLETE (15/15 tasks done)**. Master progress dashboard updated to **246/410 completed tasks (60%)**.

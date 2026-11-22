@@ -234,7 +234,7 @@ export default function HomePage() {
             clearPendingSubmission(activeDropId);
             clearDraft(activeDropId);
             const restored: StoredPlayResult = {
-              submission_id: res.submission_id,
+              submission_id: res.submission_id ?? res.request_id ?? "",
               match: {
                 matched_picks: Math.round((res.match?.similarity_score ?? 0.8) * 5),
                 total_picks: 5,
@@ -385,7 +385,7 @@ export default function HomePage() {
       });
 
       const processedResult: StoredPlayResult = {
-        submission_id: res.submission_id,
+        submission_id: res.submission_id ?? res.request_id ?? "",
         match: {
           matched_picks: Math.round((res.match?.similarity_score ?? 0.8) * 5),
           total_picks: 5,

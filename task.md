@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 59%`                                                       |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 60%`                                                       |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 242 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 246 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 168 tasks                                                                        |
+| **Pending (`TODO`)**            | 164 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -52,7 +52,7 @@
 | **Phase 1**  | Design System & UI Kit                      | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 23 / 23            | Stage 1 & Stage 0.5   |
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 2 & Stage R2    |
 | **Phase 3**  | Fastify REST API Core                       | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 16 / 16            | Stage 3 & Stage R2    |
-| **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
+| **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 4 & Stage 0.5   |
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
@@ -202,7 +202,7 @@ _Status: COMPLETE | Target: REST routes, Swagger docs, guest identity, load shed
 
 ### Phase 4: Play Flow Frontend (Stage 4)
 
-_Status: PARTIAL | Target: S1 to S4 responsive flow, TanStack Query, offline persistence, budget CI._
+_Status: COMPLETE | Target: S1 to S4 responsive flow, TanStack Query, offline persistence, budget CI._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -217,10 +217,10 @@ _Status: PARTIAL | Target: S1 to S4 responsive flow, TanStack Query, offline per
 | `[x] P4.09` | Implement offline detection banner with automatic retry when network reconnects            | 🟠 High      | ✅ DONE         | P1.14, P4.08| Agent | 2026-11-08  | Flaky network resilience        |
 | `[x] P4.10` | Implement sound and haptic sensory feedback triggers across all question interactions      | 🟢 Low       | ✅ DONE         | P1.18, P4.04| Agent | 2026-11-08  | Delightful sensory experience   |
 | `[x] P4.11` | Write Playwright E2E test verifying complete S1->S4 answering flow on mobile viewport       | 🔴 Critical  | ✅ DONE         | P4.01-P4.08 | Agent | 2026-11-08  | End-to-end flow verification    |
-| `[ ] P4.12` | Configure TanStack Query retry policy with exponential backoff and full jitter              | 🟠 High      | ⚪ TODO         | P4.08       | Agent | —           | Network discipline (Sec 6.3)    |
-| `[ ] P4.13` | Implement Zustand draft persistence with pending-submission recovery on app open           | 🟠 High      | ⚪ TODO         | P4.07       | Agent | —           | Client resilience (Sec 6.3)     |
-| `[ ] P4.14` | Synchronize countdown against server `Date` offset and add 0–4s randomized fetch jitter     | 🟠 High      | ⚪ TODO         | P4.03       | Agent | —           | Thundering herd defense (5.2)   |
-| `[ ] P4.15` | Enforce bundle budget check (<150 KB initial JS) in CI with `size-limit`                    | 🟡 Medium    | ⚪ TODO         | P4.01       | Agent | —           | Bundle budget gate (Sec 6.2)    |
+| `[x] P4.12` | Configure TanStack Query retry policy with exponential backoff and full jitter              | 🟠 High      | ✅ DONE         | P4.08       | Agent | 2026-11-22  | Network discipline, 5 retries, Retry-After (Sec 6.3) |
+| `[x] P4.13` | Implement Zustand draft persistence with pending-submission recovery on app open           | 🟠 High      | ✅ DONE         | P4.07       | Agent | 2026-11-22  | Client resilience, persist store, recovery (Sec 6.3) |
+| `[x] P4.14` | Synchronize countdown against server `Date` offset and add 0–4s randomized fetch jitter     | 🟠 High      | ✅ DONE         | P4.03       | Agent | 2026-11-22  | Thundering herd defense, /v1/time offset, 0-4s jitter (5.2) |
+| `[x] P4.15` | Enforce bundle budget check (<150 KB initial JS) in CI with `size-limit`                    | 🟡 Medium    | ✅ DONE         | P4.01       | Agent | 2026-11-22  | Bundle budget gate in CI with size-limit (Sec 6.2) |
 
 ---
 
@@ -906,10 +906,12 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Verify Mode B asynchronous ingestion behind `PERSIST_MODE=async` with queue drainage and reconciliation job parity.
 - **Stage 4 Checklist:**
   <!-- visual:start -stage-4-checklist--bar -->
-  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (2/2 verification items verified)
+  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (4/4 verification items verified)
   <!-- visual:end -stage-4-checklist--bar -->
   - [x] Open web app on mobile viewport; complete all 5 questions from S1 to S4 without logging in.
   - [x] Test offline behavior by disconnecting network; confirm answers persist and retry gracefully.
+  - [x] Verify TanStack Query exponential backoff with full jitter (5 retries max, honors Retry-After header).
+  - [x] Verify Zustand draft persistence with pending-submission recovery on app open, and countdown server date sync with 0–4s fetch jitter.
 - **Stage 5 Checklist:**
   <!-- visual:start -stage-5-checklist--bar -->
   > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (2/2 verification items verified)
@@ -1192,6 +1194,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 4 Complete (P4.12–P4.15) | Completed remaining 4 tasks for Phase 4: TanStack Query exponential backoff and full jitter (P4.12), Zustand draft store with pending-submission recovery on app open (P4.13), Countdown server date sync with 0–4s fetch jitter (P4.14), and size-limit bundle budget gate in CI (P4.15). Phase 4 now 100% COMPLETE (15/15). Dashboard updated to 246/410 (60%). | Phase 4 completion & client resilience. |
 | `2026-11-22` | Phase 3 Complete (P3.16)  | Implemented Mode B asynchronous ingestion behind `PERSIST_MODE=async` with Redis queue (`oddly:queue:submit-persist`), worker micro-batch drainage (`SubmitPersistWorker`), and reconciliation audit job (`PersistReconciliationJob`). Phase 3 now 100% COMPLETE (16/16). Dashboard updated to 242/410 (59%). | Phase 3 completion & dual persistence modes. |
 | `2026-11-22` | Phase 1 (P1.20–P1.23)     | Completed remaining 4 tasks for Phase 1: DegradationBanner (P1.20), ModeBPendingScreen (P1.21), OverloadScreens (P1.22), and ResiliencePrimitives (P1.23). Phase 1 now 100% COMPLETE (23/23). Dashboard updated to 241/410 (59%). | Phase 1 completion & resilience UI kit.       |
 | `2026-11-22` | Phases 10T, 10U, Phase 11 (P11.47–P11.50) | Added Phase 10T (Bonus Rounds, Stage L9, 7 tasks), Phase 10U (Badges, Stage L10, 6 tasks), and Phase 11 admin tasks P11.47–P11.50 per Addendum C. Updated execution order to include L9 and L10. Updated dashboard to 410 tasks across 38 phases. | Stage L0-ADD Founder approval. |

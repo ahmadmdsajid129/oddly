@@ -15,6 +15,9 @@ export const rawClient: OddlyApiClient = createOddlyClient({
 
 // Convenient domain-namespaced wrappers matching play flow patterns
 export const api = {
+  time: {
+    get: () => rawClient.getServerTime(),
+  },
   drops: {
     getToday: () => rawClient.getTodayDrop(),
     getByDate: (date: string) => rawClient.getDropByDate(date),

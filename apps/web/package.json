@@ -10,7 +10,8 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:integration": "echo 'web: e2e and unit tests only'"
+    "test:integration": "echo 'web: e2e and unit tests only'",
+    "size-limit": "node ../../scripts/check-bundle-budget.mjs"
   },
   "dependencies": {
     "@oddly/api-client": "workspace:*",
@@ -28,7 +29,8 @@
     "next": "14.2.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "tailwind-merge": "^2.5.4"
+    "tailwind-merge": "^2.5.4",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",

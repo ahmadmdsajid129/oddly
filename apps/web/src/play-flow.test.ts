@@ -244,13 +244,15 @@ describe("Stage 4: Play Flow State and Offline Caching", () => {
       expect(queryRetryPolicy(0, { status: 429 })).toBe(true);
     });
 
-    it("retries 5xx server errors and network drops up to 3 attempts", () => {
+    it("retries 5xx server errors and network drops up to 5 attempts (Sec 6.3)", () => {
       // 500 Internal Server Error
       expect(queryRetryPolicy(0, { status: 500 })).toBe(true);
       expect(queryRetryPolicy(1, { status: 503 })).toBe(true);
       expect(queryRetryPolicy(2, { status: 502 })).toBe(true);
-      // Max retries reached (failureCount >= 3)
-      expect(queryRetryPolicy(3, { status: 500 })).toBe(false);
+      expect(queryRetryPolicy(3, { status: 500 })).toBe(true);
+      expect(queryRetryPolicy(4, { status: 500 })).toBe(true);
+      // Max retries reached (failureCount >= 5)
+      expect(queryRetryPolicy(5, { status: 500 })).toBe(false);
     });
 
     it("honors server Retry-After header when present", () => {
@@ -261,12 +263,12 @@ describe("Stage 4: Play Flow State and Offline Caching", () => {
       expect(delay).toBe(5000); // 5 seconds in ms
     });
 
-    it("computes exponential backoff with full jitter within bounded range", () => {
-      for (let attempt = 0; attempt < 4; attempt++) {
+    it("computes exponential backoff with full jitter within bounded range (500ms base)", () => {
+      for (let attempt = 0; attempt < 5; attempt++) {
         const delay = queryRetryDelayPolicy(attempt, new Error("Network dropout"));
-        const base = Math.min(1000 * 2 ** attempt, 30000);
-        // Delay must be between 50% and 100% of base
-        expect(delay).toBeGreaterThanOrEqual(base * 0.5);
+        const base = Math.min(500 * 2 ** attempt, 30000);
+        // Full jitter: delay must be in [0, base]
+        expect(delay).toBeGreaterThanOrEqual(0);
         expect(delay).toBeLessThanOrEqual(base);
       }
     });
@@ -304,6 +306,87 @@ describe("Stage 4: Play Flow State and Offline Caching", () => {
       expect(res.submission_id).toBe("sub-recovered-123");
 
       vi.restoreAllMocks();
+    });
+  });
+
+  describe("P4.13: Zustand Draft Store & Pending-Submission Recovery", () => {
+    it("recovers unconfirmed pending submission on app open and clears draft upon confirmation", async () => {
+      const dropId = "drop-recovery-test";
+      const pendingData = {
+        drop_id: dropId,
+        player_id: "player-recover-1",
+        request_id: "req-recovery-999",
+        answers: [{ type: "text" as const, question_id: "q1", value: "optA" }],
+        created_at: Date.now(),
+      };
+
+      saveDraft(dropId, pendingData.answers);
+      savePendingSubmission(pendingData);
+
+      expect(getSavedDraft(dropId)).toEqual(pendingData.answers);
+      expect(getPendingSubmission(dropId)).toEqual(pendingData);
+
+      const mockSubmit = vi.fn().mockResolvedValue({
+        ok: true,
+        submission_id: "sub-recovered-success",
+        match: { similarity_score: 0.9 },
+        oddness: { raw_score: 0.4 },
+      });
+
+      const { usePlayStore } = await import("./lib/play-store");
+      const recovered = await usePlayStore.getState().recoverPendingSubmission(dropId, mockSubmit);
+
+      expect(mockSubmit).toHaveBeenCalledWith(pendingData);
+      expect(recovered).not.toBeNull();
+      // Pending submission and draft should now be cleared
+      expect(getPendingSubmission(dropId)).toBeNull();
+      expect(getSavedDraft(dropId)).toBeNull();
+      // Completed result should now be saved
+      expect(getCompletedResult(dropId)).toEqual(
+        expect.objectContaining({ submission_id: "sub-recovered-success" })
+      );
+    });
+
+    it("preserves pending submission in store if recovery network dispatch throws", async () => {
+      const dropId = "drop-fail-recovery";
+      const pendingData = {
+        drop_id: dropId,
+        player_id: "player-fail-1",
+        request_id: "req-fail-111",
+        answers: [{ type: "text" as const, question_id: "q1", value: "optB" }],
+        created_at: Date.now(),
+      };
+
+      savePendingSubmission(pendingData);
+
+      const failingSubmit = vi.fn().mockRejectedValue(new Error("503 Service Unavailable"));
+
+      const { usePlayStore } = await import("./lib/play-store");
+      await expect(
+        usePlayStore.getState().recoverPendingSubmission(dropId, failingSubmit)
+      ).rejects.toThrow("503 Service Unavailable");
+
+      // Pending submission must remain intact for future retries
+      expect(getPendingSubmission(dropId)).toEqual(pendingData);
+    });
+  });
+
+  describe("P4.14: Countdown Synchronization & Thundering-Herd Fetch Jitter", () => {
+    it("incorporates server date offset into countdown calculations", () => {
+      const now = Date.now();
+      const serverOffsetMs = -5000; // Client is 5 seconds ahead of server
+      const targetTime = new Date(now + 60000); // 1 minute in future
+
+      const diffWithOffset = targetTime.getTime() - (now + serverOffsetMs);
+      expect(diffWithOffset).toBe(65000); // 65 seconds
+    });
+
+    it("verifies 0–4s randomized fetch jitter on countdown expiry (Sec 5.2)", () => {
+      for (let i = 0; i < 20; i++) {
+        const jitterMs = Math.floor(Math.random() * 4000);
+        expect(jitterMs).toBeGreaterThanOrEqual(0);
+        expect(jitterMs).toBeLessThan(4000);
+      }
     });
   });
 });

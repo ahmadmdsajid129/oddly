@@ -1,133 +1,52 @@
 import { useEffect, useState } from "react";
 import type { AnswerPayload } from "@oddly/shared";
+import { usePlayStore, type PendingSubmissionPayload } from "./play-store";
 
-const ADULT_CONFIRMED_KEY = "oddly_adult_confirmed";
-const DRAFT_PREFIX = "oddly_draft_";
-const COMPLETED_PREFIX = "oddly_completed_";
-const PENDING_PREFIX = "oddly_pending_submission_";
-
-export interface PendingSubmissionPayload {
-  drop_id: string;
-  player_id: string;
-  request_id: string;
-  timing_ms?: number;
-  answers: AnswerPayload[];
-  created_at: number;
-}
+export type { PendingSubmissionPayload };
+export { usePlayStore };
 
 export function savePendingSubmission(payload: PendingSubmissionPayload): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(`${PENDING_PREFIX}${payload.drop_id}`, JSON.stringify(payload));
-  } catch {
-    // Ignore quota errors
-  }
+  usePlayStore.getState().savePendingSubmission(payload);
 }
 
 export function getPendingSubmission(dropId: string): PendingSubmissionPayload | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(`${PENDING_PREFIX}${dropId}`);
-    if (!raw) return null;
-    return JSON.parse(raw) as PendingSubmissionPayload;
-  } catch {
-    return null;
-  }
+  return usePlayStore.getState().getPendingSubmission(dropId);
 }
 
 export function clearPendingSubmission(dropId: string): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(`${PENDING_PREFIX}${dropId}`);
-  } catch {
-    // Ignore
-  }
+  usePlayStore.getState().clearPendingSubmission(dropId);
 }
 
 export function getAllPendingSubmissions(): PendingSubmissionPayload[] {
-  if (typeof window === "undefined") return [];
-  const list: PendingSubmissionPayload[] = [];
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith(PENDING_PREFIX)) {
-        const raw = localStorage.getItem(key);
-        if (raw) {
-          list.push(JSON.parse(raw) as PendingSubmissionPayload);
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-  return list;
+  return usePlayStore.getState().getAllPendingSubmissions();
 }
 
 export function isAdultConfirmed(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return localStorage.getItem(ADULT_CONFIRMED_KEY) === "true";
-  } catch {
-    return false;
-  }
+  return usePlayStore.getState().isAdultConfirmed();
 }
 
-export function setAdultConfirmed(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(ADULT_CONFIRMED_KEY, "true");
-  } catch {
-    // LocalStorage might be disabled in private mode
-  }
+export function setAdultConfirmed(confirmed = true): void {
+  usePlayStore.getState().setAdultConfirmed(confirmed);
 }
 
 export function getSavedDraft(dropId: string): AnswerPayload[] | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(`${DRAFT_PREFIX}${dropId}`);
-    if (!raw) return null;
-    return JSON.parse(raw) as AnswerPayload[];
-  } catch {
-    return null;
-  }
+  return usePlayStore.getState().getDraft(dropId);
 }
 
 export function saveDraft(dropId: string, answers: AnswerPayload[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(`${DRAFT_PREFIX}${dropId}`, JSON.stringify(answers));
-  } catch {
-    // Ignore quota errors
-  }
+  usePlayStore.getState().saveDraft(dropId, answers);
 }
 
 export function clearDraft(dropId: string): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(`${DRAFT_PREFIX}${dropId}`);
-  } catch {
-    // Ignore
-  }
+  usePlayStore.getState().clearDraft(dropId);
 }
 
 export function getCompletedResult<T = unknown>(dropId: string): T | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(`${COMPLETED_PREFIX}${dropId}`);
-    if (!raw) return null;
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
+  return usePlayStore.getState().getCompletedResult<T>(dropId);
 }
 
 export function saveCompletedResult(dropId: string, result: unknown): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(`${COMPLETED_PREFIX}${dropId}`, JSON.stringify(result));
-  } catch {
-    // Ignore
-  }
+  usePlayStore.getState().saveCompletedResult(dropId, result);
 }
 
 export function generateRequestId(): string {

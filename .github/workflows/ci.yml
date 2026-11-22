@@ -43,6 +43,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Verify Bundle Budget (size-limit)
+        run: pnpm size-limit
+
   integration:
     name: Real-Infrastructure Integration Tests (Postgres 16 & Redis 7)
     runs-on: ubuntu-latest

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { m, AnimatePresence, useReducedMotion } from "framer-motion";
+import { api } from "@/lib/api";
 
 interface TimeRemaining {
   hours: number;
@@ -71,9 +72,39 @@ const UnitCard = React.memo(function UnitCard({
   );
 });
 
+/**
+ * Hook to retrieve millisecond clock skew between client Date.now() and Fastify server time.
+ * Calls GET /v1/time and caches offset to defend against local device clock drift (Task P4.14).
+ */
+export function useServerDateOffset(): number {
+  const [offsetMs, setOffsetMs] = useState(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.time
+      .get()
+      .then((res) => {
+        if (isMounted && res && typeof res.server_time_ms === "number") {
+          const clientNow = Date.now();
+          const calculatedOffset = res.server_time_ms - clientNow;
+          setOffsetMs(calculatedOffset);
+        }
+      })
+      .catch(() => {
+        // Fall back to zero offset on network error or offline
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  return offsetMs;
+}
+
 export function Countdown({
   targetDate,
-  serverDateOffsetMs = 0,
+  serverDateOffsetMs,
   onComplete,
   className = "",
 }: {
@@ -83,6 +114,8 @@ export function Countdown({
   className?: string;
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const fetchedOffset = useServerDateOffset();
+  const effectiveOffsetMs = serverDateOffsetMs !== undefined ? serverDateOffsetMs : fetchedOffset;
   const hasTriggeredRef = React.useRef(false);
 
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({ hours: 0, minutes: 0, seconds: 0 });
@@ -90,7 +123,7 @@ export function Countdown({
   useEffect(() => {
     // Helper calculating next 07:00 IST (01:30 UTC)
     const calculateDefaultTarget = (): Date => {
-      const now = new Date(Date.now() + serverDateOffsetMs);
+      const now = new Date(Date.now() + effectiveOffsetMs);
       // 07:00 IST is 01:30 UTC
       const target = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 1, 30, 0, 0));
       if (now.getTime() >= target.getTime()) {
@@ -103,13 +136,14 @@ export function Countdown({
     const target = targetDate || calculateDefaultTarget();
 
     const update = () => {
-      const now = new Date(Date.now() + serverDateOffsetMs);
+      const now = new Date(Date.now() + effectiveOffsetMs);
       const diffMs = target.getTime() - now.getTime();
 
       if (diffMs <= 0) {
         setTimeRemaining({ hours: 0, minutes: 0, seconds: 0 });
         if (!hasTriggeredRef.current) {
           hasTriggeredRef.current = true;
+          // Thundering-herd defense per Sec 5.2: add 0–4s randomized fetch jitter
           const jitterMs = Math.floor(Math.random() * 4000);
           setTimeout(() => {
             onComplete?.();
@@ -129,7 +163,7 @@ export function Countdown({
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
-  }, [targetDate, serverDateOffsetMs, onComplete]);
+  }, [targetDate, effectiveOffsetMs, onComplete]);
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>

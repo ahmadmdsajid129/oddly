@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export function queryRetryPolicy(failureCount: number, error: unknown): boolean {
-  if (failureCount >= 3) return false;
+  // Architecture Sec 6.3: Retry up to 5 times for idempotent requests
+  if (failureCount >= 5) return false;
 
   const err = error as { statusCode?: number; status?: number };
   const status = err?.statusCode || err?.status;
@@ -42,9 +43,10 @@ export function queryRetryDelayPolicy(attemptIndex: number, error: unknown): num
     return err.retry_after * 1000;
   }
 
-  // Exponential backoff with full jitter: 1s -> 2s -> 4s up to 30s max
-  const baseDelay = Math.min(1000 * 2 ** attemptIndex, 30000);
-  return Math.floor(baseDelay * (0.5 + Math.random() * 0.5));
+  // Exponential backoff per Sec 6.3: 500ms -> 1s -> 2s -> 4s -> 8s (capped at 30s)
+  // Full jitter: uniformly random between 0 and baseDelay
+  const baseDelay = Math.min(500 * 2 ** attemptIndex, 30000);
+  return Math.floor(Math.random() * baseDelay);
 }
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
