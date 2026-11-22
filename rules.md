@@ -1,6 +1,6 @@
 # Rules and Operating Standards — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-21 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-22 | Owner: Founder + AI agent
 Purpose of this file: Immutable operational rules, coding standards, error-handling protocols, security policies, and Definition of Done for all development.
 
 ---
@@ -66,7 +66,7 @@ Purpose of this file: Immutable operational rules, coding standards, error-handl
 28. 🛤️ **Lane Choice is the Player's Own (Founder-approved, L0; Rule L11):** A player may play any open lane, one or more per day. Streaks count a day if at least one lane Drop was completed (v1). Lane-specific streaks are documented for v1.5, not built in v1.
 29. 🛤️ **Bonus Questions Are Not Drop Questions (Founder-approved, L0-ADD; Rule B1):** Bonus questions come from a published evergreen pool per lane, are identical for every player inside a tie group, are never personalised, and never change which Drop questions a player sees or their order (clarifies Rule 12 / L1).
 30. 🔒 **Bonus Honesty (Founder-approved, L0-ADD; Rule B2):** Participant and tie-group counts shown on bonus rounds are real database counts. A player is never told they were matched on a bonus round if they were not, and no synthetic or simulated participants are ever generated (Rule 2).
-31. 🗄️ **No Side Effects for Bonus Answers (Founder-approved, L0-ADD; Rule B3):** Bonus answers do not change oddness scores, percentiles, tiers, streaks, badges, or any global statistics. They affect solely the twin selection among participating tie-group members for that specific Drop. Bonus answers are retained only for `bonus.retention_days` (default 28 days) and then permanently purged under the history signature deletion protocol.
+31. 🗄️ **No Side Effects for Bonus Answers (Founder-approved, L0-ADD; Rule B3):** Bonus answers do not change oddness scores, percentiles, tiers, streaks, badges, or any global statistics. They never change the locked twin. They produce only an additional, participant-only result stored in `bonus_results` (shown as 'Closest in your group'). Bonus answers are retained only for `bonus.retention_days` (default 28 days) and then permanently purged.
 32. 🛤️ **Bonus Lane Isolation (Founder-approved, L0-ADD; Rule B4):** A bonus round belongs strictly to one lane and one specific Drop. Cross-lane bonus rounds do not exist (Rule L2).
 33. 🔒 **Badges Are Private and Unranked (Founder-approved, L0-ADD; Rule B5):** Badges are visible only to their owner on the result screen and their private "My badges" page. No public badge showcase, no leaderboards, no display of how many other players hold a badge, and no comparative ranking between players. Placement on any future profile requires an explicit separate Founder decision.
 34. 💸 **Badges Cannot Be Bought or Rushed (Founder-approved, L0-ADD; Rule B6):** No badge can be purchased, boosted, or accelerated with money. No badges are awarded simply for playing more days, and zero notification pressure (no pushes, emails, or "one lane away" nag copy) may be used to drive badge progress. Progress is visible only on the passive "My badges" screen. Premium (M8) remains strictly confined to its listed archival and theme perks (Rule L8, Rule 17).
@@ -313,7 +313,7 @@ All meme questions (`render_variant = "meme"`) must adhere to strict editorial s
 - **2026-11-22:** Stage L0-ADD rule additions approved by Founder:
   - Rule B1 (clarifies Rule 12 / L1): Bonus Questions Are Not Drop Questions (drawn from published evergreen pool, identical within tie group, never personalised).
   - Rule B2: Bonus Honesty (real participant and tie group counts; zero synthetic participants).
-  - Rule B3: No Side Effects for Bonus Answers (no changes to oddness, percentiles, tiers, streaks, or badges; 28-day retention purge).
+  - Rule B3: No Side Effects for Bonus Answers (no changes to oddness, percentiles, tiers, streaks, badges, or locked twin; produces additive participant-only result in `bonus_results`; 28-day retention purge).
   - Rule B4: Bonus Lane Isolation (bonus round strictly bound to one lane and one Drop).
   - Rule B5: Badges Are Private and Unranked (visible only to owner on result screen and My Badges page; no leaderboards or player comparisons).
   - Rule B6: Badges Cannot Be Bought or Rushed (no paid progress, no play-day grind badges, zero nagging notifications).

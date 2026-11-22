@@ -681,7 +681,7 @@ _Status: TODO | Target: Architecture specification for knowledge questions, anti
 | `[ ] P10T.04` | Public Bonus API routes (`GET /v1/bonus/:dropId`, `POST /v1/bonus/:roundId/answers`, `GET /v1/bonus/:roundId/result`) | 🔴 Critical | ⚪ TODO | P10T.01, P10T.03 | Agent | — | Idempotent with request_id, 24h play window, rate limited |
 | `[ ] P10T.05` | Post-window computation worker job `bonus.close_and_compute` | 🔴 Critical | ⚪ TODO | P10T.04 | Agent | — | Runs at 07:01 IST (before 07:05 final batch), evaluates bonus similarity among participants, writes additive closest-match outcome to `bonus_results`, never touches `twin_results`, handles alone state |
 | `[ ] P10T.06` | Result screen Bonus Offer Card, 3-question bonus runner, and result line UI | 🟠 High | ⚪ TODO | P10T.04, P10M.04, P1.01 | Agent | — | Reuses Stage L2 renderers, sticker styling, no countdowns or pressure |
-| `[ ] P10T.07` | Deterministic tie-break unit tests and end-to-end idempotency test suite | 🧪 Testing | ⚪ TODO | P10T.05, P10T.06 | Agent | — | Proves identical questions inside tie group, verified greedy rematching, 28-day retention purge |
+| `[ ] P10T.07` | Deterministic tie-break unit tests and end-to-end idempotency test suite | 🧪 Testing | ⚪ TODO | P10T.05, P10T.06 | Agent | — | Proves identical questions inside tie group, verified greedy computation of bonus results, 28-day retention purge |
 
 ---
 
@@ -1145,7 +1145,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [ ] P10T.02: Admin Evergreen Question Pool Editor and runway alerting active.
   - [ ] P10T.03: Post-recap round opener worker job running with deterministic seed.
   - [ ] P10T.04: Bonus API routes validated and rate-limited.
-  - [ ] P10T.05: Post-window rematch worker job running with greedy mutual rematching.
+  - [ ] P10T.05: Post-window computation worker job running to compute bonus results.
   - [ ] P10T.06: Bonus Offer Card, question runner, and result line UI verified.
   - [ ] P10T.07: Deterministic tie-break and idempotency test suite passing cleanly.
 - **Stage L10 Checklist (Phase 10U: Badges — Stage L10):**

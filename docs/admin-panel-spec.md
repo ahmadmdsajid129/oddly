@@ -725,7 +725,7 @@ Extends existing automated pre-publish validation with 8 new checks:
 
 ### C.2 Bonus Round Monitoring Dashboard (P11.48)
 - **Scope:** Real-time and historical visibility into asynchronous tie-break rounds across lanes.
-- **Metrics Displayed:** Tie-group count, distribution of group sizes ($T$), player participation rate, percentage of rounds with $>1$ participant, and rematch execution status.
+- **Metrics Displayed:** Tie-group count, distribution of group sizes ($T$), player participation rate, percentage of rounds with $>1$ participant, and bonus computation execution status.
 - **Privacy Enforcement:** Strictly aggregate metrics. Individual answers submitted by players are zero-accessible in admin views.
 - **Emergency Controls:** Master kill switch for `feature.bonus_rounds`.
 

@@ -961,7 +961,7 @@ To safely introduce lanes into a live database without downtime, schema evolutio
 | `bonus.pool_min_per_lane` | Integer | 40 | Minimum approved questions in lane evergreen pool to enable bonus rounds |
 | `bonus.window_hours` | Integer | 24 | Duration in hours that a bonus round remains open for async play |
 | `bonus.retention_days` | Integer | 28 | Retention schedule for bonus round answers before deletion |
-| `bonus.min_participants` | Integer | 2 | Minimum active participants required to execute bonus re-matching |
+| `bonus.min_participants` | Integer | 2 | Minimum active participants required to compute bonus results |
 | `feature.bonus_rounds` | Boolean | false | Master feature flag for asynchronous tie-break bonus rounds |
 | `badge.min_similarity` | Float | 0.60 | Minimum similarity threshold to qualify for a lane twin badge |
 | `badge.tier1_lanes` | Integer | 2 | Distinct open lanes required for Collector I badge |

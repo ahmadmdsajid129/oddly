@@ -1522,3 +1522,51 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 3. **Database Schema Entity Types:** Documentation in `architecture.md` 18.2.1 and 18.11.1 mixes `players(id)` and `users(id)`, and specifies TEXT IDs while core database tables use UUID. Verify against actual Prisma schema before writing Stage L1 migrations.
 4. **Rules B1–B7 Labeling Note:** Rules B1 to B7 in `rules.md` are labelled "Founder-approved, L0-ADD". The Founder has not yet provided explicit answers to questions Q1 to Q7; the rules currently reflect the recommended defaults and await formal Founder sign-off.
 
+---
+
+## 38. Stage L0-FIX3 (2026-11-22)
+
+### 38.1 Correction
+Section 37.3 listed Q1 to Q7 incorrectly (they did not match section 36.1). The correct open Founder questions are exactly the seven in 36.1, with their recommended defaults, followed by Q8, Q8b, and Q9 from 37.3. All remain OPEN:
+
+1. **Question 1 (Bonus Window Timing):** Is the bonus round async over 24 hours (recommended) or only live when both players are online simultaneously?
+   - *Status:* OPEN.
+   - *Recommended Default:* Async over 24 hours (`bonus.window_hours = 24`).
+   - *Reason:* Synchronous presence turns Oddly into a real-time lobby, creating scheduling friction across time zones and destroying the asynchronous 30-second habit loop.
+2. **Question 2 (Maximum Rounds per Tie Group):** Should maximum rounds be capped at 2 (recommended) or 1?
+   - *Status:* OPEN.
+   - *Recommended Default:* 2 rounds (`bonus.max_rounds = 2`, max 6 total bonus questions).
+   - *Reason:* For large tie groups (e.g. $T = 312$), 1 round (3 questions) often leaves a tie group around 39–78 players. A second round can reduce the pool to $< 5$, whereas $> 2$ rounds feels like homework and depletes evergreen pools.
+3. **Question 3 (Non-Participant Twin Stability):** Should a non-participant keep their original twin if other members narrowed their match?
+   - *Status:* OPEN.
+   - *Recommended Default:* Yes.
+   - *Reason:* Fairness and honesty. Non-participants opted out of extra questions; their initial twin was verified mathematically on the 5 Drop questions and should never be downgraded or stripped.
+4. **Question 4 (Evergreen Pool Threshold per Lane):** Should the minimum evergreen pool size per lane be 40 (recommended) or higher before opening the feature?
+   - *Status:* OPEN.
+   - *Recommended Default:* 40 approved questions (`bonus.pool_min_per_lane = 40`).
+   - *Reason:* 40 questions provides sufficient runway per lane without reuse while remaining realistically curatable by editors.
+5. **Question 5 (Lane Twin Similarity Threshold):** Does `badge.min_similarity = 0.6` feel right, or should a lane twin require a stricter match?
+   - *Status:* OPEN.
+   - *Recommended Default:* `0.6` (`badge.min_similarity = 0.60`).
+   - *Reason:* 0.6 corresponds to matching on roughly 3 of 5 questions with average information weights, representing genuine commonality without demanding impossible 5/5 perfection in diverse lanes.
+6. **Question 6 (Public Profile Placement):** Should badges ever appear on future public profiles?
+   - *Status:* OPEN.
+   - *Recommended Default:* Defer decision until future user profile design stage. Default to private in v1.
+   - *Reason:* Rule B5 prevents comparative ranking and social gamification. Keeping badges private preserves Oddly's relaxed, introspective spirit.
+7. **Question 7 (All-Lanes Badge Scope):** Is the All-Lanes badge defined against lanes open on the day earned (recommended) or at all times?
+   - *Status:* OPEN.
+   - *Recommended Default:* Defined against lanes open on the day the final qualifying lane twin was earned.
+   - *Reason:* Cumulative permanence. Once a player achieves All-Lanes across today's open catalog, launching a new lane tomorrow should not retroactively strip their earned achievement.
+8. **Question 8 (Additive Bonus Invariant):** Should bonus rounds remain strictly additive, writing to `bonus_results` without ever modifying or rewriting the locked twin in `twin_results`?
+   - *Status:* OPEN.
+   - *Recommended Default:* Yes.
+   - *Reason:* Prevents breaking mutual pairings, Keeps, Orbits, Telepathy, or share cards created on the 07:05 final batch.
+9. **Question 8b (Keep Permissions for Narrowed Ties):** May a Keep request be sent to the "closest in your group" participant identified by a bonus round?
+   - *Status:* OPEN.
+   - *Recommended Default:* No in v1.
+   - *Reason:* Keeps are strictly 1 per completed lane Drop and anchor to the primary mutual twin. Expanding to bonus ties introduces social sprawl and complicates Orbit limits.
+10. **Question 9 (Evergreen Pool Minimum Size):** Is a minimum of 40 approved evergreen questions per lane sufficient, or should it be higher (e.g. 120) for high-traffic lanes with large tie groups?
+    - *Status:* OPEN.
+    - *Recommended Default:* Keep `bonus.pool_min_per_lane = 40` in v1, monitor runway alerts, and expand curations based on observed empirical data.
+    - *Reason:* 40 allows rapid initial launch across catalog lanes while the majority exclusion rule cushions reuse fatigue.
+

@@ -204,3 +204,20 @@ $ git diff main..HEAD --name-only
   - `5aeacf8`: `docs(memory): append Section 37 documenting L0-FIX2 adjustments, open Founder questions, and unresolved items` (Item 7)
   - `docs: add stage-L0-fix2-report.md`: Deliverable verification report (Item 9)
 - **Tag:** `stage-L0-fix2-complete`
+
+---
+
+## 7. Stage L0-FIX3 Addendum (2026-11-22)
+
+### 7.1 Corrections Applied
+1. **Memory Section 38 (Founder Questions Alignment):** Appended Section 38 with Section 38.1 correcting the open Founder questions list to align strictly with Section 36.1 (Q1 to Q7: async 24h window, max 2 rounds, non-participant twin stability, 40 pool min, 0.6 similarity threshold, private badges in v1, All-Lanes defined on day earned), followed by Q8, Q8b, and Q9. All 10 questions marked OPEN.
+2. **Rule B3 Clarification (`rules.md`):** Updated item 31 and change log to explicitly state: "They never change the locked twin. They produce only an additional, participant-only result stored in `bonus_results` (shown as 'Closest in your group'). Bonus answers are retained only for `bonus.retention_days` (default 28 days) and then permanently purged." Header date updated to 2026-11-22. Config keys unchanged (41 keys).
+3. **Rematch Terminology Alignment:** Replaced leftover "rematch / re-match" wording with "compute bonus results" across `architecture.md` 18.2.4 (`bonus.min_participants`), `task.md` P10T.05 checklist and P10T.07 note, `docs/bonus-rounds-and-badges.md`, and `docs/admin-panel-spec.md`.
+
+### 7.2 Verification Audit
+- **Tabs:** 0.
+- **Duplicate Headers:** 0.
+- **Config Key Parity:** Exactly 41 keys, identical between `rules.md` 9.4 and `architecture.md` 18.2.4.
+- **Scope Isolation:** `git diff main..HEAD --name-only` confirmed only `.md` and `docs/` files changed.
+- **Tag:** `stage-L0-fix3-complete`.
+

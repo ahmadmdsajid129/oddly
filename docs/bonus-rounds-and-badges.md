@@ -182,7 +182,7 @@ CREATE INDEX IF NOT EXISTS idx_collector_badges_user ON collector_badges(user_id
 | `bonus.pool_min_per_lane` | Integer | 40 | Required pool questions before opening feature |
 | `bonus.window_hours` | Integer | 24 | Round play window duration in hours |
 | `bonus.retention_days` | Integer | 28 | Retention schedule for bonus responses |
-| `bonus.min_participants` | Integer | 2 | Min active players to run rematch |
+| `bonus.min_participants` | Integer | 2 | Min active players to compute bonus results |
 | `feature.bonus_rounds` | Boolean | false | Feature flag |
 | `badge.min_similarity` | Float | 0.60 | Similarity threshold for lane twin badge |
 | `badge.tier1_lanes` | Integer | 2 | Lanes for Collector I |
