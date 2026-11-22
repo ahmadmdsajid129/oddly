@@ -740,12 +740,11 @@ When `@media (prefers-reduced-motion: reduce)` is active:
   - 3-question bonus progression swaps DOM instantly without sliding easing.
   - Badge unlock sparkles and foil gleams are replaced by static icon state updates.
 
-### 12D.7 Bundle Size Budget Verification
+### 12D.7 Bundle Size Budget Evaluation
 - **Budget Constraint:** 159.5 KB total JavaScript gzipped budget exception (Section 12C.9).
 - **Evaluation:**
-  - Reuses shared question renderers (`pick1`, `pick2of6`, `slider7`, `rank3`) already bundled in Section 12C.
-  - The Bonus Runner and My Badges components introduce ~2.4 KB gzipped JavaScript (primarily Zod schemas, state machine hooks, and SVGs).
-  - Total client bundle impact: 154.2 KB -> 156.6 KB, safely below the 159.5 KB ceiling. The budget holds with zero added third-party dependencies.
+  - Reuses the renderers that Stage L2 will provide; Stage L9 depends on L2.
+  - Estimate: about 2 to 3 KB gzipped for the Bonus Runner and My Badges, NOT measured (docs-only stage). Must be measured when Stage L9 and L10 are built. The play route must stay at or under the approved 159.5 KB exception.
 
 ---
 

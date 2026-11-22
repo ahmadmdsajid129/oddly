@@ -68,7 +68,7 @@ Stage L0-ADD incorporates full end-to-end specifications for **F40 Bonus Rounds 
   - `12D.4 Badge Face Specification`: Sticker pop physical tokens, tier accents (Bronze, Silver, Gold, Celestial), unearned dotted outline slot (`2.5px dashed #D6D0C7`).
   - `12D.5 "My Badges" Showcase Page`: `/me/badges`, warm desk layout, private showcase, unranked, zero leaderboards.
   - `12D.6 Toasts & Reduced Motion`: Unearned badge unlocked toast with 3.5s auto-dismiss; `prefers-reduced-motion` compliance.
-  - `12D.7 Bundle Size Budget Verification`: Bonus components + badge showcase add ~2.4 KB gzip (total budget 156.6 KB vs 159.5 KB hard ceiling).
+  - `12D.7 Bundle Size Budget Evaluation`: Bonus components + badge showcase estimated at ~2 to 3 KB gzip (not measured; play route must stay <= 159.5 KB ceiling).
 
 ### Item 5: `docs/*.md` (Lanes, Events, Admin Spec & Dedicated Guide)
 - **Status:** DONE (Commit `305647e`)
@@ -214,3 +214,4 @@ Verified via `git diff main..HEAD --name-only`.
   - `f384e51`: `docs(memory): append Section 36 Stage L0-ADD decisions, Founder questions, and risk register (L0-ADD item 7)`
   - `docs: add stage-L0-add-report.md`: Deliverable summary report
 - **Tag:** `stage-L0-add-complete`
+
