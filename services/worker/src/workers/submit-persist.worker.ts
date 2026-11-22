@@ -157,3 +157,4 @@ export class SubmitPersistWorker {
     return processed;
   }
 }
+

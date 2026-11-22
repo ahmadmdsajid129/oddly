@@ -34,8 +34,18 @@ vi.mock("./db.js", () => ({
   executeWorkerWithTimeout: vi.fn((fn) => fn()),
 }));
 
+type MockRedis = {
+  sadd: ReturnType<typeof vi.fn>;
+  smembers: ReturnType<typeof vi.fn>;
+  rpop: ReturnType<typeof vi.fn>;
+  lpush: ReturnType<typeof vi.fn>;
+  get: ReturnType<typeof vi.fn>;
+  set: ReturnType<typeof vi.fn>;
+  exists: ReturnType<typeof vi.fn>;
+};
+
 describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation", () => {
-  let mockRedis: Partial<Redis>;
+  let mockRedis: MockRedis;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -78,7 +88,7 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
 
       vi.mocked(prisma.submission.findFirst).mockResolvedValue(existingSubmission as any);
 
-      const result = await SubmitPersistWorker.persistSubmission(samplePayload, mockRedis as Redis);
+      const result = await SubmitPersistWorker.persistSubmission(samplePayload, mockRedis as unknown as Redis);
 
       expect(result).toEqual(existingSubmission);
       expect(prisma.submission.create).not.toHaveBeenCalled();
@@ -113,7 +123,7 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
       ]);
       vi.mocked(prisma.oddnessScore.create).mockResolvedValue({} as any);
 
-      const result = await SubmitPersistWorker.persistSubmission(samplePayload, mockRedis as Redis);
+      const result = await SubmitPersistWorker.persistSubmission(samplePayload, mockRedis as unknown as Redis);
 
       expect(result).toEqual(createdSub);
       expect(prisma.submission.create).toHaveBeenCalledTimes(1);
@@ -153,7 +163,7 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
         .mockResolvedValueOnce(queuePayload2)
         .mockResolvedValueOnce(null);
 
-      const processed = await SubmitPersistWorker.drainQueue(mockRedis as Redis, 10);
+      const processed = await SubmitPersistWorker.drainQueue(mockRedis as unknown as Redis, 10);
 
       expect(processed).toBe(2);
       expect(mockRedis.rpop).toHaveBeenCalledTimes(3);
@@ -172,7 +182,7 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
         { request_id: "req-3" } as any,
       ]);
 
-      const report = await PersistReconciliationJob.reconcile(dropId, mockRedis as Redis);
+      const report = await PersistReconciliationJob.reconcile(dropId, mockRedis as unknown as Redis);
 
       expect(report.acknowledged_count).toBe(3);
       expect(report.persisted_count).toBe(3);
@@ -195,7 +205,7 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
       const durablePayload = JSON.stringify({ ...samplePayload, request_id: "req-missing-2" });
       vi.mocked(mockRedis.get).mockResolvedValue(durablePayload);
 
-      const report = await PersistReconciliationJob.reconcile(dropId, mockRedis as Redis);
+      const report = await PersistReconciliationJob.reconcile(dropId, mockRedis as unknown as Redis);
 
       expect(report.acknowledged_count).toBe(2);
       expect(report.persisted_count).toBe(1);
@@ -215,7 +225,7 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
         .mockResolvedValueOnce([]);
       vi.mocked(prisma.submission.findMany).mockResolvedValue([]);
 
-      const report = await PersistReconciliationJob.reconcile(dropId, mockRedis as Redis);
+      const report = await PersistReconciliationJob.reconcile(dropId, mockRedis as unknown as Redis);
 
       expect(report.acknowledged_count).toBe(0);
       expect(report.persisted_count).toBe(0);
@@ -225,3 +235,4 @@ describe("Stage 3 (Task P3.16): Mode B Asynchronous Persistence & Reconciliation
     });
   });
 });
+
