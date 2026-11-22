@@ -904,13 +904,13 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 
 - **Purpose:** Eliminate identical-answer tie dilution, make twin relationships genuinely mutual, and present transparent, honest group sizes.
 - **Definitions:**
-  - *Tie Group ($T$):* Candidates within $epsilon = 0.01$ of the top similarity score.
-  - *Top Neighbour List ($K=32$):* Bounded candidate list per player to maintain $O(N cdot K log K)$ graph matching performance.
+  - `Tie group T = all candidates whose similarity is within 0.01 (config match.tie_epsilon) of the top similarity score.`
+  - `Each player keeps at most 32 candidates (config match.neighbour_limit_k). This keeps the pairing work around N * K * log(K) instead of N squared.`
 - **Selection & Pairing Order:**
   1. *Similarity:* Maximum score $S(u, v)$ on today's Drop.
   2. *28-Day Lane History:* Information-weighted historical agreement over past 28 days ($\ge 5$ shared days required) via 32-byte BitMinHash signature.
   3. *Different Country:* Candidate from different country preferred.
-  4. *Deterministic Hash:* $	ext{HMAC_SHA256}(	ext{drop_id}, min(u, v) parallel max(u, v))$.
+  4. `Deterministic hash: HMAC_SHA256(drop_id, min(user_a, user_b) || max(user_a, user_b)). The same two players always get the same hash for the same Drop, so the result is repeatable.`
   5. *Greedy Mutual Pairing:* Edge pairing algorithm assigns pairs mutually (`is_mutual = true`). Odd leftover gets best twin with `is_mutual = false`.
 - **What the Player Sees:**
   - Standard Group: "4 of 5 with a person in Lagos, 18 to 24. **312 people** matched you this way."
