@@ -13,12 +13,12 @@
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
 | **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 62%`                                                       |
-| **Current Active Stage**        | **Phase 8: Streaks, History, Settings & Privacy (COMPLETE)**                     |
+| **Current Active Stage**        | **Phase 9: Daily Pipeline & BullMQ Scheduler (COMPLETE)**                         |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 253 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 254 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 157 tasks                                                                        |
+| **Pending (`TODO`)**            | 156 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -57,7 +57,7 @@
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 8 & Stage R2    |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 93%` | 14 / 15            | Stage 9 & Stage R2    |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 10 & Stage R2   |
 | **Phase 10A**| Orbit Foundation (Backend)                  | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage F1              |
 | **Phase 10B**| Orbit and Globe UI                          | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage F2              |
@@ -308,7 +308,7 @@ _Status: COMPLETE | Target: Header Flame, History archive, Settings & Privacy, r
 
 ### Phase 9: Daily Pipeline & BullMQ Scheduler (Stage 9)
 
-_Status: PARTIAL | Target: Staging, live window, final recap batch, S9 Recap screen, final batch isolation._
+_Status: COMPLETE | Target: Staging, live window, final recap batch, S9 Recap screen, final batch isolation._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -326,7 +326,7 @@ _Status: PARTIAL | Target: Staging, live window, final recap batch, S9 Recap scr
 | `[x] P9.12` | Isolate final batch worker pool with max 25% DB connection limit and separate queue         | 🔴 Critical  | ✅ DONE         | P9.06       | Agent | 2026-11-11  | Bulkhead queue isolation & separate longer statement timeout (R1.1, R2.0) |
 | `[x] P9.13` | Implement chunked resumable final batch (5,000 users/chunk) with progressive publishing     | 🔴 Critical  | ✅ DONE         | P9.06       | Agent | 2026-11-10  | Cursor pagination, batch_runs resumable tracking, zero full memory loads (R1.1) |
 | `[x] P9.14` | Implement scheduler distributed leader lock and catch-up handler on boot                    | 🔴 Critical  | ✅ DONE         | P9.01       | Agent | 2026-11-10  | Distributed leader lock & sequential catch-up on startup (R1.1) |
-| `[ ] P9.15` | Build BullMQ dead-letter queue (DLQ) replay tool and alert trigger                          | 🟠 High      | ⚪ TODO         | P0.06       | Agent | —           | Poison job quarantine (Sec 9)   |
+| `[x] P9.15` | Build BullMQ dead-letter queue (DLQ) replay tool and alert trigger                          | 🟠 High      | ✅ DONE         | P0.06       | Agent | 2026-11-22  | Poison job quarantine (Sec 9)   |
 
 ---
 
@@ -1194,6 +1194,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 9 Complete (P9.15)  | Completed remaining task for Phase 9: implemented BullMQ dead-letter queue (DLQ) poison job quarantine manager (`DLQManager`), automated error classification, alert trigger hooks (`triggerDeadLetterAlert`), programmatic and CLI replay tooling (`scripts/dlq-tool.mjs`), and Prometheus metrics instrumentation (P9.15). Phase 9 now 100% COMPLETE (15/15). Dashboard updated to 254/410 (62%). | Phase 9 completion & queue DLQ quarantine. |
 | `2026-11-22` | Phase 8 Complete (P8.11)  | Completed remaining task for Phase 8: routed player history archive (`GET /v1/history`) and aggregate world statistics (`GET /v1/world/:dropId`) to dedicated PostgreSQL read replica (`prismaReplica`) with transparent primary failover on replica timeout/error, and enforced Level L2+ load shedding (503 OVERLOADED) and extended 10m caching (P8.11). Phase 8 now 100% COMPLETE (12/12). Dashboard updated to 253/410 (62%). | Phase 8 completion & read replica routing. |
 | `2026-11-22` | Phase 7 Complete (P7.10–P7.11) | Completed remaining 2 tasks for Phase 7: enforced guest-play-only behavior under Level L3 degradation and protected against token refresh storms via single-flight promise coalescing, 10/min rate limits, and short-circuit reuse (P7.10), and implemented Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage with fail-closed signups (P7.11). Phase 7 now 100% COMPLETE (11/11). Dashboard updated to 252/410 (61%). | Phase 7 completion & auth resilience. |
 | `2026-11-22` | Phase 6 Complete (P6.11–P6.12) | Completed remaining 2 tasks for Phase 6: offloaded Satori/Resvg card rendering to dedicated Piscina worker thread pool capped to CPU cores (P6.11), and implemented single-flight promise coalescing, degradation load shedding under L3/L4, and edge caching with >95% hit ratio verification (P6.12). Phase 6 now 100% COMPLETE (12/12). Dashboard updated to 250/410 (61%). | Phase 6 completion & viral share defense. |

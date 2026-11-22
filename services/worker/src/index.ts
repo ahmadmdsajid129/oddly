@@ -11,6 +11,7 @@ import { processRenderCardJob } from "./jobs/render-card.js";
 import { DailyScheduler } from "./scheduler.js";
 import { PipelineWorker } from "./workers/pipeline.worker.js";
 import { PairingWorker } from "./workers/pairing.worker.js";
+import { dlqManager } from "./dlq.js";
 
 export * from "./clock.js";
 export * from "./scheduler.js";
@@ -24,6 +25,7 @@ export * from "./jobs/notification-timing.job.js";
 export * from "./workers/submit-persist.worker.js";
 export * from "./jobs/persist-reconciliation.job.js";
 export * from "./db.js";
+export * from "./dlq.js";
 
 const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
 const SHUTDOWN_GRACE_MS = Number(process.env.SHUTDOWN_GRACE_MS) || 15000;
@@ -55,21 +57,21 @@ let pipelineWorker: Worker | null = null;
 let isShuttingDown = false;
 
 /**
- * BullMQ Dead Letter Queue Alert Hook (R1.1)
+ * BullMQ Dead Letter Queue Alert Hook & Quarantine Engine (R1.1, P9.15)
  */
-export function triggerDeadLetterAlert(job: Job | undefined, err: Error) {
+export async function triggerDeadLetterAlert(job: Job | undefined, err: Error) {
+  if (job) {
+    return dlqManager.quarantineJob(job, err);
+  }
+
   const alertPayload = {
     alert: "BULLMQ_DEAD_LETTER_EXHAUSTED",
-    queueName: job?.queueName,
-    jobId: job?.id,
-    jobName: job?.name,
-    attemptsMade: job?.attemptsMade,
     failedReason: err.message,
     timestamp: new Date().toISOString(),
   };
 
   console.error("[CRITICAL ALERT] BullMQ job exceeded max retries. Moved to DLQ:", JSON.stringify(alertPayload));
-  // In production, emit to Sentry / PagerDuty / Webhook
+  return null;
 }
 
 /**
@@ -99,6 +101,7 @@ async function bootstrap() {
   try {
     await redis.connect();
     console.log("[Oddly Worker] Connected to Redis successfully.");
+    dlqManager.setRedis(redis);
 
     // 1. Initialize BullMQ Daily Pipeline Scheduler
     dailyScheduler.initQueue(redis);

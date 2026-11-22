@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 8: Streaks, History, Settings & Privacy (COMPLETE).
+- **Current Stage:** Phase 9: Daily Pipeline & BullMQ Scheduler (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1783,3 +1783,32 @@ All 12 tasks in Phase 8 (Stage 8: Streaks, History, Settings & Privacy) are now 
 - Verified existing Phase 8 test suites: `settings.test.ts` (8/8 tests passing), `auth.test.ts` (18/18 tests passing), and `@oddly/web` (107/107 tests passing).
 - Ran typechecks across monorepo packages (`@oddly/api`, `@oddly/web`): clean pass with zero errors (`tsc --noEmit`).
 - Phase 8 is now **100% COMPLETE (12/12 tasks done)**. Master progress dashboard updated to **253/410 completed tasks (62%)**.
+
+## 46. Phase 9 Completion: Daily Pipeline & BullMQ Scheduler (2026-11-22)
+
+### 46.1 Overview & Architecture
+All 15 tasks in Phase 9 (Stage 9: Daily Pipeline & BullMQ Scheduler) are now complete per Architecture Section 9 (Queues & CPU offload), Section 10 (Dead-letter handling), and Failure Modes Section 2 (Poison job quarantine):
+1. **P9.15: BullMQ Dead-Letter Queue (DLQ) Manager, Poison Job Quarantine & Replay Tooling (`dlq.ts`, `metrics.ts`, `dlq-tool.mjs`):**
+   - **Poison Job Quarantine Engine:** Implemented `DLQManager` in `services/worker/src/dlq.ts`. When any BullMQ job (in `daily-pipeline`, `cards`, `submit-persist`, etc.) exhausts its configured retry attempts (`job.attemptsMade >= 3`), it is automatically sequestered to the DLQ (`oddly:dlq:job:{id}`) rather than crashing the worker fleet or silently dropping.
+   - **Root Cause Error Classification:** Implemented `classifyError()` categorizing failure reasons into five diagnostic buckets: `timeout` (statement/query deadlines), `syntax_error` (JSON/formatting faults), `db_connection` (PostgreSQL/Redis connection outages), `bad_payload` (schema/validation discrepancies), and `unknown`.
+   - **Critical Alert Triggers:** Implemented `triggerDeadLetterAlert()` emitting structured JSON alert payloads (`BULLMQ_DEAD_LETTER_EXHAUSTED`) with DLQ IDs, error classifications, queue names, and retry counts. Supports subscription of on-call alert listeners (e.g. Sentry, Webhooks, PagerDuty).
+   - **Replay & Recovery Tooling:**
+     - `replayJob(dlqId)`: Safely re-enqueues individual quarantined poison jobs back into their original or target BullMQ queues with fresh attempt budgets and audit timestamps.
+     - `replayAll(filterQueue?)`: Bulk replays quarantined poison jobs across all or specified queues.
+     - `purgeJob(dlqId)` / `purgeAll()`: Permanently clears unrepairable or malformed payloads.
+   - **Operator CLI Utility:** Built executable CLI script [scripts/dlq-tool.mjs](file:///e:/Oddly/scripts/dlq-tool.mjs) providing `stats`, `list`, `inspect <dlqId>`, `replay <dlqId>`, `replay-all`, and `purge <dlqId>` operations for on-call engineers.
+   - **Prometheus Instrumentation:** Added `oddly_dlq_quarantined_total` (counter by queue and classification), `oddly_dlq_depth` (gauge of active quarantined jobs), and `oddly_dlq_replayed_total` (counter of replayed jobs) to `workerMetricsRegistry`.
+
+### 46.2 Verification & Test Results
+- Authored integration test suite in `services/worker/src/dlq.test.ts` (14/14 tests passing):
+  - Error classification across timeout, syntax, database connection, validation, and unknown.
+  - Poison job quarantine with full diagnostic payload capture.
+  - Alert trigger dispatch to subscriber handlers.
+  - DLQ listing, queue-specific filtering, and statistical aggregations.
+  - Single job replay back into original queue with duplicate replay rejection.
+  - Batch replay all quarantined jobs across multiple queues.
+  - Purge operations (single job and purge-all).
+  - Worker failed event hook integration (`triggerDeadLetterAlert`).
+- Re-verified pipeline test suite: `pipeline.test.ts` (15/15 tests passing) and `submit-persist.test.ts` (6/6 tests passing).
+- Ran typechecks across monorepo packages (`@oddly/worker`, `@oddly/api`, `@oddly/web`): clean pass with zero errors (`tsc --noEmit`).
+- Phase 9 is now **100% COMPLETE (15/15 tasks done)**. Master progress dashboard updated to **254/410 completed tasks (62%)**.

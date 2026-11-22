@@ -60,4 +60,26 @@ export const modeBReconciledTotal = new client.Counter({
   registers: [workerMetricsRegistry],
 });
 
+export const dlqQuarantinedTotal = new client.Counter({
+  name: "oddly_dlq_quarantined_total",
+  help: "Total poison jobs quarantined to DLQ by queue name and error classification",
+  labelNames: ["queue_name", "classification"],
+  registers: [workerMetricsRegistry],
+});
+
+export const dlqDepthGauge = new client.Gauge({
+  name: "oddly_dlq_depth",
+  help: "Current number of quarantined poison jobs awaiting manual replay or inspection",
+  labelNames: ["queue_name"],
+  registers: [workerMetricsRegistry],
+});
+
+export const dlqReplayedTotal = new client.Counter({
+  name: "oddly_dlq_replayed_total",
+  help: "Total poison jobs successfully replayed back into original BullMQ queues",
+  labelNames: ["queue_name"],
+  registers: [workerMetricsRegistry],
+});
+
+
 
