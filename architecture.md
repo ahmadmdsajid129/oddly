@@ -955,6 +955,20 @@ To safely introduce lanes into a live database without downtime, schema evolutio
 | `text.disable_days` | Integer | 7 | Duration of text answer cooldown on repeated rejections |
 | `text.archetype_weight_a` | Float | 0.5 | Blending factor between archetype centroid and cosine similarity |
 | `text.min_confidence` | Float | 0.7 | Minimum classifier confidence to assign an archetype tag |
+| `bonus.min_tie_size` | Integer | 2 | Minimum tie-group size required to offer a bonus tie-break round |
+| `bonus.questions_per_round` | Integer | 3 | Number of evergreen questions presented in a bonus round |
+| `bonus.max_rounds` | Integer | 2 | Maximum bonus rounds offered per tie group per Drop |
+| `bonus.pool_min_per_lane` | Integer | 40 | Minimum approved questions in lane evergreen pool to enable bonus rounds |
+| `bonus.window_hours` | Integer | 24 | Duration in hours that a bonus round remains open for async play |
+| `bonus.retention_days` | Integer | 28 | Retention schedule for bonus round answers before deletion |
+| `bonus.min_participants` | Integer | 2 | Minimum active participants required to execute bonus re-matching |
+| `feature.bonus_rounds` | Boolean | false | Master feature flag for asynchronous tie-break bonus rounds |
+| `badge.min_similarity` | Float | 0.60 | Minimum similarity threshold to qualify for a lane twin badge |
+| `badge.tier1_lanes` | Integer | 2 | Distinct open lanes required for Collector I badge |
+| `badge.tier2_lanes` | Integer | 3 | Distinct open lanes required for Collector II badge |
+| `badge.tier3_lanes` | Integer | 5 | Distinct open lanes required for Collector III badge |
+| `badge.super_window_days` | Integer | 7 | Rolling day window for earning multi-lane Super Twin badge |
+| `feature.badges` | Boolean | false | Master feature flag for private, unranked collectible badges |
 
 #### 18.2.5 Storage Growth Estimates Across Tiers
 | Metric | 10k DAU (1 lane / 2 lanes) | 100k DAU (1 lane / 2 lanes) | 10 Lakh DAU (1 lane / 2 lanes) |
@@ -1129,6 +1143,10 @@ flowchart TD
 | `GET` | `/v1/me/super-twin` | 2000 | standard | `private, no-cache` | false | ⚪ background | Returns Super twin result for date; shed at Level L2+ |
 | `GET` | `/v1/globe?lane=slug` | 2000 | standard | `public, max-age=60` | false | 🟡 normal | Returns lane-filtered arcs adhering to $k \ge 20$ anonymity |
 | `POST` | `/v1/answers/:id/text` | 3000 | tight | `no-store` | true | ⚪ background | Submits typed `say_it` answer; strictly unlogged; shed at Level L2+ |
+| `GET` | `/v1/bonus/:dropId` | 2000 | standard | `private, max-age=30` | false | 🟡 normal | Returns bonus round eligibility, tie-group size, and questions |
+| `POST` | `/v1/bonus/:roundId/answers` | 3000 | tight | `no-store` | true | 🟠 high | Submits answers for active bonus round; requires `request_id` |
+| `GET` | `/v1/bonus/:roundId/result` | 2000 | standard | `private, max-age=30` | false | 🟡 normal | Returns bonus tie-break result; falls back to original twin |
+| `GET` | `/v1/me/badges` | 2000 | standard | `private, max-age=60` | false | 🟡 normal | Returns player's earned badges and open slots; unranked |
 
 ---
 
@@ -1171,3 +1189,108 @@ flowchart TD
   2. *Persistence & Recovery:* Vectors are persisted in PostgreSQL in table `answer_text` as raw byte arrays (`BYTEA`). If `pgvector` is enabled on the managed cloud instance, an HNSW index (`vector_cosine_ops`) provides instant recovery after worker restarts.
   3. *Zero Cloud Dependency:* All inference and indexing remain 100% self-hosted on containerized CPUs.
 - **Consequences:** Eliminates external vector database SaaS costs ($0 cloud egress); guarantees deterministic sub-second matching; satisfies DPDP Act 2023 data sovereignty requirements; requires ~118 MB RAM per worker process.
+
+#### ADR 051: Bonus Evergreen Question Pool and Deterministic Tie-Group Selection
+- **Date:** 2026-11-22
+- **Context:** To narrow large candidate tie groups honestly without altering the five Drop questions, bonus rounds must present identical, unbiased questions to all group members without real-time synchronization.
+- **Decision:** Implement a **Deterministic Seeded Evergreen Pool Selection**:
+  1. *Evergreen Pool Table:* Maintain `bonus_pool_questions` per lane with pre-vetted, high-entropy questions screened for Section 9.1 non-forbidden topics.
+  2. *Deterministic Selection:* Sort candidates by entropy, filter out any question answered by any tie-group member in their 28-day history, and select questions seeded by `HMAC_SHA256(drop_id || tie_group_id || round_number)`.
+  3. *Invariance:* Every member receives identical questions in identical order.
+- **Consequences:** Eliminates question bias and personalization; ensures mathematical determinism and offline reproducibility; requires admin curation of at least 40 approved evergreen questions per lane.
+
+#### ADR 052: Tamper-Evident Badge Evaluation, Storage, and Revocation Architecture
+- **Date:** 2026-11-22
+- **Context:** Badges reward multi-lane exploration and Super Twins without competitive leaderboards or public ranking. The evaluation must be idempotent, cheat-resistant, and strictly auditable.
+- **Decision:** Implement **Post-Recap Worker Evaluation with Tamper-Evident Evidence**:
+  1. *Worker Evaluation:* `badges.evaluate` job executes post-final recap, scanning final verified `twin_results` against `badge_definitions`.
+  2. *Evidence Storage:* Badges store full audit evidence (`lane_ids`, `drop_ids`, similarity scores, and rule version) as immutable JSONB in `user_badges`.
+  3. *Revocation Protocol:* Suspended or duplicate-device accounts have badges revoked with an explicit timestamp, reason, and audit trail.
+- **Consequences:** Zero client-side trust; badges are completely tamper-evident; guarantees unranked privacy per Rule B5.
+
+---
+
+### 18.11 Bonus Rounds & Badges Infrastructure (Stage L0-ADD)
+
+#### 18.11.1 Relational Data Model
+
+```sql
+-- 1. bonus_pool_questions — Evergreen Question Pool for Tie-Breaks
+CREATE TABLE IF NOT EXISTS bonus_pool_questions (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  question_id TEXT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  entropy NUMERIC(5,4) NOT NULL DEFAULT 0.0000,
+  status VARCHAR(20) NOT NULL DEFAULT 'active', -- 'active', 'paused', 'retired'
+  approved_by TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(lane_id, question_id)
+);
+
+-- 2. bonus_rounds — Asynchronous Tie-Break Sessions
+CREATE TABLE IF NOT EXISTS bonus_rounds (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  drop_id TEXT NOT NULL REFERENCES drops(id) ON DELETE CASCADE,
+  lane_id TEXT NOT NULL REFERENCES lanes(id) ON DELETE CASCADE,
+  tie_group_id TEXT NOT NULL,
+  round_no INT NOT NULL DEFAULT 1,
+  opens_at TIMESTAMPTZ NOT NULL,
+  closes_at TIMESTAMPTZ NOT NULL,
+  seed_hash VARCHAR(64) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'open', -- 'open', 'evaluating', 'closed', 'cancelled'
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(drop_id, tie_group_id, round_no)
+);
+
+-- 3. bonus_answers — Partitioned Player Bonus Responses
+CREATE TABLE IF NOT EXISTS bonus_answers (
+  round_id TEXT NOT NULL REFERENCES bonus_rounds(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  question_id TEXT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  answer JSONB NOT NULL,
+  drop_date DATE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (round_id, user_id, question_id, drop_date)
+) PARTITION BY RANGE (drop_date);
+
+-- Schema Evolution for twin_results
+ALTER TABLE twin_results ADD COLUMN IF NOT EXISTS bonus_round_count INT NOT NULL DEFAULT 0;
+
+-- 4. badge_definitions — Master Badge Registry
+CREATE TABLE IF NOT EXISTS badge_definitions (
+  key VARCHAR(50) PRIMARY KEY, -- 'collector_1', 'collector_2', 'collector_3', 'all_lanes', 'super_twin'
+  tier VARCHAR(20) NOT NULL,   -- 'tier1', 'tier2', 'tier3', 'all_lanes', 'special'
+  rule_version INT NOT NULL DEFAULT 1,
+  copy_keys JSONB NOT NULL,    -- {"title_key": "...", "desc_key": "..."}
+  active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 5. user_badges — Private Player Badges & Audit Evidence
+CREATE TABLE IF NOT EXISTS user_badges (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  badge_key VARCHAR(50) NOT NULL REFERENCES badge_definitions(key) ON DELETE CASCADE,
+  tier VARCHAR(20) NOT NULL,
+  earned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  evidence JSONB NOT NULL, -- {"lane_ids": [...], "drop_ids": [...], "rule_version": 1}
+  revoked_at TIMESTAMPTZ,
+  revoke_reason TEXT,
+  UNIQUE(user_id, badge_key, tier)
+);
+CREATE INDEX IF NOT EXISTS idx_user_badges_user ON user_badges(user_id) WHERE revoked_at IS NULL;
+```
+
+#### 18.11.2 Worker Jobs & Redis Key Architecture
+
+1. **Worker Jobs (`services/worker`):**
+   - `bonus.open_rounds`: Scheduled at 07:05 IST post-recap. Identifies tie groups with $\ge 2$ members, queries `bonus_pool_questions` (min 40 questions), builds rounds seeded by HMAC-SHA256, and emits eligible player states.
+   - `bonus.close_and_rematch`: Scheduled 24 hours post-open. Collects participants from `bonus_answers`. If $\ge 2$ players answered, scores bonus similarity, combines with base score, re-runs greedy mutual rematching, and updates `twin_results` (`tie_break_reason = 'bonus'`). If 1 player, records alone state.
+   - `badges.evaluate`: Post-recap worker job. Evaluates active users against collector and super-twin conditions. Performs idempotent inserts into `user_badges`.
+2. **Redis Key Architecture:**
+   - `bonus:round:{roundId}:state` (Hash, TTL 36h): Cached round status, questions, and expiration timestamp.
+   - `bonus:round:{roundId}:participants` (Set, TTL 36h): User IDs participating in the tie-break round.
+   - `bonus:user:{userId}:{roundId}:done` (String, TTL 36h): Fast check preventing duplicate submissions.
+3. **Graceful Degradation:**
+   - If bonus background workers stall or fail, original twin assignments remain locked and the bonus offer card is suppressed (Rule B2).
+   - Under Degradation Level L2+, `bonus.open_rounds` and `badges.evaluate` are paused, and `POST /v1/bonus/:roundId/answers` is shed.
