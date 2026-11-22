@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="419" viewBox="0 0 820 419">
+  <title>Recommended Execution Order Roadmap</title>
+  <desc>Stage execution sequence from F1 through M0, L0, L1, L2, L3 to Phase 11 and later.</desc>
+  <style>
+    text { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .hdr { font-size: 15px; font-weight: 800; fill: #14123A; }
+    .sub { font-size: 12px; font-weight: 700; fill: #5B5780; }
+    .lbl-main { font-size: 12px; font-weight: 900; fill: #14123A; }
+    .lbl-hint { font-size: 9px; font-weight: 700; fill: #14123A; }
+    .lbl-chip { font-size: 7px; font-weight: 800; fill: #14123A; }
+  </style>
+  <rect x="14" y="14" width="796" height="395" rx="14" fill="#14123A" />
+  <rect x="10" y="10" width="796" height="395" rx="14" fill="#FFFFFF" stroke="#14123A" stroke-width="2.5" />
+
+  <text x="30" y="38" class="hdr">STAGE ROADMAP &bull; RECOMMENDED EXECUTION ORDER</text>
+  <text x="760" y="38" class="sub" text-anchor="end">Current Target: Stage L1</text>
+  <line x1="30" y1="48" x2="760" y2="48" stroke="#EEEAFE" stroke-width="2" />
+
+  
+      
+        <line x1="121" y1="88" x2="176" y2="88" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="176,84 184,88 176,92" fill="#14123A" />
+      
+      
+      <rect x="33" y="68" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="30" y="65" width="86" height="46" rx="12" fill="#3DDBB0" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="73" y="85" class="lbl-main" text-anchor="middle">F1</text>
+      <text x="73" y="99" class="lbl-hint" text-anchor="middle">Orbit Backend</text>
+      <rect x="92" y="57" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="91" y="56" width="30" height="14" rx="7" fill="#3DDBB0" stroke="#14123A" stroke-width="1.2" />
+      <text x="106" y="66" class="lbl-chip" text-anchor="middle">DONE</text>
+    
+      
+        <line x1="277" y1="88" x2="332" y2="88" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="332,84 340,88 332,92" fill="#14123A" />
+      
+      
+      <rect x="189" y="68" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="186" y="65" width="86" height="46" rx="12" fill="#3DDBB0" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="229" y="85" class="lbl-main" text-anchor="middle">M0</text>
+      <text x="229" y="99" class="lbl-hint" text-anchor="middle">Memes/Signals</text>
+      <rect x="248" y="57" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="247" y="56" width="30" height="14" rx="7" fill="#3DDBB0" stroke="#14123A" stroke-width="1.2" />
+      <text x="262" y="66" class="lbl-chip" text-anchor="middle">DONE</text>
+    
+      
+        <line x1="433" y1="88" x2="488" y2="88" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="488,84 496,88 488,92" fill="#14123A" />
+      
+      
+      <rect x="345" y="68" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="342" y="65" width="86" height="46" rx="12" fill="#3DDBB0" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="385" y="85" class="lbl-main" text-anchor="middle">L0</text>
+      <text x="385" y="99" class="lbl-hint" text-anchor="middle">Lanes Docs</text>
+      <rect x="404" y="57" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="403" y="56" width="30" height="14" rx="7" fill="#3DDBB0" stroke="#14123A" stroke-width="1.2" />
+      <text x="418" y="66" class="lbl-chip" text-anchor="middle">DONE</text>
+    
+      
+        <line x1="589" y1="88" x2="644" y2="88" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="644,84 652,88 644,92" fill="#14123A" />
+      
+      
+      <rect x="501" y="68" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="498" y="65" width="86" height="46" rx="12" fill="#FFD23F" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="541" y="85" class="lbl-main" text-anchor="middle">L1</text>
+      <text x="541" y="99" class="lbl-hint" text-anchor="middle">Lanes Plumbing</text>
+      <rect x="560" y="57" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="559" y="56" width="30" height="14" rx="7" fill="#FFD23F" stroke="#14123A" stroke-width="1.2" />
+      <text x="574" y="66" class="lbl-chip" text-anchor="middle">NEXT</text>
+    
+      
+      
+        <path d="M 697 116 v 16 h -594 v 12" fill="none" stroke="#14123A" stroke-width="2" stroke-dasharray="3,3" />
+      
+      <rect x="657" y="68" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="654" y="65" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="697" y="85" class="lbl-main" text-anchor="middle">L2</text>
+      <text x="697" y="99" class="lbl-hint" text-anchor="middle">Richer Formats</text>
+      <rect x="716" y="57" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="715" y="56" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="730" y="66" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="121" y1="174" x2="176" y2="174" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="176,170 184,174 176,178" fill="#14123A" />
+      
+      
+      <rect x="33" y="154" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="30" y="151" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="73" y="171" class="lbl-main" text-anchor="middle">L3</text>
+      <text x="73" y="185" class="lbl-hint" text-anchor="middle">Twin Depth</text>
+      <rect x="92" y="143" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="91" y="142" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="106" y="152" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="277" y1="174" x2="332" y2="174" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="332,170 340,174 332,178" fill="#14123A" />
+      
+      
+      <rect x="189" y="154" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="186" y="151" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="229" y="171" class="lbl-main" text-anchor="middle">F2</text>
+      <text x="229" y="185" class="lbl-hint" text-anchor="middle">Orbit/Globe UI</text>
+      <rect x="248" y="143" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="247" y="142" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="262" y="152" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="433" y1="174" x2="488" y2="174" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="488,170 496,174 488,178" fill="#14123A" />
+      
+      
+      <rect x="345" y="154" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="342" y="151" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="385" y="171" class="lbl-main" text-anchor="middle">F3</text>
+      <text x="385" y="185" class="lbl-hint" text-anchor="middle">Telepathy</text>
+      <rect x="404" y="143" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="403" y="142" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="418" y="152" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="589" y1="174" x2="644" y2="174" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="644,170 652,174 644,178" fill="#14123A" />
+      
+      
+      <rect x="501" y="154" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="498" y="151" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="541" y="171" class="lbl-main" text-anchor="middle">F4</text>
+      <text x="541" y="185" class="lbl-hint" text-anchor="middle">Anti-Twin</text>
+      <rect x="560" y="143" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="559" y="142" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="574" y="152" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+      
+        <path d="M 697 202 v 16 h -594 v 12" fill="none" stroke="#14123A" stroke-width="2" stroke-dasharray="3,3" />
+      
+      <rect x="657" y="154" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="654" y="151" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="697" y="171" class="lbl-main" text-anchor="middle">M1</text>
+      <text x="697" y="185" class="lbl-hint" text-anchor="middle">Meme Questions</text>
+      <rect x="716" y="143" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="715" y="142" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="730" y="152" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="121" y1="260" x2="176" y2="260" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="176,256 184,260 176,264" fill="#14123A" />
+      
+      
+      <rect x="33" y="240" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="30" y="237" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="73" y="257" class="lbl-main" text-anchor="middle">M2</text>
+      <text x="73" y="271" class="lbl-hint" text-anchor="middle">Signals Found.</text>
+      <rect x="92" y="229" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="91" y="228" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="106" y="238" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="277" y1="260" x2="332" y2="260" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="332,256 340,260 332,264" fill="#14123A" />
+      
+      
+      <rect x="189" y="240" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="186" y="237" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="229" y="257" class="lbl-main" text-anchor="middle">L4</text>
+      <text x="229" y="271" class="lbl-hint" text-anchor="middle">Memes Lane</text>
+      <rect x="248" y="229" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="247" y="228" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="262" y="238" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="433" y1="260" x2="488" y2="260" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="488,256 496,260 488,264" fill="#14123A" />
+      
+      
+      <rect x="345" y="240" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="342" y="237" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="385" y="257" class="lbl-main" text-anchor="middle">Phase 11</text>
+      <text x="385" y="271" class="lbl-hint" text-anchor="middle">Admin Panel</text>
+      <rect x="404" y="229" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="403" y="228" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="418" y="238" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+        <line x1="589" y1="260" x2="644" y2="260" stroke="#14123A" stroke-width="2.5" />
+        <polygon points="644,256 652,260 644,264" fill="#14123A" />
+      
+      
+      <rect x="501" y="240" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="498" y="237" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="541" y="257" class="lbl-main" text-anchor="middle">L5</text>
+      <text x="541" y="271" class="lbl-hint" text-anchor="middle">Situations</text>
+      <rect x="560" y="229" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="559" y="228" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="574" y="238" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+      
+        <path d="M 697 288 v 16 h -594 v 12" fill="none" stroke="#14123A" stroke-width="2" stroke-dasharray="3,3" />
+      
+      <rect x="657" y="240" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="654" y="237" width="86" height="46" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" stroke-dasharray="none" />
+      <text x="697" y="257" class="lbl-main" text-anchor="middle">L7</text>
+      <text x="697" y="271" class="lbl-hint" text-anchor="middle">Super Twin</text>
+      <rect x="716" y="229" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="715" y="228" width="30" height="14" rx="7" fill="#EEEAFE" stroke="#14123A" stroke-width="1.2" />
+      <text x="730" y="238" class="lbl-chip" text-anchor="middle">PLANNED</text>
+    
+      
+      
+      <rect x="33" y="326" width="86" height="46" rx="12" fill="#14123A" />
+      <rect x="30" y="323" width="86" height="46" rx="12" fill="#FFF8F0" stroke="#14123A" stroke-width="2.5" stroke-dasharray="5,4" />
+      <text x="73" y="343" class="lbl-main" text-anchor="middle">M3-M8, L6, L8</text>
+      <text x="73" y="357" class="lbl-hint" text-anchor="middle">On Founder Call</text>
+      <rect x="92" y="315" width="30" height="14" rx="7" fill="#14123A" />
+      <rect x="91" y="314" width="30" height="14" rx="7" fill="#FF6B5E" stroke="#14123A" stroke-width="1.2" />
+      <text x="106" y="324" class="lbl-chip" text-anchor="middle">COMMAND</text>
+    
+</svg>

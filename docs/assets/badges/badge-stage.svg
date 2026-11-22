@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="164" height="30" viewBox="0 0 164 30">
+  <title>stage: L0 complete</title>
+  <rect x="3" y="3" width="160" height="26" rx="6" fill="#14123A" />
+  <rect x="1" y="1" width="160" height="26" rx="6" fill="#FFFFFF" stroke="#14123A" stroke-width="1.8" />
+  <!-- Label section -->
+  <rect x="1" y="1" width="56" height="26" rx="6" fill="#14123A" />
+  <rect x="52" y="1" width="4" height="26" fill="#14123A" />
+  <text x="28" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#FFFFFF" text-anchor="middle">stage</text>
+  <!-- Value section -->
+  <rect x="56" y="1" width="104" height="26" rx="6" fill="#3DDBB0" stroke="#14123A" stroke-width="1.8" />
+  <text x="108" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#14123A" text-anchor="middle">L0 complete</text>
+</svg>

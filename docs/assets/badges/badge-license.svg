@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="244" height="30" viewBox="0 0 244 30">
+  <title>license: All Rights Reserved</title>
+  <rect x="3" y="3" width="240" height="26" rx="6" fill="#14123A" />
+  <rect x="1" y="1" width="240" height="26" rx="6" fill="#FFFFFF" stroke="#14123A" stroke-width="1.8" />
+  <!-- Label section -->
+  <rect x="1" y="1" width="72" height="26" rx="6" fill="#14123A" />
+  <rect x="68" y="1" width="4" height="26" fill="#14123A" />
+  <text x="36" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#FFFFFF" text-anchor="middle">license</text>
+  <!-- Value section -->
+  <rect x="72" y="1" width="168" height="26" rx="6" fill="#FFF8F0" stroke="#14123A" stroke-width="1.8" />
+  <text x="156" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#14123A" text-anchor="middle">All Rights Reserved</text>
+</svg>

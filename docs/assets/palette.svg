@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="330" viewBox="0 0 780 330">
+  <title>Oddly Sticker Pop Palette and Tier Chips</title>
+  <desc>Core design system color tokens from design.md section 2.1 and oddness tier chips from section 2.3.</desc>
+  <defs>
+    <linearGradient id="mythicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E" />
+      <stop offset="35%" stop-color="#FFD23F" />
+      <stop offset="70%" stop-color="#3DDBB0" />
+      <stop offset="100%" stop-color="#6C4CF1" />
+    </linearGradient>
+  </defs>
+
+  <rect x="14" y="14" width="756" height="306" rx="14" fill="#14123A" />
+  <rect x="10" y="10" width="756" height="306" rx="14" fill="#FFFFFF" stroke="#14123A" stroke-width="2.5" />
+
+  <text x="30" y="38" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15px" font-weight="900" fill="#14123A">STICKER POP CORE PALETTE &bull; DESIGN TOKENS</text>
+  <text x="750" y="38" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="700" fill="#5B5780" text-anchor="end">Source: design.md §2.1</text>
+  <line x1="30" y1="46" x2="750" y2="46" stroke="#EEEAFE" stroke-width="1.5" />
+
+  
+      <!-- Swatch shadow -->
+      <rect x="33" y="63" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="30" y="60" width="105" height="40" rx="8" fill="#14123A" stroke="#14123A" stroke-width="2" />
+      <text x="38" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#FFFFFF">ink</text>
+      <text x="38" y="115" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#14123A</text>
+      <text x="38" y="128" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Text, outlines, shadows</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="153" y="63" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="150" y="60" width="105" height="40" rx="8" fill="#FFF8F0" stroke="#14123A" stroke-width="2" />
+      <text x="158" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">cream</text>
+      <text x="158" y="115" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#FFF8F0</text>
+      <text x="158" y="128" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Desk background</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="273" y="63" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="270" y="60" width="105" height="40" rx="8" fill="#FFFFFF" stroke="#14123A" stroke-width="2" />
+      <text x="278" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">paper</text>
+      <text x="278" y="115" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#FFFFFF</text>
+      <text x="278" y="128" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Cards, sheets</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="393" y="63" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="390" y="60" width="105" height="40" rx="8" fill="#6C4CF1" stroke="#14123A" stroke-width="2" />
+      <text x="398" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#FFFFFF">violet</text>
+      <text x="398" y="115" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#6C4CF1</text>
+      <text x="398" y="128" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Primary brand, links</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="513" y="63" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="510" y="60" width="105" height="40" rx="8" fill="#EEEAFE" stroke="#14123A" stroke-width="2" />
+      <text x="518" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">lavender</text>
+      <text x="518" y="115" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#EEEAFE</text>
+      <text x="518" y="128" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Soft fills, Common</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="633" y="63" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="630" y="60" width="105" height="40" rx="8" fill="#CDBFFF" stroke="#14123A" stroke-width="2" />
+      <text x="638" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">lilac</text>
+      <text x="638" y="115" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#CDBFFF</text>
+      <text x="638" y="128" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Uncommon tier</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="33" y="148" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="30" y="145" width="105" height="40" rx="8" fill="#3DDBB0" stroke="#14123A" stroke-width="2" />
+      <text x="38" y="169" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">mint</text>
+      <text x="38" y="200" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#3DDBB0</text>
+      <text x="38" y="213" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Success, Done, Match</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="153" y="148" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="150" y="145" width="105" height="40" rx="8" fill="#FFD23F" stroke="#14123A" stroke-width="2" />
+      <text x="158" y="169" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">sun</text>
+      <text x="158" y="200" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#FFD23F</text>
+      <text x="158" y="213" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">In progress, Rare</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="273" y="148" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="270" y="145" width="105" height="40" rx="8" fill="#FF6B5E" stroke="#14123A" stroke-width="2" />
+      <text x="278" y="169" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#14123A">coral</text>
+      <text x="278" y="200" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#FF6B5E</text>
+      <text x="278" y="213" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Warning, Todo, Streaks</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="393" y="148" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="390" y="145" width="105" height="40" rx="8" fill="#5B5780" stroke="#14123A" stroke-width="2" />
+      <text x="398" y="169" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#FFFFFF">muted</text>
+      <text x="398" y="200" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#5B5780</text>
+      <text x="398" y="213" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Secondary text</text>
+    
+      <!-- Swatch shadow -->
+      <rect x="513" y="148" width="105" height="40" rx="8" fill="#14123A" />
+      <!-- Swatch box -->
+      <rect x="510" y="145" width="105" height="40" rx="8" fill="#D92D4B" stroke="#14123A" stroke-width="2" />
+      <text x="518" y="169" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="900" fill="#FFFFFF">error</text>
+      <text x="518" y="200" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A">#D92D4B</text>
+      <text x="518" y="213" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="600" fill="#5B5780">Critical alert</text>
+    
+
+  <text x="30" y="235" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14px" font-weight="900" fill="#14123A">ODDNESS TIER CHIPS &bull; PERCENTILE BANDS</text>
+  <line x1="30" y1="242" x2="750" y2="242" stroke="#EEEAFE" stroke-width="1.5" />
+
+  
+      <!-- Tier shadow -->
+      <rect x="33" y="253" width="160" height="44" rx="12" fill="#14123A" />
+      <!-- Tier box -->
+      <rect x="30" y="250" width="160" height="44" rx="12" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" />
+      <text x="42" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12px" font-weight="900" fill="#14123A">★ Common</text>
+      <text x="42" y="285" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="700" fill="#14123A">0 to 50%</text>
+    
+      <!-- Tier shadow -->
+      <rect x="211" y="253" width="160" height="44" rx="12" fill="#14123A" />
+      <!-- Tier box -->
+      <rect x="208" y="250" width="160" height="44" rx="12" fill="#CDBFFF" stroke="#14123A" stroke-width="2.5" />
+      <text x="220" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12px" font-weight="900" fill="#14123A">★ Uncommon</text>
+      <text x="220" y="285" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="700" fill="#14123A">50 to 80%</text>
+    
+      <!-- Tier shadow -->
+      <rect x="389" y="253" width="160" height="44" rx="12" fill="#14123A" />
+      <!-- Tier box -->
+      <rect x="386" y="250" width="160" height="44" rx="12" fill="#FFD23F" stroke="#14123A" stroke-width="2.5" />
+      <text x="398" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12px" font-weight="900" fill="#14123A">★ Rare</text>
+      <text x="398" y="285" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="700" fill="#14123A">80 to 95%</text>
+    
+      <!-- Tier shadow -->
+      <rect x="567" y="253" width="160" height="44" rx="12" fill="#14123A" />
+      <!-- Tier box -->
+      <rect x="564" y="250" width="160" height="44" rx="12" fill="url(#mythicGrad)" stroke="#14123A" stroke-width="2.5" />
+      <text x="576" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12px" font-weight="900" fill="#14123A">★ Mythic</text>
+      <text x="576" y="285" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="700" fill="#14123A">95 to 100%</text>
+    
+</svg>

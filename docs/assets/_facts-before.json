@@ -1,0 +1,615 @@
+{
+  "dashboard_numbers": {
+    "overall_project_progress_pct": 60,
+    "total_tasks_tracked": 393,
+    "total_phases": 36,
+    "completed_tasks": 237,
+    "in_progress_tasks": 0,
+    "blocked_tasks": 0,
+    "pending_tasks": 156
+  },
+  "phase_table_numbers": [
+    {
+      "phase_id": "Phase 0",
+      "phase_name": "Documentation & Skeleton Initialisation",
+      "priority": "Critical",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 17,
+      "total": 17,
+      "stage": "Stage 0 & Stage 0.5"
+    },
+    {
+      "phase_id": "Phase 1",
+      "phase_name": "Design System & UI Kit",
+      "priority": "High",
+      "status": "PARTIAL",
+      "progress_pct": 83,
+      "done": 19,
+      "total": 23,
+      "stage": "Stage 1 & Stage 0.5"
+    },
+    {
+      "phase_id": "Phase 2",
+      "phase_name": "Database & Shared Core Scoring",
+      "priority": "Critical",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 17,
+      "total": 17,
+      "stage": "Stage 2 & Stage R2"
+    },
+    {
+      "phase_id": "Phase 3",
+      "phase_name": "Fastify REST API Core",
+      "priority": "Critical",
+      "status": "PARTIAL",
+      "progress_pct": 94,
+      "done": 15,
+      "total": 16,
+      "stage": "Stage 3 & Stage R2"
+    },
+    {
+      "phase_id": "Phase 4",
+      "phase_name": "Play Flow Frontend (PWA)",
+      "priority": "Critical",
+      "status": "PARTIAL",
+      "progress_pct": 73,
+      "done": 11,
+      "total": 15,
+      "stage": "Stage 4 & Stage 0.5"
+    },
+    {
+      "phase_id": "Phase 5",
+      "phase_name": "Reveal, Matching UX & Oddness",
+      "priority": "High",
+      "status": "PARTIAL",
+      "progress_pct": 82,
+      "done": 9,
+      "total": 11,
+      "stage": "Stage 5 & Stage 0.5"
+    },
+    {
+      "phase_id": "Phase 6",
+      "phase_name": "Server-Rendered Share Cards & Links",
+      "priority": "High",
+      "status": "PARTIAL",
+      "progress_pct": 83,
+      "done": 10,
+      "total": 12,
+      "stage": "Stage 6 & Stage 0.5"
+    },
+    {
+      "phase_id": "Phase 7",
+      "phase_name": "Authentication & Guest Merge",
+      "priority": "High",
+      "status": "PARTIAL",
+      "progress_pct": 82,
+      "done": 9,
+      "total": 11,
+      "stage": "Stage 7 & Stage 0.5"
+    },
+    {
+      "phase_id": "Phase 8",
+      "phase_name": "Streaks, History, Settings & Privacy",
+      "priority": "Medium",
+      "status": "PARTIAL",
+      "progress_pct": 92,
+      "done": 11,
+      "total": 12,
+      "stage": "Stage 8 & Stage R2"
+    },
+    {
+      "phase_id": "Phase 9",
+      "phase_name": "Daily Pipeline & BullMQ Scheduler",
+      "priority": "Critical",
+      "status": "PARTIAL",
+      "progress_pct": 93,
+      "done": 14,
+      "total": 15,
+      "stage": "Stage 9 & Stage R2"
+    },
+    {
+      "phase_id": "Phase 10",
+      "phase_name": "Web Push Notifications & PWA Caching",
+      "priority": "Medium",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 11,
+      "total": 11,
+      "stage": "Stage 10 & Stage R2"
+    },
+    {
+      "phase_id": "Phase 10A",
+      "phase_name": "Orbit Foundation (Backend)",
+      "priority": "High",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 10,
+      "total": 10,
+      "stage": "Stage F1"
+    },
+    {
+      "phase_id": "Phase 10B",
+      "phase_name": "Orbit and Globe UI",
+      "priority": "High",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 10,
+      "total": 10,
+      "stage": "Stage F2"
+    },
+    {
+      "phase_id": "Phase 10C",
+      "phase_name": "Telepathy (Instinct Sync)",
+      "priority": "High",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 9,
+      "total": 9,
+      "stage": "Stage F3"
+    },
+    {
+      "phase_id": "Phase 10D",
+      "phase_name": "Anti-Twin, Share Faces & Verification Gate",
+      "priority": "High",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 9,
+      "total": 9,
+      "stage": "Stage F4"
+    },
+    {
+      "phase_id": "Phase 10E",
+      "phase_name": "Meme Questions & Themed Drops",
+      "priority": "High",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 9,
+      "total": 9,
+      "stage": "Stage M1 (after F4)"
+    },
+    {
+      "phase_id": "Phase 10F",
+      "phase_name": "Signals Foundation",
+      "priority": "High",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 10,
+      "total": 10,
+      "stage": "Stage M2 (after M1)"
+    },
+    {
+      "phase_id": "Phase 10G",
+      "phase_name": "Meme Lab (User Captions & Moderation Queue)",
+      "priority": "Medium",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 9,
+      "total": 9,
+      "stage": "Stage M3"
+    },
+    {
+      "phase_id": "Phase 10H",
+      "phase_name": "Insights Engine (Statistics Only)",
+      "priority": "Medium",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 9,
+      "total": 9,
+      "stage": "Stage M4"
+    },
+    {
+      "phase_id": "Phase 10I",
+      "phase_name": "Taste Dimension & Recognition (Badges)",
+      "priority": "Medium",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 8,
+      "total": 8,
+      "stage": "Stage M5/M6"
+    },
+    {
+      "phase_id": "Phase 10J",
+      "phase_name": "ML Ranker for Optional Surfaces",
+      "priority": "Low",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 5,
+      "total": 5,
+      "stage": "Stage M7"
+    },
+    {
+      "phase_id": "Phase 10K",
+      "phase_name": "Premium Groundwork (Monetisation Gate G3)",
+      "priority": "Low",
+      "status": "COMPLETE",
+      "progress_pct": 100,
+      "done": 5,
+      "total": 5,
+      "stage": "Stage M8"
+    },
+    {
+      "phase_id": "Phase 10L",
+      "phase_name": "Lanes Plumbing",
+      "priority": "Critical",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 10,
+      "stage": "Stage L1"
+    },
+    {
+      "phase_id": "Phase 10M",
+      "phase_name": "Richer Answer Formats",
+      "priority": "High",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 7,
+      "stage": "Stage L2"
+    },
+    {
+      "phase_id": "Phase 10N",
+      "phase_name": "Twin Depth & Mutual Pairing",
+      "priority": "High",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 7,
+      "stage": "Stage L3"
+    },
+    {
+      "phase_id": "Phase 10O",
+      "phase_name": "Memes Lane Launch",
+      "priority": "High",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 5,
+      "stage": "Stage L4 (after M1)"
+    },
+    {
+      "phase_id": "Phase 10P",
+      "phase_name": "Situations Lane (Cards First)",
+      "priority": "Medium",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 5,
+      "stage": "Stage L5"
+    },
+    {
+      "phase_id": "Phase 10Q",
+      "phase_name": "Say It: Free-Text Answers (Gate G4)",
+      "priority": "Low",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 8,
+      "stage": "Stage L6 (Gate G4)"
+    },
+    {
+      "phase_id": "Phase 10R",
+      "phase_name": "Super Twin & Lane-Aware Connection Features",
+      "priority": "Medium",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 6,
+      "stage": "Stage L7"
+    },
+    {
+      "phase_id": "Phase 10S",
+      "phase_name": "Brain Lane (Documented Only)",
+      "priority": "Low",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 1,
+      "stage": "Stage L8"
+    },
+    {
+      "phase_id": "Phase 11",
+      "phase_name": "Admin Panel (\"Mission Control\")",
+      "priority": "High",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 46,
+      "stage": "Stage 11 (Addenda A+B)"
+    },
+    {
+      "phase_id": "Phase 12",
+      "phase_name": "Observability, Telemetry & Security",
+      "priority": "High",
+      "status": "PARTIAL",
+      "progress_pct": 9,
+      "done": 1,
+      "total": 11,
+      "stage": "Stage 12 & Stage R2"
+    },
+    {
+      "phase_id": "Phase 13",
+      "phase_name": "End-to-End QA, Load Tests & Audits",
+      "priority": "Critical",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 12,
+      "stage": "Stage 13"
+    },
+    {
+      "phase_id": "Phase 14",
+      "phase_name": "Cloud Deployment & Infrastructure",
+      "priority": "Critical",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 11,
+      "stage": "Stage 14"
+    },
+    {
+      "phase_id": "Phase 15",
+      "phase_name": "Beta Launch & Go/No-Go Decision Gates",
+      "priority": "High",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 6,
+      "stage": "Stage 15"
+    },
+    {
+      "phase_id": "Phase 16",
+      "phase_name": "Scale Readiness Gate (T1, T2, T3)",
+      "priority": "Critical",
+      "status": "TODO",
+      "progress_pct": 0,
+      "done": 0,
+      "total": 5,
+      "stage": "Stage 16 (Scale Gate)"
+    }
+  ],
+  "config_keys": {
+    "architecture_18_2_4": [
+      "lane.closest_so_far_below",
+      "lane.early_below",
+      "lane.expected_players_threshold_for_entropy_rule",
+      "lane.max_legacy_formats_in_everyday",
+      "lane.min_approved_drops_to_open",
+      "lane.min_high_entropy_questions",
+      "lane.missing_drop_alert_hours",
+      "match.group_size_display_cap",
+      "match.history_min_shared_days",
+      "match.history_tiebreak_enabled",
+      "match.history_window_days",
+      "match.min_questions_compared",
+      "match.mutual_pairing_enabled",
+      "match.neighbour_limit_k",
+      "match.tie_epsilon",
+      "match.weight_cap",
+      "match.weight_cap_enabled",
+      "super.min_lanes",
+      "super.min_similarity",
+      "text.archetype_weight_a",
+      "text.disable_days",
+      "text.history_retention_days",
+      "text.max_chars",
+      "text.max_questions_per_drop",
+      "text.min_confidence",
+      "text.raw_retention_days",
+      "text.rejection_limit_per_day"
+    ],
+    "rules_9_4": [
+      "lane.closest_so_far_below",
+      "lane.early_below",
+      "lane.expected_players_threshold_for_entropy_rule",
+      "lane.max_legacy_formats_in_everyday",
+      "lane.min_approved_drops_to_open",
+      "lane.min_high_entropy_questions",
+      "lane.missing_drop_alert_hours",
+      "match.group_size_display_cap",
+      "match.history_min_shared_days",
+      "match.history_tiebreak_enabled",
+      "match.history_window_days",
+      "match.min_questions_compared",
+      "match.mutual_pairing_enabled",
+      "match.neighbour_limit_k",
+      "match.tie_epsilon",
+      "match.weight_cap",
+      "match.weight_cap_enabled",
+      "super.min_lanes",
+      "super.min_similarity",
+      "text.archetype_weight_a",
+      "text.disable_days",
+      "text.history_retention_days",
+      "text.max_chars",
+      "text.max_questions_per_drop",
+      "text.min_confidence",
+      "text.raw_retention_days",
+      "text.rejection_limit_per_day"
+    ]
+  },
+  "header_counts": {
+    "AGENTS.md": {
+      "h2": 4,
+      "h3": 0
+    },
+    "README.md": {
+      "h2": 7,
+      "h3": 4
+    },
+    "architecture.md": {
+      "h2": 18,
+      "h3": 42
+    },
+    "design.md": {
+      "h2": 26,
+      "h3": 32
+    },
+    "docs/admin-panel-spec.md": {
+      "h2": 42,
+      "h3": 35
+    },
+    "docs/capacity-model.md": {
+      "h2": 6,
+      "h3": 13
+    },
+    "docs/connection-features.md": {
+      "h2": 8,
+      "h3": 5
+    },
+    "docs/degradation-playbook.md": {
+      "h2": 4,
+      "h3": 2
+    },
+    "docs/disaster-recovery.md": {
+      "h2": 4,
+      "h3": 0
+    },
+    "docs/dynamic-content-audit.md": {
+      "h2": 3,
+      "h3": 0
+    },
+    "docs/event-dictionary.md": {
+      "h2": 4,
+      "h3": 3
+    },
+    "docs/failure-modes.md": {
+      "h2": 2,
+      "h3": 0
+    },
+    "docs/implementation-status.md": {
+      "h2": 3,
+      "h3": 0
+    },
+    "docs/lanes-and-matching.md": {
+      "h2": 7,
+      "h3": 13
+    },
+    "docs/load-testing.md": {
+      "h2": 3,
+      "h3": 1
+    },
+    "docs/manual-a11y-checklist.md": {
+      "h2": 4,
+      "h3": 12
+    },
+    "docs/meme-and-insights-features.md": {
+      "h2": 8,
+      "h3": 7
+    },
+    "docs/reliability-gap-audit.md": {
+      "h2": 5,
+      "h3": 5
+    },
+    "docs/runbook.md": {
+      "h2": 3,
+      "h3": 9
+    },
+    "docs/say-it-text-answers.md": {
+      "h2": 7,
+      "h3": 4
+    },
+    "docs/scaling-plan.md": {
+      "h2": 4,
+      "h3": 5
+    },
+    "docs/situations-lane-guidelines.md": {
+      "h2": 6,
+      "h3": 1
+    },
+    "docs/slo.md": {
+      "h2": 6,
+      "h3": 0
+    },
+    "docs/stage-F0-report.md": {
+      "h2": 6,
+      "h3": 0
+    },
+    "docs/stage-F1-report.md": {
+      "h2": 3,
+      "h3": 0
+    },
+    "docs/stage-F2-report.md": {
+      "h2": 3,
+      "h3": 3
+    },
+    "docs/stage-F3-report.md": {
+      "h2": 3,
+      "h3": 3
+    },
+    "docs/stage-F4-report.md": {
+      "h2": 4,
+      "h3": 5
+    },
+    "docs/stage-L0-fix-report.md": {
+      "h2": 3,
+      "h3": 8
+    },
+    "docs/stage-L0-prompt.md": {
+      "h2": 14,
+      "h3": 8
+    },
+    "docs/stage-L0-repair-report.md": {
+      "h2": 5,
+      "h3": 8
+    },
+    "docs/stage-L0-report.md": {
+      "h2": 5,
+      "h3": 12
+    },
+    "docs/stage-M0-report.md": {
+      "h2": 6,
+      "h3": 0
+    },
+    "docs/stage-M1-report.md": {
+      "h2": 4,
+      "h3": 5
+    },
+    "docs/stage-M2-report.md": {
+      "h2": 5,
+      "h3": 4
+    },
+    "docs/stage-M3-report.md": {
+      "h2": 5,
+      "h3": 4
+    },
+    "docs/stage-M4-report.md": {
+      "h2": 4,
+      "h3": 5
+    },
+    "docs/stage-M5-M6-report.md": {
+      "h2": 4,
+      "h3": 3
+    },
+    "docs/stage-M7-report.md": {
+      "h2": 5,
+      "h3": 4
+    },
+    "docs/stage-M8-report.md": {
+      "h2": 4,
+      "h3": 4
+    },
+    "docs/stage-r2-prompt.md": {
+      "h2": 13,
+      "h3": 0
+    },
+    "memory.md": {
+      "h2": 31,
+      "h3": 62
+    },
+    "product.md": {
+      "h2": 19,
+      "h3": 78
+    },
+    "rules.md": {
+      "h2": 12,
+      "h3": 11
+    },
+    "task.md": {
+      "h2": 5,
+      "h3": 37
+    }
+  }
+}

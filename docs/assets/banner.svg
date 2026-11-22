@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="180" viewBox="0 0 800 180">
+  <title>Oddly — Find your twin</title>
+  <desc>Oddly logo banner with three overlapping sticker pop circles in violet, coral and mint on warm cream desk.</desc>
+
+  <!-- Desk background card with 4px hard shadow -->
+  <rect x="14" y="14" width="776" height="156" rx="18" fill="#14123A" />
+  <rect x="10" y="10" width="776" height="156" rx="18" fill="#FFF8F0" stroke="#14123A" stroke-width="2.5" />
+
+  <!-- Overlapping Sticker Circles -->
+  <!-- Circle 1: Violet -->
+  <circle cx="94" cy="94" r="50" fill="#14123A" />
+  <circle cx="90" cy="90" r="50" fill="#6C4CF1" stroke="#14123A" stroke-width="2.5" />
+
+  <!-- Circle 2: Coral -->
+  <circle cx="144" cy="94" r="42" fill="#14123A" />
+  <circle cx="140" cy="90" r="42" fill="#FF6B5E" stroke="#14123A" stroke-width="2.5" />
+
+  <!-- Circle 3: Mint -->
+  <circle cx="184" cy="94" r="34" fill="#14123A" />
+  <circle cx="180" cy="90" r="34" fill="#3DDBB0" stroke="#14123A" stroke-width="2.5" />
+
+  <!-- Mini Star in Violet Circle -->
+  <polygon points="90,72 95,84 107,85 98,93 101,105 90,98 79,105 82,93 73,85 85,84" fill="#FFFFFF" stroke="#14123A" stroke-width="1.5" />
+
+  <!-- Brand Typography -->
+  <text x="245" y="96" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="54px" font-weight="900" fill="#14123A" letter-spacing="-1px">oddly</text>
+
+  <!-- Tagline Badge -->
+  <rect x="250" y="114" width="160" height="28" rx="14" fill="#14123A" />
+  <rect x="248" y="112" width="160" height="28" rx="14" fill="#FFD23F" stroke="#14123A" stroke-width="2" />
+  <text x="328" y="131" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12px" font-weight="900" fill="#14123A" text-anchor="middle">★ FIND YOUR TWIN</text>
+
+  <text x="430" y="131" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13px" font-weight="700" fill="#5B5780">Daily 5-question instinct match at 07:00 IST</text>
+
+  <!-- Right Side Badge Sticker -->
+  <rect x="674" y="54" width="94" height="74" rx="12" fill="#14123A" />
+  <rect x="670" y="50" width="94" height="74" rx="12" fill="#FFFFFF" stroke="#14123A" stroke-width="2.5" />
+  <text x="717" y="78" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22px" font-weight="900" fill="#6C4CF1" text-anchor="middle">v1.0</text>
+  <text x="717" y="98" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="10px" font-weight="800" fill="#14123A" text-anchor="middle">STICKER POP</text>
+  <text x="717" y="112" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="8px" font-weight="700" fill="#5B5780" text-anchor="middle">CREAM DESK</text>
+</svg>
