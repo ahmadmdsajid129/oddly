@@ -15,7 +15,8 @@
 > Daily five-pick game finding your stranger twin anywhere in the world in under 30 seconds.
 
 <!-- visual:start where-we-are -->
-### Where We Are
+**Where We Are**
+
 ![Overall Project Progress](docs/assets/progress-overall.svg)
 
 ![Recommended Execution Order Stage Roadmap](docs/assets/roadmap-stages.svg)

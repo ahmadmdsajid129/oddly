@@ -5,6 +5,16 @@ Purpose of this file: Definitive product blueprint, scope, user personas, brand 
 
 ---
 
+<!-- visual:start product-at-a-glance -->
+> [!NOTE]
+> **Oddly at a Glance**
+> - **Core Loop:** Five instinct-based picks in under 30 seconds every morning at 07:00 IST.
+> - **Lanes:** Choose your universe (Everyday, Memes, Situations); matching is strictly lane-isolated.
+> - **Honest Matching:** Find your Twin and your Oddness rarity percentile with zero profiles, feeds, or chat.
+> - **Safe by Design:** Structured answers, 18+ only, zero shaming, no sensitive inference, non-political.
+> - **Tactile Pop:** Physical paper sticker aesthetic on warm cream desk (`#FFF8F0`) with ink outlines and hard shadows.
+<!-- visual:end product-at-a-glance -->
+
 ## 1. What We Are Making
 
 **Oddly** (working title: _Twin_) is a daily five-pick game web app designed to give every person a daily moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-based questions—identical for everyone on Earth. Players answer on intuition without profiles, feeds, chat, or followers. Immediately upon submission, Oddly computes your **Twin**: the one stranger anywhere in the world who answered most like you today. It also computes your **Oddness**: an information-theoretic rarity percentile revealing how singular your combination of picks was compared to everyone else who played.
@@ -157,6 +167,24 @@ When traffic surges trigger the Graceful Degradation Ladder, the user experience
   > *"We are having trouble reaching our servers. Your picks are safely saved on this device and will send automatically the moment we are back."*
 
 ### 4.6 Go/No-Go Decision Gates
+
+<!-- visual:start decision-gates-flowchart -->
+```mermaid
+flowchart TD
+    G0["🟢 G0: Private Alpha<br/>50 players · D1 ≥ 40%"] --> G1["🟢 G1: Public Beta<br/>1k players · D7 ≥ 25% · p95 < 2s"]
+    G1 --> G2["🟡 G2: Campus Launch<br/>5k players · D30 ≥ 18% · K ≥ 0.3"]
+    G2 --> G3["⚪ G3: Monetisation Gate<br/>25k MAU · No paywalls before"]
+    
+    subgraph LaneGates["Lane & Content Side Branches"]
+        GLA["🛤️ Gate L-A: Lane Opening<br/>≥ 3k global DAU · 8 queued Drops"]
+        G4["🔒 Gate G4: Free-Text / Say It<br/>Text moderation · Macro-F1 ≥ 0.75"]
+    end
+    
+    G1 -.-> GLA
+    GLA -.-> G4
+```
+<!-- visual:end decision-gates-flowchart -->
+
 - **G0 (Private Alpha):** 50 players over 1 weekend. Metric: D1 retention $\ge 40\%$, zero crash reports, zero unhandled errors in telemetry.
 - **G1 (Public Beta):** 1,000 players over 14 days. Metric: D7 retention $\ge 25\%$, share rate $\ge 15\%$, matching latency p95 < 2.0s.
 - **G2 (Campus Launch):** 5,000 players across 3 campuses. Metric: D30 retention $\ge 18\%$, referral coefficient $K \ge 0.3$.
@@ -225,6 +253,19 @@ When traffic surges trigger the Graceful Degradation Ladder, the user experience
 ## 6. Core Loop and Daily Timeline
 
 ### 6.1 The Player Core Loop
+
+<!-- visual:start core-loop-flowchart -->
+```mermaid
+flowchart LR
+    D["1. Discovery<br/>(18+ Age Gate)"] --> P["2. Play Drop<br/>(5 instinct picks)"]
+    P --> R["3. Instant Reveal<br/>(Twin & Oddness)"]
+    R --> E["4. Explore<br/>(Lane carousel)"]
+    E --> H["5. Returning Home<br/>(Last played first)"]
+    H --> M["6. Morning Recap<br/>(07:05 IST mutual)"]
+    M -.-> P
+```
+<!-- visual:end core-loop-flowchart -->
+
 Oddly operates on a fast, tactile daily habit loop designed for rapid completion (~30 seconds) and high shareability, now lane-aware:
 
 ```
@@ -253,6 +294,16 @@ Oddly operates on a fast, tactile daily habit loop designed for rapid completion
 ```
 
 ### 6.2 The Daily "Twin Day" Timeline (All times IST, stored in UTC)
+
+<!-- visual:start timeline-flowchart -->
+```mermaid
+flowchart TD
+    T1["07:00 IST<br/>Unified Daily Drop Open"] --> T2["07:00 – 23:00 IST<br/>Active Play Window & On-Demand Provisional Matching"]
+    T2 --> T3["07:00 IST (+1 Day)<br/>Drop Close & 24h Window Freeze"]
+    T3 --> T4["07:05 IST (+1 Day)<br/>Batch Mutual Pairing · History Tie-Break · Morning Recap"]
+```
+<!-- visual:end timeline-flowchart -->
+
 - **07:00 IST — Unified Daily Drop Open:** All open lanes release their daily Drop simultaneously. All Drops share the exact same 24-hour cycle. No staggered drop clocks in v1 to protect capacity and prevent duplicate peak load spikes.
 - **07:00 to 23:00 IST — Active Play Window:** Peak traffic windows (07:00-09:30 morning commute, 12:30-14:00 lunch, 20:00-22:30 evening). Provisional twin matching runs on-demand via the BullMQ pipeline with sub-second response times.
 - **07:00 IST (+1 Day) — Drop Close & Freeze:** The 24-hour play window closes. Unfinished Drops expire.
@@ -358,6 +409,15 @@ The player's **Rarity Percentile** is:
 $$\text{Percentile}(u) = 100 \times \frac{\#\{v \in \text{Players} \mid \text{Oddness}(v) < \text{Oddness}(u)\}}{N}$$
 **Rarity Tiers:**
 
+<!-- visual:start oddness-tier-chips -->
+| Tier | Percentile Range | Visual Accent & Indicator |
+|---|---|---|
+| **Common** | 0.0% – 49.9% | ⚪ Slate / Ink outline (`#5B5780`) |
+| **Uncommon** | 50.0% – 79.9% | 🟢 Mint (`#3DDBB0`) |
+| **Rare** | 80.0% – 94.9% | 🟣 Violet (`#6C4CF1`) |
+| **Mythic** | 95.0% – 100.0% | 🟡 Sun / Gold foil (`#FFD23F`) |
+<!-- visual:end oddness-tier-chips -->
+
 - **Common:** 0.0% – 49.9%
 - **Uncommon:** 50.0% – 79.9%
 - **Rare:** 80.0% – 94.9%
@@ -375,6 +435,18 @@ $$\text{Percentile}(u) = 100 \times \frac{\#\{v \in \text{Players} \mid \text{Od
    - Vector embeddings + Approximate Nearest Neighbors (ANN via pgvector HNSW index) followed by top-K exact rescoring.
 
 ### 9.6 Tie-Breaking, History Agreement, and Mutual Pairing
+
+<!-- visual:start tie-break-pipeline-flowchart -->
+```mermaid
+flowchart TD
+    C["Candidate Pool"] --> S1["Step 1: Top Similarity Score<br/>Filter to peak score within ε = 0.01"]
+    S1 --> S2["Step 2: 28-Day Lane History<br/>BitMinHash signature agreement (≥ 5 shared days)"]
+    S2 --> S3["Step 3: Cross-Cultural Preference<br/>Prefer candidate from different country"]
+    S3 --> S4["Step 4: Deterministic Cryptographic Hash<br/>HMAC_SHA256(drop_id, min || max)"]
+    S4 --> S5["Step 5: Greedy Mutual Pairing<br/>Pair reciprocal twins (is_mutual = true)"]
+```
+<!-- visual:end tie-break-pipeline-flowchart -->
+
 
 When thousands of players complete 5 questions, tie collisions naturally occur. Oddly resolves ties through a strictly deterministic, privacy-preserving, and mutual multi-stage process:
 
@@ -824,19 +896,25 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 
 | Lane ID | Display Name | Theme & Content Style | Formats Used | Status at Launch | Opening Criteria |
 |---|---|---|---|---|---|
-| `everyday` | Everyday | Daily life dilemmas, food, small habits, light "would you rather" | `pick1`, `pick2of6`, `rank3`, `slider7`, legacy (max 2) | **Open** | Universal default; always open; first visit route (Rule L10) |
-| `memes` | Memes | Internet culture, meme templates, caption pairing (F24/F35) | `pick1`, `pick2of6`, `rank3` | **Open** | Core launch lane; feeds from Meme Lab |
-| `gaming` | Gaming | Playstyles, genres, rage moments, gaming debates (no real brands) | `pick1`, `pick2of6`, `rank3`, `slider7` | Planned | Gate L-A ($\ge 3,000$ global DAU, 8 queued Drops) |
-| `screen_sound` | Screen & Sound | Films, television, music moods, fandom-neutral preferences | `pick1`, `pick2of6`, `rank3`, `slider7` | Planned | Gate L-A |
-| `food_habits` | Food & Habits | Taste nuances, daily routines, sleep, study/work quirks | `pick1`, `pick2of6`, `rank3`, `slider7` | Planned | Gate L-A |
-| `hot_takes` | Hot Takes | Harmless debates (pineapple on pizza, reply vs seen); zero politics | `pick1`, `slider7` | Planned | Gate L-A; strict editorial non-politics enforcement |
-| `how_you_think`| How You Think | Playful decision styles (fast vs careful, plan vs wing it); non-clinical | `pick1`, `slider7`, `rank3` | Planned | Gate L-A; strict non-diagnostic disclaimer |
-| `situations` | Situations | "What would you do" scenes; illustrated cards; style archetypes | `scene` (v1), `say_it` (v2 behind G4) | Planned | Gate L-A; Rule L7 safety review; cards first |
-| `brain` | Brain | Knowledge & trivia dilemmas; twin means "made the same mistakes" | `pick1`, `pick2of6` | Documented | Unscheduled; documented for architecture parity |
+| `everyday` | 🟪 Everyday | Daily life dilemmas, food, small habits, light "would you rather" | `pick1`, `pick2of6`, `rank3`, `slider7`, legacy (max 2) | 🟢 **Open** | Universal default; always open; first visit route (Rule L10) |
+| `memes` | 🟨 Memes | Internet culture, meme templates, caption pairing (F24/F35) | `pick1`, `pick2of6`, `rank3` | 🟢 **Open** | Core launch lane; feeds from Meme Lab |
+| `gaming` | 🟩 Gaming | Playstyles, genres, rage moments, gaming debates (no real brands) | `pick1`, `pick2of6`, `rank3`, `slider7` | ⚪ Planned | Gate L-A ($\ge 3,000$ global DAU, 8 queued Drops) |
+| `screen_sound` | 🟪 Screen & Sound | Films, television, music moods, fandom-neutral preferences | `pick1`, `pick2of6`, `rank3`, `slider7` | ⚪ Planned | Gate L-A |
+| `food_habits` | 🟧 Food & Habits | Taste nuances, daily routines, sleep, study/work quirks | `pick1`, `pick2of6`, `rank3`, `slider7` | ⚪ Planned | Gate L-A |
+| `hot_takes` | 🟥 Hot Takes | Harmless debates (pineapple on pizza, reply vs seen); zero politics | `pick1`, `slider7` | ⚪ Planned | Gate L-A; strict editorial non-politics enforcement |
+| `how_you_think`| 🟪 How You Think | Playful decision styles (fast vs careful, plan vs wing it); non-clinical | `pick1`, `slider7`, `rank3` | ⚪ Planned | Gate L-A; strict non-diagnostic disclaimer |
+| `situations` | 🟨 Situations | "What would you do" scenes; illustrated cards; style archetypes | `scene` (v1), `say_it` (v2 behind G4) | ⚪ Planned | Gate L-A; Rule L7 safety review; cards first |
+| `brain` | 🟦 Brain | Knowledge & trivia dilemmas; twin means "made the same mistakes" | `pick1`, `pick2of6` | 📄 Documented | Unscheduled; documented for architecture parity |
 
 ---
 
 ### F32 Lanes (v1, Stage L1)
+
+<!-- visual:start card-f32 -->
+> [!NOTE]
+> **Stage:** Stage L1 | **Status:** 🟢 In Progress | **Feature Flag:** `feature.lanes`
+<!-- visual:end card-f32 -->
+
 
 - **Purpose:** Allow players to choose the subject matter they enjoy, matching them exclusively with players who chose the same subject, while preserving the 30-second loop and no-login first run.
 - **Player Journey:**
@@ -874,6 +952,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 
 ### F33 Richer Answer Formats (v1, Stage L2)
 
+<!-- visual:start card-f33 -->
+> [!NOTE]
+> **Stage:** Stage L2 | **Status:** ⚪ Planned | **Feature Flag:** `feature.richer_formats`
+<!-- visual:end card-f33 -->
+
+
 - **Purpose:** Expand the combinatorial outcome space of questions to drastically reduce tie collisions while maintaining instant, visceral playability.
 - **Player Journey:**
   1. *Pick 1 of N (`pick1`):* Tap 1 option. Immediate selection state.
@@ -901,6 +985,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 ---
 
 ### F34 Twin Depth & Mutual Pairing (v1, Stage L3)
+
+<!-- visual:start card-f34 -->
+> [!NOTE]
+> **Stage:** Stage L3 | **Status:** ⚪ Planned | **Feature Flag:** `feature.twin_depth`
+<!-- visual:end card-f34 -->
+
 
 - **Purpose:** Eliminate identical-answer tie dilution, make twin relationships genuinely mutual, and present transparent, honest group sizes.
 - **Definitions:**
@@ -939,6 +1029,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 
 ### F35 Memes Lane Launch (v1, Stage L4)
 
+<!-- visual:start card-f35 -->
+> [!NOTE]
+> **Stage:** Stage L4 | **Status:** ⚪ Planned | **Feature Flag:** `feature.memes_lane`
+<!-- visual:end card-f35 -->
+
+
 - **Purpose:** Provide a high-engagement, dedicated culture lane using meme templates and caption choices, directly utilizing the F24 question infrastructure developed in Stage M1.
 - **Relationship to F24:** F24 defines the Meme Question format and Meme Lab authoring engine. F35 is the **dedicated live lane** on the home screen that runs daily meme Drops.
 - **Player Journey:**
@@ -962,6 +1058,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 ---
 
 ### F36 Situations Lane (Stage L5, Card Version First)
+
+<!-- visual:start card-f36 -->
+> [!NOTE]
+> **Stage:** Stage L5 | **Status:** ⚪ Planned | **Feature Flag:** `feature.situations_lane`
+<!-- visual:end card-f36 -->
+
 
 - **Purpose:** Present relatable, playful social scenarios ("What would you do?") yielding a descriptive behavioral style label, without ranking, shaming, or evaluating human worth.
 - **Card-First Launch Architecture:** In accordance with Founder decisions, Situations launches with **illustrated scenario cards (`scene`)**, completely avoiding free-text NLP risks until Gate G4.
@@ -995,6 +1097,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 ---
 
 ### F37 Say It: Free-Text Answers (Stage L6, Gated Behind Gate G4)
+
+<!-- visual:start card-f37 -->
+> [!NOTE]
+> **Stage:** Stage L6 | **Status:** 🔒 Gated (Gate G4) | **Feature Flag:** `feature.say_it`
+<!-- visual:end card-f37 -->
+
 
 - **Purpose:** Match players on short, typed responses (up to 80 chars) based on semantic meaning using a self-hosted ONNX model, without exposing text to other players.
 - **The 7-Step Processing Pipeline:**
@@ -1033,6 +1141,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 
 ### F38 Super Twin and Lane-Aware Connection Features (Stage L7)
 
+<!-- visual:start card-f38 -->
+> [!NOTE]
+> **Stage:** Stage L7 | **Status:** ⚪ Planned | **Feature Flag:** `feature.super_twin`
+<!-- visual:end card-f38 -->
+
+
 - **Purpose:** Recognize the rare, delightful occurrence when two players match as twins across multiple distinct lanes on the same calendar day, and adapt connection features (Globe, Keep/Orbit, Telepathy, Anti-twin) to be lane-aware.
 - **Super Twin Mechanics:**
   - Triggered when player A and player B are paired as twins in **2 or more lanes** on the same date, or achieve $\ge 0.80$ similarity across $\ge 2$ lanes.
@@ -1057,6 +1171,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 ---
 
 ### F39 Brain Lane (Stage L8, Documented Only)
+
+<!-- visual:start card-f39 -->
+> [!NOTE]
+> **Stage:** Stage L8 | **Status:** 📄 Documented Only | **Feature Flag:** `None (Documented Only)`
+<!-- visual:end card-f39 -->
+
 
 - **Purpose:** Knowledge and trivia dilemma lane where "twin" means something unique: you made the **same intuitive leaps and the exact same mistakes**.
 - **Status:** Documented only; unscheduled for implementation. Preserved for architectural completeness and future roadmap evaluation.
