@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage L0-FIX2: Documentation Corrections & Alignment (COMPLETE).
+- **Current Stage:** Stage 1: Design System & UI Kit Resilience Primitives (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1569,4 +1569,37 @@ Section 37.3 listed Q1 to Q7 incorrectly (they did not match section 36.1). The 
     - *Status:* OPEN.
     - *Recommended Default:* Keep `bonus.pool_min_per_lane = 40` in v1, monitor runway alerts, and expand curations based on observed empirical data.
     - *Reason:* 40 allows rapid initial launch across catalog lanes while the majority exclusion rule cushions reuse fatigue.
+
+---
+
+## 39. Phase 1 Completion: Resilience & Degradation UI Kit (2026-11-22)
+
+### 39.1 Overview & Motivation
+During Stage 0.5 scale and reliability hardening, four resilience UI requirements were added to Phase 1 (Stage 1 Design System & UI Kit) under Section 17.4 to guarantee user-friendly, non-alarmist feedback during peak volume and system degradation:
+1. **P1.20 Degradation Banners (`DegradationBanner.tsx`):**
+   - Non-alarmist status banner reflecting system load shedding levels L0–L4.
+   - L0 Healthy: Null render (zero visual clutter).
+   - L1 Conserve: Polite notice about non-essential animations paused to conserve speed.
+   - L2 High Traffic: Informs players that high volume is active and background batching is running.
+   - L3 Surge Active: Prominent, non-dismissible amber alert for peak load shedding where live matchmaking runs in queue.
+   - L4 Offline/Emergency Mode: Crimson alert informing players that submissions are queued locally and will sync once connectivity resumes.
+2. **P1.21 Mode B Pending Screen (`ModeBPendingScreen.tsx`):**
+   - Asynchronous transition view shown when immediate synchronous Stage A provisional match is bypassed due to peak load shedding or high volume.
+   - Features animated two-dot motif ("Saved. Finding your twin...") with automatic fallback to static dots when `prefers-reduced-motion` is detected via `useReducedMotion()`.
+   - Displays Ticket ID chip with request tracking reference, "Check Status" action button, and "Back Home" navigation.
+3. **P1.22 Overload Screens & Stale Indicators (`OverloadScreens.tsx`):**
+   - `FreshnessLabel`: Renders relative timestamps ("Live 12s ago", "Updated 5m ago") and amber/coral warning badge when serving stale or cached data during outages.
+   - `RateLimitScreen`: Friendly, brand-aligned HTTP 429 rate limit screen featuring a live split-flap second countdown timer until retry is permitted.
+   - `ServiceOverloadScreen`: Friendly, brand-aligned HTTP 503 high traffic screen explaining temporary server congestion with a retry countdown ticker and manual retry action.
+4. **P1.23 Anti-Flicker Skeletons & Fallbacks (`ResiliencePrimitives.tsx`):**
+   - `useMinimumLoading`: Custom React hook enforcing a 200ms minimum display threshold on loading skeleton states to eliminate jarring visual micro-flashes on fast networks.
+   - `AntiFlickerSkeleton`: Wrapper component leveraging `useMinimumLoading` to wrap content and skeleton fallbacks.
+   - `WidgetErrorBoundary`: Granular error boundary that isolates component and widget failures without crashing the core Drop flow, displaying an in-place retry button and friendly message.
+
+### 39.2 Verification & Integration
+- **Interactive Gallery:** Mounted all four components into Section 10 of `/dev/ui` (`apps/web/src/app/dev/ui/page.tsx`).
+- **Automated Tests:** Authored 15 comprehensive unit tests in `apps/web/src/resilience-ui.test.tsx` verifying SSR rendering, reduction-motion fallbacks, countdown intervals, stale label classes, and error boundary recovery.
+- **Test Pass:** Ran `@oddly/web` suite: 13 test files passed, 98 tests passed in 4.29s. Typecheck (`tsc --noEmit`) clean with zero errors.
+- **Phase 1 Metrics:** Phase 1 (Stage 1) is now 100% COMPLETE (23/23 tasks done). Overall tracked tasks: 241 completed / 410 total across 38 phases (59% overall progress).
+
 

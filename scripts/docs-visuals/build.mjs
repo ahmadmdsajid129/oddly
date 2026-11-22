@@ -55,7 +55,18 @@ function parseTaskMarkdown(taskPath) {
     todo: 0,
   };
 
+  let inDashboard = false;
   for (const line of lines) {
+    if (line.includes('## 1. Master Progress Dashboard')) {
+      inDashboard = true;
+      continue;
+    }
+    if (inDashboard && line.startsWith('---')) {
+      inDashboard = false;
+      continue;
+    }
+    if (!inDashboard) continue;
+
     if (line.includes('Overall Project Progress')) {
       const m = line.match(/(\d+)%/);
       if (m) dashboard.progress_pct = parseInt(m[1], 10);

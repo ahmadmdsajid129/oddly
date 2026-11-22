@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 58%`                                                       |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 59%`                                                       |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 237 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 241 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 173 tasks                                                                        |
+| **Pending (`TODO`)**            | 169 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -49,7 +49,7 @@
 | Phase        | Phase Name                                  | Priority | Status    | Progress Bar       | Tasks (Done/Total) | Stage That Builds It  |
 | ------------ | ------------------------------------------- | -------- | --------- | ------------------ | ------------------ | --------------------- |
 | **Phase 0**  | Documentation & Skeleton Initialisation     | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 0 & Stage 0.5   |
-| **Phase 1**  | Design System & UI Kit                      | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 83%` | 19 / 23            | Stage 1 & Stage 0.5   |
+| **Phase 1**  | Design System & UI Kit                      | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 23 / 23            | Stage 1 & Stage 0.5   |
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 2 & Stage R2    |
 | **Phase 3**  | Fastify REST API Core                       | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 94%` | 15 / 16            | Stage 3 & Stage R2    |
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
@@ -119,7 +119,7 @@ _Status: COMPLETE | Target: Skeleton verified, zero features implemented, scale 
 
 ### Phase 1: Design System & UI Kit (Stage 1)
 
-_Status: PARTIAL | Target: Token foundation, accessible UI primitives, 28 custom SVGs, degraded state UI._
+_Status: COMPLETE | Target: Token foundation, accessible UI primitives, 28 custom SVGs, degraded state UI._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -142,10 +142,10 @@ _Status: PARTIAL | Target: Token foundation, accessible UI primitives, 28 custom
 | `[x] P1.17` | Create visual design showcase page at `apps/web/src/app/design/page.tsx`                    | 🟠 High      | ✅ DONE         | P1.03-P1.16 | Agent | 2026-11-07  | Component verification gallery  |
 | `[x] P1.18` | Implement haptic vibration and sound effect hooks with user preference toggles              | 🟢 Low       | ✅ DONE         | P1.03       | Agent | 2026-11-07  | Sensory feedback system         |
 | `[x] P1.19` | Run automated accessibility audit with `@axe-core/playwright` on all UI components          | 🟠 High      | ✅ DONE         | P1.17       | Agent | 2026-11-12  | Playwright axe-core e2e suite with 11 tests verifying zero critical/serious violations across all routes & play flow |
-| `[ ] P1.20` | Build status banner component for degradation levels L1–L4 with dynamic copy                | 🟠 High      | ⚪ TODO         | P1.01       | Agent | —           | Degradation UI (Section 17.4)   |
-| `[ ] P1.21` | Build "Saved. Finding your twin..." pending screen for Mode B with reduced-motion support   | 🟠 High      | ⚪ TODO         | P1.01       | Agent | —           | Async pending screen (17.4)     |
-| `[ ] P1.22` | Build stale-data freshness labels and 429/503 friendly overload screens with countdown      | 🟡 Medium    | ⚪ TODO         | P1.01       | Agent | —           | Overload feedback screens       |
-| `[ ] P1.23` | Enforce skeleton minimum display time (200ms) and widget-level error boundary fallbacks     | 🟡 Medium    | ⚪ TODO         | P1.01       | Agent | —           | Anti-flicker skeleton rules     |
+| `[x] P1.20` | Build status banner component for degradation levels L1–L4 with dynamic copy                | 🟠 High      | ✅ DONE         | P1.01       | Agent | 2026-11-22  | Non-alarmist banner for L1–L4 load shedding (DegradationBanner.tsx) |
+| `[x] P1.21` | Build "Saved. Finding your twin..." pending screen for Mode B with reduced-motion support   | 🟠 High      | ✅ DONE         | P1.01       | Agent | 2026-11-22  | Async pending screen with two-dot animation & reduced motion (ModeBPendingScreen.tsx) |
+| `[x] P1.22` | Build stale-data freshness labels and 429/503 friendly overload screens with countdown      | 🟡 Medium    | ✅ DONE         | P1.01       | Agent | 2026-11-22  | Stale freshness labels & friendly overload retry screens (OverloadScreens.tsx) |
+| `[x] P1.23` | Enforce skeleton minimum display time (200ms) and widget-level error boundary fallbacks     | 🟡 Medium    | ✅ DONE         | P1.01       | Agent | 2026-11-22  | Anti-flicker 200ms hook/skeleton & WidgetErrorBoundary (ResiliencePrimitives.tsx) |
 
 ---
 
@@ -886,9 +886,10 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Verify `pnpm typecheck`, `pnpm lint`, `pnpm test` pass with zero regressions.
 - **Stage 1 Checklist:**
   <!-- visual:start -stage-1-checklist--bar -->
-  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (1/1 verification items verified)
+  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (2/2 verification items verified)
   <!-- visual:end -stage-1-checklist--bar -->
   - [x] Check contrast ratios, mobile touch targets ($\ge 44 \text{px}$), and verify all 28 question SVGs render.
+  - [x] Verify degradation banner (L1–L4), Mode B pending screen, 429/503 overload screens, 200ms anti-flicker skeleton, and widget error boundaries.
 - **Stage 2 Checklist:**
   <!-- visual:start -stage-2-checklist--bar -->
   > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (3/3 verification items verified)
@@ -1190,6 +1191,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 1 (P1.20–P1.23)     | Completed remaining 4 tasks for Phase 1: DegradationBanner (P1.20), ModeBPendingScreen (P1.21), OverloadScreens (P1.22), and ResiliencePrimitives (P1.23). Phase 1 now 100% COMPLETE (23/23). Dashboard updated to 241/410 (59%). | Phase 1 completion & resilience UI kit.       |
 | `2026-11-22` | Phases 10T, 10U, Phase 11 (P11.47–P11.50) | Added Phase 10T (Bonus Rounds, Stage L9, 7 tasks), Phase 10U (Badges, Stage L10, 6 tasks), and Phase 11 admin tasks P11.47–P11.50 per Addendum C. Updated execution order to include L9 and L10. Updated dashboard to 410 tasks across 38 phases. | Stage L0-ADD Founder approval. |
 | `2026-11-21` | Phases 10L–10S, Phase 11 (P11.33–P11.46) | Added Phases 10L to 10S (Stages L1 to L8) for Lanes, Richer Formats, Twin Depth, Situations, Say It, Super Twin, and Brain. Expanded Phase 11 with tasks P11.33–P11.46 per Addendum B. Added Recommended Execution Order. Corrected dashboard to 393 tasks across 36 phases. | Stage L0 Founder approval & architectural review.  |
 | `2026-11-15` | Phase 10E–10K, Phase 11   | Added Phases 10E to 10K (Stages M1 to M8) for F24–F31 Memes, Signals, and Insights. Expanded Phase 11 with tasks P11.26–P11.32 per Addendum A. Dashboard updated to 336 tasks. | Stage M0 Founder approval & scope decisions.  |

@@ -18,7 +18,17 @@ import {
   WordChipsGrid,
 } from "@/components/play/AnswerComponents";
 import { SearchMapAnimation } from "@/components/play/SearchMapAnimation";
-import { Check, Flame, Sparkles, Orbit, Compass, UserCheck } from "lucide-react";
+import { Check, Flame, Sparkles, Orbit, Compass, UserCheck, ShieldAlert, Clock, RefreshCw } from "lucide-react";
+import { DegradationBanner, DegradationLevel } from "@/components/ui/DegradationBanner";
+import { FreshnessLabel, RateLimitScreen, ServiceOverloadScreen } from "@/components/ui/OverloadScreens";
+import { AntiFlickerSkeleton, WidgetErrorBoundary } from "@/components/ui/ResiliencePrimitives";
+import { ModeBPendingScreen } from "@/components/ui/ModeBPendingScreen";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: (string | undefined | null | false)[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function DevUiGallery() {
   const { toast } = useToast();
@@ -34,6 +44,8 @@ export default function DevUiGallery() {
   const [checkboxVal, setCheckboxVal] = useState<boolean>(true);
   const [toggleVal, setToggleVal] = useState<boolean>(true);
   const [inputValue, setInputValue] = useState<string>("Stranger from Earth");
+  const [demoDegradationLevel, setDemoDegradationLevel] = useState<DegradationLevel>("L2");
+  const [antiFlickerLoading, setAntiFlickerLoading] = useState<boolean>(false);
 
   return (
     <main className="min-h-screen bg-cream text-ink p-6 sm:p-10 max-w-5xl mx-auto space-y-12 select-none">
@@ -387,6 +399,117 @@ export default function DevUiGallery() {
                 <span className="text-[9px] font-display font-bold text-muted">Berlin</span>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Phase 1 Resilience & Degradation Showcase (P1.20 - P1.23) */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between border-b-[2px] border-ink pb-2">
+          <h2 className="font-display text-display-m font-bold text-ink">
+            10. Resilience &amp; Degradation UI Kit (P1.20 - P1.23)
+          </h2>
+          <span className="text-xs font-mono font-bold text-muted bg-paper border border-ink rounded-pill px-2.5 py-0.5">
+            Phase 1 Complete
+          </span>
+        </div>
+
+        {/* P1.20: Degradation Banners */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-display-s font-bold text-ink">
+              P1.20 Degradation Banners (L0–L4)
+            </h3>
+            <div className="flex items-center gap-1">
+              {(["L0", "L1", "L2", "L3", "L4"] as DegradationLevel[]).map((lvl) => (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => setDemoDegradationLevel(lvl)}
+                  className={cn(
+                    "px-2 py-0.5 rounded-pill text-xs font-bold border border-ink transition-transform active:scale-95",
+                    demoDegradationLevel === lvl
+                      ? "bg-violet text-paper shadow-xs"
+                      : "bg-paper text-ink hover:bg-cream"
+                  )}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <DegradationBanner
+              level={demoDegradationLevel}
+              onDismiss={() => toast("Banner dismissed", "info")}
+            />
+            {demoDegradationLevel === "L0" && (
+              <div className="p-3 bg-paper border-[1.5px] border-ink rounded-m text-xs text-muted font-body">
+                Level L0 (Healthy) active: Banner cleanly hidden (null render) to preserve zero user-facing clutter.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* P1.22: Freshness Labels & Overload Screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <h3 className="font-display text-display-s font-bold text-ink">
+              P1.22 Freshness Labels
+            </h3>
+            <div className="flex flex-wrap items-center gap-2 p-4 bg-cream border-[1.5px] border-ink rounded-m">
+              <FreshnessLabel label="Live 12s ago" />
+              <FreshnessLabel timestamp={Date.now() - 120000} isStale={false} />
+              <FreshnessLabel timestamp={Date.now() - 480000} isStale={true} />
+              <FreshnessLabel label="Serving cached standings" isStale={true} />
+            </div>
+          </div>
+
+          {/* P1.23: Anti-Flicker Skeleton & Error Boundary */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-display-s font-bold text-ink">
+                P1.23 Anti-Flicker &amp; Error Boundary
+              </h3>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setAntiFlickerLoading(true);
+                  setTimeout(() => setAntiFlickerLoading(false), 50); // fast 50ms trigger to test 200ms lock
+                }}
+              >
+                Trigger 50ms pulse
+              </Button>
+            </div>
+
+            <AntiFlickerSkeleton
+              isLoading={antiFlickerLoading}
+              minDisplayMs={200}
+              skeleton={<div className="h-14 rounded-m bg-lavender border-[1.5px] border-ink animate-pulse flex items-center px-4 text-xs font-bold text-muted">200ms Minimum Skeleton Lock...</div>}
+            >
+              <WidgetErrorBoundary name="Stats Widget">
+                <div className="p-3 bg-paper border-[1.5px] border-ink rounded-m text-xs font-bold text-ink flex items-center justify-between">
+                  <span>Widget Content Healthy</span>
+                  <span className="text-mint font-black">Online</span>
+                </div>
+              </WidgetErrorBoundary>
+            </AntiFlickerSkeleton>
+          </div>
+        </div>
+
+        {/* P1.21: Mode B Pending Screen Preview */}
+        <div className="space-y-3">
+          <h3 className="font-display text-display-s font-bold text-ink">
+            P1.21 Mode B Asynchronous Pending Screen
+          </h3>
+          <div className="border-[2px] border-ink rounded-xl bg-cream p-4">
+            <ModeBPendingScreen
+              requestId="req_preview_9876543210"
+              onCheckStatus={() => toast("Checking status...", "info")}
+              onHome={() => toast("Returning home...", "info")}
+            />
           </div>
         </div>
       </section>
