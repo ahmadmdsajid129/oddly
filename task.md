@@ -13,12 +13,12 @@
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
 | **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 61%`                                                       |
-| **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
+| **Current Active Stage**        | **Phase 7: Authentication & Guest Merge (COMPLETE)**                             |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 250 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 252 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 160 tasks                                                                        |
+| **Pending (`TODO`)**            | 158 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -55,7 +55,7 @@
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 4 & Stage 0.5   |
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 6 & Stage 0.5   |
-| **Phase 7**  | Authentication & Guest Merge                | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
+| **Phase 7**  | Authentication & Guest Merge                | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 92%` | 11 / 12            | Stage 8 & Stage R2    |
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 93%` | 14 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 10 & Stage R2   |
@@ -267,7 +267,7 @@ _Status: COMPLETE | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId
 
 ### Phase 7: Authentication & Guest Merge (Stage 7)
 
-_Status: PARTIAL | Target: Google Identity, soft sign-in modal, guest submission merge, L3 guest mode._
+_Status: COMPLETE | Target: Google Identity, soft sign-in modal, guest submission merge, L3 guest mode._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -280,8 +280,8 @@ _Status: PARTIAL | Target: Google Identity, soft sign-in modal, guest submission
 | `[x] P7.07` | Implement one-click account deletion and data export under DPDP Act requirements           | 🔴 Critical  | ✅ DONE         | P7.04       | Agent | 2026-11-09  | Legal right to erasure          |
 | `[x] P7.08` | Build `POST /v1/auth/logout` clearing all auth cookies and invalidating refresh token       | 🟠 High      | ✅ DONE         | P7.03       | Agent | 2026-11-09  | Clean session termination       |
 | `[x] P7.09` | Write automated tests verifying token verification, cookie rotation, and history merge      | 🟠 High      | ✅ DONE         | P7.02-P7.08 | Agent | 2026-11-09  | Auth integration test suite     |
-| `[ ] P7.10` | Enforce guest-play-only behavior under Level L3 and protect against token refresh storms    | 🟠 High      | ⚪ TODO         | P7.04       | Agent | —           | Degradation auth protection (12)|
-| `[ ] P7.11` | Implement Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage  | 🟡 Medium    | ⚪ TODO         | P3.10       | Agent | —           | Bot defense resilience (Sec 13) |
+| `[x] P7.10` | Enforce guest-play-only behavior under Level L3 and protect against token refresh storms    | 🟠 High      | ✅ DONE         | P7.04       | Agent | 2026-11-22  | Degradation auth protection (12)|
+| `[x] P7.11` | Implement Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage  | 🟡 Medium    | ✅ DONE         | P3.10       | Agent | 2026-11-22  | Bot defense resilience (Sec 13) |
 
 ---
 
@@ -1194,6 +1194,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 7 Complete (P7.10–P7.11) | Completed remaining 2 tasks for Phase 7: enforced guest-play-only behavior under Level L3 degradation and protected against token refresh storms via single-flight promise coalescing, 10/min rate limits, and short-circuit reuse (P7.10), and implemented Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage with fail-closed signups (P7.11). Phase 7 now 100% COMPLETE (11/11). Dashboard updated to 252/410 (61%). | Phase 7 completion & auth resilience. |
 | `2026-11-22` | Phase 6 Complete (P6.11–P6.12) | Completed remaining 2 tasks for Phase 6: offloaded Satori/Resvg card rendering to dedicated Piscina worker thread pool capped to CPU cores (P6.11), and implemented single-flight promise coalescing, degradation load shedding under L3/L4, and edge caching with >95% hit ratio verification (P6.12). Phase 6 now 100% COMPLETE (12/12). Dashboard updated to 250/410 (61%). | Phase 6 completion & viral share defense. |
 | `2026-11-22` | Phase 5 Complete (P5.10–P5.11) | Completed remaining 2 tasks for Phase 5: ETag 304 exponential backoff polling with Page Visibility API pausing and Mode B status checking (P5.10), and degraded UI state wiring (DegradationBanner, ModeBPendingScreen, FreshnessLabel, WidgetErrorBoundary) across play flow (P5.11). Phase 5 now 100% COMPLETE (11/11). Dashboard updated to 248/410 (60%). | Phase 5 completion & reveal resilience. |
 | `2026-11-22` | Phase 4 Complete (P4.12–P4.15) | Completed remaining 4 tasks for Phase 4: TanStack Query exponential backoff and full jitter (P4.12), Zustand draft store with pending-submission recovery on app open (P4.13), Countdown server date sync with 0–4s fetch jitter (P4.14), and size-limit bundle budget gate in CI (P4.15). Phase 4 now 100% COMPLETE (15/15). Dashboard updated to 246/410 (60%). | Phase 4 completion & client resilience. |

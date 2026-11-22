@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 6: Server-Rendered Share Cards & Links (COMPLETE).
+- **Current Stage:** Phase 7: Authentication & Guest Merge (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1729,3 +1729,32 @@ All 12 tasks in Phase 6 (Stage 6: Server-Rendered Share Cards & Links) are now c
 - Ran all share card test suites: **5 test files passed, 28 tests passed** across `@oddly/shared` and `@oddly/web`.
 - Ran typechecks across `@oddly/shared`, `@oddly/worker`, and `@oddly/api`: clean pass with zero errors (`tsc --noEmit`).
 - Phase 6 is now **100% COMPLETE (12/12 tasks done)**. Master progress dashboard updated to **250/410 completed tasks (61%)**.
+
+## 44. Phase 7 Completion: Authentication & Guest Merge Resilience (2026-11-22)
+
+### 44.1 Overview & Architecture
+All 11 tasks in Phase 7 (Stage 7: Authentication & Guest Merge) are now complete per Architecture Section 6.3 (Refresh storms), Section 12 (Degradation ladder), and Failure Modes Section 1 / R2.4 (Turnstile outage policy):
+1. **P7.10: Token Refresh Storm Protection & Level L3 Degradation (`services/api/src/routes/auth.ts`, `api-client`):**
+   - **Single-Flight Promise Coalescing:** Implemented `inFlightRefreshes` per-account map deduplicating concurrent refresh requests. When thousands of clients simultaneously attempt token refresh at 07:00 IST drop open, only 1 crypto verify/sign + DB lookup executes while all concurrent callers await the single promise.
+   - **Sliding Window Refresh Rate Limiter:** Applied per-account refresh sliding window limiting each account to a maximum of 10 refreshes per 60-second window, rejecting excess requests with HTTP 429 `REFRESH_RATE_LIMIT` and `Retry-After: 30`.
+   - **Level L3 Degradation Short-Circuit:** Under emergency load shedding (Level L3), if the client's existing access token (`oddly_at`) is still cryptographically valid, the endpoint avoids unnecessary DB lookups and JWT re-signing, returning HTTP 200 immediately with the valid token.
+   - **Guest-Play-Only Under L3:** New sign-ups (`POST /v1/auth/oauth`) and guest history merges (`POST /v1/auth/merge-guest`) are rejected under Level L3 with HTTP 403 `SIGNUPS_TEMPORARILY_PAUSED` and HTTP 503 `SERVICE_DEGRADED` respectively, preserving 100% database write capacity for core gameplay.
+   - **Exposed Client Method:** Added `refreshToken()` to `@oddly/api-client` and `auth.refresh()` to `@oddly/web`.
+2. **P7.11: Cloudflare Turnstile Outage Policy & Breaker Resilience (`services/api/src/auth/turnstile.ts`):**
+   - **Risk-Differentiated Outage Policy:**
+     - High-Risk Actions (Sign-up / Account creation): strictly **FAIL-CLOSED**. If Cloudflare Turnstile is unavailable (`turnstileBreaker` OPEN), registration requests return HTTP 503 `TURNSTILE_OUTAGE_FAIL_CLOSED` to prevent automated bot farm registrations.
+     - Low-Risk Actions (Daily Drop answering, guest gameplay): **FAIL-OPEN**. When Turnstile is unreachable, requests proceed with `tighterRateLimitRequired: true`, applying strict IP-level rate limits while ensuring genuine players can continue playing the drop.
+   - **Automated Fallback:** Integrated with Circuit Breaker pattern with consecutive failure tripping and exponential reset timeout.
+
+### 44.2 Verification & Test Results
+- Authored integration tests in `services/api/src/auth.test.ts` (18/18 tests passing) verifying:
+  - Token refresh rotation, 15-minute access JWT issuance, and rotating 30-day refresh cookies.
+  - Rejection of missing/invalid refresh tokens with 401.
+  - Single-flight deduplication across 10 concurrent refresh calls.
+  - Level L3 sign-up blocking (403 `SIGNUPS_TEMPORARILY_PAUSED`).
+  - Level L3 merge blocking (503 `SERVICE_DEGRADED` + `Retry-After: 30`).
+  - Turnstile circuit breaker fail-closed for sign-up operations.
+  - Turnstile circuit breaker fail-open for low-risk gameplay actions.
+- Ran `@oddly/api` auth integration tests: **18 passed (18/18)**.
+- Ran typechecks across monorepo packages (`@oddly/shared`, `@oddly/api-client`, `@oddly/api`, `@oddly/web`): clean pass with zero errors (`tsc --noEmit`).
+- Phase 7 is now **100% COMPLETE (11/11 tasks done)**. Master progress dashboard updated to **252/410 completed tasks (61%)**.

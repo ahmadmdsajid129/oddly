@@ -108,6 +108,7 @@ export const api = {
       rawClient.mergeGuest(data),
     logout: () => rawClient.logout(),
     getSession: () => rawClient.getSession(),
+    refresh: () => rawClient.refreshToken(),
   },
   history: {
     get: (params?: { limit?: number; offset?: number }) =>

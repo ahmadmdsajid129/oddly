@@ -7,11 +7,27 @@ import { DegradationManager } from "../resilience/degradation.js";
 import {
   signAccessToken,
   signRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
   setAuthCookies,
   clearAuthCookies,
   getAuthAccount,
 } from "../auth/tokens.js";
 import { verifyTurnstileToken } from "../auth/turnstile.js";
+
+// Rate limiter map for refresh storms: accountId -> { count: number, resetAt: number }
+const refreshRateLimits = new Map<string, { count: number; resetAt: number }>();
+
+// Single-flight in-flight map coalescing concurrent refresh calls per account (P7.10)
+const inFlightRefreshes = new Map<
+  string,
+  Promise<{
+    ok: boolean;
+    accessToken: string;
+    refreshToken: string;
+    account: { id: string; displayName: string; emailHash: string };
+  }>
+>();
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID || "mock-google-client-id.apps.googleusercontent.com"
@@ -63,6 +79,12 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
             error: z.string(),
             message: z.string(),
           }),
+          403: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+            degradation_level: z.number().optional(),
+          }),
         },
       },
     },
@@ -74,13 +96,16 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
 
       const { id_token, turnstile_token } = req.body;
 
-      // 1. Bot defense check via Cloudflare Turnstile (P7.06)
-      const turnstile = await verifyTurnstileToken(turnstile_token, req.ip);
+      // 1. Bot defense check via Cloudflare Turnstile with fail-closed policy for sign-ups (P7.11)
+      const turnstile = await verifyTurnstileToken(turnstile_token, req.ip, {
+        isSignUp: true,
+        action: "signup",
+      });
       if (!turnstile.success) {
         return reply.status(400).send({
           ok: false,
           error: "BOT_CHALLENGE_FAILED",
-          message: "Bot verification failed. Please refresh and retry.",
+          message: turnstile.message || "Bot verification failed. Please refresh and retry.",
         });
       }
 
@@ -226,10 +251,26 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
             error: z.string(),
             message: z.string(),
           }),
+          503: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+          }),
         },
       },
     },
     async (req, reply) => {
+      // Degradation Ladder L3 Check: Pause guest history merging during high load shedding
+      const degradationLevel = await DegradationManager.getLevel();
+      if (degradationLevel >= 3) {
+        reply.header("Retry-After", "30");
+        return reply.status(503).send({
+          ok: false,
+          error: "SERVICE_DEGRADED",
+          message: "Guest history merging is paused during peak load. Your guest progress is safely stored on your device.",
+        });
+      }
+
       const auth = await getAuthAccount(req);
       if (!auth) {
         return reply.status(401).send({
@@ -280,6 +321,163 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
         ok: true,
         message: "Signed out successfully",
       });
+    }
+  );
+
+  /**
+   * POST /v1/auth/refresh
+   * Rotates refresh tokens and issues fresh access tokens (P7.06).
+   * Protects against refresh storms via single-flight concurrency coalescing and sliding rate limiting (P7.10).
+   */
+  app.post(
+    "/v1/auth/refresh",
+    {
+      schema: {
+        tags: ["Authentication"],
+        summary: "Rotate refresh token and issue fresh access JWT",
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            message: z.string(),
+            account: z.object({
+              id: z.string(),
+              displayName: z.string(),
+              emailHash: z.string(),
+            }),
+          }),
+          401: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+          }),
+          429: z.object({
+            ok: z.boolean(),
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const refreshToken = req.cookies.oddly_rt;
+      if (!refreshToken) {
+        return reply.status(401).send({
+          ok: false,
+          error: "NO_REFRESH_TOKEN",
+          message: "No refresh token provided",
+        });
+      }
+
+      const refreshPayload = await verifyRefreshToken(refreshToken);
+      if (!refreshPayload || !refreshPayload.accountId) {
+        return reply.status(401).send({
+          ok: false,
+          error: "INVALID_REFRESH_TOKEN",
+          message: "Refresh token is invalid or expired",
+        });
+      }
+
+      const accountId = refreshPayload.accountId;
+
+      // 1. Sliding rate limit check to protect against token refresh storms (P7.10)
+      const now = Date.now();
+      const rateLimit = refreshRateLimits.get(accountId);
+      if (rateLimit && now < rateLimit.resetAt) {
+        if (rateLimit.count >= 10) {
+          reply.header("Retry-After", "30");
+          return reply.status(429).send({
+            ok: false,
+            error: "REFRESH_RATE_LIMIT",
+            message: "Too many refresh attempts. Please retry in 30 seconds.",
+          });
+        }
+        rateLimit.count++;
+      } else {
+        refreshRateLimits.set(accountId, { count: 1, resetAt: now + 60000 });
+      }
+
+      // 2. Degradation Ladder L3 Guard: If access token is still valid, avoid unnecessary re-signing
+      const degradationLevel = await DegradationManager.getLevel();
+      if (degradationLevel >= 3) {
+        const existingAccessToken = req.cookies.oddly_at;
+        if (existingAccessToken) {
+          const validAccess = await verifyAccessToken(existingAccessToken);
+          if (validAccess) {
+            return reply.send({
+              ok: true,
+              message: "Token valid (refresh bypassed under L3 load shedding)",
+              account: {
+                id: validAccess.accountId,
+                displayName: validAccess.displayName,
+                emailHash: validAccess.emailHash,
+              },
+            });
+          }
+        }
+      }
+
+      // 3. Single-flight concurrency coalescing (P7.10):
+      // Deduplicate simultaneous refresh requests from multiple browser tabs
+      if (inFlightRefreshes.has(accountId)) {
+        const result = await inFlightRefreshes.get(accountId)!;
+        setAuthCookies(reply, result.accessToken, result.refreshToken, req.cookies.oddly_session);
+        return reply.send({
+          ok: true,
+          message: "Token refreshed successfully",
+          account: result.account,
+        });
+      }
+
+      const refreshPromise = (async () => {
+        try {
+          const account = await AccountsRepository.findById(accountId);
+          if (!account) {
+            throw new Error("ACCOUNT_NOT_FOUND");
+          }
+
+          const newAccessToken = await signAccessToken({
+            accountId: account.id,
+            emailHash: account.email_hash,
+            displayName: account.display_name,
+          });
+
+          const newRefreshToken = await signRefreshToken({
+            accountId: account.id,
+            tokenVersion: refreshPayload.tokenVersion || 1,
+          });
+
+          return {
+            ok: true,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            account: {
+              id: account.id,
+              displayName: account.display_name,
+              emailHash: account.email_hash,
+            },
+          };
+        } finally {
+          inFlightRefreshes.delete(accountId);
+        }
+      })();
+
+      inFlightRefreshes.set(accountId, refreshPromise);
+
+      try {
+        const result = await refreshPromise;
+        setAuthCookies(reply, result.accessToken, result.refreshToken, req.cookies.oddly_session);
+        return reply.send({
+          ok: true,
+          message: "Token refreshed successfully",
+          account: result.account,
+        });
+      } catch (err) {
+        return reply.status(401).send({
+          ok: false,
+          error: "ACCOUNT_NOT_FOUND",
+          message: "Account associated with refresh token no longer exists",
+        });
+      }
     }
   );
 

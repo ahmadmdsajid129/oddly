@@ -695,6 +695,17 @@ export class OddlyApiClient {
     });
   }
 
+  /** Refresh session access token and rotate refresh token (P7.06, P7.10) */
+  async refreshToken(): Promise<{
+    ok: boolean;
+    message: string;
+    account: { id: string; displayName: string; emailHash: string };
+  }> {
+    return this.request("/v1/auth/refresh", {
+      method: "POST",
+    });
+  }
+
   /** Current session status */
   async getSession(): Promise<SessionResponse> {
     return this.request<SessionResponse>("/v1/auth/session");

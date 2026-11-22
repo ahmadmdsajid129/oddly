@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="196" height="30" viewBox="0 0 196 30">
-  <title>tasks: 250 / 410 (61%)</title>
+  <title>tasks: 252 / 410 (61%)</title>
   <rect x="3" y="3" width="192" height="26" rx="6" fill="#14123A" />
   <rect x="1" y="1" width="192" height="26" rx="6" fill="#FFFFFF" stroke="#14123A" stroke-width="1.8" />
   <!-- Label section -->
@@ -8,5 +8,5 @@
   <text x="28" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#FFFFFF" text-anchor="middle">tasks</text>
   <!-- Value section -->
   <rect x="56" y="1" width="136" height="26" rx="6" fill="#FFD23F" stroke="#14123A" stroke-width="1.8" />
-  <text x="124" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#14123A" text-anchor="middle">250 / 410 (61%)</text>
+  <text x="124" y="17" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11px" font-weight="800" fill="#14123A" text-anchor="middle">252 / 410 (61%)</text>
 </svg>

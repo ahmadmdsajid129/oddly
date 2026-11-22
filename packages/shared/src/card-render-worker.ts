@@ -14,3 +14,4 @@ import { renderShareCardPng, type ShareCardData } from "./share-cards.js";
 export default async function renderCardWorker(data: ShareCardData): Promise<Buffer> {
   return renderShareCardPng(data);
 }
+

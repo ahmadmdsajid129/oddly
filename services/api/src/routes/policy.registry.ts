@@ -245,6 +245,16 @@ export const ROUTE_POLICIES: RoutePolicy[] = [
     degradationBehavior: "Revokes session cookie",
   },
   {
+    method: "POST",
+    path: "/v1/auth/refresh",
+    timeoutMs: 2000,
+    rateLimitClass: "tight",
+    cacheControl: "private, no-cache, no-store, must-revalidate",
+    idempotencyRequired: false,
+    priorityLane: "normal",
+    degradationBehavior: "Refresh storm protection, single-flight coalescing and L3 guard",
+  },
+  {
     method: "GET",
     path: "/v1/auth/session",
     timeoutMs: 2000,

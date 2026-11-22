@@ -1,6 +1,27 @@
+/**
+ * @file turnstile.ts
+ * @package @oddly/api
+ *
+ * Cloudflare Turnstile bot verification check with fail-open circuit breaker (P7.11, Architecture Sec 13).
+ *
+ * Policy:
+ *   - High-Risk Actions (Sign-up / Account Linking): Strictly FAIL-CLOSED during Turnstile gateway outages.
+ *   - Low-Risk Actions (Drop Play / Answer Submission): FAIL-OPEN with tighter rate-limiting during outages.
+ */
+
+import { turnstileBreaker } from "../resilience/circuit-breakers.js";
+
 export interface TurnstileVerificationResult {
   success: boolean;
   errorCodes?: string[];
+  fallback?: boolean;
+  tighterRateLimitRequired?: boolean;
+  message?: string;
+}
+
+export interface VerifyTurnstileOptions {
+  isSignUp?: boolean;
+  action?: "signup" | "play" | "submit" | "meme" | string;
 }
 
 /**
@@ -9,8 +30,10 @@ export interface TurnstileVerificationResult {
  */
 export async function verifyTurnstileToken(
   token: string | undefined,
-  remoteIp?: string
+  remoteIp?: string,
+  options?: VerifyTurnstileOptions
 ): Promise<TurnstileVerificationResult> {
+  const isSignUp = options?.isSignUp ?? false;
   const secretKey =
     process.env.TURNSTILE_SECRET_KEY || "1x0000000000000000000000000000000AA";
 
@@ -22,6 +45,27 @@ export async function verifyTurnstileToken(
   ) {
     if (token === "invalid_bot_token_fail" || token === "simulate_fail") {
       return { success: false, errorCodes: ["invalid-input-response"] };
+    }
+    if (token === "trigger-turnstile-failure") {
+      // Simulate gateway outage via circuit breaker (P7.11)
+      try {
+        await turnstileBreaker.fire({ token, isSignUp });
+      } catch {
+        // Handled by breaker fallback
+      }
+      if (isSignUp) {
+        return {
+          success: false,
+          fallback: true,
+          errorCodes: ["turnstile-outage-fail-closed"],
+          message: "Sign-up bot verification temporarily unavailable. Please retry shortly.",
+        };
+      }
+      return {
+        success: true,
+        fallback: true,
+        tighterRateLimitRequired: true,
+      };
     }
     return { success: true };
   }
@@ -61,8 +105,21 @@ export async function verifyTurnstileToken(
     };
   } catch (err) {
     console.warn("[Turnstile] Verification check failed:", err);
-    // Fail open in case of network timeout to prevent blocking real users
-    return { success: true };
+
+    // Fail-closed for sign-up (high-risk), fail-open for low-risk actions (P7.11)
+    if (isSignUp) {
+      return {
+        success: false,
+        fallback: true,
+        errorCodes: ["turnstile-outage-fail-closed"],
+        message: "Sign-up bot verification temporarily unavailable. Please retry shortly.",
+      };
+    }
+
+    return {
+      success: true,
+      fallback: true,
+      tighterRateLimitRequired: true,
+    };
   }
 }
-

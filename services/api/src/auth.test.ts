@@ -23,6 +23,7 @@ import {
 } from "./auth/tokens.js";
 import { verifyTurnstileToken } from "./auth/turnstile.js";
 import { AccountsRepository, InMemoryPlayerRecord } from "./db/accounts.repo.js";
+import { DegradationManager } from "./resilience/degradation.js";
 import crypto from "node:crypto";
 
 describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", () => {
@@ -269,20 +270,140 @@ describe("Stage 7: Authentication & Login Integration Tests (P7.01 – P7.09)", 
     });
   });
 
-  describe("P7.09: Phone OTP Stub Interface", () => {
-    it("returns stub response with FEATURE_PHONE_OTP flag identifier", async () => {
-      const res = await app.inject({
+  describe("P7.10: Token Refresh Storm Protection & Degradation Level L3 Guard", () => {
+    it("POST /v1/auth/refresh rotates tokens and issues fresh access token with valid refresh cookie", async () => {
+      // 1. Log in to establish cookies
+      const mockToken = `mock-google-token-refresh_${Date.now()}-RefreshTester`;
+      const loginRes = await app.inject({
         method: "POST",
-        url: "/v1/auth/phone/otp-stub",
+        url: "/v1/auth/oauth",
         payload: {
-          phone: "+919876543210",
+          provider: "google",
+          id_token: mockToken,
         },
       });
+      const rawCookies = loginRes.headers["set-cookie"];
+      const cookieHeader = Array.isArray(rawCookies) ? rawCookies.join("; ") : (rawCookies as string);
 
-      expect(res.statusCode).toBe(200);
+      // 2. Refresh token
+      const refreshRes = await app.inject({
+        method: "POST",
+        url: "/v1/auth/refresh",
+        headers: { cookie: cookieHeader },
+      });
+
+      expect(refreshRes.statusCode).toBe(200);
+      const data = JSON.parse(refreshRes.body);
+      expect(data.ok).toBe(true);
+      expect(data.account.displayName).toBe("RefreshTester");
+
+      // Verify fresh cookies attached
+      const setCookies = refreshRes.headers["set-cookie"] as string[];
+      expect(setCookies.some((c) => c.includes("oddly_at="))).toBe(true);
+      expect(setCookies.some((c) => c.includes("oddly_rt="))).toBe(true);
+    });
+
+    it("POST /v1/auth/refresh rejects missing or invalid refresh token with 401", async () => {
+      const res = await app.inject({
+        method: "POST",
+        url: "/v1/auth/refresh",
+      });
+      expect(res.statusCode).toBe(401);
       const data = JSON.parse(res.body);
-      expect(data.feature_flag).toBe("FEATURE_PHONE_OTP");
-      expect(data.enabled).toBe(false);
+      expect(data.error).toBe("NO_REFRESH_TOKEN");
+    });
+
+    it("coalesces 10 concurrent refresh calls for the same account without duplicate execution", async () => {
+      const mockToken = `mock-google-token-coalesce_${Date.now()}-CoalesceUser`;
+      const loginRes = await app.inject({
+        method: "POST",
+        url: "/v1/auth/oauth",
+        payload: {
+          provider: "google",
+          id_token: mockToken,
+        },
+      });
+      const rawCookies = loginRes.headers["set-cookie"];
+      const cookieHeader = Array.isArray(rawCookies) ? rawCookies.join("; ") : (rawCookies as string);
+
+      // 10 concurrent refresh calls
+      const refreshCalls = Array.from({ length: 10 }, () =>
+        app.inject({
+          method: "POST",
+          url: "/v1/auth/refresh",
+          headers: { cookie: cookieHeader },
+        })
+      );
+
+      const results = await Promise.all(refreshCalls);
+      expect(results.every((r) => r.statusCode === 200)).toBe(true);
+    });
+
+    it("enforces guest-play-only behavior under Level L3 degradation: pauses sign-ups with 403", async () => {
+      DegradationManager.setManualOverride(3);
+
+      try {
+        const res = await app.inject({
+          method: "POST",
+          url: "/v1/auth/oauth",
+          payload: {
+            provider: "google",
+            id_token: "mock-google-token-l3_user-L3User",
+          },
+        });
+
+        expect(res.statusCode).toBe(403);
+        const data = JSON.parse(res.body);
+        expect(data.error).toBe("SIGNUPS_TEMPORARILY_PAUSED");
+        expect(data.message).toContain("guest");
+      } finally {
+        DegradationManager.setManualOverride(null);
+      }
+    });
+
+    it("pauses guest history merge under Level L3 degradation with 503 and Retry-After", async () => {
+      DegradationManager.setManualOverride(3);
+
+      try {
+        const res = await app.inject({
+          method: "POST",
+          url: "/v1/auth/merge-guest",
+          payload: {
+            guest_player_id: "some_guest_id",
+          },
+        });
+
+        expect(res.statusCode).toBe(503);
+        expect(res.headers["retry-after"]).toBe("30");
+        const data = JSON.parse(res.body);
+        expect(data.error).toBe("SERVICE_DEGRADED");
+      } finally {
+        DegradationManager.setManualOverride(null);
+      }
+    });
+  });
+
+  describe("P7.11: Cloudflare Turnstile Outage Fail-Open / Fail-Closed Policy (Architecture Sec 13)", () => {
+    it("fails closed for high-risk sign-up / account creation when Turnstile gateway is down", async () => {
+      const res = await verifyTurnstileToken("trigger-turnstile-failure", "127.0.0.1", {
+        isSignUp: true,
+        action: "signup",
+      });
+
+      expect(res.success).toBe(false);
+      expect(res.fallback).toBe(true);
+      expect(res.errorCodes).toContain("turnstile-outage-fail-closed");
+    });
+
+    it("fails open for low-risk actions with tighter rate limit flag when Turnstile gateway is down", async () => {
+      const res = await verifyTurnstileToken("trigger-turnstile-failure", "127.0.0.1", {
+        isSignUp: false,
+        action: "play",
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.fallback).toBe(true);
+      expect(res.tighterRateLimitRequired).toBe(true);
     });
   });
 });

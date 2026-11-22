@@ -147,3 +147,4 @@ export async function destroyCardRenderPool(): Promise<void> {
     poolInstance = null;
   }
 }
+
