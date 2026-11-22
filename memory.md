@@ -1,6 +1,6 @@
 # Living Project Memory — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-21 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-22 | Owner: Founder + AI agent
 Purpose of this file: Persistent institutional memory across coding sessions: system snapshot, real-time status, architectural decisions, defect logs, learnings, environment parameters, and next actions.
 
 ---
@@ -9,8 +9,8 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage M7: ML Ranker for Optional Surfaces (Phase 10J) — COMPLETE (Tasks P10J.01 to P10J.05 complete & verified).
-- **Current Target:** Stage M8 (Phase 10K: Premium Groundwork) or Stage 11 (Phase 11: Admin Panel "Mission Control").
+- **Current Stage:** Stage L0-FIX2: Documentation Corrections & Alignment (COMPLETE).
+- **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
 
@@ -1480,3 +1480,45 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 ### 36.3 Next Actions
 - Stand ready for Stage L1 (Phase 10L: Lanes Plumbing) on Founder command.
+
+---
+
+## 37. Stage L0-FIX2 (2026-11-22)
+
+### 37.1 What Was Fixed
+- **Item 1 (Badge Table & Route Collision):** Renamed L10 badge database objects to `collector_badge_definitions`, `collector_badges`, `idx_collector_badges_user`, column `collector_badge_key`, and API route `GET /v1/me/collector-badges`, completely isolating them from M6 caption badge tables and preserving the `/me/badges` screen route.
+- **Item 2 (Additive Bonus Outcomes):** Redesigned bonus tie-break results to be strictly additive in `bonus_results`, ensuring `twin_results` immutable locked twins and mutual pairings are never rewritten, with connection features (Keep, Orbit, Telepathy, Globe, share cards) anchored exclusively to the locked twin.
+- **Item 3 (Bonus Timing Reschedule):** Adjusted bonus evaluation job `bonus.close_and_compute` to execute at 07:01 IST the following morning (safely ahead of the 07:05 IST final batch), with the round closing at 06:59:59 IST.
+- **Item 4 (Pool Majority Exclusion & Runway Math):** Replaced universal individual history exclusion with a majority threshold (excluding questions answered by >= 50% of tie group in 28 days) and added pool runway analysis marked "estimated, not measured".
+- **Item 5 (Bundle Size Budget Clarification):** Replaced unmeasured bundle numbers with an explicit 2 to 3 KB gzip estimate to be measured during Stage L9/L10, and linked Stage L2 renderer dependency (`P10M.04`) to `P10T.06`.
+- **Item 6 (UI Token & Dependency Cleanups):** Updated `design.md` v1.4 change log, corrected Rule B6 citation, aligned secondary button shadow to `shadow-sticker`, corrected radius token to `rounded-m`, normalized task dependency IDs (`P1.01`), switched dashboard progress to emoji blocks (`🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 58%`), set headers to 2026-11-22, and added schema verification notes on `players` vs `users` and UUID vs TEXT.
+
+### 37.2 The Additive-Bonus Decision
+- **Decision:** Bonus evaluation is strictly additive. The locked twin in `twin_results` produced by the 07:05 IST final batch is immutable. The greedy mutual pairing among bonus participants writes exclusively to `bonus_results`. The narrowed outcome is rendered as an informational extra line ("Closest in your group") beneath the unchanged twin.
+- **Status:** Recommended default; marked "Founder to confirm (Q8)".
+
+### 37.3 Open Founder Questions
+- **Questions Q1 to Q7 (from Section 36.1):** STILL OPEN (not yet answered by the Founder):
+  - Q1: Blind answering in tie group (recommended default: `false`, blind).
+  - Q2: Permanent bonus opt-out setting (recommended default: `true`, user agency).
+  - Q3: Bonus format binary only (recommended default: binary only in v1).
+  - Q4: Odd number alone state handling (recommended default: yes, honest alone state).
+  - Q5: Badge revocation on abuse/bot detection (recommended default: `true` with audit log).
+  - Q6: Individual share cards for badges (recommended default: `false` in v1, private collector).
+  - Q7: Bonus count toward streak (recommended default: `false`, daily Drop only).
+- **Question Q8 (Additive Bonus Invariant):** Should bonus rounds remain strictly additive, writing to `bonus_results` without ever modifying or rewriting the locked twin in `twin_results`?
+  - *Recommended Default:* Yes.
+  - *Reason:* Prevents breaking mutual pairings, Keeps, Orbits, Telepathy, or share cards created on the 07:05 final batch.
+- **Question Q8b (Keep Permissions for Narrowed Ties):** May a Keep request be sent to the "closest in your group" participant identified by a bonus round?
+  - *Recommended Default:* No in v1.
+  - *Reason:* Keeps are strictly 1 per completed lane Drop and anchor to the primary mutual twin. Expanding to bonus ties introduces social sprawl and complicates Orbit limits.
+- **Question Q9 (Evergreen Pool Minimum Size):** Is a minimum of 40 approved evergreen questions per lane sufficient, or should it be higher (e.g. 120) for high-traffic lanes with large tie groups?
+  - *Recommended Default:* Keep `bonus.pool_min_per_lane = 40` in v1, monitor runway alerts, and expand curations based on observed empirical data.
+  - *Reason:* 40 allows rapid initial launch across catalog lanes while the majority exclusion rule cushions reuse fatigue.
+
+### 37.4 Open Technical Items
+1. **Play Bundle Budget (160 kB vs 159.5 KB limit):** Memory Section 2 (D1) notes the play bundle sits at ~160 kB against the 159.5 KB ceiling. This is unresolved. Must be accurately measured and audited at Stage L1/L2.
+2. **Token Hex Mismatch:** Memory D1 lists lavender `#E5DEFF`, coral `#FF6B4A`, mint `#2EC4B6`, whereas `design.md` defines `#EEEAFE`, `#FF6B5E`, `#3DDBB0`. Verify `packages/ui-tokens` against `design.md` at Stage L1.
+3. **Database Schema Entity Types:** Documentation in `architecture.md` 18.2.1 and 18.11.1 mixes `players(id)` and `users(id)`, and specifies TEXT IDs while core database tables use UUID. Verify against actual Prisma schema before writing Stage L1 migrations.
+4. **Rules B1–B7 Labeling Note:** Rules B1 to B7 in `rules.md` are labelled "Founder-approved, L0-ADD". The Founder has not yet provided explicit answers to questions Q1 to Q7; the rules currently reflect the recommended defaults and await formal Founder sign-off.
+
