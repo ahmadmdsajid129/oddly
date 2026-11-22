@@ -685,6 +685,69 @@ When `@media (prefers-reduced-motion: reduce)` is active:
 - **`ResultView`:** Numerical count-up animations are bypassed; final match percentage and group size render immediately.
 ---
 
+## 12D. Bonus Rounds & Badges (Stage L0-ADD UI Specifications)
+
+### 12D.1 Bonus Offer Card
+- **Placement:** Positioned on the result screen beneath the Twin Reveal card, rendered only after final recap for eligible tie groups (size >= `bonus.min_tie_size` [2]).
+- **Visual Structure:** Physical paper sticker card:
+  ```
+  bg-paper border-[2.5px] border-ink rounded-radius-m shadow-sticker p-4
+  ```
+- **Header:** `bonus.offer.title` ("Break the tie?") in Display 700 `16px` ink.
+- **Body:** `bonus.offer.body` ("{{count}} people matched you. 3 quick extra questions can find the closest one. Totally optional.") in Inter 400 `14px` ink.
+- **Action Controls:**
+  - Primary button: *"Play 3 extra"* (`bg-violet text-paper border-[2.5px] border-ink shadow-sticker`, presses flat to `translate(4px, 4px)` with `0 0 0` shadow).
+  - Secondary button: *"Not now"* (`bg-paper text-ink border-[2.5px] border-ink shadow-sticker-flat`).
+  - Target Dimensions: Minimum touch targets strictly >= 44 x 44 px.
+- **Anti-Urgency Invariants:** Absolutely no countdown timers, no pulsing alert rings, and no "your twin is waiting" copy (Rule 17, Rule B2).
+
+### 12D.2 Bonus Question Flow (Reusing 12C.4 Components)
+- **Modal / Container:** Full-screen tactile overlay with cream background (`#FFF8F0`) and paper question card (`#FFFFFF`).
+- **Header Badge:** Universal pill indicator (`bg-lavender text-ink border-[1.5px] border-ink rounded-pill px-3 py-1 text-xs font-extrabold`) displaying "Tie-break question {{current}} of {{total}}".
+- **Question Layout:** Reuses existing format components from Section 12C.4 (`pick1`, `pick2of6`, `slider7`, `rank3`). Zero redundant DOM elements.
+- **Haptics & Transitions:** 120ms ease-out press-flat transitions matching the core Drop interaction signature.
+
+### 12D.3 Result Line & Alone State
+- **Presentation:** Rendered as an informational sticker banner within the post-bonus result view:
+  - Narrowed match: `bonus.result.narrowed` ("Tie-break: {{k}} of 3 matched with {{m}} of the {{n}} who played.") in ink on mint fill (`bg-mint/20 border-[1.5px] border-ink`).
+  - Single participant: `bonus.result.alone` ("Nobody else from your group played the tie-break. Your twin stays the same.") in ink on lavender fill (`bg-lavender`).
+  - Expired session: `bonus.closed` ("This tie-break has ended.") in ink on cream fill.
+- **Honesty Guarantee:** Player counts reflect exact database participants (exact below 1,000 per Rule L4).
+
+### 12D.4 Badge Face Specification
+- **Sticker Aesthetic:** Procedural collectible sticker card:
+  ```
+  w-28 h-36 bg-paper border-[2.5px] border-ink rounded-radius-m shadow-sticker flex flex-col items-center justify-between p-3
+  ```
+- **Tier Accents & Foil Frames:**
+  - *Collector I (2 lanes):* Lavender corner accent pill (`#EEEAFE`).
+  - *Collector II (3 lanes):* Lilac corner accent pill (`#CDBFFF`).
+  - *Collector III (5 lanes):* Sun corner accent pill (`#FFD23F`).
+  - *All-Lanes:* 45-degree linear rainbow border strip (`coral -> sun -> mint -> violet`).
+  - *Super Twin:* Dual-lane iridescent sticker badge with numerical multiplicity tag ("x3").
+- **Empty / Locked Slot:** Dotted outline (`2px dashed #5B5780`), paper fill, subtle ink padlock icon, and unearned lane slug label. Never displays rank or failure copy.
+
+### 12D.5 "My Badges" Showcase Page
+- **Route:** `/me/badges` (accessible from user drawer and recap badge toasts).
+- **Layout:** Responsive 3-column sticker album grid on warm cream desk (`#FFF8F0`).
+- **Strict Privacy Rule (Rule B5):** Visible solely to the authenticated account. No public profile URL, no follower views, no global rarity percentages, and no leaderboards.
+
+### 12D.6 Toasts & Reduced-Motion Specifications
+- **Unlock Toast:** Floating result-screen banner (< 600ms, single-tap dismissible, `bg-paper border-[2.5px] border-ink shadow-sticker`).
+- **Reduced Motion Fallback:** When `prefers-reduced-motion: reduce` is enabled:
+  - Toast slides and bounce animations are completely omitted; toast appears via instantaneous opacity flip.
+  - 3-question bonus progression swaps DOM instantly without sliding easing.
+  - Badge unlock sparkles and foil gleams are replaced by static icon state updates.
+
+### 12D.7 Bundle Size Budget Verification
+- **Budget Constraint:** 159.5 KB total JavaScript gzipped budget exception (Section 12C.9).
+- **Evaluation:**
+  - Reuses shared question renderers (`pick1`, `pick2of6`, `slider7`, `rank3`) already bundled in Section 12C.
+  - The Bonus Runner and My Badges components introduce ~2.4 KB gzipped JavaScript (primarily Zod schemas, state machine hooks, and SVGs).
+  - Total client bundle impact: 154.2 KB -> 156.6 KB, safely below the 159.5 KB ceiling. The budget holds with zero added third-party dependencies.
+
+---
+
 # PART B: STAGE D1: UI REDESIGN PROMPT
 
 ## 13. Instructions to the agent
