@@ -167,3 +167,14 @@ Under Rule L2 (Founder-approved, L0), every connection artifact—Twin Globe arc
    - Evaluated during the 07:05 IST final recap for players completing 2 or more shared lanes on the same calendar date.
    - Awarded when two players achieve twin status (or $\ge 0.8$ similarity) in at least 2 distinct lanes.
    - Generates a distinct holographic dual-accent share card naming both lanes explicitly (*"Twins in Everyday & Memes"*).
+
+---
+
+### Bonus-Narrowed Twin Interaction with Orbit and Globe (Stage L0-ADD)
+
+- **Operating Invariant:** Both F18 (Twin Globe) and F19 (Keep & Orbit) operate exclusively on the player's **final verified twin** stored in `twin_results`.
+- **Timing & Resolution:**
+  - Before recap or bonus resolution: Orbit requests and Globe arcs reflect the initial verified match.
+  - After bonus resolution: If a bonus round narrows the candidate tie group to a closer twin, `twin_results` is updated with `tie_break_reason = 'bonus'`.
+  - Orbit Interaction: If an Orbit request has not yet been accepted, or if an Orbit is established after the bonus round concludes, it links to this narrowed twin.
+  - Zero Rule Disruption: Bonus rounds do not alter Orbit limits (maximum 10 active Orbits), mutual opt-in requirements, Telepathy daily 1-question mechanics, or DPDP consent rules.

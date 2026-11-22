@@ -712,3 +712,24 @@ Extends existing automated pre-publish validation with 8 new checks:
 - [ ] Two-person approval workflow is strictly enforced per lane Drop prior to scheduling.
 - [ ] Viewing held user text in B6 strictly requires Moderator role and mandatory reason entry, logged to audit table.
 - [ ] Automated pre-publish checks reject any Drop containing forbidden topics, safety violations, or low entropy.
+
+---
+
+## Addendum C: Bonus Rounds & Badges Administration (Stage L0-ADD)
+
+### C.1 Evergreen Question Pool Editor (P11.47)
+- **Scope:** Allows administrators to curate and manage `bonus_pool_questions` per lane.
+- **Entropy Meter:** Calculates and displays estimated split power and Shannon entropy $H(Q)$ based on historical choice distributions.
+- **Safety Screening:** Enforces the Section 9.1 non-forbidden topics checklist. Requires explicit admin sign-off before status transitions to `active`.
+- **Pool Size Alerting:** Automatically raises a yellow alert if a lane's active pool drops below `bonus.pool_min_per_lane` (40) with a 7-day advance warning before depletion.
+
+### C.2 Bonus Round Monitoring Dashboard (P11.48)
+- **Scope:** Real-time and historical visibility into asynchronous tie-break rounds across lanes.
+- **Metrics Displayed:** Tie-group count, distribution of group sizes ($T$), player participation rate, percentage of rounds with $>1$ participant, and rematch execution status.
+- **Privacy Enforcement:** Strictly aggregate metrics. Individual answers submitted by players are zero-accessible in admin views.
+- **Emergency Controls:** Master kill switch for `feature.bonus_rounds`.
+
+### C.3 Badge Definitions & Revocation Tool (P11.49, P11.50)
+- **Badge Registry Editor:** Interface for managing `badge_definitions` (thresholds, tier names, copy keys in `app_content`, and rule versions).
+- **Tamper-Evident Revoke Tool:** Search user by ID to inspect earned badges and attached cryptographic evidence. Allows revocation with mandatory structured reason code and audit log entry.
+- **Aggregate Analytics:** $k \ge 20$ anonymous distribution of badges across lanes. Zero individual user profiling.

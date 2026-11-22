@@ -226,3 +226,44 @@ Where:
 - **Rarity:** With independent lane choices, Super Twins occur in $< 0.4\%$ of multi-lane players, making it a highly cherished milestone.
 - **Card:** Special holographic dual-accent share card generated via Satori.
 
+---
+
+## 8. Bonus Round Tie-Shrinking Mathematics & Entropy Analysis (Stage L0-ADD / F40)
+
+### 8.1 Mathematical Model of Group Shrinkage
+When a candidate tie group of size $T$ enters an optional tie-breaking bonus round, each question partitions the group based on option choice distribution.
+
+Let a question have $K$ mutually exclusive options with population choice probabilities $p_1, p_2, \dots, p_K$ where $\sum_{i=1}^K p_i = 1$. Assuming candidates choose options independently according to these probabilities, the probability that two randomly selected candidates choose the same option is the collision probability:
+$$\sum_{i=1}^K p_i^2$$
+
+For a group of $T$ players, the expected number of co-choosers that any given player shares an answer with after 1 question is:
+$$E[T_1] = T \cdot \sum_{i=1}^K p_i^2$$
+
+For $Q$ consecutive questions with independent answer distributions, the expected group size shrinks multiplicatively:
+$$E[T_Q] = T \cdot \prod_{j=1}^Q \left( \sum_{i=1}^{K_j} p_{j,i}^2 \right)$$
+
+### 8.2 Expected Group Shrinkage Table
+The table below models expected group size after a 3-question round ($Q=3$) across different initial tie-group sizes ($T = 20, 100, 312, 1000$) for typical question formats, and calculates the total questions needed to reach a median group size under 3 ($E[T_Q] < 3$):
+
+| Initial Tie Group ($T$) | Format & Balance | Split Factor ($\sum p_i^2$) | Expected Size After 1 Q | Expected Size After 3 Q | Questions Needed for $E[T] < 3$ |
+|---|---|---|---|---|---|
+| **$T = 20$** | 2-option (50 / 50 balanced) | $0.50$ | $10.0$ | $2.50$ | 3 questions |
+| **$T = 20$** | 4-option (25% each balanced) | $0.25$ | $5.0$ | $0.31$ | 2 questions |
+| **$T = 20$** | `pick2of6` (15 pairs, balanced) | $0.0667$ | $1.33$ | $0.01$ | 1 question |
+| **$T = 100$** | 2-option (50 / 50 balanced) | $0.50$ | $50.0$ | $12.50$ | 6 questions |
+| **$T = 100$** | 4-option (25% each balanced) | $0.25$ | $25.0$ | $1.56$ | 3 questions |
+| **$T = 100$** | `pick2of6` (15 pairs, balanced) | $0.0667$ | $6.67$ | $0.03$ | 2 questions |
+| **$T = 312$** | 2-option (50 / 50 balanced) | $0.50$ | $156.0$ | $39.00$ | 7 questions |
+| **$T = 312$** | 4-option (25% each balanced) | $0.25$ | $78.0$ | $4.88$ | 4 questions |
+| **$T = 312$** | `pick2of6` (15 pairs, balanced) | $0.0667$ | $20.8$ | $0.09$ | 2 questions |
+| **$T = 1000$** | 2-option (50 / 50 balanced) | $0.50$ | $500.0$ | $125.00$ | 9 questions |
+| **$T = 1000$** | 4-option (25% each balanced) | $0.25$ | $250.0$ | $15.63$ | 5 questions |
+| **$T = 1000$** | `pick2of6` (15 pairs, balanced) | $0.0667$ | $66.7$ | $0.30$ | 3 questions |
+
+### 8.3 Invalidation of the Independence Assumption in Real Cohorts
+**Crucial Mathematical Reality:** The calculations above assume complete statistical independence between successive questions. In actual human populations, choices correlate strongly along latent psychographic, linguistic, and lifestyle axes.
+
+Consequently:
+1. **Real-world shrinkage is slower:** Positive correlations between choices cause $\sum p_i^2$ across conditional distributions to exceed the theoretical independent product, meaning real post-round group sizes will be larger than theoretical minimums.
+2. **Curation Requirement:** To maximize split power, the evergreen question pool curation algorithm sorts questions by marginal Shannon entropy and penalizes questions that strongly cross-correlate with previously answered questions in that lane.
+3. **Fallback Protection:** Even when correlation leaves ties after 2 rounds (max 6 bonus questions), the standard deterministic cascade (28-day history agreement -> different country -> cryptographic hash) resolves any remaining ties definitively.
