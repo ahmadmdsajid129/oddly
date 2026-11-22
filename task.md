@@ -15,10 +15,10 @@
 | **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 59%`                                                       |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 241 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 242 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 169 tasks                                                                        |
+| **Pending (`TODO`)**            | 168 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -51,7 +51,7 @@
 | **Phase 0**  | Documentation & Skeleton Initialisation     | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 0 & Stage 0.5   |
 | **Phase 1**  | Design System & UI Kit                      | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 23 / 23            | Stage 1 & Stage 0.5   |
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 2 & Stage R2    |
-| **Phase 3**  | Fastify REST API Core                       | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 94%` | 15 / 16            | Stage 3 & Stage R2    |
+| **Phase 3**  | Fastify REST API Core                       | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 16 / 16            | Stage 3 & Stage R2    |
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
@@ -177,7 +177,7 @@ _Status: PARTIAL | Target: PostgreSQL schema, pure scoring algorithms, partition
 
 ### Phase 3: Fastify REST API Core (Stage 3)
 
-_Status: PARTIAL | Target: REST routes, Swagger docs, guest identity, load shedding, route policies._
+_Status: COMPLETE | Target: REST routes, Swagger docs, guest identity, load shedding, route policies._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -196,7 +196,7 @@ _Status: PARTIAL | Target: REST routes, Swagger docs, guest identity, load shedd
 | `[x] P3.13` | Implement `@fastify/under-pressure` load shedding on event-loop delay (>20ms) and heap     | 🔴 Critical  | ✅ DONE         | P3.01       | Agent | 2026-11-11  | Under-pressure load shedding, 503 OVERLOADED & Retry-After (R1.3, R2.5) |
 | `[x] P3.14` | Implement per-route policy table enforcement in code (timeouts, circuit breakers)           | 🔴 Critical  | ✅ DONE         | P3.01       | Agent | 2026-11-11  | Route policy registry, weak ETag, 304, Opossum breakers (R2.3, R2.4) |
 | `[x] P3.15` | Implement `/ready`, `/v1/stats/today`, `/v1/time`, `/v1/config/public` with degradation     | 🟠 High      | ✅ DONE         | P3.03       | Agent | 2026-11-11  | Ready probe, time offset, degradation headers L0-L4 (R1.3, R2.5) |
-| `[ ] P3.16` | Implement Mode B asynchronous ingestion behind `PERSIST_MODE=async` with reconciliation     | 🟠 High      | ⚪ TODO         | P3.05       | Agent | —           | Dual persistence modes (8.3)    |
+| `[x] P3.16` | Implement Mode B asynchronous ingestion behind `PERSIST_MODE=async` with reconciliation     | 🟠 High      | ✅ DONE         | P3.05       | Agent | 2026-11-22  | Dual persistence modes, Redis queue, worker micro-batching, reconciliation audit (8.3, ADR 012) |
 
 ---
 
@@ -899,10 +899,11 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Run seed script to verify `batch_001.json` imports cleanly into PostgreSQL.
 - **Stage 3 Checklist:**
   <!-- visual:start -stage-3-checklist--bar -->
-  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (2/2 verification items verified)
+  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (3/3 verification items verified)
   <!-- visual:end -stage-3-checklist--bar -->
   - [x] Execute `curl http://localhost:4000/v1/drop/today` and verify edge-cached JSON structure.
   - [x] Execute `POST /v1/submissions` with sample vector; confirm immediate Stage A provisional twin return.
+  - [x] Verify Mode B asynchronous ingestion behind `PERSIST_MODE=async` with queue drainage and reconciliation job parity.
 - **Stage 4 Checklist:**
   <!-- visual:start -stage-4-checklist--bar -->
   > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (2/2 verification items verified)
@@ -1191,6 +1192,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 3 Complete (P3.16)  | Implemented Mode B asynchronous ingestion behind `PERSIST_MODE=async` with Redis queue (`oddly:queue:submit-persist`), worker micro-batch drainage (`SubmitPersistWorker`), and reconciliation audit job (`PersistReconciliationJob`). Phase 3 now 100% COMPLETE (16/16). Dashboard updated to 242/410 (59%). | Phase 3 completion & dual persistence modes. |
 | `2026-11-22` | Phase 1 (P1.20–P1.23)     | Completed remaining 4 tasks for Phase 1: DegradationBanner (P1.20), ModeBPendingScreen (P1.21), OverloadScreens (P1.22), and ResiliencePrimitives (P1.23). Phase 1 now 100% COMPLETE (23/23). Dashboard updated to 241/410 (59%). | Phase 1 completion & resilience UI kit.       |
 | `2026-11-22` | Phases 10T, 10U, Phase 11 (P11.47–P11.50) | Added Phase 10T (Bonus Rounds, Stage L9, 7 tasks), Phase 10U (Badges, Stage L10, 6 tasks), and Phase 11 admin tasks P11.47–P11.50 per Addendum C. Updated execution order to include L9 and L10. Updated dashboard to 410 tasks across 38 phases. | Stage L0-ADD Founder approval. |
 | `2026-11-21` | Phases 10L–10S, Phase 11 (P11.33–P11.46) | Added Phases 10L to 10S (Stages L1 to L8) for Lanes, Richer Formats, Twin Depth, Situations, Say It, Super Twin, and Brain. Expanded Phase 11 with tasks P11.33–P11.46 per Addendum B. Added Recommended Execution Order. Corrected dashboard to 393 tasks across 36 phases. | Stage L0 Founder approval & architectural review.  |

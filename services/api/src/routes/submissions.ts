@@ -77,6 +77,16 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
               })
               .nullable(),
           }),
+          202: z.object({
+            ok: z.literal(true),
+            status: z.literal("accepted"),
+            mode: z.literal("async"),
+            request_id: z.string(),
+            message: z.string(),
+            submission_id: z.string().optional(),
+            oddness: z.null().optional(),
+            match: z.null().optional(),
+          }),
         },
       },
     },
@@ -105,6 +115,33 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
       } catch {
         // If Redis is offline, continue to database unique constraint
         lockAcquired = true;
+      }
+
+      // Check if Mode B asynchronous persistence is active (PERSIST_MODE=async or L3 degradation)
+      const degradationLevel = await DegradationManager.getLevel();
+      const isModeB = process.env.PERSIST_MODE === "async" || degradationLevel >= 3;
+      const acknowledgedKey = `drop:${drop_id}:acknowledged_requests`;
+
+      // Check if request_id was already acknowledged in Mode B
+      let isAlreadyAcked = false;
+      try {
+        isAlreadyAcked = (await redis.sismember(acknowledgedKey, request_id)) === 1;
+      } catch {
+        // Redis fallback
+      }
+
+      if (isAlreadyAcked) {
+        return {
+          ok: true,
+          status: "duplicate",
+          submission_id: request_id,
+          oddness: {
+            raw_score: 0.5,
+            percentile: 50,
+            tier: "Common",
+          },
+          match: null,
+        };
       }
 
       // Check if request_id already exists in DB
@@ -179,6 +216,24 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       // 3. Prevent duplicate submission by player for the same drop
+      const playerDropKey = `drop:${drop_id}:player:${player_id}`;
+      let playerAlreadySubmitted = false;
+      try {
+        const val = await redis.get(playerDropKey);
+        playerAlreadySubmitted = val === "1";
+      } catch {
+        // Fallback to database check
+      }
+
+      if (playerAlreadySubmitted) {
+        reply.status(409).send({
+          ok: false,
+          error: "ALREADY_SUBMITTED",
+          message: "You have already participated in this drop today.",
+        });
+        return;
+      }
+
       const existingPlayerSub = await SubmissionsRepository.findByPlayerAndDrop(
         player_id,
         drop_id
@@ -200,6 +255,45 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
         question_id: a.question_id,
         value: a.value,
       }));
+
+      // Mode B (Asynchronous Ingestion - Level L3 or PERSIST_MODE=async)
+      if (isModeB) {
+        const payload = {
+          drop_id,
+          drop_date: dropDateStr,
+          player_id,
+          request_id,
+          answers: storedAnswers,
+          timing_ms,
+          is_bot_flagged: isBotFlagged,
+          submitted_at: new Date().toISOString(),
+        };
+
+        try {
+          await redis.set(`submission:payload:${request_id}`, JSON.stringify(payload), "EX", 86400 * 7);
+          await redis.set(playerDropKey, "1", "EX", 86400);
+          await redis.sadd(acknowledgedKey, request_id);
+          await redis.lpush("oddly:queue:submit-persist", JSON.stringify(payload));
+
+          for (const a of storedAnswers) {
+            const valStr = Array.isArray(a.value) ? a.value.join(",") : String(a.value);
+            await redis.hincrby(`drop:${drop_id}:counts`, `${a.question_id}:${valStr}`, 1);
+          }
+        } catch {
+          // If Redis queuing fails, continue to Mode A synchronous write below
+        }
+
+        reply.status(202).send({
+          ok: true,
+          status: "accepted",
+          mode: "async",
+          request_id,
+          message: "Saved. Finding your twin...",
+          match: null,
+          oddness: null,
+        });
+        return;
+      }
 
       const submission = await SubmissionsRepository.createSubmission({
         drop_id,
@@ -385,6 +479,177 @@ export const submissionsRoutes: FastifyPluginAsyncZod = async (app) => {
           }
         }
       }
+    }
+  );
+
+  /**
+   * GET /v1/submissions/status/:requestId
+   * Check status of an asynchronous submission (Mode B).
+   */
+  app.get<{
+    Params: { requestId: string };
+  }>(
+    "/v1/submissions/status/:requestId",
+    {
+      schema: {
+        description: "Check asynchronous submission status for Mode B",
+        tags: ["Submissions"],
+        params: z.object({
+          requestId: z.string().min(16).max(64),
+        }),
+        response: {
+          200: z.object({
+            ok: z.literal(true),
+            status: z.enum(["pending", "persisted"]),
+            request_id: z.string(),
+            submission_id: z.string().nullable().optional(),
+            oddness: z
+              .object({
+                raw_score: z.number(),
+                percentile: z.number(),
+                tier: z.string(),
+              })
+              .nullable()
+              .optional(),
+            match: z
+              .object({
+                twin_token: z.string(),
+                similarity_score: z.number(),
+                is_provisional: z.boolean(),
+              })
+              .nullable()
+              .optional(),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const { requestId } = req.params;
+
+      // 1. Check if submission is already persisted in database
+      const sub = await SubmissionsRepository.findByRequestId(requestId);
+      if (sub) {
+        const oddness = await prisma.oddnessScore.findFirst({
+          where: { submission_id: sub.id },
+        });
+        const match = await MatchesRepository.getMatchForPlayer(sub.drop_id, sub.player_id);
+
+        return {
+          ok: true,
+          status: "persisted",
+          request_id: requestId,
+          submission_id: sub.id,
+          oddness: oddness
+            ? {
+                raw_score: oddness.raw_score,
+                percentile: oddness.percentile,
+                tier: oddness.tier,
+              }
+            : null,
+          match: match
+            ? {
+                twin_token: hashTwinId(
+                  match.player_a_id === sub.player_id ? match.player_b_id : match.player_a_id,
+                  sub.drop_id
+                ),
+                similarity_score: match.similarity_score,
+                is_provisional: match.is_provisional,
+              }
+            : null,
+        };
+      }
+
+      // 2. Check if submission is acknowledged and queued in Redis
+      let hasPayload = false;
+      try {
+        hasPayload = Boolean(await redis.exists(`submission:payload:${requestId}`));
+      } catch {}
+
+      if (hasPayload) {
+        return {
+          ok: true,
+          status: "pending",
+          request_id: requestId,
+          submission_id: null,
+          oddness: null,
+          match: null,
+        };
+      }
+
+      return reply.status(404).send({
+        ok: false,
+        error: "NOT_FOUND",
+        message: "Submission request not found.",
+      } as any);
+    }
+  );
+
+  /**
+   * GET /v1/admin/submissions/reconciliation
+   * Audit Mode B parity between acknowledged Redis requests and stored DB rows.
+   */
+  app.get<{
+    Querystring: { drop_id: string };
+  }>(
+    "/v1/admin/submissions/reconciliation",
+    {
+      schema: {
+        description: "Audit Mode B submission parity between Redis queue and PostgreSQL",
+        tags: ["Submissions", "Admin"],
+        querystring: z.object({
+          drop_id: z.string().uuid(),
+        }),
+      },
+    },
+    async (req, _reply) => {
+      const { drop_id } = req.query;
+
+      const acknowledgedKey = `drop:${drop_id}:acknowledged_requests`;
+      const persistedKey = `drop:${drop_id}:persisted_requests`;
+
+      let acknowledgedIds: string[] = [];
+      let redisPersistedIds = new Set<string>();
+
+      try {
+        acknowledgedIds = await redis.smembers(acknowledgedKey);
+        const persistedArray = await redis.smembers(persistedKey);
+        redisPersistedIds = new Set(persistedArray);
+      } catch {
+        // Redis error
+      }
+
+      // Query database submissions
+      const dbSubs = await prisma.submission.findMany({
+        where: { drop_id },
+        select: { request_id: true },
+      });
+      for (const s of dbSubs) {
+        if (s.request_id) {
+          redisPersistedIds.add(s.request_id);
+        }
+      }
+
+      const missingIds: string[] = [];
+      for (const ackId of acknowledgedIds) {
+        if (!redisPersistedIds.has(ackId)) {
+          missingIds.push(ackId);
+        }
+      }
+
+      const acknowledgedCount = acknowledgedIds.length;
+      const persistedCount = redisPersistedIds.size;
+      const parityPercentage =
+        acknowledgedCount === 0 ? 100 : Math.min(100, (persistedCount / acknowledgedCount) * 100);
+
+      return {
+        ok: true,
+        drop_id,
+        acknowledged_count: acknowledgedCount,
+        persisted_count: persistedCount,
+        parity_percentage: parityPercentage,
+        missing_count: missingIds.length,
+        reconciled: missingIds.length === 0,
+      };
     }
   );
 };

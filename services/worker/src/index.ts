@@ -21,6 +21,8 @@ export * from "./workers/globe.worker.js";
 export * from "./jobs/wilson-scoring.job.js";
 export * from "./jobs/player-taste.job.js";
 export * from "./jobs/notification-timing.job.js";
+export * from "./workers/submit-persist.worker.js";
+export * from "./jobs/persist-reconciliation.job.js";
 export * from "./db.js";
 
 const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";

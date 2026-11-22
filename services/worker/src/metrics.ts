@@ -47,3 +47,17 @@ export const provisionalUpgradesTotal = new client.Counter({
   registers: [workerMetricsRegistry],
 });
 
+export const modeBPersistedTotal = new client.Counter({
+  name: "oddly_mode_b_persisted_total",
+  help: "Total Mode B asynchronous submissions persisted to PostgreSQL",
+  registers: [workerMetricsRegistry],
+});
+
+export const modeBReconciledTotal = new client.Counter({
+  name: "oddly_mode_b_reconciled_total",
+  help: "Total Mode B submissions checked by reconciliation job",
+  labelNames: ["status"],
+  registers: [workerMetricsRegistry],
+});
+
+

@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Stage 1: Design System & UI Kit Resilience Primitives (COMPLETE).
+- **Current Stage:** Phase 3: Fastify REST API Core (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1603,3 +1603,45 @@ During Stage 0.5 scale and reliability hardening, four resilience UI requirement
 - **Phase 1 Metrics:** Phase 1 (Stage 1) is now 100% COMPLETE (23/23 tasks done). Overall tracked tasks: 241 completed / 410 total across 38 phases (59% overall progress).
 
 
+
+## 40. Phase 3 Completion: Mode B Asynchronous Ingestion & Reconciliation (2026-11-22)
+
+### 40.1 Architecture & Implementation (Task P3.16)
+Per Architecture Section 8.3 and ADR 012 (Dual Persistence Modes & Asynchronous Ingestion), Oddly provides dual persistence strategies:
+- **Mode A (Default L0–L2):** Synchronous database transaction and instant provisional matching returning HTTP 200 OK.
+- **Mode B (L3 Surge Shedding or `PERSIST_MODE=async`):** Ultra-high-throughput Redis queue ingestion returning HTTP 202 Accepted (`"Saved. Finding your twin..."`), micro-batched worker persistence to PostgreSQL, and background reconciliation auditing to uphold the core Reliability Promise: _"No acknowledged submission is ever lost."_
+
+### 40.2 Delivered Components
+1. **Fastify API Routes (`services/api/src/routes/submissions.ts`):**
+   - Added Mode B conditional activation check: `PERSIST_MODE=async` or degradation level $\ge 3$.
+   - Implemented duplicate check against acknowledged requests set (`drop:${drop_id}:acknowledged_requests`).
+   - Implemented player duplicate submission prevention (`drop:${drop_id}:player:${player_id}`).
+   - Durable Redis backup storage: stores full payload under `submission:payload:${request_id}` with 7-day TTL.
+   - Pushes to queue `oddly:queue:submit-persist` and increments answer distribution counters in Redis.
+   - Returns HTTP 202 Accepted with `{ ok: true, status: "accepted", mode: "async", request_id, message: "Saved. Finding your twin..." }`.
+   - `GET /v1/submissions/status/:requestId`: Polling endpoint returning `"persisted"` with calculated oddness/match if DB row exists, `"pending"` if queued in Redis, or HTTP 404 `"NOT_FOUND"`.
+   - `GET /v1/admin/submissions/reconciliation`: Admin endpoint auditing parity between Redis acknowledged requests and database rows.
+2. **Policy Registry (`services/api/src/routes/policy.registry.ts`):**
+   - Registered `/v1/submissions/status/:requestId` (standard rate limit, critical priority lane, 3000ms timeout).
+   - Registered `/v1/admin/submissions/reconciliation` (tight rate limit, high priority lane, 5000ms timeout).
+3. **Background Persistence Worker (`services/worker/src/workers/submit-persist.worker.ts`):**
+   - `SubmitPersistWorker.persistSubmission`: Idempotently persists payload to PostgreSQL (`prisma.submission.create`), updates `AnswerStat` frequencies via atomic upsert, calculates information-theoretic oddness score, writes `OddnessScore`, and records request ID to `drop:${drop_id}:persisted_requests`.
+   - `SubmitPersistWorker.drainQueue`: Drains up to batch limit (default 50) from `oddly:queue:submit-persist`.
+4. **Reconciliation Job (`services/worker/src/jobs/persist-reconciliation.job.ts`):**
+   - `PersistReconciliationJob.reconcile`: Audits acknowledged request IDs against persisted IDs in Redis and PostgreSQL.
+   - Automatically recovers missing items by pulling from durable payload storage (`submission:payload:${missingId}`) and re-enqueuing into `oddly:queue:submit-persist`.
+   - Computes `parity_percentage` and updates Prometheus metrics (`oddly_mode_b_reconciled_total`).
+5. **Typed API Client (`packages/api-client/src/index.ts`):**
+   - Updated `SubmitResponse` type to support `mode?: "sync" | "async"`.
+   - Added `SubmissionStatusResponse` and `OddlyApiClient.getSubmissionStatus(requestId)`.
+
+### 40.3 Verification & Status
+- Authored unit test suite in `services/worker/src/submit-persist.test.ts` (6 tests passing):
+  - Idempotent skip on duplicate `request_id`.
+  - Full insert, answer stats update, oddness calculation, and Redis persistence recording.
+  - Queue drainage processing.
+  - 100% parity verification.
+  - Automatic detection and re-enqueue recovery of missing submissions.
+  - Empty drop handling.
+- Full typecheck (`tsc --noEmit`) clean across `@oddly/shared`, `@oddly/api`, `@oddly/worker`, `@oddly/api-client`.
+- Phase 3 is now 100% COMPLETE (16/16 tasks done). Master progress dashboard updated to 242/410 completed tasks (59%).

@@ -56,13 +56,33 @@ export interface PageResponse {
 export interface SubmitResponse {
   ok: boolean;
   status: "accepted" | "duplicate";
-  submission_id: string;
-  oddness: {
+  mode?: "sync" | "async";
+  request_id?: string;
+  message?: string;
+  submission_id?: string;
+  oddness?: {
     raw_score: number;
     percentile: number;
     tier: string;
-  };
-  match: {
+  } | null;
+  match?: {
+    twin_token: string;
+    similarity_score: number;
+    is_provisional: boolean;
+  } | null;
+}
+
+export interface SubmissionStatusResponse {
+  ok: boolean;
+  status: "pending" | "persisted";
+  request_id: string;
+  submission_id?: string | null;
+  oddness?: {
+    raw_score: number;
+    percentile: number;
+    tier: string;
+  } | null;
+  match?: {
     twin_token: string;
     similarity_score: number;
     is_provisional: boolean;
@@ -534,6 +554,11 @@ export class OddlyApiClient {
       method: "POST",
       body: JSON.stringify(data),
     });
+  }
+
+  /** Check asynchronous Mode B submission status */
+  async getSubmissionStatus(requestId: string): Promise<SubmissionStatusResponse> {
+    return this.request<SubmissionStatusResponse>(`/v1/submissions/status/${encodeURIComponent(requestId)}`);
   }
 
   /** View personal drop results */

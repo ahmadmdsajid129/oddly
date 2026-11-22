@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="460" height="260" viewBox="0 0 460 260">
-  <title>Tasks Distribution: 241 Done, 169 To Do</title>
-  <desc>Donut chart: Done 241, In Progress 0, Blocked 0, Pending 169, Total 410.</desc>
+  <title>Tasks Distribution: 242 Done, 168 To Do</title>
+  <desc>Donut chart: Done 242, In Progress 0, Blocked 0, Pending 168, Total 410.</desc>
   <style>
     .val { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 900; fill: #14123A; }
     .lbl { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 800; fill: #5B5780; letter-spacing: 0.5px; }
@@ -19,7 +19,7 @@
 
   <!-- Done Slice (Mint) -->
   <circle cx="130" cy="130" r="80" fill="none" stroke="#3DDBB0" stroke-width="34"
-          stroke-dasharray="295.46 502.65"
+          stroke-dasharray="296.69 502.65"
           transform="rotate(-90 130 130)" />
 
   <!-- Inner Cutout Fill -->
@@ -34,11 +34,11 @@
 
   <!-- Done item -->
   <rect x="260" y="60" width="16" height="16" rx="4" fill="#3DDBB0" stroke="#14123A" stroke-width="2" />
-  <text x="286" y="73" class="leg">Done: <tspan font-weight="800">241</tspan> (59%)</text>
+  <text x="286" y="73" class="leg">Done: <tspan font-weight="800">242</tspan> (59%)</text>
 
   <!-- Todo item -->
   <rect x="260" y="92" width="16" height="16" rx="4" fill="#EEEAFE" stroke="#14123A" stroke-width="2" />
-  <text x="286" y="105" class="leg">To Do: <tspan font-weight="800">169</tspan> (41%)</text>
+  <text x="286" y="105" class="leg">To Do: <tspan font-weight="800">168</tspan> (41%)</text>
 
   <!-- In Progress item -->
   <rect x="260" y="124" width="16" height="16" rx="4" fill="#FFD23F" stroke="#14123A" stroke-width="2" />
