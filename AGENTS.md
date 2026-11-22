@@ -24,5 +24,8 @@ Never personalise Drop questions; analytics only with consent; no sensitive infe
 
 Lanes isolate matching; Drops are identical within a lane; typed answers only behind Gate G4; no politics; never shame a player.
 
+After any change to task.md counts, run `node scripts/docs-visuals/build.mjs` and commit the updated SVGs. Follow `docs/DOCS-STYLE.md`. Never change a fact to make a visual look nicer.
+
+
 
 

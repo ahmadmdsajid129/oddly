@@ -230,6 +230,7 @@ A stage is complete only when:
 4. `memory.md` contains an updated "Current state", dated decisions, and changelog entries.
 5. The Stage Report is printed in the exact format defined in Section 1.3 of the Master Prompt.
 6. The AI assistant halts execution and waits for the Founder's review.
+7. The docs visuals are regenerated when task counts change.
 
 ---
 
