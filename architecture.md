@@ -10,6 +10,33 @@
 
 ## 1. System Overview & Service Level Objectives (SLOs)
 
+<!-- visual:start system-topology-diagram -->
+```mermaid
+flowchart TD
+    CF["Cloudflare CDN & Edge<br/>(DDoS, SSL, Static Assets, Cache)"]
+    Web["Next.js 14 PWA<br/>(Client UI, Service Worker, Local Storage)"]
+    API["Fastify API Origin<br/>(Stateless, Rate Limiting, Load Shedding)"]
+    R2["Cloudflare R2<br/>(Pre-published Drop JSON, Share Cards)"]
+    Redis["Redis 7 (Multi-Role)<br/>(Cache, Counters, Vectors, Queues)"]
+    PG[("PostgreSQL 16 (Primary)<br/>(Partitions, Relational State)")]
+    Worker["BullMQ Worker Fleet<br/>(Async Persist, Matching, Satori Card Render)"]
+    Push["Push Gateway<br/>(Web Push & Mobile Notifications)"]
+
+    CF --> Web
+    CF --> API
+    CF --> R2
+    Web --> API
+    API --> Redis
+    API --> PG
+    API --> Worker
+    Worker --> Redis
+    Worker --> PG
+    Worker --> R2
+    Worker --> Push
+```
+<!-- visual:end system-topology-diagram -->
+
+
 Oddly is architected as an ultra-high-throughput, low-latency, mobile-first Web Application (PWA) and API designed to withstand extreme diurnal traffic spikes (around the 07:00 IST daily Drop). The platform combines edge caching, distributed in-memory evaluation, graceful degradation, and asynchronous worker pools to guarantee zero data loss.
 
 ### 1.1 Service Level Objectives (SLOs)
@@ -89,15 +116,26 @@ See [`docs/capacity-model.md`](file:///e:/Oddly/docs/capacity-model.md) for full
 
 ## 4. Scale Tiers Architecture
 
+<!-- visual:start scale-tiers-chart -->
+```mermaid
+flowchart LR
+    T0["🟢 T0<br/>≤ 1k DAU"] --> T1["🟡 T1<br/>1k–10k DAU"]
+    T1 --> T2["🟠 T2<br/>10k–100k DAU"]
+    T2 --> T3["🔴 T3<br/>100k–1M DAU"]
+    T3 --> T4["🟣 T4<br/>> 1M DAU"]
+```
+<!-- visual:end scale-tiers-chart -->
+
+
 See [`docs/scaling-plan.md`](file:///e:/Oddly/docs/scaling-plan.md) for full architectural roadmap and cost projections.
 
 | Tier | Daily Players | Peak Submissions / sec | Infrastructure Topology | Promotion Trigger (Move Up When) |
 |---|---|---|---|---|
-| **T0** | Up to 1,000 | ~1 – 5 | 1 API instance, 1 worker, starter Postgres & Redis, CDN | Sustained peak > 20 req/s, or CPU > 60% at peak |
-| **T1** | 1,000 to 10,000 | ~10 – 25 | 2 API instances, 1 worker, managed Postgres with pooler, persistent Redis | DB CPU > 60% at peak, p95 submit > 300 ms, or > 8,000 players |
-| **T2** | 10,000 to 1,00,000 | ~100 – 250 | 3 to 6 API instances, separate worker pools, multi-role Redis, Postgres replica | > 80,000 players, queue lag > 30 s at peak, or DB write saturation |
-| **T3** | 1,00,000 to 10,00,000 | ~1,100 (2x: 2,200) | 10 to 40 API instances, dedicated Postgres primary + pooler + replicas, Redis Cluster | > 8,00,000 players or breaking point found in load test |
-| **T4** | > 10,00,000 | > 2,500+ | Multi-region reads, sharded counters, vector search service, managed stream | Strategic business decision and funded dedicated SRE plan |
+| 🟢 **T0** | Up to 1,000 | ~1 – 5 | 1 API instance, 1 worker, starter Postgres & Redis, CDN | Sustained peak > 20 req/s, or CPU > 60% at peak |
+| 🟡 **T1** | 1,000 to 10,000 | ~10 – 25 | 2 API instances, 1 worker, managed Postgres with pooler, persistent Redis | DB CPU > 60% at peak, p95 submit > 300 ms, or > 8,000 players |
+| 🟠 **T2** | 10,000 to 1,00,000 | ~100 – 250 | 3 to 6 API instances, separate worker pools, multi-role Redis, Postgres replica | > 80,000 players, queue lag > 30 s at peak, or DB write saturation |
+| 🔴 **T3** | 1,00,000 to 10,00,000 | ~1,100 (2x: 2,200) | 10 to 40 API instances, dedicated Postgres primary + pooler + replicas, Redis Cluster | > 8,00,000 players or breaking point found in load test |
+| 🟣 **T4** | > 10,00,000 | > 2,500+ | Multi-region reads, sharded counters, vector search service, managed stream | Strategic business decision and funded dedicated SRE plan |
 
 - **Build Now (v1.0):** CDN edge caching; stateless Fastify API; idempotent submissions; Redis atomic counters; BullMQ workers with isolated queues; rate limits; timeouts & circuit breakers; `@fastify/under-pressure` load shedding; degradation ladder L0–L4; range partitioning by `drop_date`; zero-downtime migrations; k6 load test harness.
 - **Design Now, Build on Trigger:** Mode B async persist; matching Stage B bucket index & Stage C ANN; Redis role split; Postgres read replica; sharded hot counters; progressive final batch chunking.
@@ -161,50 +199,50 @@ Cloudflare sits in front of all services. Over 95% of requests never reach the o
 
 | Route | Method | Timeout | Rate Limit | Cache Policy | Idempotency | Priority Lane | Degradation Behavior |
 |---|---|---|---|---|---|---|---|
-| `/health` | GET | 1 s | None | No-store | None | Core | Never shed |
-| `/ready` | GET | 2 s | None | No-store | None | Core | Never shed |
-| `/v1/drop/today` | GET | 3 s | 120/min/IP | Edge s-maxage=5 | None | Core | Serve stale from CDN if down |
-| `/v1/drops/:id.json` | GET | 3 s | None | Edge immutable | None | Core | Served directly from CDN/R2 |
-| `/v1/submissions` | POST | 5 s | 30/min/IP | No-store | `request_id` (24h) | **Critical** | Switch to Mode B async at L3 |
-| `/v1/results/:dropId` | GET | 3 s | 60/min/IP | Private ETag | None | Core | Return provisional if matching slow |
-| `/v1/results/:dropId/card`| GET | 10 s | 30/min/IP | Edge immutable | None | Medium | On-demand render only at L1/L2 |
-| `/v1/stats/today` | GET | 2 s | 60/min/IP | Edge s-maxage=10 | None | Low | Serve cached counter; shed at L2 |
-| `/v1/time` | GET | 1 s | 120/min/IP | Edge s-maxage=1 | None | Core | Clock synchronization header |
-| `/v1/config/public` | GET | 2 s | 120/min/IP | Edge s-maxage=30 | None | Core | Reflects active degradation level |
-| `/v1/content/:locale` | GET | 3 s | 60/min/IP | Edge s-maxage=60 | None | Core | Serve last-known-good cached bundle |
-| `/v1/history` | GET | 4 s | 30/min/IP | Private no-store | None | Medium | Route to replica; shed at L2 |
-| `/v1/world/:dropId` | GET | 4 s | 60/min/IP | Edge s-maxage=300 | None | Low | Stale numbers up to 10 min at L2 |
-| `/v1/auth/*` | POST | 5 s | 10/min/IP | No-store | None | Medium | Guest play only at L3 |
-| `/v1/me/*` | GET/PUT | 4 s | 30/min/IP | Private no-store | None | Medium | Shed at L2/L3 |
-| `/v1/reports` | POST | 4 s | 10/min/IP | No-store | None | Medium | Queued in BullMQ |
-| `/v1/keeps` | POST | 4 s | 10/min/device | No-store | `request_id` | Medium | Paused at L2+ |
-| `/v1/keeps/incoming` | GET | 3 s | 30/min/device | Private no-store | None | Medium | Shed at L2+ |
-| `/v1/keeps/:id/respond` | POST | 4 s | 10/min/device | No-store | `request_id` | Medium | Paused at L2+ |
-| `/v1/orbits` | GET | 3 s | 30/min/device | Private no-store | None | Medium | Read-only at L2, shed at L3+ |
-| `/v1/orbits/:id` | GET | 3 s | 30/min/device | Private ETag | None | Medium | Read-only at L2, shed at L3+ |
-| `/v1/orbits/:id/expressions` | POST | 3 s | 20/min/device | No-store | `request_id` | Low | Paused at L2+ |
-| `/v1/orbits/:id/end` | POST | 3 s | 10/min/device | No-store | `request_id` | Medium | Never paused (safety invariant) |
-| `/v1/orbits/:id/telepathy` | GET | 3 s | 30/min/device | Private no-store | None | Low | Hidden at L2+ |
-| `/v1/orbits/:id/telepathy/guess` | POST | 3 s | 10/min/device | No-store | `request_id` | Low | Paused at L2+ |
-| `/v1/globe` | GET | 3 s | 60/min/IP | Edge s-maxage=60 | None | Low | Stale up to 10m at L1, hidden at L2+ |
-| `/v1/results/:dropId/anti-twin` | GET | 3 s | 20/min/device | Private no-store | None | Low | Hidden at L2+ |
-| `/v1/events` | POST | 3 s | 60/min/device | No-store | None | Low | Sampled 50% at L1, shed at L2+; never in submit path |
-| `/v1/consents` | GET | 3 s | 30/min/device | Private no-store | None | Medium | Shed at L2+ |
-| `/v1/consents` | PUT | 3 s | 10/min/device | No-store | `request_id` | Medium | Shed at L2+ |
-| `/v1/memes/today` | GET | 3 s | 60/min/device | Edge s-maxage=60 | None | Low | Hidden at L2+ (M3) |
-| `/v1/memes/:id/rating` | POST | 3 s | 30/min/device | No-store | `request_id` | Low | Paused at L2+ (M3) |
-| `/v1/memes/submissions` | POST | 5 s | 5/min/device | No-store | `request_id` | Low | Blocked at L2+ (M3) |
-| `/v1/me/memes` | GET | 3 s | 20/min/device | Private no-store | None | Low | Shed at L2+ (M3) |
-| `/v1/me/badges` | GET | 3 s | 30/min/device | Private no-store | None | Low | Shed at L2+ (M6) |
-| `/v1/shoutouts` | GET | 3 s | 60/min/IP | Edge s-maxage=300 | None | Low | Stale up to 1h at L2+ (M6) |
-| `/v1/orbits/:id/subject-sync` | GET | 3 s | 30/min/device | Private ETag | None | Low | Hidden at L2+ (M5) |
+| `/health` | GET | 1 s | None | No-store | None | 🟠 Core | Never shed |
+| `/ready` | GET | 2 s | None | No-store | None | 🟠 Core | Never shed |
+| `/v1/drop/today` | GET | 3 s | 120/min/IP | Edge s-maxage=5 | None | 🟠 Core | Serve stale from CDN if down |
+| `/v1/drops/:id.json` | GET | 3 s | None | Edge immutable | None | 🟠 Core | Served directly from CDN/R2 |
+| `/v1/submissions` | POST | 5 s | 30/min/IP | No-store | `request_id` (24h) | 🔴 **Critical** | Switch to Mode B async at L3 |
+| `/v1/results/:dropId` | GET | 3 s | 60/min/IP | Private ETag | None | 🟠 Core | Return provisional if matching slow |
+| `/v1/results/:dropId/card`| GET | 10 s | 30/min/IP | Edge immutable | None | 🟡 Medium | On-demand render only at L1/L2 |
+| `/v1/stats/today` | GET | 2 s | 60/min/IP | Edge s-maxage=10 | None | ⚪ Low | Serve cached counter; shed at L2 |
+| `/v1/time` | GET | 1 s | 120/min/IP | Edge s-maxage=1 | None | 🟠 Core | Clock synchronization header |
+| `/v1/config/public` | GET | 2 s | 120/min/IP | Edge s-maxage=30 | None | 🟠 Core | Reflects active degradation level |
+| `/v1/content/:locale` | GET | 3 s | 60/min/IP | Edge s-maxage=60 | None | 🟠 Core | Serve last-known-good cached bundle |
+| `/v1/history` | GET | 4 s | 30/min/IP | Private no-store | None | 🟡 Medium | Route to replica; shed at L2 |
+| `/v1/world/:dropId` | GET | 4 s | 60/min/IP | Edge s-maxage=300 | None | ⚪ Low | Stale numbers up to 10 min at L2 |
+| `/v1/auth/*` | POST | 5 s | 10/min/IP | No-store | None | 🟡 Medium | Guest play only at L3 |
+| `/v1/me/*` | GET/PUT | 4 s | 30/min/IP | Private no-store | None | 🟡 Medium | Shed at L2/L3 |
+| `/v1/reports` | POST | 4 s | 10/min/IP | No-store | None | 🟡 Medium | Queued in BullMQ |
+| `/v1/keeps` | POST | 4 s | 10/min/device | No-store | `request_id` | 🟡 Medium | Paused at L2+ |
+| `/v1/keeps/incoming` | GET | 3 s | 30/min/device | Private no-store | None | 🟡 Medium | Shed at L2+ |
+| `/v1/keeps/:id/respond` | POST | 4 s | 10/min/device | No-store | `request_id` | 🟡 Medium | Paused at L2+ |
+| `/v1/orbits` | GET | 3 s | 30/min/device | Private no-store | None | 🟡 Medium | Read-only at L2, shed at L3+ |
+| `/v1/orbits/:id` | GET | 3 s | 30/min/device | Private ETag | None | 🟡 Medium | Read-only at L2, shed at L3+ |
+| `/v1/orbits/:id/expressions` | POST | 3 s | 20/min/device | No-store | `request_id` | ⚪ Low | Paused at L2+ |
+| `/v1/orbits/:id/end` | POST | 3 s | 10/min/device | No-store | `request_id` | 🟡 Medium | Never paused (safety invariant) |
+| `/v1/orbits/:id/telepathy` | GET | 3 s | 30/min/device | Private no-store | None | ⚪ Low | Hidden at L2+ |
+| `/v1/orbits/:id/telepathy/guess` | POST | 3 s | 10/min/device | No-store | `request_id` | ⚪ Low | Paused at L2+ |
+| `/v1/globe` | GET | 3 s | 60/min/IP | Edge s-maxage=60 | None | ⚪ Low | Stale up to 10m at L1, hidden at L2+ |
+| `/v1/results/:dropId/anti-twin` | GET | 3 s | 20/min/device | Private no-store | None | ⚪ Low | Hidden at L2+ |
+| `/v1/events` | POST | 3 s | 60/min/device | No-store | None | ⚪ Low | Sampled 50% at L1, shed at L2+; never in submit path |
+| `/v1/consents` | GET | 3 s | 30/min/device | Private no-store | None | 🟡 Medium | Shed at L2+ |
+| `/v1/consents` | PUT | 3 s | 10/min/device | No-store | `request_id` | 🟡 Medium | Shed at L2+ |
+| `/v1/memes/today` | GET | 3 s | 60/min/device | Edge s-maxage=60 | None | ⚪ Low | Hidden at L2+ (M3) |
+| `/v1/memes/:id/rating` | POST | 3 s | 30/min/device | No-store | `request_id` | ⚪ Low | Paused at L2+ (M3) |
+| `/v1/memes/submissions` | POST | 5 s | 5/min/device | No-store | `request_id` | ⚪ Low | Blocked at L2+ (M3) |
+| `/v1/me/memes` | GET | 3 s | 20/min/device | Private no-store | None | ⚪ Low | Shed at L2+ (M3) |
+| `/v1/me/badges` | GET | 3 s | 30/min/device | Private no-store | None | ⚪ Low | Shed at L2+ (M6) |
+| `/v1/shoutouts` | GET | 3 s | 60/min/IP | Edge s-maxage=300 | None | ⚪ Low | Stale up to 1h at L2+ (M6) |
+| `/v1/orbits/:id/subject-sync` | GET | 3 s | 30/min/device | Private ETag | None | ⚪ Low | Hidden at L2+ (M5) |
 | `/v1/lanes` | GET | 2 s | 60/min/IP | Edge s-maxage=60 | None | Core | Returns cached catalogue; client sorts last-played |
 | `/v1/drops/today` | GET | 3 s | 120/min/IP | Edge s-maxage=5 | None | Core | Query param `?lane=slug` isolates Drop by lane |
-| `/v1/lane-interest` | POST | 3 s | 10/min/device | No-store | `request_id` | Low | Records planned lane interest; shed at L2+ |
-| `/v1/me/lane-prefs` | PUT | 3 s | 20/min/device | No-store | `request_id` | Medium | Updates per-lane push and history opt-in |
-| `/v1/me/super-twin` | GET | 3 s | 30/min/device | Private no-cache | None | Low | Returns Super twin result; shed at L2+ |
-| `/v1/answers/:id/text`| POST | 4 s | 5/min/device | No-store | `request_id` | Low | Free-text submission (Gate G4); shed at L2+ |
-| `/admin/*` | ALL | 10 s | 120/min/IP | No-store | None | Low | Block writes at L2/L3 |
+| `/v1/lane-interest` | POST | 3 s | 10/min/device | No-store | `request_id` | ⚪ Low | Records planned lane interest; shed at L2+ |
+| `/v1/me/lane-prefs` | PUT | 3 s | 20/min/device | No-store | `request_id` | 🟡 Medium | Updates per-lane push and history opt-in |
+| `/v1/me/super-twin` | GET | 3 s | 30/min/device | Private no-cache | None | ⚪ Low | Returns Super twin result; shed at L2+ |
+| `/v1/answers/:id/text`| POST | 4 s | 5/min/device | No-store | `request_id` | ⚪ Low | Free-text submission (Gate G4); shed at L2+ |
+| `/admin/*` | ALL | 10 s | 120/min/IP | No-store | None | ⚪ Low | Block writes at L2/L3 |
 
 ### 7.2 Layered Rate Limiting and Indian CGNAT Cellular Architecture (R1-PATCH Item 5)
 
@@ -233,6 +271,34 @@ Redis instances are segmented by logical role with dedicated eviction policies:
 3. **`queues` Role (`noeviction`, AOF `everysec`):** BullMQ job queues. Never evicted.
 
 ### 8.3 Ingestion Persistence Modes (A vs. B)
+
+<!-- visual:start submit-mode-sequence -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as Player Client
+    participant API as Fastify API
+    participant PG as PostgreSQL
+    participant Redis as Redis 7
+    participant Worker as BullMQ Worker
+
+    alt Mode A: Synchronous (Default: L0–L2)
+        Player->>API: POST /v1/submissions
+        API->>PG: BEGIN tx (insert submission & answers)
+        API->>Redis: Atomic incr C(a) & update player vector
+        PG-->>API: COMMIT tx
+        API-->>Player: 200 OK (Provisional Twin)
+    else Mode B: Asynchronous (Survive: L3 / Peak Overload)
+        Player->>API: POST /v1/submissions
+        API->>Redis: SET idempotency & HSET vector
+        API->>Redis: LPUSH submit-persist queue
+        API-->>Player: 202 Accepted ("Saved. Finding twin...")
+        Worker->>Redis: RPOP submit-persist
+        Worker->>PG: Micro-batch bulk INSERT (zero data loss)
+    end
+```
+<!-- visual:end submit-mode-sequence -->
+
 - **Mode A (Synchronous Ingestion — Default):** API writes submission, answers, and provisional match to PostgreSQL in a transaction, then updates Redis counters/vector, and responds with HTTP 200.
 - **Mode B (Asynchronous Ingestion — Level L3):** API writes idempotency key and vector to Redis, appends submission to BullMQ `submit-persist` queue, and immediately responds with HTTP 202 (`"Saved. Finding your twin..."`). Worker micro-batches inserts to PostgreSQL. A reconciliation job ensures zero loss between acknowledged IDs and database rows.
 
@@ -278,11 +344,11 @@ Controlled dynamically via database `app_config.degradation_level` (L0 to L4). S
 
 | Level | Name | Automated Trigger | System Adjustments | User Experience |
 |---|---|---|---|---|
-| **L0** | Normal | Healthy | All features active (including Globe live arcs, Keep/Orbit, Telepathy, Anti-twin) | Standard UI |
-| **L1** | Conserve | submit p95 > 400 ms or CPU > 70% | Live count cached 60 s; matching refresh interval doubled; analytics sampled 50%; card pre-render on-demand; **Globe refresh interval doubled** (60s to 120s); Anti-twin, Orbit, Telepathy normal | Live count shows subtle freshness label |
-| **L2** | Protect Core | submit p95 > 800 ms or queue lag > 2m | Twin upgrade push paused; history/settings served stale; sign-up queued; admin writes locked; **Globe real-time arcs paused (switches to Replay loop); new Keep requests paused; existing Orbits read-only; Telepathy & Anti-twin paused** | Banner: *"Busy right now. Your picks are safe."* |
-| **L3** | Survive | Error rate > 2% or DB write saturation | **Mode B async persist active**; matching deferred; guest play only; push paused except Drop Live; **all connection features (Globe, Orbit, Telepathy, Anti-twin) read-only or hidden with honest copy** | Screen: *"Saved! Finding your twin... This may take a minute."* |
-| **L4** | Static | Origin down / catastrophic | CDN serves cached shell and Drop JSON; client stores picks locally and retries for 6h; **all connection features hidden** | Banner: *"Picks saved safely on device. Will send automatically when reconnected."* |
+| 🟢 **L0** | Normal | Healthy | All features active (including Globe live arcs, Keep/Orbit, Telepathy, Anti-twin) | Standard UI |
+| 🟡 **L1** | Conserve | submit p95 > 400 ms or CPU > 70% | Live count cached 60 s; matching refresh interval doubled; analytics sampled 50%; card pre-render on-demand; **Globe refresh interval doubled** (60s to 120s); Anti-twin, Orbit, Telepathy normal | Live count shows subtle freshness label |
+| 🟠 **L2** | Protect Core | submit p95 > 800 ms or queue lag > 2m | Twin upgrade push paused; history/settings served stale; sign-up queued; admin writes locked; **Globe real-time arcs paused (switches to Replay loop); new Keep requests paused; existing Orbits read-only; Telepathy & Anti-twin paused** | Banner: *"Busy right now. Your picks are safe."* |
+| 🔴 **L3** | Survive | Error rate > 2% or DB write saturation | **Mode B async persist active**; matching deferred; guest play only; push paused except Drop Live; **all connection features (Globe, Orbit, Telepathy, Anti-twin) read-only or hidden with honest copy** | Screen: *"Saved! Finding your twin... This may take a minute."* |
+| ⚫ **L4** | Static | Origin down / catastrophic | CDN serves cached shell and Drop JSON; client stores picks locally and retries for 6h; **all connection features hidden** | Banner: *"Picks saved safely on device. Will send automatically when reconnected."* |
 
 *Load Shedding Priority Order:*  
 1. Priority 1 (Core): Drop JSON, Submissions (Mode A -> Mode B), `/health`.  
@@ -665,6 +731,24 @@ Stage L0 expands Oddly from a single monolithic daily Drop into subject-isolated
 
 ### 18.2 Relational Data Model Proposal
 
+<!-- visual:start lanes-er-diagram -->
+```mermaid
+erDiagram
+    lanes ||--o{ drops : "schedules"
+    lanes ||--o{ questions : "contains"
+    lanes ||--o{ submissions : "receives"
+    lanes ||--o{ lane_interest : "tracks"
+    lanes ||--o{ player_lane_prefs : "configures"
+    lanes ||--o{ lane_history_signature : "summarizes"
+    drops ||--o{ submissions : "records"
+    submissions ||--o{ answer_text : "optional typed answer"
+    answer_text }o--|| text_archetypes : "classifies"
+    text_archetypes }o--o{ style_tags : "tags"
+    submissions ||--o{ super_twin_results : "participates"
+```
+<!-- visual:end lanes-er-diagram -->
+
+
 #### 18.2.1 New Tables
 
 ```sql
@@ -798,6 +882,16 @@ CREATE INDEX IF NOT EXISTS idx_super_twin_date ON super_twin_results(drop_date);
 - `events_raw`, `question_stats_daily`, `tag_stats_daily`: Add `lane_id` dimension.
 
 #### 18.2.3 Migration Order, Rollback Strategy & Idempotent Backfill
+
+<!-- visual:start migration-steps-flowchart -->
+```mermaid
+flowchart TD
+    S1["Step 1: Expand Migration<br/>012_lanes_foundation.sql<br/>New tables & nullable lane_id"] --> S2["Step 2: Idempotent Backfill<br/>Assign historical data to Everyday lane<br/>Batches of 5,000 with pg_sleep(0.05)"]
+    S2 --> S3["Step 3: Verification Check<br/>Assert zero NULL lane_id in DB"]
+    S3 --> S4["Step 4: Contract Migration<br/>013_lanes_constraints.sql<br/>Apply NOT NULL & composite unique indexes"]
+```
+<!-- visual:end migration-steps-flowchart -->
+
 
 To safely introduce lanes into a live database without downtime, schema evolution follows an expand-only, multi-phase strategy:
 
@@ -1026,15 +1120,15 @@ flowchart TD
 
 | Method | Path | Timeout (ms) | Rate Limit Class | Cache-Control | Idempotent | Priority Lane | Degradation Behavior |
 |---|---|---|---|---|---|---|---|
-| `GET` | `/v1/lanes` | 1000 | standard | `public, max-age=60` | false | normal | Returns cached lane catalogue; client sorts last-played |
-| `GET` | `/v1/drops/today?lane=slug` | 2000 | standard | `public, max-age=120` | false | normal | Returns signed Drop JSON for lane; returns 200 with resting state if Drop missing |
-| `POST` | `/v1/answers` | 3000 | tight | `no-store` | true | high | Accepts lane submission; validates format payloads; core submit path |
-| `GET` | `/v1/results/:dropId` | 2000 | standard | `private, max-age=30` | false | normal | Returns lane twin, honest tie group size, and questions compared count |
-| `POST` | `/v1/lane-interest` | 2000 | tight | `no-store` | true | normal | Records player interest in planned lane; requires notification consent |
-| `PUT` | `/v1/me/lane-prefs` | 2000 | standard | `no-store` | true | normal | Updates per-lane push opt-in and history tie-break toggle |
-| `GET` | `/v1/me/super-twin` | 2000 | standard | `private, no-cache` | false | background | Returns Super twin result for date; shed at Level L2+ |
-| `GET` | `/v1/globe?lane=slug` | 2000 | standard | `public, max-age=60` | false | normal | Returns lane-filtered arcs adhering to $k \ge 20$ anonymity |
-| `POST` | `/v1/answers/:id/text` | 3000 | tight | `no-store` | true | background | Submits typed `say_it` answer; strictly unlogged; shed at Level L2+ |
+| `GET` | `/v1/lanes` | 1000 | standard | `public, max-age=60` | false | 🟡 normal | Returns cached lane catalogue; client sorts last-played |
+| `GET` | `/v1/drops/today?lane=slug` | 2000 | standard | `public, max-age=120` | false | 🟡 normal | Returns signed Drop JSON for lane; returns 200 with resting state if Drop missing |
+| `POST` | `/v1/answers` | 3000 | tight | `no-store` | true | 🟠 high | Accepts lane submission; validates format payloads; core submit path |
+| `GET` | `/v1/results/:dropId` | 2000 | standard | `private, max-age=30` | false | 🟡 normal | Returns lane twin, honest tie group size, and questions compared count |
+| `POST` | `/v1/lane-interest` | 2000 | tight | `no-store` | true | 🟡 normal | Records player interest in planned lane; requires notification consent |
+| `PUT` | `/v1/me/lane-prefs` | 2000 | standard | `no-store` | true | 🟡 normal | Updates per-lane push opt-in and history tie-break toggle |
+| `GET` | `/v1/me/super-twin` | 2000 | standard | `private, no-cache` | false | ⚪ background | Returns Super twin result for date; shed at Level L2+ |
+| `GET` | `/v1/globe?lane=slug` | 2000 | standard | `public, max-age=60` | false | 🟡 normal | Returns lane-filtered arcs adhering to $k \ge 20$ anonymity |
+| `POST` | `/v1/answers/:id/text` | 3000 | tight | `no-store` | true | ⚪ background | Submits typed `say_it` answer; strictly unlogged; shed at Level L2+ |
 
 ---
 
