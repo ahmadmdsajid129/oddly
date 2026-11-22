@@ -249,6 +249,10 @@ flowchart TD
 - **Super Twin:** Rare cross-lane occurrence where two players are twinned in 2 or more distinct lanes on the same calendar day.
 - **Say It:** Free-text question format (up to 80 chars) compared via semantic embeddings, gated behind Gate G4.
 - **Style Archetype:** Descriptive behavioral style label in the Situations lane (e.g. Calm, Playful, Shy), never an evaluative rank.
+- **Bonus Round:** An optional, asynchronous tie-break round (3 questions) offered after final recap to players in tie groups of `bonus.min_tie_size` (>= 2) members to find the closest twin.
+- **Lane Twin:** A verified final twin result earned in a specific open lane on a day with >= 200 players and similarity >= 0.6 (`badge.min_similarity`).
+- **Collector:** A cumulative badge recognizing players who have earned lane twins across multiple distinct open lanes (Tiers I, II, III, All-Lanes).
+- **Super Twin Badge:** A rare badge recognizing players who achieve a Super Twin across >= 2 lanes within a rolling 7-day window.
 
 ## 6. Core Loop and Daily Timeline
 
@@ -470,6 +474,8 @@ When thousands of players complete 5 questions, tie collisions naturally occur. 
    - Players are never paired with themselves.
    - Accounts sharing the same IP subnet, device fingerprint, or network signature are excluded by the anti-self engine.
    - Blocked players (via the Safety & Shield feature) are strictly excluded from mutual and provisional candidate pools.
+
+*(Optional Post-Recap Tie-Breaking: For tie groups with 2 or more members after Drop finalisation, players may optionally narrow their match via asynchronous Bonus Rounds [F40].)*
 
 ### 9.7 Privacy via $k$-Anonymity
 
@@ -1181,6 +1187,73 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 - **Purpose:** Knowledge and trivia dilemma lane where "twin" means something unique: you made the **same intuitive leaps and the exact same mistakes**.
 - **Status:** Documented only; unscheduled for implementation. Preserved for architectural completeness and future roadmap evaluation.
 
+---
+
+### F40 Bonus Rounds (Stage L9, Built After Stage L4)
+
+<!-- visual:start card-f40 -->
+> [!NOTE]
+> **Stage:** Stage L9 | **Status:** ⚪ Planned | **Feature Flag:** `feature.bonus_rounds`
+<!-- visual:end card-f40 -->
+
+- **Purpose:** Provide an optional, asynchronous mechanism for players in large tie groups to answer a few extra evergreen questions to find who is closest, transforming "meet one of them" into "meet the closest of them" without ever altering the daily Drop questions or experience.
+- **When a Bonus Round Exists:**
+  - After a lane's Drop is finalised (07:05 IST morning recap), a player whose tie group has at least `bonus.min_tie_size` (default 2) members and whose lane has at least `bonus.pool_min_per_lane` (default 40) approved evergreen questions is offered "Break the tie" on their result screen.
+  - Never offered on lanes under `lane.closest_so_far_below` (200) players that day (nothing to break).
+  - Never offered in the `say_it` format; never offered for provisional results.
+  - A round has `bonus.questions_per_round` (default 3) questions. Maximum `bonus.max_rounds` (default 2) rounds per tie group per Drop. Maximum 6 bonus questions per player per Drop.
+- **Deterministic Selection (Pool & Seed):**
+  - Pool: A separate evergreen pool per lane, admin-managed, adhering to the same editorial and forbidden-topic rules as Drops (Rules L6, L7), entropy-checked, and never reused for the same tie group.
+  - Selection: The engine sorts the pool by predicted split power (highest entropy first), excludes any questions that any member of the tie group answered in their 28-day history, and deterministically selects questions using `HMAC_SHA256(drop_id || tie_group_id || round_number)` as seed.
+  - Invariant: Everyone in the tie group receives the exact same questions in the exact same order. Zero personalisation (Rule L1 spirit, Rule B1).
+- **How It Plays (Asynchronous, Optional, No Pressure):**
+  - The round opens at recap and remains open for `bonus.window_hours` (default 24h). A second round, if still needed, opens at the next finalisation. Nobody needs to be online simultaneously.
+  - Playing is 100% optional. Non-players stay in the tie group but are not compared in the bonus round.
+  - When the round closes, the twin is re-chosen among participating players using combined score: original Drop similarity first (tie group unchanged), then bonus similarity with the information-weighted formula, then deterministic tie-breaks (history, country, hash).
+  - Single-participant honesty: If only one member plays, they keep their original twin and the app displays: *"Nobody else from your group played the tie-break. Your twin stays the same."*
+  - Mutual pairing is re-run for participants only, applying greedy mutual pairing.
+- **Exact Copy Keys (`app_content`):**
+  - `bonus.offer.title`: "Break the tie?"
+  - `bonus.offer.body`: "{{count}} people matched you. 3 quick extra questions can find the closest one. Totally optional."
+  - `bonus.result.narrowed`: "Tie-break: {{k}} of 3 matched with {{m}} of the {{n}} who played." (Counts follow Rule L4: exact below 1,000).
+  - `bonus.result.alone`: "Nobody else from your group played the tie-break. Your twin stays the same."
+  - `bonus.closed`: "This tie-break has ended."
+  - Forbidden copy: No countdown timers, no "your twin is waiting", no "only X players left", no streak or reward attached to playing (Rules 17, "Never Do").
+- **Rules Invariants:** Rules B1, B2, B3, B4. Bonus answers do not change oddness, percentile, tier, streak, or badges. Retained only for `bonus.retention_days` (default 28) and purged under history signature deletion rules.
+- **Degradation:** If the bonus background job fails, the original twin stands and the offer is hidden (never show a broken round).
+- **Config & Flags:** `bonus.min_tie_size` (2), `bonus.questions_per_round` (3), `bonus.max_rounds` (2), `bonus.pool_min_per_lane` (40), `bonus.window_hours` (24), `bonus.retention_days` (28), `bonus.min_participants` (2), flag `feature.bonus_rounds` (default false).
+- **Success Metrics & Guardrails:** Participation rate among offered players, median tie group size before and after, share of rounds with >1 participant. Guardrail: If participation falls below 10% for 14 days, flag for review rather than push harder (no growth tricks).
+
+---
+
+### F41 Badges (Stage L10, Built After Stage L7)
+
+<!-- visual:start card-f41 -->
+> [!NOTE]
+> **Stage:** Stage L10 | **Status:** ⚪ Planned | **Feature Flag:** `feature.badges`
+<!-- visual:end card-f41 -->
+
+- **Purpose:** Reward the thing that is unique to Oddly—finding twins across multiple subject lanes—through private, unranked collectible badges without leaderboards, public counts, or social pressure.
+- **Lane Collector Badge (Cumulative, Never Lost):**
+  - Earning condition: A "lane twin" is earned when the player receives a final (not provisional) twin result in an `open` lane on a day when that lane had at least `lane.closest_so_far_below` (200) players, with similarity at or above `badge.min_similarity` (default 0.6).
+  - Tiers:
+    - Collector I: `badge.tier1_lanes` (default 2) distinct open lanes.
+    - Collector II: `badge.tier2_lanes` (default 3) distinct open lanes.
+    - Collector III: `badge.tier3_lanes` (default 5) distinct open lanes.
+    - All-Lanes: Every lane that was `open` on the day the player earned their last required lane twin.
+  - Invariants: Once earned, a badge is never removed because a new lane opens. A newly opened lane simply appears as a new empty slot, never a lost badge. Only lanes with status `open` count (not `preview`, not `planned`).
+- **Super Twin Badge (Rare, Time-Windowed):**
+  - Earning condition: Awarded when a player achieves a Super Twin per F38 (matched with the same person in >= `super.min_lanes` lanes with similarity >= `super.min_similarity`) within a rolling `badge.super_window_days` (default 7) window.
+  - Multiplicity: Earned again each time it occurs; displayed with count ("Super twin x3").
+  - Privacy: Names the matched lanes, never the person.
+- **Player Journey & Surfaces:**
+  - Result-screen toast: Brief notification on recap screen (< 600 ms, skippable, strictly honors `prefers-reduced-motion`).
+  - "My badges" page: Private showcase displaying earned sticker badges and empty slots for unearned lanes. No public badge display, no leaderboards, no count of other players holding a badge, and no comparison between players (Rule B5).
+  - Share card: Optional tactile sticker share card showing badge artwork with no player count and no rank.
+- **Rules Invariants:** Rules B5, B6, B7. Badges are private, unranked, unbuyable, and tamper-evidenced with stored lane IDs, Drop IDs, and rule version. Revoked upon account suspension for abuse.
+- **Config & Flags:** `badge.min_similarity` (0.6), `badge.tier1_lanes` (2), `badge.tier2_lanes` (3), `badge.tier3_lanes` (5), `badge.super_window_days` (7), flag `feature.badges` (default false).
+- **Success Metrics & Guardrails:** Share of active players who open "My badges", multi-lane play rate. Guardrail: If multi-lane play rises while next-day return falls, review immediately (badges must never become a chore).
+
 ## 12. Business Model and Monetisation Philosophy
 
 ### 12.1 Phase-1: Pure Focus on Retention
@@ -1286,5 +1359,6 @@ Oddly involves zero real-money stakes, zero entry fees, and zero financial payou
 
 ## 16. Change Log
 
+- 2026-11-22: Added Section 11C features F40 (Bonus Rounds) and F41 (Badges), glossary additions (Bonus Round, Lane Twin, Collector, Super Twin Badge), and tie-breaking cross-reference in Section 9.6, Stage L0-ADD.
 - 2026-11-22: Founder-approved edit to 5.1, Stage L0-FIX.
 
