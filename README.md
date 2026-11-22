@@ -1,7 +1,25 @@
+<!-- visual:start banner -->
+![Oddly Banner](docs/assets/banner.svg)
+
+<p align="center">
+  <img src="docs/assets/badges/badge-stage.svg" alt="Stage: L0 Complete" />
+  <img src="docs/assets/badges/badge-tasks.svg" alt="Tasks: 237 / 393 (60%)" />
+  <img src="docs/assets/badges/badge-stack.svg" alt="Stack: Next.js 14 · Fastify · BullMQ" />
+  <img src="docs/assets/badges/badge-license.svg" alt="License: Proprietary" />
+</p>
+<!-- visual:end banner -->
+
 # Oddly v1 (Web MVP)
 
 > _"Someone out there is oddly like you."_
 > Daily five-pick game finding your stranger twin anywhere in the world in under 30 seconds.
+
+<!-- visual:start where-we-are -->
+### Where We Are
+![Overall Project Progress](docs/assets/progress-overall.svg)
+
+![Recommended Execution Order Stage Roadmap](docs/assets/roadmap-stages.svg)
+<!-- visual:end where-we-are -->
 
 ---
 
@@ -67,12 +85,12 @@ The architecture and operational standards are fully articulated across six foun
 
 | Document                   | File Path                              | Core Purpose                                                                                              |
 | -------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| **Product Specification**  | [`product.md`](./product.md)           | Audience, personas, core loop, brand identity, matching maths, F1–F17 specs, and honesty rules.           |
-| **Technical Architecture** | [`architecture.md`](./architecture.md) | System overview, topology, complete tech stack, data models, Redis keys, API specs, and ADRs.             |
-| **Rules & Standards**      | [`rules.md`](./rules.md)               | 11 absolute rules, coding standards, error handling matrix, security constraints, and Definition of Done. |
-| **Design System**          | [`design.md`](./design.md)             | Colors, typography, spacing, component states, motion specs, accessibility, and screen blueprints.        |
-| **Task Breakdown**         | [`task.md`](./task.md)                 | 16-phase task tracker (Stage 0 to Stage 15), progress bars, dependencies, and verification checklists.    |
-| **Living Memory**          | [`memory.md`](./memory.md)             | Real-time state, architectural decisions, defect logs, learnings, environment notes, and next actions.    |
+| 📘 **Product Specification** | [`product.md`](./product.md)           | Audience, personas, core loop, brand identity, matching maths, F1–F17 specs, and honesty rules.           |
+| 🏗️ **Technical Architecture** | [`architecture.md`](./architecture.md) | System overview, topology, complete tech stack, data models, Redis keys, API specs, and ADRs.             |
+| 📏 **Rules & Standards** | [`rules.md`](./rules.md)               | 11 absolute rules, coding standards, error handling matrix, security constraints, and Definition of Done. |
+| 🎨 **Design System** | [`design.md`](./design.md)             | Colors, typography, spacing, component states, motion specs, accessibility, and screen blueprints.        |
+| ✅ **Task Breakdown** | [`task.md`](./task.md)                 | 16-phase task tracker (Stage 0 to Stage 15), progress bars, dependencies, and verification checklists.    |
+| 🧠 **Living Memory** | [`memory.md`](./memory.md)             | Real-time state, architectural decisions, defect logs, learnings, environment notes, and next actions.    |
 | **Admin Panel Spec**       | [`docs/admin-panel-spec.md`](./docs/admin-panel-spec.md) | Mission Control authoritative specification: access control, Command Center, ops tools, audit log, and Addendum A. |
 | **Connection Features**    | [`docs/connection-features.md`](./docs/connection-features.md) | Architectural analysis, DPDP compliance, scale projections, and threat models for F18–F23.            |
 | **Event Dictionary**       | [`docs/event-dictionary.md`](./docs/event-dictionary.md) | Allowlisted event dictionary, telemetry schemas, priority lanes, and DPDP consent policies for F25.    |
