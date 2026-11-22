@@ -1,5 +1,16 @@
 # Oddly v1 — Scale & Reliability Addendum Implementation Status
 
+<!-- visual:start impl-status-chip-row -->
+| Package / Service | Architectural Status | Test Coverage | Key Focus |
+|---|---|---|---|
+| `apps/web` | 🟢 Next.js 14 PWA Complete | Unit & E2E Passing | Core player loop, Sticker Pop UI |
+| `services/api` | 🟢 Fastify Backend Complete | Integration Passing | High throughput, Mode A/B persist |
+| `services/worker` | 🟢 BullMQ Workers Complete | Queue Testing Passing | Satori render, final batch match |
+| `packages/shared` | 🟢 Zod Schemas & Invariants | 100% Invariant Coverage | Math formulas, strict schemas |
+<!-- visual:end impl-status-chip-row -->
+
+
+
 > **Document Type:** SRE / System Architecture Tracking  
 > **Status:** Authoritative  
 > **Date:** 2026-11-12  

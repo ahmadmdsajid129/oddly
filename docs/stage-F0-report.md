@@ -1,5 +1,12 @@
 # Oddly — Stage F0 Report: New Features Analysis and Documentation
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-F0-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-14  
 **Branch:** `stage-F0-feature-docs`  
 **Status:** Complete  

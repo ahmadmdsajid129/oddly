@@ -1,5 +1,17 @@
 # Oddly — Architectural & Feasibility Analysis: Memes, Signals & Insights Engine (F24 to F31)
 
+<!-- visual:start meme-lifecycle-flowchart -->
+```mermaid
+flowchart TD
+    M1["1. Submission (Meme Lab)<br/>Creator pairs template + 4 captions"] --> M2["2. Fast Moderation<br/>Admin queue check (Rule 19)"]
+    M2 --> M3["3. Drop Queue Staging<br/>Scheduled in admin_lane_drops"]
+    M3 --> M4["4. Live Memes Drop<br/>Unified 07:00 IST release"]
+    M4 --> M5["5. Recognition & Badges<br/>Anonymous creator credit (Rule 20)"]
+```
+<!-- visual:end meme-lifecycle-flowchart -->
+
+
+
 **Date:** 2026-11-15  
 **Stage:** Stage M0 (Analysis and Documentation)  
 **Author:** AI System Designer / Coding Agent  

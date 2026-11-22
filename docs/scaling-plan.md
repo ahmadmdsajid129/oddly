@@ -1,5 +1,17 @@
 # Oddly — Scale Tiers and Scaling Plan
 
+<!-- visual:start scaling-tiers-flowchart -->
+```mermaid
+flowchart TD
+    T0["🟢 T0: Up to 1k DAU<br/>Single instance starter stack"] --> T1["🟡 T1: 1k to 10k DAU<br/>2 API instances + managed Postgres"]
+    T1 --> T2["🟠 T2: 10k to 100k DAU<br/>Postgres replica + multi-role Redis"]
+    T2 --> T3["🔴 T3: 100k to 1M DAU<br/>Redis cluster + Mode B async persist"]
+    T3 --> T4["🟣 T4: > 1M DAU<br/>Multi-region reads & sharded counters"]
+```
+<!-- visual:end scaling-tiers-flowchart -->
+
+
+
 > **Purpose:** Defines the scale tiers (T0 to T4), architecture evolution, triggers, upgrade playbooks, and cost guardrails as Oddly scales from 1,000 to 1,000,000+ daily players.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

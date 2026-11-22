@@ -1,5 +1,16 @@
 # Oddly — Failure Modes and Effects Analysis (FMEA)
 
+<!-- visual:start failure-mode-summary -->
+| Failure Domain | Primary Defense | Fallback State | Recovery Time |
+|---|---|---|---|
+| **PostgreSQL Outage** | Mode B async ingestion | Cached static drop, local client retry | RTO < 30m |
+| **Redis Outage** | Direct DB fallback mode | Reduced rate limits, provisional delay | RTO < 10m |
+| **Worker Overload** | Piscina CPU cap + load shed | Defer non-critical matching jobs | Self-healing |
+| **CDN Partition** | Stale-if-error headers | Local browser cached bundle | Instant |
+<!-- visual:end failure-mode-summary -->
+
+
+
 > **Purpose:** Comprehensive catalog of failure scenarios, architectural mitigations, detection signals, and resilience design patterns.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

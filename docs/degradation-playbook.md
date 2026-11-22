@@ -1,5 +1,17 @@
 # Oddly — Graceful Degradation Ladder and Playbook
 
+<!-- visual:start degradation-ladder-visual -->
+| Level | Name | Trigger | Action Summary |
+|---|---|---|---|
+| 🟢 **L0** | Normal | Healthy | Full system capability across all lanes |
+| 🟡 **L1** | Conserve | p95 > 400ms / CPU > 70% | Cache counters 60s, double refresh, sample analytics 50% |
+| 🟠 **L2** | Protect Core | p95 > 800ms / lag > 2m | Pause real-time arcs, lock admin writes, serve stale settings |
+| 🔴 **L3** | Survive | Error > 2% / DB saturated | **Mode B async persist**, defer matching, Everyday lane only |
+| ⚫ **L4** | Static | Origin down | CDN edge fallback shell, local storage on device |
+<!-- visual:end degradation-ladder-visual -->
+
+
+
 > **Purpose:** Detailed operational guide for the five-stage Graceful Degradation Ladder (L0 to L4), including automated triggers, manual admin controls, hysteresis rules, and user-facing communications.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

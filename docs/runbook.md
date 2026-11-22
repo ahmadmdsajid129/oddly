@@ -1,5 +1,16 @@
 # Oddly — Incident Response Runbooks
 
+<!-- visual:start runbook-incident-matrix -->
+| Severity | Impact | Pager Duty SLA | Operational Action |
+|---|---|---|---|
+| 🔴 **SEV-1** | Drop unavailable or submit error rate > 5% | 5 minutes | Immediate rollback, switch to Mode B, fail over CDN |
+| 🟠 **SEV-2** | Latency p95 > 1,500ms or background queue lag | 15 minutes | Step degradation ladder to L2, scale workers |
+| 🟡 **SEV-3** | Non-critical feature degraded (cards/stats) | 60 minutes | Shed non-essential priority routes |
+| 🟢 **SEV-4** | Minor telemetry or non-blocking bug | Next business day | Log ticket, normal development cycle |
+<!-- visual:end runbook-incident-matrix -->
+
+
+
 > **Purpose:** Operational playbooks, triage procedures, and incident response runbooks for on-call engineers and operators.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

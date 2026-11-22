@@ -1,5 +1,12 @@
 # Oddly — Stage F1 Report: Orbit Foundation (Backend)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-F1-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-15  
 **Branch:** `stage-F1-orbit-backend`  
 **Status:** Complete  

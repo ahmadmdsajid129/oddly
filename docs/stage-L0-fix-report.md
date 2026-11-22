@@ -1,5 +1,12 @@
 # Stage L0-FIX Report: Documentation Corrections and Standards Alignment
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-L0-fix-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 > **Stage Milestone:** Stage L0-FIX (Documentation Cleanup & Alignment — Docs Only, No Code)  
 > **Status:** COMPLETE  
 > **Date:** 2026-11-22  

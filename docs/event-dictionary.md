@@ -1,5 +1,16 @@
 # Oddly — Allowlisted Event Dictionary & Telemetry Specification
 
+<!-- visual:start event-priority-table -->
+| Telemetry Priority | Delivery Mechanism | Shedding Threshold | Example Events |
+|---|---|---|---|
+| 🔴 **Critical** | Synchronous DB record | Never shed | `drop.submitted`, `auth.age_verified` |
+| 🟠 **Core** | Redis queue batch | Shed at L3 | `twin.revealed`, `streak.incremented` |
+| 🟡 **Operational** | Fastify in-memory buffer | Sampled at L1, shed at L2 | `page.view`, `share.clicked` |
+| ⚪ **Telemetry** | Micro-batched analytics | Shed at L2+ | `animation.skipped`, `card.dragged` |
+<!-- visual:end event-priority-table -->
+
+
+
 **Version:** 1.0.0  
 **Effective Date:** 2026-11-15  
 **Governing Principles:** `rules.md` Rule 13 (Consent Rule), Rule 14 (No Sensitive Inference), Rule 15 (No Identity-Joined Profiling), ADR-042.

@@ -1,5 +1,12 @@
 # Stage L0 Repair Report: Fix and Complete the Stage L0 Documentation
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-L0-repair-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 > **Stage Milestone:** Stage L0-REPAIR (Documentation & Analysis Repair Only — No Code)  
 > **Status:** COMPLETE  
 > **Date:** 2026-11-21  

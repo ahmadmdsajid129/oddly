@@ -1,5 +1,12 @@
 # Stage M4 Report: Insights Engine — Statistics Only (Phase 10H)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M4-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-21  
 **Branch:** `main` (synchronized with `origin/main`)  
 **Commit Milestone:** `stage-M4-complete`  

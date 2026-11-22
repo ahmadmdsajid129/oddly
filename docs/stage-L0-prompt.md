@@ -1,5 +1,12 @@
 # STAGE L0: LANES, RICHER ANSWERS, TWIN DEPTH AND TEXT ANSWERS: ANALYSIS AND DOCUMENTATION (NO CODE)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-L0-prompt.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 You are the coding agent for Oddly. This stage is **documentation and analysis only**. Write no application code, no migrations, no seed changes, no dependencies. Follow `rules.md` Rule 1: do this stage, update the living documents, print the Stage Report in the same format as your previous stage reports, then **STOP** and wait for the Founder to say "proceed to Stage L1".
 
 This stage changes the shape of the whole product, so it touches **every** markdown file, from the player-facing frontend to the admin panel. It must leave the documents so complete and so consistent that the next prompt ("proceed to Stage L1") can start changing the code without asking anything.

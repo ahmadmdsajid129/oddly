@@ -1,5 +1,12 @@
 # Oddly — Stage F4 Report: Anti-Twin, Share Faces & Verification Gate
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-F4-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-15  
 **Branch:** `stage-F4-antitwin-share`  
 **Status:** Complete  

@@ -1,5 +1,16 @@
 # Situations Lane Editorial & Safety Guidelines (Rule L7 & Feature F36)
 
+<!-- visual:start situations-safety-callout -->
+> [!WARNING]
+> **Situations Lane Safety Invariants (Rule L7)**
+> - **Zero Shaming:** Archetypes describe playful styles (e.g. *Calm Anchor*, *Impulsive Spark*), never evaluations (*simp*, *loser* are forbidden).
+> - **Gender Neutral:** Scenarios never assume or inquire about player gender or orientation.
+> - **Respect & Consent:** Zero scenarios depicting pursuit after refusal, following, or pressure.
+> - **18+ Non-Dating:** Situations is an instinct game, strictly non-dating with zero direct communication.
+<!-- visual:end situations-safety-callout -->
+
+
+
 > **Document Status:** Authoritative Content Policy & Editorial Safety Manual  
 > **Target Milestone:** Stage L5 (Phase 10P)  
 > **Governance:** `rules.md` Rule L7 (Situations Safety & Kindness), Section 9.1 (Forbidden Topics), and ADR 045

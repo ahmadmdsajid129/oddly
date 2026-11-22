@@ -1,5 +1,12 @@
 # Stage M7 Report: ML Ranker for Optional Surfaces (Phase 10J)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M7-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-21  
 **Branch:** `main` (synchronized with `origin/main`)  
 **Commit Milestone:** `stage-M7-complete`  

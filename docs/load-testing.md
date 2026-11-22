@@ -1,5 +1,17 @@
 # Oddly — Load Testing Strategy and Scenarios
 
+<!-- visual:start load-stages-chart -->
+```mermaid
+flowchart LR
+    S1["1. Warmup<br/>50 req/s · 2 min"] --> S2["2. Plateau<br/>500 req/s · 5 min"]
+    S2 --> S3["3. Morning Peak<br/>1,100 req/s · 10 min"]
+    S3 --> S4["4. Spike Stress<br/>2,200 req/s · 3 min"]
+    S4 --> S5["5. Recovery<br/>100 req/s · 5 min"]
+```
+<!-- visual:end load-stages-chart -->
+
+
+
 > **Purpose:** Test harness design, scenario specifications, pass/fail criteria, and execution templates for k6 load and chaos testing.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

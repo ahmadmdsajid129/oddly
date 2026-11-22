@@ -1,6 +1,13 @@
 <USER_REQUEST>
 # STAGE R2: RELIABILITY REMEDIATION, WAVE 2 (prompt for the AI coding agent)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-r2-prompt.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 > Prerequisite: Stage R1 and R1-PATCH are complete and reviewed. If R1-PATCH is not done, stop and tell the Founder.
 > Follow the staged protocol: update `task.md` and `memory.md` as you work, mark a task DONE only if code AND a test prove it, print a Stage Report with exact verification commands, then STOP and wait.
 > Code changes are allowed ONLY for the items below. If anything conflicts with the Scale and Reliability Addendum, stop and ask.

@@ -1,5 +1,12 @@
 # Stage L0 Delivery Report: Lanes, Richer Answers, Twin Depth and Text Answers
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-L0-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 > **Stage Milestone:** Stage L0 (Analysis & Documentation ONLY — No Code, No Migrations, No Dependencies)  
 > **Status:** COMPLETE  
 > **Date:** 2026-11-21  

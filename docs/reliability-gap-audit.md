@@ -1,5 +1,12 @@
 # Authoritative Reliability Gap Audit — Oddly v1
 
+<!-- visual:start reliability-gap-callout -->
+> [!IMPORTANT]
+> **Reliability Invariant:** No acknowledged submission is ever lost. All write paths guarantee idempotency with `request_id`. Worker pipelines enforce deterministic job completion and circuit-breaker isolation.
+<!-- visual:end reliability-gap-callout -->
+
+
+
 > **Document Type:** SRE & System Architecture Audit  
 > **Status:** Authoritative / Read-Only Codebase Audit  
 > **Date:** 2026-11-10  

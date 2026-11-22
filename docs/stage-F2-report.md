@@ -1,5 +1,12 @@
 # Oddly — Stage F2 Report: Orbit and Globe UI
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-F2-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-15  
 **Branch:** `stage-F2-orbit-globe-ui`  
 **Status:** Complete  

@@ -1,5 +1,17 @@
 # Oddly — Disaster Recovery and Business Continuity Plan
 
+<!-- visual:start dr-timeline-flowchart -->
+```mermaid
+flowchart LR
+    I["🚨 Incident Detected"] --> A["T+2m: Auto-Degrade<br/>Switch to Level L4 static"]
+    A --> R["T+10m: Redis/DB Restore<br/>Target RPO < 5 min"]
+    R --> S["T+25m: Service Restored<br/>Target RTO < 30 min"]
+    S --> V["T+30m: Health Probes Pass<br/>Gradual step down to L0"]
+```
+<!-- visual:end dr-timeline-flowchart -->
+
+
+
 > **Purpose:** Disaster recovery protocol, automated backup topology, step-by-step restoration procedures, and quarterly recovery drill logs.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

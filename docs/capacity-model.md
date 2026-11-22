@@ -1,5 +1,17 @@
 # Oddly — Load Model and Capacity Math
 
+<!-- visual:start capacity-flowchart -->
+```mermaid
+flowchart TD
+    D0["06:30 IST: Staging<br/>Pre-warm CDN & R2, pre-create partitions"] --> D1["07:00 IST: Drop Opens<br/>Peak window: 1,100 to 2,200 submissions/sec"]
+    D1 --> D2["07:00 – 23:00 IST: Live Play<br/>Provisional matching & BullMQ ingestion"]
+    D2 --> D3["06:59 IST D+1: Close Window<br/>Freeze submissions, snapshot counters"]
+    D3 --> D4["07:00 – 07:10 IST: Final Batch<br/>5,000-user chunks, mutual pairing, recap dispatch"]
+```
+<!-- visual:end capacity-flowchart -->
+
+
+
 > **Purpose:** Authoritative capacity model, resource formulas, and throughput calculations supporting Oddly from MVP to 10 lakh (1,000,000) daily players.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

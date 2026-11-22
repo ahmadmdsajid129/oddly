@@ -1,5 +1,16 @@
 # Oddly v1 — Hard-Coded Content & Configuration Audit
 
+<!-- visual:start content-audit-summary -->
+| Surface | Storage Authority | Cache TTL | Rule 11 Compliance |
+|---|---|---|---|
+| **Daily Drop Questions** | PostgreSQL `drops` / `questions` | Edge 5s / R2 immutable | 🟢 100% Dynamic |
+| **App Copy & Labels** | PostgreSQL `app_content` | Edge 60s / Memory cache | 🟢 100% Dynamic |
+| **System Feature Flags** | PostgreSQL `app_config` | Fastify 30s cache | 🟢 100% Dynamic |
+| **Offline Fallback Copy** | Client Service Worker | Stored on device | 🟢 Authorized Fallback |
+<!-- visual:end content-audit-summary -->
+
+
+
 > **Document Type:** Architecture & Dynamic Configuration Audit  
 > **Date:** 2026-11-12  
 > **Status:** Authoritative  

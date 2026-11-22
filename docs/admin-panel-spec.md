@@ -1,5 +1,15 @@
 # Oddly Admin Panel: "Mission Control"
 
+<!-- visual:start admin-priority-legend -->
+| Priority | SLA / Weight | Scope | Focus Areas |
+|---|---|---|---|
+| 🔴 **P1** | Critical / Immediate | Phase 11 Core | Auth, Command Center, Drop Management, Audit Log |
+| 🟠 **P2** | Essential Operations | Phase 11 Importer | Bulk Question Import, Content Editor, Safety Flags |
+| 🟡 **P3** | Advanced Tooling | Post-Launch Tools | Telemetry Viewer, Batch Analytics, Export Tools |
+<!-- visual:end admin-priority-legend -->
+
+
+
 > Spec v1.0 | 14 Nov 2026 | Audience: the founder (boss) and the AI build agent
 > Companion to: Oddly Product, Brand and Technical Blueprint v1.0, plus the later v1 decisions (Twin Globe, Orbit with Telepathy, Anti-twin, Oddly Deck).
 > Phase tags: **[P1]** ships with v1 (Stage 11) | **[P2]** v1.1 to v1.5 | **[P3]** later.

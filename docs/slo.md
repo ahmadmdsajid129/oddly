@@ -1,5 +1,16 @@
 # Oddly — Service Level Objectives (SLOs) and Error Budget Policy
 
+<!-- visual:start slo-summary-table -->
+| Service Boundary | SLO Target | Error Budget (30d) | Key Defense |
+|---|---|---|---|
+| **Availability** | 🟢 **99.9%** (99.95% Drop peak) | 43.2 minutes | Multi-role redundancy, CDN fallback |
+| **Drop Delivery** | 🟢 **p95 < 100ms** | Hit ratio > 99% | Cloudflare CDN edge caching |
+| **Submissions** | 🟢 **p95 < 500ms** | Error rate < 0.5% | Stateless Fastify API, Mode B persist |
+| **Final Batch** | 🟢 **99% by 07:10 IST** | 100% by 07:20 IST | BullMQ worker chunking (5k batches) |
+<!-- visual:end slo-summary-table -->
+
+
+
 > **Purpose:** Defines the availability, latency, durability, and recovery SLOs, error budget burn rules, and alerting thresholds for Oddly v1.0.  
 > **Owner:** Senior System Designer / SRE  
 > **Last Updated:** 2026-11-10  

@@ -1,5 +1,19 @@
 # Say It: Short Free-Text Answers Matched by Semantic Meaning (Feature F37)
 
+<!-- visual:start say-it-pipeline-flowchart -->
+```mermaid
+flowchart TD
+    P1["1. Raw Input<br/>Max 80 chars, strictly untracked"] --> P2["2. Local Regex Filter<br/>Screen phone/email/handles"]
+    P2 --> P3["3. Content Moderation<br/>Forbidden topics & hate speech check"]
+    P3 --> P4["4. CPU ONNX Embedding<br/>all-MiniLM-L6-v2 vector generation"]
+    P4 --> P5["5. Archetype Classification<br/>Assign playful archetype & style tag"]
+    P5 --> P6["6. Cosine Similarity<br/>Evaluate text component of match"]
+    P6 --> P7["7. Ephemeral Cleanup<br/>Drop raw text; keep archetypes only"]
+```
+<!-- visual:end say-it-pipeline-flowchart -->
+
+
+
 > **Document Status:** Authoritative Architectural Specification & Gate G4 Blueprint  
 > **Target Milestone:** Stage L6 (Phase 10Q) — **Gated Behind Gate G4 (Strictly Inactive in v1)**  
 > **Governance:** `rules.md` Rule L5 (Free-Text Privacy & Machine Matching), Rule 18 Exception, and ADR 048 / ADR 049 / ADR 050

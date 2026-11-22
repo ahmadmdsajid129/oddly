@@ -1,5 +1,12 @@
 # Stage M8 Report: Premium Groundwork & Guardrail Engine (Phase 10K)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M8-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-21  
 **Status:** Completed  
 **Branch:** `main`  

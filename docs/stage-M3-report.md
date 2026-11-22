@@ -1,5 +1,12 @@
 # Stage M3 Report: Meme Lab — User Captions & Moderation Queue (Phase 10G)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M3-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-20  
 **Branch:** `main` (synchronized with `origin/main`)  
 **Commit Milestone:** `stage-M3-complete`  

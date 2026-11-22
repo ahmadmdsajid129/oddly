@@ -1,5 +1,12 @@
 # Oddly — Stage M1 Report: Meme Questions & Themed Drops (Phase 10E)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M1-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-15  
 **Branch:** `stage-M1-meme-questions`  
 **Status:** Complete (100% of P10E.01 to P10E.09)  

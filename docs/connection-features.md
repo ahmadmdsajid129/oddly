@@ -1,5 +1,17 @@
 # Connection Features Analysis & Architecture (F18 to F23)
 
+<!-- visual:start connection-topology-flowchart -->
+```mermaid
+flowchart TD
+    T["Daily Twin Reveal"] --> G["🌐 F18: Twin Globe<br/>Coarse 3D arcs (k ≥ 20)"]
+    T --> K["🤝 F19: Keep & Orbit<br/>Mutual opt-in, 1-per-day, max 10"]
+    K --> P["🔮 F20: Telepathy<br/>Daily 1-question instinct guess"]
+    T --> A["🪞 F21: Anti-Twin<br/>Honest polar opposite reveal"]
+```
+<!-- visual:end connection-topology-flowchart -->
+
+
+
 > **Document Version:** v1.0 | **Date:** 2026-11-14  
 > **Status:** Stage F0 Analysis & Documentation (No Code)  
 > **Scope:** Analysis for F18 (Twin Globe), F19 (Keep & Orbit), F20 (Telepathy), F21 (Anti-twin), F22 (Oddly Deck [v1.5]), and F23 (Friend-Invite Orbit [v1.5]).

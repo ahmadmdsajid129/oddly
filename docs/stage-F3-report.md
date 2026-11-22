@@ -1,5 +1,12 @@
 # Oddly — Stage F3 Report: Telepathy (Instinct Sync)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-F3-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-15  
 **Branch:** `stage-F3-telepathy`  
 **Status:** Complete  

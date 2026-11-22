@@ -1,5 +1,12 @@
 # Oddly — Stage M0 Report: Memes, Signals and Insights Engine Analysis and Documentation
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M0-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-15  
 **Branch:** `stage-M0-meme-signals-docs`  
 **Status:** Complete  

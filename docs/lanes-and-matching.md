@@ -1,5 +1,17 @@
 # Lanes, Formats, Twin Depth and Matching Mathematics
 
+<!-- visual:start tie-shrink-table -->
+| Matching Stage | Candidate Pool Reduction | Metric / Mechanism | Anonymity Guarantee |
+|---|---|---|---|
+| **1. Peak Similarity** | Top ~100 to 500 candidates | Score within $\epsilon = 0.01$ | $k \ge 20$ group threshold |
+| **2. 28-Day History** | Filter to top 5–20 candidates | BitMinHash agreement ($\ge 5$ shared days) | Zero raw vector exposure |
+| **3. Cross-Culture** | Filter to 2–5 candidates | Different country preference | Coarse region only |
+| **4. Crypto Hash** | Exactly 1 unique Twin | HMAC-SHA256 deterministic tiebreak | Auditable determinism |
+| **5. Mutual Pairing** | Reciprocal assignment | Greedy stable matching ($K=32$ candidate subgraph) | `is_mutual = true` flag |
+<!-- visual:end tie-shrink-table -->
+
+
+
 **Document Version:** 1.0.0  
 **Date:** 2026-11-21  
 **Status:** Stage L0 Specification and Mathematical Analysis (No Code)  

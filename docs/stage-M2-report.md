@@ -1,5 +1,12 @@
 # Stage M2 Report: Signals Foundation (Phase 10F)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M2-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-17  
 **Branch:** `stage-M2-signals-foundation`  
 **Commit Milestone:** `stage-M2-complete`  

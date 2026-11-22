@@ -1,5 +1,13 @@
 # Oddly v1: Manual Screen-Reader & Accessibility Verification Checklist
 
+<!-- visual:start a11y-compliance-callout -->
+> [!NOTE]
+> **Accessibility Standard:** WCAG 2.1 Level AA Compliance  
+> Minimum contrast ratios: 4.5:1 normal text, 3.0:1 large text. Minimum touch target size: 44 × 44 px. Strictly honors `prefers-reduced-motion`. Visible focus rings on all interactive elements.
+<!-- visual:end a11y-compliance-callout -->
+
+
+
 **Standard:** WCAG 2.1 AA Compliance  
 **Applicability:** `apps/web` (PWA, mobile web, desktop web)  
 **Target Assistive Technologies:**

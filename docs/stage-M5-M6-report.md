@@ -1,5 +1,12 @@
 # Stage M5 & M6 Report: Taste Dimension & Recognition Engine (Phase 10I)
 
+<!-- visual:start stage-archive-callout -->
+> [!NOTE]
+> **Stage Documentation Archive:** Historical deliverable record for `stage-M5-M6-report.md`. Invariant specifications preserved.
+<!-- visual:end stage-archive-callout -->
+
+
+
 **Date:** 2026-11-21  
 **Branch:** `main` (synchronized with `origin/main`)  
 **Commit Milestone:** `stage-M5-M6-complete`  
