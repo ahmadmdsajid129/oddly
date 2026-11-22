@@ -1,6 +1,6 @@
 # Product Specification — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-07 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-22 | Owner: Founder + AI agent
 Purpose of this file: Definitive product blueprint, scope, user personas, brand identity, matching mechanics, feature definitions (F1–F17), edge cases, and legal/safety boundaries.
 
 ---
@@ -172,7 +172,7 @@ When traffic surges trigger the Graceful Degradation Ladder, the user experience
 >
 > You assume it is just you. It almost never is.
 >
-> Oddly asks you five tiny questions every day, the same five for everyone on Earth. No quizzes to study for, no profile to build, no followers to chase. You answer on instinct, and then we do one simple thing: we look for the person, anywhere in the world, who answered most like you.
+> Oddly asks you five tiny questions every day, the same five for everyone who picks the same lane. No quizzes to study for, no profile to build, no followers to chase. You answer on instinct, and then we do one simple thing: we look for the person, anywhere in the world, who answered most like you.
 >
 > You will never know their name. You will know they are real, that they are somewhere you have never been, and that today, for thirty seconds, two strangers were oddly in sync.
 >
@@ -185,7 +185,7 @@ When traffic surges trigger the Graceful Degradation Ladder, the user experience
 - **Core Values:**
   1. **Tiny:** Respect human time. Never demand homework, quizzes, or profiles.
   2. **Kind:** Celebrate eccentricities. No shaming, no ranking, no losers.
-  3. **Safe by Design:** Prevent abuse architecturally by eliminating free text, chat, and precise locations.
+  3. **Safe by Design:** Prevent abuse architecturally by keeping answers structured, never showing one player's typed words to another, and never showing precise locations. Any text answer or chat feature stays off until its safety gate passes.
   4. **Honest:** Never generate synthetic twins, bots, or fake rarity counts. If data is sparse, say so transparently.
 
 ### 5.3 Brand Voice Guidelines
@@ -931,7 +931,7 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 - **Privacy Rules:** The 32-byte BitMinHash signature is a one-way mathematical summary. Cannot be reversed into individual answers. Purged immediately on account deletion.
 - **Data Produced:** `twin_results` gains `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days`. New table `lane_history_signature`.
 - **Degradation Behaviour:** If batch mutual job times out, falls back to greedy provisional twin assignments.
-- **Feature Flags & Config:** `twin_depth_enabled` (bool), `history_tiebreak_enabled` (bool), `tie_epsilon` (0.01), `tie_candidate_k` (32), `history_window_days` (28), `min_shared_history_days` (5).
+- **Feature Flags & Config:** `feature.twin_depth` (bool, default false until Stage L3 is built), `match.history_tiebreak_enabled` (bool), `match.tie_epsilon` (0.01), `match.neighbour_limit_k` (32), `match.history_window_days` (28), `match.history_min_shared_days` (5).
 - **Success Metrics:** Median tie group size reduced by $> 80%$; $\ge 98\%$ of paired twins are mutual; zero duplicate pairings across devices.
 - **Out of Scope:** Infinite candidate graphs ($K > 32$), cross-lane history mixing (Rule L2).
 
@@ -1025,7 +1025,7 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
   - `format.say_it.cooldown`: "Text answers paused for 7 days. You can still play all card lanes."
   - `format.say_it.privacy_hint`: "Your words are never shown to other players. Compared privately by AI."
 - **Data Produced:** `answer_text` table (`player_id`, `drop_id`, `question_id`, `raw_text` [7d purge], `embedding` [28d purge], `archetype_id`, `moderation_status`).
-- **Feature Flags & Config:** `say_it_enabled` (false in v1), `raw_text_retention_days` (7), `embedding_retention_days` (28), `say_it_max_chars` (80).
+- **Feature Flags & Config:** `feature.say_it` (false in v1), `text.raw_retention_days` (7), `text.history_retention_days` (28), `text.max_chars` (80).
 - **Success Metrics:** Human-model agreement $\ge 80\%$; zero PII leakage incidents; embedding queue p95 $< 100$ms.
 - **Out of Scope:** Generative AI responses, chatbot twins, displaying text to twins, audio/voice input.
 
@@ -1050,7 +1050,7 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
   - `supertwin.copy`: "You and this person were twins in both {{lane1}} and {{lane2}} today."
   - `globe.filter.all_lanes`: "All Lanes"
 - **Data Produced:** `super_twin_results` (`player_a_id`, `player_b_id`, `drop_date`, `lane_ids`, `mean_similarity`).
-- **Feature Flags & Config:** `super_twin_enabled` (bool), `super_twin_min_lanes` (2), `super_twin_threshold` (0.80).
+- **Feature Flags & Config:** `feature.super_twin` (bool), `super.min_lanes` (2), `super.min_similarity` (0.80).
 - **Success Metrics:** Super twin card share rate $\ge 35\%$; zero false positive lane collisions.
 - **Out of Scope:** Paid super twin boosts, guaranteed super twins.
 
@@ -1161,3 +1161,10 @@ Oddly involves zero real-money stakes, zero entry fees, and zero financial payou
 | **Super Twin** | The rare occurrence where two players match as twins in two or more distinct lanes on the exact same date. |
 | **Telepathy** | Real-time live synchronization reveal when two players in an active Orbit answer a question identically. |
 | **Tie Group** | The cohort of players whose similarity score to a given player falls within $\epsilon = 0.01$ of the top match. |
+
+---
+
+## 16. Change Log
+
+- 2026-11-22: Founder-approved edit to 5.1, Stage L0-FIX.
+
