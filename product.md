@@ -1207,7 +1207,7 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
   - Selection: The engine sorts the pool by predicted split power (highest entropy first), excludes any questions that any member of the tie group answered in their 28-day history, and deterministically selects questions using `HMAC_SHA256(drop_id || tie_group_id || round_number)` as seed.
   - Invariant: Everyone in the tie group receives the exact same questions in the exact same order. Zero personalisation (Rule L1 spirit, Rule B1).
 - **How It Plays (Asynchronous, Optional, Additive, No Pressure):**
-  - The round opens at recap (07:05 IST) and remains open for `bonus.window_hours` (default 24h). A second round, if still needed, opens at the next finalisation. Nobody needs to be online simultaneously.
+  - The round opens at recap (07:05 IST) and closes at the end of that Drop's play window (06:59:59 IST the next morning; `bonus.window_hours`, default 24h, serves as the cap). The background job `bonus.close_and_compute` runs at 07:01 IST the next morning, before the 07:05 final batch, and is pausable at degradation L2+. A second round, if still needed, opens at the next 07:05 recap. Nobody needs to be online simultaneously.
   - Playing is 100% optional. Non-players stay in the tie group but are not compared in the bonus round.
   - When the round closes, the engine computes outcomes among participating players only using the information-weighted bonus formula, and writes the narrowed result strictly to `bonus_results`.
   - The original twin in `twin_results` is immutable and never rewritten. Mutual pairing of the original Drop is never broken.

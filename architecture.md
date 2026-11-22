@@ -1298,8 +1298,8 @@ CREATE INDEX IF NOT EXISTS idx_collector_badges_user ON collector_badges(user_id
 #### 18.11.2 Worker Jobs & Redis Key Architecture
 
 1. **Worker Jobs (`services/worker`):**
-   - `bonus.open_rounds`: Scheduled at 07:05 IST post-recap. Identifies tie groups with $\ge 2$ members, queries `bonus_pool_questions` (min 40 questions), builds rounds seeded by HMAC-SHA256, and emits eligible player states.
-   - `bonus.close_and_compute`: Scheduled at 07:01 IST. Collects participants from `bonus_answers`. If $\ge 2$ players answered, scores bonus similarity, runs greedy mutual pairing among participants only, and writes additive outcomes strictly to `bonus_results`. Never touches `twin_results` (locked twin and mutual status are immutable). If 1 player, records alone state.
+   - `bonus.open_rounds`: Scheduled at 07:05 IST post-recap. Identifies tie groups with $\ge 2$ members, queries `bonus_pool_questions` (min 40 questions), builds rounds seeded by HMAC-SHA256, and emits eligible player states. Rounds open at 07:05 IST and close at 06:59:59 IST the next morning (effective window until the next Drop opens; `bonus.window_hours` [24h] is the cap).
+   - `bonus.close_and_compute`: Scheduled at 07:01 IST the next morning (before the 07:05 final batch; pausable at degradation L2+). Collects participants from `bonus_answers`. If $\ge 2$ players answered, scores bonus similarity, runs greedy mutual pairing among participants only, and writes additive outcomes strictly to `bonus_results`. Never touches `twin_results` (locked twin and mutual status are immutable). If 1 player, records alone state. A second round (if still needed) opens at the next 07:05 recap.
    - `badges.evaluate`: Post-recap worker job. Evaluates active users against collector and super-twin conditions. Performs idempotent inserts into `collector_badges`.
 2. **Redis Key Architecture:**
    - `bonus:round:{roundId}:state` (Hash, TTL 36h): Cached round status, questions, and expiration timestamp.
@@ -1307,4 +1307,4 @@ CREATE INDEX IF NOT EXISTS idx_collector_badges_user ON collector_badges(user_id
    - `bonus:user:{userId}:{roundId}:done` (String, TTL 36h): Fast check preventing duplicate submissions.
 3. **Graceful Degradation:**
    - If bonus background workers stall or fail, original twin assignments remain locked and the bonus offer card is suppressed (Rule B2).
-   - Under Degradation Level L2+, `bonus.open_rounds` and `badges.evaluate` are paused, and `POST /v1/bonus/:roundId/answers` is shed.
+   - Under Degradation Level L2+, `bonus.open_rounds`, `bonus.close_and_compute`, and `badges.evaluate` are paused, and `POST /v1/bonus/:roundId/answers` is shed.

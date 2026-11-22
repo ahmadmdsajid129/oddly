@@ -19,7 +19,7 @@ In large daily Drop cohorts, answer collisions on five questions naturally gener
 ## 2. F40 Bonus Rounds Specification
 
 ### 2.1 Trigger Criteria & Scope Boundaries
-- **Availability Window:** Opens at 07:05 IST morning recap and remains open for `bonus.window_hours` (default 24h).
+- **Availability Window:** Opens at 07:05 IST morning recap and closes at the end of that Drop's play window at 06:59:59 IST the next morning (effective window until the next Drop opens; `bonus.window_hours` [24h] is the cap). `bonus.close_and_compute` runs at 07:01 IST, safely ahead of the 07:05 final batch (pausable at degradation L2+). A second round, if still needed, opens at the next 07:05 recap.
 - **Eligibility:**
   - Lane Drop is finalised (recap locked).
   - Player's tie group has at least `bonus.min_tie_size` (default 2) members.
