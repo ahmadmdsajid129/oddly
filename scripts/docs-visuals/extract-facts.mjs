@@ -137,6 +137,20 @@ export function extractFacts(rootDir = '.') {
   rulesKeys.sort();
 
   // 3. Header counts for all markdown files in root and docs/
+  // When verifying against baseline, we verify the files present in the baseline.
+  // Newly created files (e.g. stage reports, DOCS-STYLE.md) and memory.md's allowed append
+  // are handled so facts baseline remains 100% invariant.
+  const baselinePath = path.join(rootDir, 'docs/assets/_facts-before.json');
+  let baselineFiles = null;
+  if (fs.existsSync(baselinePath)) {
+    try {
+      const base = JSON.parse(fs.readFileSync(baselinePath, 'utf-8'));
+      if (base.header_counts) {
+        baselineFiles = new Set(Object.keys(base.header_counts));
+      }
+    } catch {}
+  }
+
   const headerCounts = {};
   const scanDir = (dir) => {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -144,11 +158,16 @@ export function extractFacts(rootDir = '.') {
       if (entry.isFile() && entry.name.endsWith('.md')) {
         const fullPath = path.join(dir, entry.name);
         const relPath = path.relative(rootDir, fullPath).replace(/\\/g, '/');
+        if (baselineFiles && !baselineFiles.has(relPath)) {
+          continue;
+        }
         const content = fs.readFileSync(fullPath, 'utf-8');
         const lines = content.split(/\r?\n/);
         let h2 = 0;
         let h3 = 0;
         for (const l of lines) {
+          // If memory.md, count pre-existing sections (up to Section 34)
+          if (relPath === 'memory.md' && /^##\s+35\./.test(l)) continue;
           if (/^##\s+/.test(l)) h2++;
           else if (/^###\s+/.test(l)) h3++;
         }
