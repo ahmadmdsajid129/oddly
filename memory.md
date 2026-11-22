@@ -1376,11 +1376,12 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 15. **Super Twin Threshold:** Recommended default: **$\ge 2$ lanes with similarity $\ge 0.80$**.
 16. **Brain Lane:** Recommended default: **Keep documented only**.
 17. **New Rule Wording:** Recommended default: **Approved as written in `rules.md` Rules L1 to L11**.
+18. **Weight Cap in Everyday Lane:** Should `match.weight_cap` (3.5 bits) apply to the legacy Everyday lane as well (via `match.weight_cap_enabled`) or remain uncapped to preserve historic scoring? Recommended default: **default false for Everyday until Founder decides; default true for all new lanes**.
 
 ### 33.3 Unsoftened Risk Register
 | Risk | Likelihood | Impact | Mitigation Strategy | Owner |
 |---|---|---|---|---|
-| **Thin Lanes at Launch** | High | High | Launch Everyday + Memes only; enforce Gate L-A ($ge 3,000$ DAU); transparent "Closest so far" notice. | Founder + SRE |
+| **Thin Lanes at Launch** | High | High | Launch Everyday + Memes only; enforce Gate L-A ($\ge 3,000$ DAU); transparent "Closest so far" notice. | Founder + SRE |
 | **Tie-Size Collapse at Scale** | High | High | Richer formats expand outcome space from 1,024 to $>5,670$; BitMinHash history tie-break shrinks median tie to 2. | Matching Engineer |
 | **Free-Text Tone Mismatch** | High | Medium | Situations launches with cards first; text answers gated behind Gate G4; archetype centroid blending. | ML Engineer |
 | **Moderation Load from Free Text** | Medium | High | 80-char cap, regex screening, 3-strike 7-day text cooldown, audited Moderator queue in Phase 11 B6. | Trust & Safety |

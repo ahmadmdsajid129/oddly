@@ -845,7 +845,8 @@ To safely introduce lanes into a live database without downtime, schema evolutio
 | `match.neighbour_limit_k` | Integer | 32 | Maximum candidates evaluated per player for mutual pairing |
 | `match.history_window_days` | Integer | 28 | Rolling window for lane history BitMinHash evaluation |
 | `match.history_min_shared_days` | Integer | 5 | Minimum shared play dates required for history tie-break |
-| `match.weight_cap` | Float | 4.0 | Information content cap ($W_{max}$) preventing outlier hijack |
+| `match.weight_cap` | Float | 3.5 | Information content cap ($W_{max}$) preventing outlier hijack |
+| `match.weight_cap_enabled` | Boolean | true (new lanes) / false (Everyday) | Toggle for 3.5-bit information cap; false for Everyday pending Founder sign-off |
 | `match.min_questions_compared` | Integer | 3 | Minimum valid questions required to render a twin result |
 | `match.mutual_pairing_enabled` | Boolean | true | Master toggle for greedy mutual pairing algorithm |
 | `match.history_tiebreak_enabled` | Boolean | true | Master toggle for BitMinHash historical tie-break |
@@ -928,9 +929,32 @@ Where:
 ---
 
 **Information Weight Capping & Backward Compatibility Reconciliation:**  
-Section 9.2 defines pairwise question weight as the mean information of both players' answers: $I(a_u, a_v) = \frac{I(a_u) + I(a_v)}{2}$. To prevent ultra-rare answers from hijacking the total score, Stage L0 introduces an upper information cap $W_{\max} = 4.0$ bits (*config* `match.weight_cap`):
-$w_q = \min\left( \frac{I(a_u) + I(a_v)}{2}, W_{\max} \right)$
-*Parity with Legacy `pick1` Scoring:* For identical choices on single-choice questions ($a_u = a_v = a$), $I(a_u, a_v) = I(a) = \log_2(1 / p(a))$. For any standard option with observed probability $p(a) \ge 0.0625$ ($1/16$), $I(a) \le 4.0$ bits. In these cases, the cap is not reached, and $w_q$ is mathematically identical to pre-L0 scoring. Regression test suites in Stage L1/L2 explicitly verify that existing scores produce 100% identical values.
+Section 9.2 defines pairwise question weight as the mean information of both players' answers: `I(a_u, a_v) = (I(a_u) + I(a_v)) / 2`. To prevent ultra-rare answers from hijacking the total score, Stage L0 introduces an upper information cap `W_max = 3.5` bits (config `match.weight_cap`):
+`w_q = min((I(a_u) + I(a_v)) / 2, W_max)`
+
+*Parity with Legacy pick1 Scoring:*  
+The capped score is identical to the legacy score except where an answer has more than 3.5 bits of information (an answer rarer than approximately 8.8% of daily players); the cap then limits the weight of that one answer.
+
+*Worked Example with Real Numbers:*  
+Consider a 5-question Drop where player U and player V agree on questions 1, 2, 3, and 5, but disagree on question 4:
+- Question 1: `p = 0.50`, `I = 1.0` bit, `s_1 = 1.0`
+- Question 2: `p = 0.25`, `I = 2.0` bits, `s_2 = 1.0`
+- Question 3: `p = 0.20`, `I = 2.32` bits, `s_3 = 1.0`
+- Question 4: `p = 0.50`, `I = 1.0` bit, `s_4 = 0.0` (disagree)
+- Question 5: rare answer chosen by 2% of players (`p = 0.02`), `I = log2(1 / 0.02) = 5.64` bits, `s_5 = 1.0`
+
+1. **Legacy Uncapped Score:**
+   - Weights: `w_1 = 1.0`, `w_2 = 2.0`, `w_3 = 2.32`, `w_4 = 1.0`, `w_5 = 5.64`. Total weight = `11.96`.
+   - Weighted sum = `1.0(1) + 2.0(1) + 2.32(1) + 1.0(0) + 5.64(1) = 10.96`.
+   - Old `S(U, V) = 10.96 / 11.96 = 0.9164` (91.6%).
+
+2. **Capped Score (`W_max = 3.5` bits):**
+   - Weights: `w_1 = 1.0`, `w_2 = 2.0`, `w_3 = 2.32`, `w_4 = 1.0`, `w_5 = 3.5`. Total weight = `9.82`.
+   - Weighted sum = `1.0(1) + 2.0(1) + 2.32(1) + 1.0(0) + 3.5(1) = 8.82`.
+   - New `S(U, V) = 8.82 / 9.82 = 0.8982` (89.8%).
+
+*Everyday Lane Policy:*  
+The cap is controlled by flag `match.weight_cap_enabled`: default `true` for all new lanes, and default `false` for the legacy Everyday lane until the Founder confirms applying it to Everyday as a deliberate change to shipped matching.
 
 ### 18.5 Twin Depth: Bounded Tie-Groups & Mutual Pairing Algorithm
 

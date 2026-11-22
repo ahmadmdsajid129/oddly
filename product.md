@@ -894,7 +894,7 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
 - **Privacy Rules:** Formats generate categorical IDs or discrete integer indices (0-6). Zero personal data captured.
 - **Data Produced:** Stored polymorphically in `answers.answer_value` as JSON (`{"selected": [1, 4]}`, `{"ranking": [2, 0, 1]}`, `{"stop": 5}`).
 - **Degradation Behaviour:** If format assets fail to load, falls back to plain text list options.
-- **Feature Flags & Config:** `rich_formats_enabled` (bool), `format_information_cap` (default: 4.0 bits).
+- **Feature Flags & Config:** `rich_formats_enabled` (bool), `match.weight_cap` (default: 3.5 bits), `match.weight_cap_enabled` (bool).
 - **Success Metrics:** $\ge 90\%$ format completion rate without abandonment; format understanding error rate $< 1%$.
 - **Out of Scope:** Free-form text in v1 (reserved for F37 behind G4), multi-select of variable length, continuous non-discrete sliders.
 

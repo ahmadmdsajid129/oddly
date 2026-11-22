@@ -557,7 +557,7 @@ _Status: TODO | Target: Polymorphic validator, similarity metrics, interactive c
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
 | `[ ] P10M.01` | Implement polymorphic question validator and schemas for `pick2of6`, `rank3`, `slider7`, and `scene`       | Critical | TODO   | P10L.10        | Agent | —         | Strict JSONSchema / Zod payloads         |
 | `[ ] P10M.02` | Implement similarity scoring functions ($s_q$) for all richer formats with symmetry and boundedness proofs  | Critical | TODO   | P10M.01        | Agent | —         | Jaccard, Kendall tau, Manhattan dist     |
-| `[ ] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 4.0-bit cap     | High     | TODO   | P10M.02        | Agent | —         | Prevents single-answer match hijack      |
+| `[ ] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 3.5-bit cap     | High     | TODO   | P10M.02        | Agent | —         | Prevents single-answer match hijack      |
 | `[ ] P10M.04` | Build interactive frontend components for `pick2of6`, `rank3` (tap/drag), `slider7`, and `scene`        | High     | TODO   | P10M.01, P1.01 | Agent | —         | Physical tactile sticker styling         |
 | `[ ] P10M.05` | Implement accessibility keyboard controls, ARIA live tags, and reduced-motion fallbacks for all formats     | High     | TODO   | P10M.04        | Agent | —         | Tap-to-order default on mobile           |
 | `[ ] P10M.06` | Implement tie-risk and entropy estimator utility functions in `@oddly/shared`                              | Medium   | TODO   | P10M.02        | Agent | —         | Computes theoretical & effective entropy |
@@ -955,7 +955,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 - **Stage L2 Checklist (Phase 10M: Richer Answer Formats):**
   - [ ] Implement and test polymorphic schemas for `pick2of6`, `rank3`, `slider7`, and `scene`.
   - [ ] Verify mathematical properties of similarity functions: symmetry, boundedness $[0, 1]$, and identity.
-  - [ ] Verify information content weighting with smoothed set frequencies and 4.0-bit cap.
+  - [ ] Verify information content weighting with smoothed set frequencies and 3.5-bit cap.
   - [ ] Verify mobile tap-to-order and desktop drag-to-rank for `rank3`.
   - [ ] Verify accessibility keyboard navigation and ARIA tags across all new formats.
   - [ ] Verify play route bundle size remains strictly $\le 159.5$ KB gzipped.
