@@ -708,11 +708,11 @@ When `@media (prefers-reduced-motion: reduce)` is active:
 - **Haptics & Transitions:** 120ms ease-out press-flat transitions matching the core Drop interaction signature.
 
 ### 12D.3 Result Line & Alone State
-- **Presentation:** Rendered as an informational sticker banner within the post-bonus result view:
+- **Presentation:** The narrowed bonus outcome is completely additive, displayed as an extra line, "Closest in your group", directly beneath the unchanged locked twin on the recap view:
   - Narrowed match: `bonus.result.narrowed` ("Tie-break: {{k}} of 3 matched with {{m}} of the {{n}} who played.") in ink on mint fill (`bg-mint/20 border-[1.5px] border-ink`).
   - Single participant: `bonus.result.alone` ("Nobody else from your group played the tie-break. Your twin stays the same.") in ink on lavender fill (`bg-lavender`).
   - Expired session: `bonus.closed` ("This tie-break has ended.") in ink on cream fill.
-- **Honesty Guarantee:** Player counts reflect exact database participants (exact below 1,000 per Rule L4).
+- **Honesty Guarantee:** Player counts reflect exact database participants (exact below 1,000 per Rule L4). The original locked twin and mutual pairing are never rewritten.
 
 ### 12D.4 Badge Face Specification
 - **Sticker Aesthetic:** Procedural collectible sticker card:

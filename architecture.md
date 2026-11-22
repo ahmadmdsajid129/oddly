@@ -1197,7 +1197,7 @@ flowchart TD
   1. *Evergreen Pool Table:* Maintain `bonus_pool_questions` per lane with pre-vetted, high-entropy questions screened for Section 9.1 non-forbidden topics.
   2. *Deterministic Selection:* Sort candidates by entropy, filter out any question answered by any tie-group member in their 28-day history, and select questions seeded by `HMAC_SHA256(drop_id || tie_group_id || round_number)`.
   3. *Invariance:* Every member receives identical questions in identical order.
-- **Consequences:** Eliminates question bias and personalization; ensures mathematical determinism and offline reproducibility; requires admin curation of at least 40 approved evergreen questions per lane.
+- **Consequences:** Eliminates question bias and personalization; ensures mathematical determinism and offline reproducibility; requires admin curation of at least 40 approved evergreen questions per lane. Additive design preserves immutable locked twins in `twin_results` and guarantees mutual pairings, Keeps, Orbits, and share cards are never invalidated.
 
 #### ADR 052: Tamper-Evident Badge Evaluation, Storage, and Revocation Architecture
 - **Date:** 2026-11-22
@@ -1253,8 +1253,19 @@ CREATE TABLE IF NOT EXISTS bonus_answers (
   PRIMARY KEY (round_id, user_id, question_id, drop_date)
 ) PARTITION BY RANGE (drop_date);
 
--- Schema Evolution for twin_results
-ALTER TABLE twin_results ADD COLUMN IF NOT EXISTS bonus_round_count INT NOT NULL DEFAULT 0;
+-- 4. bonus_results — Additive Narrowed Outcome (Never rewrites twin_results)
+CREATE TABLE IF NOT EXISTS bonus_results (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  round_id TEXT NOT NULL REFERENCES bonus_rounds(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  closest_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  questions_matched INT NOT NULL DEFAULT 0, -- 0 to 3
+  participants INT NOT NULL DEFAULT 0,
+  is_mutual BOOLEAN NOT NULL DEFAULT false,
+  computed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(round_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_bonus_results_user ON bonus_results(user_id);
 
 ##### Relation to M6 creator badges
 Creator badges (M6) are earned by caption quality and have their own table (`badge_definitions`, `creator_badges`) and API route (`GET /v1/badges/mine` / `/v1/me/badges`); collector badges (L10) are earned by lane twins and live in `collector_badge_definitions` and `collector_badges` accessed via `GET /v1/me/collector-badges`. They share only the `/me/badges` UI page. They never share tables or a unified score.
@@ -1288,7 +1299,7 @@ CREATE INDEX IF NOT EXISTS idx_collector_badges_user ON collector_badges(user_id
 
 1. **Worker Jobs (`services/worker`):**
    - `bonus.open_rounds`: Scheduled at 07:05 IST post-recap. Identifies tie groups with $\ge 2$ members, queries `bonus_pool_questions` (min 40 questions), builds rounds seeded by HMAC-SHA256, and emits eligible player states.
-   - `bonus.close_and_rematch`: Scheduled 24 hours post-open. Collects participants from `bonus_answers`. If $\ge 2$ players answered, scores bonus similarity, combines with base score, re-runs greedy mutual rematching, and updates `twin_results` (`tie_break_reason = 'bonus'`). If 1 player, records alone state.
+   - `bonus.close_and_compute`: Scheduled at 07:01 IST. Collects participants from `bonus_answers`. If $\ge 2$ players answered, scores bonus similarity, runs greedy mutual pairing among participants only, and writes additive outcomes strictly to `bonus_results`. Never touches `twin_results` (locked twin and mutual status are immutable). If 1 player, records alone state.
    - `badges.evaluate`: Post-recap worker job. Evaluates active users against collector and super-twin conditions. Performs idempotent inserts into `collector_badges`.
 2. **Redis Key Architecture:**
    - `bonus:round:{roundId}:state` (Hash, TTL 36h): Cached round status, questions, and expiration timestamp.

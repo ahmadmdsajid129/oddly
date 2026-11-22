@@ -38,12 +38,12 @@ In large daily Drop cohorts, answer collisions on five questions naturally gener
 4. **Deterministic Seed:** Seeded by `HMAC_SHA256(drop_id || tie_group_id || round_number)`. Every player in the tie group receives the exact same questions in the exact same order (Rule L1 / Rule B1).
 
 ### 2.3 Asynchronous Play & Scoring Mechanics
-- **Optionality:** 100% voluntary. Non-participants remain in the group and retain their original twin.
-- **Rematch Protocol:**
-  - When the round window closes, the engine re-evaluates participants who answered.
-  - Combined similarity = Base Drop similarity + Bonus question similarity (using the standard information-weighted formula).
-  - Remaining ties cascade through 28-day history agreement -> different country -> cryptographic hash.
-  - Greedy mutual pairing re-runs exclusively among participating players.
+- **Optionality:** 100% voluntary. Non-participants remain in the group and retain their original locked twin.
+- **Additive Evaluation Protocol:**
+  - When the round window closes, the engine evaluates participants who answered.
+  - Bonus answers are scored using the information-weighted formula.
+  - Greedy mutual pairing runs among participants only, evaluating closest participant in the tie group.
+  - The outcome is written strictly to `bonus_results`. Non-participants' twins and participants' original locked twins in `twin_results` are never touched or modified.
 - **Alone State Honesty:** If only 1 player participates, their twin remains unchanged with honest copy: *"Nobody else from your group played the tie-break. Your twin stays the same."*
 
 ### 2.4 Exact Copy Keys (`app_content`)
@@ -119,6 +119,20 @@ CREATE TABLE IF NOT EXISTS bonus_answers (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (round_id, user_id, question_id, drop_date)
 ) PARTITION BY RANGE (drop_date);
+
+-- Bonus Results (Additive Outcome, Never Modifies twin_results)
+CREATE TABLE IF NOT EXISTS bonus_results (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  round_id TEXT NOT NULL REFERENCES bonus_rounds(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  closest_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  questions_matched INT NOT NULL DEFAULT 0, -- 0 to 3
+  participants INT NOT NULL DEFAULT 0,
+  is_mutual BOOLEAN NOT NULL DEFAULT false,
+  computed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(round_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_bonus_results_user ON bonus_results(user_id);
 
 -- Collector Badge Registry & Collector Badges
 CREATE TABLE IF NOT EXISTS collector_badge_definitions (

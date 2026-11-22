@@ -170,11 +170,10 @@ Under Rule L2 (Founder-approved, L0), every connection artifact—Twin Globe arc
 
 ---
 
-### Bonus-Narrowed Twin Interaction with Orbit and Globe (Stage L0-ADD)
+### Interaction of Connection Features with Bonus Rounds (Stage L0-FIX2)
 
-- **Operating Invariant:** Both F18 (Twin Globe) and F19 (Keep & Orbit) operate exclusively on the player's **final verified twin** stored in `twin_results`.
-- **Timing & Resolution:**
-  - Before recap or bonus resolution: Orbit requests and Globe arcs reflect the initial verified match.
-  - After bonus resolution: If a bonus round narrows the candidate tie group to a closer twin, `twin_results` is updated with `tie_break_reason = 'bonus'`.
-  - Orbit Interaction: If an Orbit request has not yet been accepted, or if an Orbit is established after the bonus round concludes, it links to this narrowed twin.
-  - Zero Rule Disruption: Bonus rounds do not alter Orbit limits (maximum 10 active Orbits), mutual opt-in requirements, Telepathy daily 1-question mechanics, or DPDP consent rules.
+- **Operating Invariant:** F18 (Twin Globe), F19 (Keep & Orbit), F20 (Telepathy), share cards, and F38 (Super Twin) operate strictly and exclusively on the **locked twin** recorded in `twin_results` at the 07:05 IST final batch.
+- **Additive Bonus Outcomes:** Bonus rounds are completely additive and write solely to `bonus_results`. They never rewrite `twin_results`. Consequently:
+  - Orbit requests and established Orbits link only to the locked twin; sending a Keep or Orbit to a "closest in your group" participant is not supported in v1 (Founder question Q8b).
+  - Globe arcs, Telepathy pairs, and share cards remain anchored to the locked twin and are completely unaffected by bonus results.
+  - Zero Rule Disruption: Mutual pairing between original locked twins is never broken by asynchronous bonus participation.

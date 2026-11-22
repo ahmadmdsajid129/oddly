@@ -1206,12 +1206,15 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
   - Pool: A separate evergreen pool per lane, admin-managed, adhering to the same editorial and forbidden-topic rules as Drops (Rules L6, L7), entropy-checked, and never reused for the same tie group.
   - Selection: The engine sorts the pool by predicted split power (highest entropy first), excludes any questions that any member of the tie group answered in their 28-day history, and deterministically selects questions using `HMAC_SHA256(drop_id || tie_group_id || round_number)` as seed.
   - Invariant: Everyone in the tie group receives the exact same questions in the exact same order. Zero personalisation (Rule L1 spirit, Rule B1).
-- **How It Plays (Asynchronous, Optional, No Pressure):**
-  - The round opens at recap and remains open for `bonus.window_hours` (default 24h). A second round, if still needed, opens at the next finalisation. Nobody needs to be online simultaneously.
+- **How It Plays (Asynchronous, Optional, Additive, No Pressure):**
+  - The round opens at recap (07:05 IST) and remains open for `bonus.window_hours` (default 24h). A second round, if still needed, opens at the next finalisation. Nobody needs to be online simultaneously.
   - Playing is 100% optional. Non-players stay in the tie group but are not compared in the bonus round.
-  - When the round closes, the twin is re-chosen among participating players using combined score: original Drop similarity first (tie group unchanged), then bonus similarity with the information-weighted formula, then deterministic tie-breaks (history, country, hash).
+  - When the round closes, the engine computes outcomes among participating players only using the information-weighted bonus formula, and writes the narrowed result strictly to `bonus_results`.
+  - The original twin in `twin_results` is immutable and never rewritten. Mutual pairing of the original Drop is never broken.
   - Single-participant honesty: If only one member plays, they keep their original twin and the app displays: *"Nobody else from your group played the tie-break. Your twin stays the same."*
-  - Mutual pairing is re-run for participants only, applying greedy mutual pairing.
+  - UI Presentation: The narrowed result is displayed as an extra line, "Closest in your group", under the unchanged twin on the recap screen.
+  - Keeps, Orbits, Telepathy, share cards, and the Globe remain strictly anchored to the locked twin; sending a Keep to the "closest in your group" participant is out of scope in v1 (Founder question Q8b).
+  - Mutual pairing for bonus results is run among participants only and recorded in `bonus_results`. Non-participants are never affected.
 - **Exact Copy Keys (`app_content`):**
   - `bonus.offer.title`: "Break the tie?"
   - `bonus.offer.body`: "{{count}} people matched you. 3 quick extra questions can find the closest one. Totally optional."
