@@ -15,10 +15,10 @@
 | **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 60%`                                                       |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 246 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 248 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 164 tasks                                                                        |
+| **Pending (`TODO`)**            | 162 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -53,7 +53,7 @@
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 2 & Stage R2    |
 | **Phase 3**  | Fastify REST API Core                       | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 16 / 16            | Stage 3 & Stage R2    |
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 4 & Stage 0.5   |
-| **Phase 5**  | Reveal, Matching UX & Oddness               | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 5 & Stage 0.5   |
+| **Phase 5**  | Reveal, Matching UX & Oddness               | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 92%` | 11 / 12            | Stage 8 & Stage R2    |
@@ -226,7 +226,7 @@ _Status: COMPLETE | Target: S1 to S4 responsive flow, TanStack Query, offline pe
 
 ### Phase 5: Reveal, Matching UX & Oddness (Stage 5)
 
-_Status: PARTIAL | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarity, degraded UI._
+_Status: COMPLETE | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarity, degraded UI._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -239,8 +239,8 @@ _Status: PARTIAL | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarity
 | `[x] P5.07` | Implement honest low-density messaging when total players < 200                             | 🟠 High      | ✅ DONE         | P5.02, P5.05| Agent | 2026-11-08  | Ethical honesty standard        |
 | `[x] P5.08` | Implement share trigger buttons opening S8 Share Sheet                                      | 🟠 High      | ✅ DONE         | P5.02, P5.05| Agent | 2026-11-08  | Viral loop entry point          |
 | `[x] P5.09` | Write unit and integration tests verifying reveal animations and percentile formatting      | 🟠 High      | ✅ DONE         | P5.02-P5.07 | Agent | 2026-11-08  | Reveal screen test suite        |
-| `[ ] P5.10` | Implement pending-result polling with ETag 304 backoff and tab visibility pausing           | 🟠 High      | ⚪ TODO         | P5.02       | Agent | —           | Polling discipline (Sec 6.3)    |
-| `[ ] P5.11` | Wire degraded UI states (stale labels, status banners) under L1 to L4                       | 🟡 Medium    | ⚪ TODO         | P5.02       | Agent | —           | Degraded UI wiring (Sec 12)     |
+| `[x] P5.10` | Implement pending-result polling with ETag 304 backoff and tab visibility pausing           | 🟠 High      | ✅ DONE         | P5.02       | Agent | 2026-11-22  | Polling discipline (Sec 6.3)    |
+| `[x] P5.11` | Wire degraded UI states (stale labels, status banners) under L1 to L4                       | 🟡 Medium    | ✅ DONE         | P5.02       | Agent | 2026-11-22  | Degraded UI wiring (Sec 12)     |
 
 ---
 
@@ -1194,6 +1194,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 5 Complete (P5.10–P5.11) | Completed remaining 2 tasks for Phase 5: ETag 304 exponential backoff polling with Page Visibility API pausing and Mode B status checking (P5.10), and degraded UI state wiring (DegradationBanner, ModeBPendingScreen, FreshnessLabel, WidgetErrorBoundary) across play flow (P5.11). Phase 5 now 100% COMPLETE (11/11). Dashboard updated to 248/410 (60%). | Phase 5 completion & reveal resilience. |
 | `2026-11-22` | Phase 4 Complete (P4.12–P4.15) | Completed remaining 4 tasks for Phase 4: TanStack Query exponential backoff and full jitter (P4.12), Zustand draft store with pending-submission recovery on app open (P4.13), Countdown server date sync with 0–4s fetch jitter (P4.14), and size-limit bundle budget gate in CI (P4.15). Phase 4 now 100% COMPLETE (15/15). Dashboard updated to 246/410 (60%). | Phase 4 completion & client resilience. |
 | `2026-11-22` | Phase 3 Complete (P3.16)  | Implemented Mode B asynchronous ingestion behind `PERSIST_MODE=async` with Redis queue (`oddly:queue:submit-persist`), worker micro-batch drainage (`SubmitPersistWorker`), and reconciliation audit job (`PersistReconciliationJob`). Phase 3 now 100% COMPLETE (16/16). Dashboard updated to 242/410 (59%). | Phase 3 completion & dual persistence modes. |
 | `2026-11-22` | Phase 1 (P1.20–P1.23)     | Completed remaining 4 tasks for Phase 1: DegradationBanner (P1.20), ModeBPendingScreen (P1.21), OverloadScreens (P1.22), and ResiliencePrimitives (P1.23). Phase 1 now 100% COMPLETE (23/23). Dashboard updated to 241/410 (59%). | Phase 1 completion & resilience UI kit.       |

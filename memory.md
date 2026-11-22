@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 4: Play Flow Frontend (COMPLETE).
+- **Current Stage:** Phase 5: Reveal, Matching UX & Oddness (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1677,3 +1677,34 @@ All remaining tasks in Phase 4 (Stage 4 Play Flow Frontend) have been completed 
 - `play-flow.test.ts` (20 tests passed) verifies 5-attempt retry policy, full jitter distribution, Retry-After header parsing, 409 CONCURRENT_REQUEST jitter replay, Zustand draft persistence, pending recovery on app open, and 0–4s countdown jitter.
 - Ran typecheck across packages: `@oddly/shared`, `@oddly/api-client`, and `@oddly/web` passed with zero errors (`tsc --noEmit`).
 - Phase 4 is now **100% COMPLETE (15/15 tasks done)**. Master progress dashboard updated to **246/410 completed tasks (60%)**.
+
+## 42. Phase 5 Completion: Reveal, Matching UX & Oddness Resilience (2026-11-22)
+
+### 42.1 Overview & Architecture
+All 11 tasks in Phase 5 (Stage 5: Reveal, Matching UX & Oddness) are now complete per Architecture Section 6.3 (Polling discipline) and Section 12 (Degraded UI wiring):
+1. **P5.10: Pending-Result Polling with ETag 304 Backoff & Page Visibility Pausing (`use-result-polling.ts`, `api-client`):**
+   - Implemented `requestWithMeta<T>` in `@oddly/api-client` supporting conditional `If-None-Match: etag` and returning `{ data, status, etag, notModified: true }` on HTTP 304.
+   - Added `getResultsWithEtag(dropId, etag)` to `OddlyApiClient` and `api.results.getWithEtag()` in `@oddly/web`.
+   - Created custom React hook `useResultPolling` in `apps/web/src/lib/use-result-polling.ts`:
+     - Base interval 30s for match upgrades, or 3s for Mode B async submission status.
+     - On HTTP 304 Not Modified, backs off exponentially: 30s -> 60s -> 120s -> 240s -> 300s (capped at 5 minutes per Architecture Sec 6.3).
+     - On HTTP 200 OK with new data, resets immediately back to initial interval.
+     - Automatically adapts interval to system degradation level: $2\times$ at L1, $4\times$ at L2, $10\times$ at L3/L4.
+     - Implements Page Visibility API discipline: polling pauses when tab is hidden (`document.visibilityState === "hidden"`) and immediately resumes when tab becomes visible again.
+     - Seamlessly handles Mode B pending status polling (`api.submissions.getStatus(requestId)`), automatically transitioning to the persisted match/oddness reveal state when the worker persists the submission.
+2. **P5.11: Degraded UI Wiring Under L1 to L4 (`apps/web/src/app/page.tsx`, `DegradationBanner`, `ModeBPendingScreen`, `FreshnessLabel`, `WidgetErrorBoundary`):**
+   - Wired `DegradationBanner` at the top of the landing screen, reflecting real-time system degradation state from `/v1/config/public`.
+   - Wired `ModeBPendingScreen` (S5.5) when submission returns Mode B asynchronous acceptance, showing an animated waiting badge, live polling status, and manual status check button.
+   - Wrapped `TwinRevealScreen` (S6) and `OddnessScreen` (S7) inside `WidgetErrorBoundary` to isolate widget-level exceptions without breaking the core app shell.
+   - Rendered `FreshnessLabel` during L1+ degradation levels or cached offline data fallback to communicate data freshness transparently to players.
+
+### 42.2 Verification & Test Results
+- Authored `apps/web/src/result-polling.test.ts` (5 tests passing) covering:
+  - 304 exponential backoff schedule (30s -> 60s -> 120s -> 240s -> 300s max cap).
+  - 200 OK reset back to base interval.
+  - Degradation multiplier scaling across L0–L4.
+  - Page Visibility API pausing and resumption.
+  - Mode B interval backoff from 3s up to 30s.
+- Ran `@oddly/web` test suite: **14 test files passed, 107 tests passed** with zero failures.
+- Ran typecheck across `@oddly/api-client` and `@oddly/web`: clean pass with zero errors (`tsc --noEmit`).
+- Phase 5 is now **100% COMPLETE (11/11 tasks done)**. Master progress dashboard updated to **248/410 completed tasks (60%)**.

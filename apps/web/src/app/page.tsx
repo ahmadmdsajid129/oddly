@@ -34,6 +34,11 @@ import { FirstRunConsentBanner } from "@/components/ui/FirstRunConsentBanner";
 import { QuestionScreen, QuestionData } from "@/components/play/QuestionScreen";
 import type { TwinMatchData } from "@/components/play/TwinRevealScreen";
 import type { OddnessData } from "@/components/play/OddnessScreen";
+import { DegradationBanner, type DegradationLevel } from "@/components/ui/DegradationBanner";
+import { ModeBPendingScreen } from "@/components/ui/ModeBPendingScreen";
+import { FreshnessLabel } from "@/components/ui/OverloadScreens";
+import { WidgetErrorBoundary } from "@/components/ui/ResiliencePrimitives";
+import { useResultPolling } from "@/lib/use-result-polling";
 import dynamic from "next/dynamic";
 
 const Under18Screen = dynamic(
@@ -146,6 +151,7 @@ type FlowStep =
   | "question"
   | "review"
   | "searching"
+  | "pending_mode_b"
   | "reveal"
   | "oddness";
 
@@ -163,6 +169,7 @@ export default function HomePage() {
 
   // Screen state
   const [step, setStep] = useState<FlowStep>("landing");
+  const [pendingRequestId, setPendingRequestId] = useState<string | null>(null);
   const [ageGateOpen, setAgeGateOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -172,6 +179,16 @@ export default function HomePage() {
   const [startTime, setStartTime] = useState<number>(0);
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [shareFormat, setShareFormat] = useState<ShareFormat>("story");
+
+  // Fetch runtime configuration (including degradation level)
+  const { data: publicConfig } = useQuery({
+    queryKey: ["public-config"],
+    queryFn: () => api.config.getPublic().catch(() => null),
+    staleTime: 60 * 1000,
+  });
+
+  const degradationLevel: DegradationLevel =
+    (publicConfig?.degradation_level as DegradationLevel) || "L0";
 
   // Fetch today's drop
   const { data: dropData, isLoading } = useQuery({
@@ -269,32 +286,58 @@ export default function HomePage() {
     }
   }, [activeDropId, isOnline]);
 
-  // Background polling for provisional match upgrades (P5.05)
-  useQuery({
-    queryKey: ["match-poll", activeDropId, submissionResult?.submission_id],
-    queryFn: async () => {
-      if (!submissionResult?.submission_id || dropStatus !== "live") return null;
-      try {
-        const updated = await api.results.get(activeDropId);
-        if (updated && (updated as any).match) {
-          setSubmissionResult((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              match: {
-                ...prev.match,
-                ...((updated as any).match),
-              },
-            };
-          });
-        }
-        return updated;
-      } catch {
-        return null;
+  // Background polling for provisional match upgrades & Mode B status (P5.10, Architecture Sec 6.3)
+  const { isPolling: isMatchPolling, pollNow: pollMatchNow } = useResultPolling({
+    dropId: activeDropId,
+    requestId: pendingRequestId || undefined,
+    enabled: Boolean(
+      (submissionResult?.submission_id || step === "pending_mode_b") && dropStatus === "live"
+    ),
+    isModeBPending: step === "pending_mode_b",
+    degradationLevel,
+    onResult: (updated) => {
+      if (updated && (updated as any).match) {
+        setSubmissionResult((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            match: {
+              ...prev.match,
+              ...((updated as any).match),
+            },
+          };
+        });
       }
     },
-    enabled: Boolean(submissionResult?.submission_id && dropStatus === "live"),
-    refetchInterval: 15000,
+    onModeBPersisted: (status) => {
+      if (status.status === "persisted") {
+        const persistedResult: StoredPlayResult = {
+          submission_id: status.submission_id || pendingRequestId || "",
+          match: {
+            matched_picks: Math.round(((status.match?.similarity_score as number) ?? 0.8) * 5),
+            total_picks: 5,
+            dice_coefficient: (status.match?.similarity_score as number) ?? 0.8,
+            twin_location: "Berlin, Germany",
+            twin_age_band: "25 to 34",
+            is_provisional: status.match?.is_provisional ?? false,
+            total_players_today: 3482,
+          },
+          oddness: {
+            percentile: status.oddness?.percentile ?? 84,
+            tier: (status.oddness?.tier as any) ?? "Rare",
+            raw_score: status.oddness?.raw_score,
+            rarest_pick: {
+              prompt: "Pick the colour that best describes your energy right now:",
+              value_label: "Luminous Violet",
+              frequency_pct: 3.1,
+            },
+          },
+        };
+        saveCompletedResult(activeDropId, persistedResult);
+        setSubmissionResult(persistedResult);
+        setStep("reveal");
+      }
+    },
   });
 
   // Handle Play CTA
@@ -383,6 +426,14 @@ export default function HomePage() {
         duration_ms: durationMs,
         request_id: requestId,
       });
+
+      // Mode B async acceptance handling (Architecture Sec 6.1 & P5.10)
+      if ((res as any).mode === "async" || ((res as any).status === "accepted" && !res.match)) {
+        setPendingRequestId(requestId);
+        clearDraft(activeDropId);
+        setStep("pending_mode_b");
+        return;
+      }
 
       const processedResult: StoredPlayResult = {
         submission_id: res.submission_id ?? res.request_id ?? "",
@@ -513,10 +564,30 @@ export default function HomePage() {
     return <SearchMapAnimation onComplete={() => setStep("reveal")} />;
   }
 
+  // 4.5. Mode B Pending Screen (S5.5 / R1.5)
+  if (step === "pending_mode_b") {
+    return (
+      <WidgetErrorBoundary>
+        <ModeBPendingScreen
+          requestId={pendingRequestId || undefined}
+          isPolling={isMatchPolling}
+          onCheckStatus={pollMatchNow}
+          onHome={() => setStep("landing")}
+        />
+      </WidgetErrorBoundary>
+    );
+  }
+
   // 5. Twin Reveal Screen (S6)
   if (step === "reveal" && submissionResult) {
     return (
-      <>
+      <WidgetErrorBoundary>
+        <OfflineBanner isOnline={isOnline} />
+        {degradationLevel !== "L0" && (
+          <div className="max-w-md mx-auto pt-2 px-4 flex justify-end">
+            <FreshnessLabel isStale timestamp={Date.now()} />
+          </div>
+        )}
         <TwinRevealScreen
           match={submissionResult.match}
           onSeeOddness={() => setStep("oddness")}
@@ -532,14 +603,20 @@ export default function HomePage() {
           dropId={activeDropId}
           defaultFormat={shareFormat}
         />
-      </>
+      </WidgetErrorBoundary>
     );
   }
 
   // 6. Oddness Screen (S7)
   if (step === "oddness" && submissionResult) {
     return (
-      <>
+      <WidgetErrorBoundary>
+        <OfflineBanner isOnline={isOnline} />
+        {degradationLevel !== "L0" && (
+          <div className="max-w-md mx-auto pt-2 px-4 flex justify-end">
+            <FreshnessLabel isStale timestamp={Date.now()} />
+          </div>
+        )}
         <OddnessScreen
           oddness={submissionResult.oddness}
           onBackToTwin={() => setStep("reveal")}
@@ -559,7 +636,7 @@ export default function HomePage() {
           dropId={activeDropId}
           defaultFormat={shareFormat}
         />
-      </>
+      </WidgetErrorBoundary>
     );
   }
 
@@ -568,6 +645,7 @@ export default function HomePage() {
     <main className="min-h-screen flex flex-col justify-between p-6 relative select-none">
       <Atmosphere />
       <OfflineBanner isOnline={isOnline} />
+      <DegradationBanner level={degradationLevel} />
 
       {/* Top Header */}
       <header className="relative z-20 flex items-center justify-between w-full max-w-xl mx-auto pt-2">

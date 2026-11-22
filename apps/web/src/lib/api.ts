@@ -18,6 +18,9 @@ export const api = {
   time: {
     get: () => rawClient.getServerTime(),
   },
+  config: {
+    getPublic: () => rawClient.getPublicConfig(),
+  },
   drops: {
     getToday: () => rawClient.getTodayDrop(),
     getByDate: (date: string) => rawClient.getDropByDate(date),
@@ -75,9 +78,11 @@ export const api = {
         }
       }
     },
+    getStatus: (requestId: string) => rawClient.getSubmissionStatus(requestId),
   },
   results: {
     get: (dropId: string) => rawClient.getResults(dropId),
+    getWithEtag: (dropId: string, etag?: string) => rawClient.getResultsWithEtag(dropId, etag),
   },
   content: {
     get: (locale = "en") => rawClient.getContent(locale),

@@ -13,6 +13,8 @@ import type {
   ResultResponse,
 } from "@oddly/shared";
 
+export type { ResultResponse };
+
 export interface OddlyClientConfig {
   baseUrl: string;
   fetchFn?: typeof fetch;
@@ -44,6 +46,7 @@ export interface PublicConfigResponse {
     description: string;
     badge_color: string;
   }>;
+  degradation_level?: "L0" | "L1" | "L2" | "L3" | "L4";
 }
 
 export interface PageResponse {
@@ -502,6 +505,46 @@ export class OddlyApiClient {
     return res.json();
   }
 
+  async requestWithMeta<T>(
+    path: string,
+    options: RequestInit & { etag?: string } = {}
+  ): Promise<{ data: T | null; status: number; etag: string | null; notModified: boolean }> {
+    const url = `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = {
+      ...this.defaultHeaders,
+      ...((options.headers as Record<string, string>) || {}),
+    };
+    if (options.etag) {
+      headers["If-None-Match"] = options.etag;
+    }
+
+    const res = await this.fetchFn(url, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
+
+    const responseEtag = res.headers.get("etag") || res.headers.get("ETag");
+
+    if (res.status === 304) {
+      return { data: null, status: 304, etag: responseEtag, notModified: true };
+    }
+
+    if (!res.ok) {
+      let errorMessage = res.statusText;
+      try {
+        const errorBody = (await res.json()) as { message?: string };
+        if (errorBody?.message) {
+          errorMessage = errorBody.message;
+        }
+      } catch {}
+      throw new Error(errorMessage || `Request to ${path} failed with HTTP ${res.status}`);
+    }
+
+    const data = (await res.json()) as T;
+    return { data, status: res.status, etag: responseEtag, notModified: false };
+  }
+
   /** System health check */
   async getHealth(): Promise<HealthCheckResult> {
     return this.request<HealthCheckResult>("/health");
@@ -577,6 +620,17 @@ export class OddlyApiClient {
   async getResults(dropId: string, playerId?: string): Promise<ResultResponse> {
     const query = playerId ? `?player_id=${encodeURIComponent(playerId)}` : "";
     return this.request<ResultResponse>(`/v1/results/${dropId}${query}`);
+  }
+
+  /** View personal drop results with ETag 304 conditional polling (Task P5.10) */
+  async getResultsWithEtag(
+    dropId: string,
+    etag?: string,
+    playerId?: string
+  ): Promise<{ data: ResultResponse | null; notModified: boolean; etag: string | null }> {
+    const query = playerId ? `?player_id=${encodeURIComponent(playerId)}` : "";
+    const res = await this.requestWithMeta<ResultResponse>(`/v1/results/${dropId}${query}`, { etag });
+    return { data: res.data, notModified: res.notModified, etag: res.etag };
   }
 
   /** Global community statistics for a drop */
