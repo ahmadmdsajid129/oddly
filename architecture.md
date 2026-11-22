@@ -860,7 +860,7 @@ To safely introduce lanes into a live database without downtime, schema evolutio
 | `text.rejection_limit_per_day` | Integer | 3 | Moderation rejections before triggering 7-day cooldown |
 | `text.disable_days` | Integer | 7 | Duration of text answer cooldown on repeated rejections |
 | `text.archetype_weight_a` | Float | 0.5 | Blending factor between archetype centroid and cosine similarity |
-| `text.min_confidence` | Float | 0.60 | Minimum classifier confidence to assign an archetype tag |
+| `text.min_confidence` | Float | 0.7 | Minimum classifier confidence to assign an archetype tag |
 
 #### 18.2.5 Storage Growth Estimates Across Tiers
 | Metric | 10k DAU (1 lane / 2 lanes) | 100k DAU (1 lane / 2 lanes) | 10 Lakh DAU (1 lane / 2 lanes) |
@@ -1039,16 +1039,6 @@ flowchart TD
 ---
 
 ### 18.10 Architecture Decision Records (ADRs)
-#### ADR 050: Vector Index Architecture for Free-Text Answers (pgvector HNSW vs In-Memory Matcher Index)
-- **Date:** 2026-11-21
-- **Context:** Free-text semantic matching requires nearest-neighbour search over 384-dimensional dense vectors. We must evaluate whether to use the managed PostgreSQL `pgvector` extension or maintain an in-memory HNSW index inside the BullMQ matching worker.
-- **Decision:** Adopt a **Hybrid Worker-Indexed Architecture**:
-  1. *Provisional Matching (Hot Path):* Maintain an in-memory HNSW graph in the matcher worker process (via `hnswlib-node` or in-process cosine scan). For cohorts under 10,000 daily lane players, brute-force matrix dot product requires $< 15$ ms CPU time.
-  2. *Persistence & Recovery:* Vectors are persisted in PostgreSQL in table `answer_text` as raw byte arrays (`BYTEA`). If `pgvector` is enabled on the managed cloud instance, an HNSW index (`vector_cosine_ops`) provides instant recovery after worker restarts.
-  3. *Zero Cloud Dependency:* All inference and indexing remain 100% self-hosted on containerized CPUs.
-- **Consequences:** Eliminates external vector database SaaS costs ($0 cloud egress); guarantees deterministic sub-second matching; satisfies DPDP Act 2023 data sovereignty requirements; requires ~118 MB RAM per worker process.
-
-
 #### ADR 045: Lane-Isolated Matching & Relational Data Model
 - **Date:** 2026-11-21
 - **Context:** Collisions on five simple questions demand subject segregation so players find authentic peers.
@@ -1058,14 +1048,14 @@ flowchart TD
 #### ADR 046: Richer Answer Formats & Entropy-Aware Information Weighting
 - **Date:** 2026-11-21
 - **Context:** Multiple-choice collisions can be further mitigated by richer question interactions without adding high typing friction.
-- **Decision:** Introduce `pick2of6` (Jaccard), `rank3` (Kendall Tau), and `slider7` (Linear Distance) alongside `pick1`. Cap information weights at $w_{max} = 3.5$.
+- **Decision:** Introduce `pick2of6` (Jaccard), `rank3` (Kendall Tau), and `slider7` (Linear Distance) alongside `pick1`. Cap information weights at `w_max = 3.5`.
 - **Consequence:** Substantially expands the combinatorial state space (from 1,024 to >5,670 states), reducing median tie sizes by an estimated ~94% under synthetic Zipf popularity skew, while keeping play time under 30 seconds.
 
 #### ADR 047: Bounded Tie-Group Evaluation, Mutual Pairing & 32-Byte History Signature
 - **Date:** 2026-11-21
 - **Context:** When hundreds of players tie on identical scores, picking a random twin feels arbitrary and asymmetric.
-- **Decision:** Maintain top $K=32$ candidate list per player. Break ties using 28-day lane history agreement evaluated via a 32-byte BitMinHash signature. Execute greedy mutual pairing so that matched twins are bidirectional. Display honest group counts ("4 of 5 with 312 people").
-- **Consequence:** Eliminates asymmetric twin confusion, rewards daily loyalty with deeper historical matching, and bounds worst-case compute to $O(N \cdot K \log K)$.
+- **Decision:** Maintain top `K=32` candidate list per player. Break ties using 28-day lane history agreement evaluated via a 32-byte BitMinHash signature. Execute greedy mutual pairing so that matched twins are bidirectional. Display honest group counts ("4 of 5 with 312 people").
+- **Consequence:** Eliminates asymmetric twin confusion, rewards daily loyalty with deeper historical matching, and bounds worst-case compute to `O(N * K * log(K))`.
 
 #### ADR 048: Self-Hosted Multilingual CPU ONNX Embedding & Archetype Tagger for "Say It"
 - **Date:** 2026-11-21
@@ -1078,3 +1068,12 @@ flowchart TD
 - **Context:** User-authored text poses severe long-term privacy and regulatory liabilities if retained indefinitely.
 - **Decision:** Implement multi-tiered retention: raw user text is hard-deleted from `answer_text` after 7 days; derived embeddings and archetypes are purged after 28 days (history window); complete cryptographic erasure occurs upon account deletion.
 - **Consequence:** Strict data minimisation under DPDP Act Section 12 while maintaining sufficient historical matching depth.
+
+#### ADR 050: Vector Index Architecture for Free-Text Answers (pgvector HNSW vs In-Memory Matcher Index)
+- **Date:** 2026-11-21
+- **Context:** Free-text semantic matching requires nearest-neighbour search over 384-dimensional dense vectors. We must evaluate whether to use the managed PostgreSQL `pgvector` extension or maintain an in-memory HNSW index inside the BullMQ matching worker.
+- **Decision:** Adopt a **Hybrid Worker-Indexed Architecture**:
+  1. *Provisional Matching (Hot Path):* Maintain an in-memory HNSW graph in the matcher worker process (via `hnswlib-node` or in-process cosine scan). For cohorts under 10,000 daily lane players, brute-force matrix dot product requires less than 15 ms CPU time.
+  2. *Persistence & Recovery:* Vectors are persisted in PostgreSQL in table `answer_text` as raw byte arrays (`BYTEA`). If `pgvector` is enabled on the managed cloud instance, an HNSW index (`vector_cosine_ops`) provides instant recovery after worker restarts.
+  3. *Zero Cloud Dependency:* All inference and indexing remain 100% self-hosted on containerized CPUs.
+- **Consequences:** Eliminates external vector database SaaS costs ($0 cloud egress); guarantees deterministic sub-second matching; satisfies DPDP Act 2023 data sovereignty requirements; requires ~118 MB RAM per worker process.

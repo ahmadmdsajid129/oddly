@@ -144,16 +144,16 @@ All API responses on failure must return a uniform JSON error payload:
 
 ---
 
-## 6. Constraints and Guardrails
+## 6A. Constraints and Guardrails
 
-### 6.1 Technical & Operational Constraints
+### 6A.1 Technical & Operational Constraints
 
 - **Runtime:** Node.js 20 LTS.
 - **Client Bundle Budget:** Initial JavaScript bundle for the `/play` flow must remain $\le 150 \text{ KB}$ gzipped.
 - **First Contentful Paint (FCP):** $\le 1.8 \text{ s}$ on a simulated 4G connection and mid-range mobile CPU.
 - **Infrastructure Budget:** Lean architecture designed to run on free/inexpensive tiers (Cloudflare Pages/Workers, Fly.io / Render, Supabase / Neon, Upstash Redis). Total monthly operating cost kept below ₹2,500 (~$30) at inception.
 
-### 6.2 Legal & Privacy Guardrails
+### 6A.2 Legal & Privacy Guardrails
 
 - In full compliance with India's **DPDP Act 2023**:
   - Explicit adult confirmation (18+) required before storing answer telemetry.
@@ -249,7 +249,7 @@ All meme questions (`render_variant = "meme"`) must adhere to strict editorial s
 ### 9.4 Architectural Reminders (Founder-approved, L0)
 
 1. **Rule 9 Reminder (Failure Modes for Embedding Model & Vector Index):** Introducing a self-hosted ONNX embedding model (for Stage L6 `say_it`) and vector search index introduces worker CPU and memory failure modes. These must be fully analyzed in `docs/say-it-text-answers.md` and failure modes documented before code is authored.
-2. **Rule 11 Reminder (New Dynamic `app_config` Keys):** All operational thresholds for lanes and twin depth reside in `app_config`: `lane.closest_so_far_below` (200), `lane.early_below` (500), `lane.min_approved_drops_to_open` (8), `lane.missing_drop_alert_hours` (24), `lane.max_legacy_formats_in_everyday` (2), `lane.min_high_entropy_questions` (3), `lane.expected_players_threshold_for_entropy_rule` (5000), `match.tie_epsilon` (0.01), `match.neighbour_limit_k` (32), `match.history_window_days` (28), `match.history_min_shared_days` (5), `match.weight_cap` (3.5), `match.min_questions_compared` (3), `match.mutual_pairing_enabled` (true), `match.history_tiebreak_enabled` (true), `match.group_size_display_cap` (1000), `super.min_lanes` (2), `super.min_similarity` (0.8), `text.max_chars` (80), `text.max_questions_per_drop` (2), `text.raw_retention_days` (7), `text.history_retention_days` (28), `text.rejection_limit_per_day` (3), `text.disable_days` (7), `text.archetype_weight_a` (0.5), `text.min_confidence` (0.7).
+2. **Rule 11 Reminder (New Dynamic `app_config` Keys):** All operational thresholds for lanes and twin depth reside in `app_config`: `lane.closest_so_far_below` (200), `lane.early_below` (500), `lane.min_approved_drops_to_open` (8), `lane.missing_drop_alert_hours` (24), `lane.max_legacy_formats_in_everyday` (2), `lane.min_high_entropy_questions` (3), `lane.expected_players_threshold_for_entropy_rule` (5000), `match.tie_epsilon` (0.01), `match.neighbour_limit_k` (32), `match.history_window_days` (28), `match.history_min_shared_days` (5), `match.weight_cap` (3.5), `match.weight_cap_enabled` (true for new lanes, false for Everyday until the Founder decides), `match.min_questions_compared` (3), `match.mutual_pairing_enabled` (true), `match.history_tiebreak_enabled` (true), `match.group_size_display_cap` (1000), `super.min_lanes` (2), `super.min_similarity` (0.8), `text.max_chars` (80), `text.max_questions_per_drop` (1), `text.raw_retention_days` (7), `text.history_retention_days` (28), `text.rejection_limit_per_day` (3), `text.disable_days` (7), `text.archetype_weight_a` (0.5), `text.min_confidence` (0.7).
 
 ---
 
