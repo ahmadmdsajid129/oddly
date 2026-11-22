@@ -33,9 +33,14 @@ In large daily Drop cohorts, answer collisions on five questions naturally gener
 
 ### 2.2 Evergreen Pool & Deterministic Selection
 1. **Evergreen Pool:** Per-lane catalog of approved, high-entropy questions managed via admin (P11.47), strictly screened against Section 9.1 forbidden topics.
-2. **Entropy Sorting:** Questions are prioritized by predicted split power (highest Shannon entropy $H(Q)$ first).
-3. **History Exclusion:** Excludes any question answered by any tie-group member in their 28-day history.
-4. **Deterministic Seed:** Seeded by `HMAC_SHA256(drop_id || tie_group_id || round_number)`. Every player in the tie group receives the exact same questions in the exact same order (Rule L1 / Rule B1).
+2. **Exclusion Rules:**
+   - Round 2 never repeats a question from round 1 of the same tie group on the same Drop.
+   - Exclude a question if a majority (50% or more) of the current tie-group members answered it as a bonus question within `bonus.retention_days` (default 28 days).
+   - If fewer than `bonus.questions_per_round` (3) questions remain after filtering, do NOT offer a round (honest hide, Rule B2). Never reuse a question to fill the gap.
+3. **Entropy Sorting & Deterministic Seed:** Questions in the eligible set are prioritized by predicted split power (highest Shannon entropy first) and deterministically selected using `HMAC_SHA256(drop_id || tie_group_id || round_number)`. Every player in the tie group receives the exact same questions in the exact same order (Rule L1 / Rule B1).
+
+#### Pool Runway Math (Estimated, Not Measured)
+With a pool of 40 approved evergreen questions, 3 questions per round and up to 2 rounds, a tie group consumes at most 6 questions on any single Drop. This does not imply a simplistic 6-day runway (40 / 6 ≈ 6.7 days, estimated, not measured) for an individual returning player. Because the majority exclusion threshold (>= 50% answered) and the rolling 28-day retention window both govern availability across dynamically shifting tie groups, different cohorts rotate through questions at varying rates. Nonetheless, pool depletion remains an active operational risk in lanes with persistently large tie groups: admins must actively monitor the runway alert (P11.48) and replenish questions before the available count drops below the 40-question floor. All runway figures are estimated, not measured.
 
 ### 2.3 Asynchronous Play & Scoring Mechanics
 - **Optionality:** 100% voluntary. Non-participants remain in the group and retain their original locked twin.

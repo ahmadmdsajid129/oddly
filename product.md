@@ -1203,8 +1203,12 @@ Oddly categorises daily play into distinct, thematic **Lanes**. Each lane is an 
   - Never offered in the `say_it` format; never offered for provisional results.
   - A round has `bonus.questions_per_round` (default 3) questions. Maximum `bonus.max_rounds` (default 2) rounds per tie group per Drop. Maximum 6 bonus questions per player per Drop.
 - **Deterministic Selection (Pool & Seed):**
-  - Pool: A separate evergreen pool per lane, admin-managed, adhering to the same editorial and forbidden-topic rules as Drops (Rules L6, L7), entropy-checked, and never reused for the same tie group.
-  - Selection: The engine sorts the pool by predicted split power (highest entropy first), excludes any questions that any member of the tie group answered in their 28-day history, and deterministically selects questions using `HMAC_SHA256(drop_id || tie_group_id || round_number)` as seed.
+  - Pool: A separate evergreen pool per lane, admin-managed, adhering to the same editorial and forbidden-topic rules as Drops (Rules L6, L7), entropy-checked.
+  - Selection & Exclusion Rules:
+    1. Round 2 never repeats a question from round 1 of the same tie group on the same Drop.
+    2. Exclude a question if a majority (50% or more) of the current tie-group members answered it as a bonus question within `bonus.retention_days` (default 28 days).
+    3. The engine sorts the remaining eligible pool by predicted split power (highest Shannon entropy first) and deterministically selects questions using `HMAC_SHA256(drop_id || tie_group_id || round_number)` as seed.
+    4. If fewer than `bonus.questions_per_round` (3) questions remain, do NOT offer a round (honest hide, Rule B2). Never reuse a question to fill the gap.
   - Invariant: Everyone in the tie group receives the exact same questions in the exact same order. Zero personalisation (Rule L1 spirit, Rule B1).
 - **How It Plays (Asynchronous, Optional, Additive, No Pressure):**
   - The round opens at recap (07:05 IST) and closes at the end of that Drop's play window (06:59:59 IST the next morning; `bonus.window_hours`, default 24h, serves as the cap). The background job `bonus.close_and_compute` runs at 07:01 IST the next morning, before the 07:05 final batch, and is pausable at degradation L2+. A second round, if still needed, opens at the next 07:05 recap. Nobody needs to be online simultaneously.

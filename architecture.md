@@ -1195,7 +1195,7 @@ flowchart TD
 - **Context:** To narrow large candidate tie groups honestly without altering the five Drop questions, bonus rounds must present identical, unbiased questions to all group members without real-time synchronization.
 - **Decision:** Implement a **Deterministic Seeded Evergreen Pool Selection**:
   1. *Evergreen Pool Table:* Maintain `bonus_pool_questions` per lane with pre-vetted, high-entropy questions screened for Section 9.1 non-forbidden topics.
-  2. *Deterministic Selection:* Sort candidates by entropy, filter out any question answered by any tie-group member in their 28-day history, and select questions seeded by `HMAC_SHA256(drop_id || tie_group_id || round_number)`.
+  2. *Deterministic Selection & Majority Exclusion:* Round 2 never repeats a question from round 1 for the same tie group on the same Drop. Exclude a question if a majority (50% or more) of current tie-group members answered it as a bonus question within `bonus.retention_days` (28 days). From remaining candidates, select highest entropy questions seeded by `HMAC_SHA256(drop_id || tie_group_id || round_number)`. If fewer than `bonus.questions_per_round` questions remain, suppress the round (honest hide, Rule B2).
   3. *Invariance:* Every member receives identical questions in identical order.
 - **Consequences:** Eliminates question bias and personalization; ensures mathematical determinism and offline reproducibility; requires admin curation of at least 40 approved evergreen questions per lane. Additive design preserves immutable locked twins in `twin_results` and guarantees mutual pairings, Keeps, Orbits, and share cards are never invalidated.
 
