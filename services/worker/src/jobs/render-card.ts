@@ -1,6 +1,6 @@
 import type { Job } from "bullmq";
 import {
-  renderShareCardPng,
+  renderCardWithPool,
   computeCardContentHash,
   computeCardStorageKey,
   getCardStorage,
@@ -59,8 +59,8 @@ export async function processRenderCardJob(
     theme,
   };
 
-  // 1. Render PNG Buffer via Satori + Resvg
-  const pngBuffer = await renderShareCardPng(cardData);
+  // 1. Render PNG Buffer via Satori + Resvg worker pool (P6.11, Architecture Sec 9)
+  const pngBuffer = await renderCardWithPool(cardData);
 
   // 2. Compute deterministic content-hash key
   const contentHash = computeCardContentHash({

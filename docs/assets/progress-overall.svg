@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="100" viewBox="0 0 760 100">
-  <title>Overall Project Progress: 60%</title>
-  <desc>Overall progress bar: 248 of 410 tasks completed (60%).</desc>
+  <title>Overall Project Progress: 61%</title>
+  <desc>Overall progress bar: 250 of 410 tasks completed (61%).</desc>
   <style>
     .title { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; fill: #14123A; }
     .badge { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; fill: #14123A; }
@@ -14,17 +14,17 @@
 
   <!-- Title & Counts -->
   <text x="30" y="36" class="title">ODDLY V1 &bull; MASTER PROGRESS</text>
-  <text x="600" y="36" class="subtext" text-anchor="end">248 / 410 tasks</text>
+  <text x="600" y="36" class="subtext" text-anchor="end">250 / 410 tasks</text>
 
   <!-- Progress Track -->
   <rect x="33" y="51" width="560" height="26" rx="13" fill="#14123A" />
   <rect x="30" y="48" width="560" height="26" rx="13" fill="#EEEAFE" stroke="#14123A" stroke-width="2.5" />
 
   <!-- Progress Fill -->
-  <rect x="30" y="48" width="336" height="26" rx="13" fill="#3DDBB0" stroke="#14123A" stroke-width="2.5" />
+  <rect x="30" y="48" width="342" height="26" rx="13" fill="#3DDBB0" stroke="#14123A" stroke-width="2.5" />
 
   <!-- Percentage Sticker Pill -->
   <rect x="608" y="46" width="90" height="30" rx="15" fill="#14123A" />
   <rect x="605" y="43" width="90" height="30" rx="15" fill="#FFD23F" stroke="#14123A" stroke-width="2.5" />
-  <text x="650" y="63" class="badge" text-anchor="middle">60% DONE</text>
+  <text x="650" y="63" class="badge" text-anchor="middle">61% DONE</text>
 </svg>

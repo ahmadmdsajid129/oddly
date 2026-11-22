@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 60%`                                                       |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 61%`                                                       |
 | **Current Active Stage**        | **Stage L0: Lanes, Richer Answers, Twin Depth & Text (COMPLETE)**                |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 248 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 250 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 162 tasks                                                                        |
+| **Pending (`TODO`)**            | 160 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -54,7 +54,7 @@
 | **Phase 3**  | Fastify REST API Core                       | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 16 / 16            | Stage 3 & Stage R2    |
 | **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 4 & Stage 0.5   |
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 5 & Stage 0.5   |
-| **Phase 6**  | Server-Rendered Share Cards & Links         | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 83%` | 10 / 12            | Stage 6 & Stage 0.5   |
+| **Phase 6**  | Server-Rendered Share Cards & Links         | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 82%` | 9 / 11             | Stage 7 & Stage 0.5   |
 | **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 92%` | 11 / 12            | Stage 8 & Stage R2    |
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 93%` | 14 / 15            | Stage 9 & Stage R2    |
@@ -246,7 +246,7 @@ _Status: COMPLETE | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarit
 
 ### Phase 6: Server-Rendered Share Cards & Links (Stage 6)
 
-_Status: PARTIAL | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId`, worker threads._
+_Status: COMPLETE | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId`, worker threads._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -260,8 +260,8 @@ _Status: PARTIAL | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId`
 | `[x] P6.08` | Build dynamic challenge landing page at `apps/web/src/app/c/[shortId]/page.tsx`             | 🔴 Critical  | ✅ DONE         | P6.05       | Agent | 2026-11-08  | Public viral landing page       |
 | `[x] P6.09` | Inject dynamic Open Graph and Twitter Card metadata into challenge landing pages           | 🟠 High      | ✅ DONE         | P6.08       | Agent | 2026-11-08  | Rich social link previews       |
 | `[x] P6.10` | Write automated tests verifying share card generation, QR code parsing, and OG tags         | 🟠 High      | ✅ DONE         | P6.01-P6.09 | Agent | 2026-11-08  | Share infrastructure test suite |
-| `[ ] P6.11` | Offload Satori/Resvg card rendering to worker threads (`piscina`) capped to CPU cores       | 🟠 High      | ⚪ TODO         | P6.02       | Agent | —           | Worker CPU offload (Sec 9)      |
-| `[ ] P6.12` | Implement on-demand card rendering under load and verify CDN edge cache hit ratios (>95%)   | 🟡 Medium    | ⚪ TODO         | P6.04       | Agent | —           | Viral share defense (Sec 5)     |
+| `[x] P6.11` | Offload Satori/Resvg card rendering to worker threads (`piscina`) capped to CPU cores       | 🟠 High      | ✅ DONE         | P6.02       | Agent | 2026-11-22  | Worker CPU offload (Sec 9)      |
+| `[x] P6.12` | Implement on-demand card rendering under load and verify CDN edge cache hit ratios (>95%)   | 🟡 Medium    | ✅ DONE         | P6.04       | Agent | 2026-11-22  | Viral share defense (Sec 5)     |
 
 ---
 
@@ -1194,6 +1194,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 6 Complete (P6.11–P6.12) | Completed remaining 2 tasks for Phase 6: offloaded Satori/Resvg card rendering to dedicated Piscina worker thread pool capped to CPU cores (P6.11), and implemented single-flight promise coalescing, degradation load shedding under L3/L4, and edge caching with >95% hit ratio verification (P6.12). Phase 6 now 100% COMPLETE (12/12). Dashboard updated to 250/410 (61%). | Phase 6 completion & viral share defense. |
 | `2026-11-22` | Phase 5 Complete (P5.10–P5.11) | Completed remaining 2 tasks for Phase 5: ETag 304 exponential backoff polling with Page Visibility API pausing and Mode B status checking (P5.10), and degraded UI state wiring (DegradationBanner, ModeBPendingScreen, FreshnessLabel, WidgetErrorBoundary) across play flow (P5.11). Phase 5 now 100% COMPLETE (11/11). Dashboard updated to 248/410 (60%). | Phase 5 completion & reveal resilience. |
 | `2026-11-22` | Phase 4 Complete (P4.12–P4.15) | Completed remaining 4 tasks for Phase 4: TanStack Query exponential backoff and full jitter (P4.12), Zustand draft store with pending-submission recovery on app open (P4.13), Countdown server date sync with 0–4s fetch jitter (P4.14), and size-limit bundle budget gate in CI (P4.15). Phase 4 now 100% COMPLETE (15/15). Dashboard updated to 246/410 (60%). | Phase 4 completion & client resilience. |
 | `2026-11-22` | Phase 3 Complete (P3.16)  | Implemented Mode B asynchronous ingestion behind `PERSIST_MODE=async` with Redis queue (`oddly:queue:submit-persist`), worker micro-batch drainage (`SubmitPersistWorker`), and reconciliation audit job (`PersistReconciliationJob`). Phase 3 now 100% COMPLETE (16/16). Dashboard updated to 242/410 (59%). | Phase 3 completion & dual persistence modes. |

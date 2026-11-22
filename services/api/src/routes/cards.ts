@@ -1,7 +1,7 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import {
-  renderShareCardPng,
+  renderCardWithPool,
   renderAntiTwinCardPng,
   renderOrbitCardPng,
   renderAchievementCardPng,
@@ -13,6 +13,7 @@ import {
   type Tier,
 } from "@oddly/shared";
 import { resolveAuthenticatedPlayer } from "../auth/player-auth.js";
+import { DegradationManager } from "../resilience/degradation.js";
 import {
   prisma,
   SubmissionsRepository,
@@ -25,6 +26,9 @@ const CardQuerySchema = z.object({
   format: z.enum(["story", "square", "link"]).default("story"),
   theme: z.enum(["dark", "light", "mythic"]).default("dark"),
 });
+
+// Single-flight in-flight map deduplicating concurrent on-demand renders (P6.12, Architecture Sec 5.2)
+const inFlightRenders = new Map<string, Promise<string>>();
 
 export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
   /**
@@ -58,6 +62,10 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
             message: z.string(),
           }),
           404: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+          503: z.object({
             error: z.string(),
             message: z.string(),
           }),
@@ -140,31 +148,63 @@ export const cardsRoutes: FastifyPluginAsyncZod = async (app) => {
       if (exists) {
         publicUrl = storage.getPublicUrl(storageKey);
       } else {
-        // Render on demand
-        const dateStr = drop?.drop_date
-          ? new Date(drop.drop_date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })
-          : "Nov 8, 2026";
+        // Load shedding defense (P6.12, Architecture Sec 12):
+        // If system is under L3/L4 load shedding and card is not yet rendered, shed on-demand CPU load
+        const degradationLevel = await DegradationManager.getLevel();
+        if (degradationLevel >= 3) {
+          reply.header("Retry-After", "30");
+          return reply.status(503).send({
+            error: "SERVICE_DEGRADED",
+            message: "On-demand card rendering deferred during peak load shedding",
+          });
+        }
 
-        const pngBuffer = await renderShareCardPng({
-          score,
-          total: 5,
-          tier,
-          percentile,
-          twinCity,
-          streak: 1,
-          dateStr,
-          shortId,
-          format,
-          theme,
-        });
+        // Single-flight promise coalescing (P6.12, Architecture Sec 5.2):
+        // If a render for this exact storageKey is already in progress, await it rather than duplicating work
+        if (inFlightRenders.has(storageKey)) {
+          publicUrl = await inFlightRenders.get(storageKey)!;
+        } else {
+          const dateStr = drop?.drop_date
+            ? new Date(drop.drop_date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : "Nov 8, 2026";
 
-        publicUrl = await storage.putCard(storageKey, pngBuffer);
-        if (submission) {
-          await SharesRepository.saveShareCard(submission.id, format, storageKey, submission.drop_date);
+          const renderPromise = (async () => {
+            try {
+              // Offload Satori + Resvg rendering to Piscina worker thread pool (P6.11, Architecture Sec 9)
+              const pngBuffer = await renderCardWithPool({
+                score,
+                total: 5,
+                tier,
+                percentile,
+                twinCity,
+                streak: 1,
+                dateStr,
+                shortId,
+                format,
+                theme,
+              });
+
+              const url = await storage.putCard(storageKey, pngBuffer);
+              if (submission) {
+                await SharesRepository.saveShareCard(
+                  submission.id,
+                  format,
+                  storageKey,
+                  submission.drop_date
+                ).catch(() => {});
+              }
+              return url;
+            } finally {
+              inFlightRenders.delete(storageKey);
+            }
+          })();
+
+          inFlightRenders.set(storageKey, renderPromise);
+          publicUrl = await renderPromise;
         }
       }
 

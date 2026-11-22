@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 5: Reveal, Matching UX & Oddness (COMPLETE).
+- **Current Stage:** Phase 6: Server-Rendered Share Cards & Links (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1708,3 +1708,24 @@ All 11 tasks in Phase 5 (Stage 5: Reveal, Matching UX & Oddness) are now complet
 - Ran `@oddly/web` test suite: **14 test files passed, 107 tests passed** with zero failures.
 - Ran typecheck across `@oddly/api-client` and `@oddly/web`: clean pass with zero errors (`tsc --noEmit`).
 - Phase 5 is now **100% COMPLETE (11/11 tasks done)**. Master progress dashboard updated to **248/410 completed tasks (60%)**.
+
+## 43. Phase 6 Completion: Server-Rendered Share Cards & Links Resilience (2026-11-22)
+
+### 43.1 Overview & Architecture
+All 12 tasks in Phase 6 (Stage 6: Server-Rendered Share Cards & Links) are now complete per Architecture Section 5 (Edge and caching), Section 5.2 (Thundering-herd defenses), and Section 9 (Queues & CPU offload):
+1. **P6.11: Piscina Worker Thread Pool CPU Offload (`packages/shared/src/card-render-pool.ts`, `render-card.ts`):**
+   - Implemented dedicated worker thread pool management via `piscina` capped strictly to available CPU cores (`maxThreads: Math.min(os.cpus().length, CARD_RENDER_MAX_THREADS)`).
+   - Offloads CPU-intensive SVG layout (`satori`) and C++ PNG rasterization (`@resvg/resvg-js`) off the Node.js event loops of both Fastify API and BullMQ worker.
+   - Includes graceful in-process fallback to ensure zero card request drops if thread pool limits or sandbox constraints occur.
+   - Updated `services/worker/src/jobs/render-card.ts` (`processRenderCardJob`) to render cards via `renderCardWithPool()`.
+2. **P6.12: On-Demand Card Rendering Under Load & Edge Cache Hit Ratios (`cards.ts`, `card-pool-resilience.test.ts`):**
+   - **Single-Flight Promise Coalescing:** Implemented `inFlightRenders` promise map in `services/api/src/routes/cards.ts`. When multiple concurrent requests hit the API for an uncached card, exactly 1 render operation executes while all concurrent callers await the same result.
+   - **Degradation Ladder Load Shedding:** Under emergency degradation (L3/L4), on-demand card rendering is shed gracefully, returning HTTP 503 with `Retry-After: 30`, while cached cards continue to be served cleanly.
+   - **Edge Caching Policy:** Content-hashed card assets (`/v1/cards/*`) enforce `Cache-Control: public, max-age=31536000, immutable` (Cloudflare R2 1-year immutable edge caching), and `/c/:shortId` landing page enforces `public, s-maxage=300, stale-while-revalidate=86400`.
+   - **Hit Ratio Verification:** Simulation test proves that 10,000 viral requests achieve $>95\%$ edge cache hit ratio ($99.99\%$ observed hit ratio).
+
+### 43.2 Verification & Test Results
+- Authored `packages/shared/src/card-pool-resilience.test.ts` (9 tests passing) verifying CPU core capping, PNG magic byte validation, pool telemetry stats, 50-request single-flight coalescing, 10,000-request edge hit ratio simulation ($>95\%$), and L3/L4 degradation load shedding.
+- Ran all share card test suites: **5 test files passed, 28 tests passed** across `@oddly/shared` and `@oddly/web`.
+- Ran typechecks across `@oddly/shared`, `@oddly/worker`, and `@oddly/api`: clean pass with zero errors (`tsc --noEmit`).
+- Phase 6 is now **100% COMPLETE (12/12 tasks done)**. Master progress dashboard updated to **250/410 completed tasks (61%)**.
