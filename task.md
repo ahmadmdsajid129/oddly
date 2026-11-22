@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 61%`                                                       |
-| **Current Active Stage**        | **Phase 7: Authentication & Guest Merge (COMPLETE)**                             |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 62%`                                                       |
+| **Current Active Stage**        | **Phase 8: Streaks, History, Settings & Privacy (COMPLETE)**                     |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 252 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 253 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 158 tasks                                                                        |
+| **Pending (`TODO`)**            | 157 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -56,7 +56,7 @@
 | **Phase 5**  | Reveal, Matching UX & Oddness               | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 5 & Stage 0.5   |
 | **Phase 6**  | Server-Rendered Share Cards & Links         | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 6 & Stage 0.5   |
 | **Phase 7**  | Authentication & Guest Merge                | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 7 & Stage 0.5   |
-| **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 92%` | 11 / 12            | Stage 8 & Stage R2    |
+| **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 8 & Stage R2    |
 | **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | 🟡 PARTIAL  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 93%` | 14 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 10 & Stage R2   |
 | **Phase 10A**| Orbit Foundation (Backend)                  | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage F1              |
@@ -287,7 +287,7 @@ _Status: COMPLETE | Target: Google Identity, soft sign-in modal, guest submissio
 
 ### Phase 8: Streaks, History, Settings & Privacy (Stage 8)
 
-_Status: PARTIAL | Target: Header Flame, History archive, Settings & Privacy, replica reads, 90d retention._
+_Status: COMPLETE | Target: Header Flame, History archive, Settings & Privacy, replica reads, 90d retention._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -301,7 +301,7 @@ _Status: PARTIAL | Target: Header Flame, History archive, Settings & Privacy, re
 | `[x] P8.08` | Build report submission bottom sheet (`POST /v1/reports`) with 140-character note limit     | 🟠 High      | ✅ DONE         | P1.05, P3.01| Agent | 2026-11-09  | User content moderation intake  |
 | `[x] P8.09` | Implement regional privacy toggle allowing players to conceal coarse geographical region    | 🟠 High      | ✅ DONE         | P2.09       | Agent | 2026-11-09  | Granular privacy control        |
 | `[x] P8.10` | Write automated test suite verifying streak calculations, history pagination, and erasure   | 🟠 High      | ✅ DONE         | P8.01-P8.09 | Agent | 2026-11-09  | Settings & history test suite   |
-| `[ ] P8.11` | Route history archive and world stats queries to database read replicas                     | 🟠 High      | ⚪ TODO         | P8.03       | Agent | —           | Read replica routing (Sec 8.1)  |
+| `[x] P8.11` | Route history archive and world stats queries to database read replicas                     | 🟠 High      | ✅ DONE         | P8.03       | Agent | 2026-11-22  | Read replica routing (Sec 8.1)  |
 | `[x] P8.12` | Implement 90-day answer data retention compaction and cold archive worker job               | 🟠 High      | ✅ DONE         | P2.01       | Agent | 2026-11-11  | RetentionWorker automated partition drop older than retention_days (R2.1) |
 
 ---
@@ -1194,6 +1194,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-22` | Phase 8 Complete (P8.11)  | Completed remaining task for Phase 8: routed player history archive (`GET /v1/history`) and aggregate world statistics (`GET /v1/world/:dropId`) to dedicated PostgreSQL read replica (`prismaReplica`) with transparent primary failover on replica timeout/error, and enforced Level L2+ load shedding (503 OVERLOADED) and extended 10m caching (P8.11). Phase 8 now 100% COMPLETE (12/12). Dashboard updated to 253/410 (62%). | Phase 8 completion & read replica routing. |
 | `2026-11-22` | Phase 7 Complete (P7.10–P7.11) | Completed remaining 2 tasks for Phase 7: enforced guest-play-only behavior under Level L3 degradation and protected against token refresh storms via single-flight promise coalescing, 10/min rate limits, and short-circuit reuse (P7.10), and implemented Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage with fail-closed signups (P7.11). Phase 7 now 100% COMPLETE (11/11). Dashboard updated to 252/410 (61%). | Phase 7 completion & auth resilience. |
 | `2026-11-22` | Phase 6 Complete (P6.11–P6.12) | Completed remaining 2 tasks for Phase 6: offloaded Satori/Resvg card rendering to dedicated Piscina worker thread pool capped to CPU cores (P6.11), and implemented single-flight promise coalescing, degradation load shedding under L3/L4, and edge caching with >95% hit ratio verification (P6.12). Phase 6 now 100% COMPLETE (12/12). Dashboard updated to 250/410 (61%). | Phase 6 completion & viral share defense. |
 | `2026-11-22` | Phase 5 Complete (P5.10–P5.11) | Completed remaining 2 tasks for Phase 5: ETag 304 exponential backoff polling with Page Visibility API pausing and Mode B status checking (P5.10), and degraded UI state wiring (DegradationBanner, ModeBPendingScreen, FreshnessLabel, WidgetErrorBoundary) across play flow (P5.11). Phase 5 now 100% COMPLETE (11/11). Dashboard updated to 248/410 (60%). | Phase 5 completion & reveal resilience. |

@@ -12,6 +12,8 @@ import { HistoryRepository } from "../db/history.repo.js";
 import { StreaksRepository } from "../db/streaks.repo.js";
 import { PlayersRepository } from "../db/players.repo.js";
 import { getAuthAccount } from "../auth/tokens.js";
+import { DegradationManager } from "../resilience/degradation.js";
+import { isReplicaConfigured } from "../db/client.js";
 
 export const historyRoutes: FastifyPluginAsyncZod = async (app) => {
   /**
@@ -62,6 +64,14 @@ export const historyRoutes: FastifyPluginAsyncZod = async (app) => {
       },
     },
     async (req, reply) => {
+      // Degradation Level L2+: shed low-priority history archive reads (Architecture Sec 8.1 & Table of Endpoints)
+      if (await DegradationManager.checkLowPriorityShedding(req, reply)) {
+        return;
+      }
+
+      reply.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+      reply.header("x-oddly-routed-to", isReplicaConfigured() ? "replica" : "primary");
+
       // 1. Resolve player ID from auth or guest cookies
       let playerId = req.cookies.oddly_session;
 

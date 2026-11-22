@@ -9,7 +9,7 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 7: Authentication & Guest Merge (COMPLETE).
+- **Current Stage:** Phase 8: Streaks, History, Settings & Privacy (COMPLETE).
 - **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
 
 ---
@@ -1758,3 +1758,28 @@ All 11 tasks in Phase 7 (Stage 7: Authentication & Guest Merge) are now complete
 - Ran `@oddly/api` auth integration tests: **18 passed (18/18)**.
 - Ran typechecks across monorepo packages (`@oddly/shared`, `@oddly/api-client`, `@oddly/api`, `@oddly/web`): clean pass with zero errors (`tsc --noEmit`).
 - Phase 7 is now **100% COMPLETE (11/11 tasks done)**. Master progress dashboard updated to **252/410 completed tasks (61%)**.
+
+## 45. Phase 8 Completion: Streaks, History, Settings & Privacy (2026-11-22)
+
+### 45.1 Overview & Architecture
+All 12 tasks in Phase 8 (Stage 8: Streaks, History, Settings & Privacy) are now complete per Architecture Section 8.1 (PostgreSQL 16 replica architecture), Section 12 (Degradation ladder), and Scaling Plan T2 (Read replicas):
+1. **P8.11: Database Read Replica Routing & Transparent Failover (`client.ts`, `history.repo.ts`, `world.ts`, `history.ts`):**
+   - **Dual Database Client Configuration:** Extended `services/api/src/db/client.ts` with `prismaReplica` client wired to `DATABASE_REPLICA_URL` (configured with `statement_timeout=3000ms`), defaulting cleanly to primary `prisma` when running in single-database environments.
+   - **Analytical Query Offloading:** Routed analytical aggregation queries in `HistoryRepository.getPlayerHistory` (`GET /v1/history`) and `worldRoutes` (`GET /v1/world/:dropId`) to `prismaReplica` via `executeReplicaQueryWithFallback()`.
+   - **Transparent Failover on Replica Outage:** If the read replica experiences connection exhaustion, network partition, or query timeout, `executeReplicaQueryWithFallback()` catches the exception, increments telemetry metric `fallbackCount`, and transparently routes the query to primary `prisma`, ensuring zero end-user errors.
+   - **Degradation Level L2+ Load Shedding:** Enforced Architecture Table policy on `GET /v1/history`: under Level L2+ peak drop crunch, `/v1/history` sheds traffic with HTTP 503 `OVERLOADED` and `Retry-After: 30`, freeing database connections for live drop submissions.
+   - **Degradation Level L2+ Cache Extension:** In `GET /v1/world/:dropId`, under Level L2+, `Cache-Control` header automatically extends from 30s to 10 minutes (`public, max-age=600, s-maxage=600, stale-while-revalidate=1200`) to eliminate redundant queries.
+   - **Routing Telemetry Header:** Attached `x-oddly-routed-to: replica` (or `primary`) on read-routed API responses.
+
+### 45.2 Verification & Test Results
+- Authored integration tests in `services/api/src/replica-routing.test.ts` (10/10 tests passing):
+  - Proves `isReplicaConfigured()` detection and `x-oddly-routed-to` response headers.
+  - Proves `/v1/history` queries hit `mockReplica.player` and `mockReplica.submission`.
+  - Proves `/v1/world/:dropId` queries hit `mockReplica.submission.count` and `mockReplica.oddnessScore.findMany`.
+  - Proves transparent failover to primary client when replica throws an error with metric tracking (`fallbackCount >= 1`).
+  - Proves Level L2 and L3 load shedding on `/v1/history` (HTTP 503 `OVERLOADED` with `Retry-After: 30`).
+  - Proves normal operations on `/v1/history` under Level L0 and L1.
+  - Proves Cache-Control extension to 10 minutes for `/v1/world/:dropId` under Level L2.
+- Verified existing Phase 8 test suites: `settings.test.ts` (8/8 tests passing), `auth.test.ts` (18/18 tests passing), and `@oddly/web` (107/107 tests passing).
+- Ran typechecks across monorepo packages (`@oddly/api`, `@oddly/web`): clean pass with zero errors (`tsc --noEmit`).
+- Phase 8 is now **100% COMPLETE (12/12 tasks done)**. Master progress dashboard updated to **253/410 completed tasks (62%)**.
