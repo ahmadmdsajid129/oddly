@@ -26,6 +26,11 @@ Do not: soft blurry shadows, gradients on UI chrome (the only gradient allowed i
 
 ## 2. Colour tokens
 
+<!-- visual:start palette-svg -->
+![Oddly Colour Palette](docs/assets/palette.svg)
+<!-- visual:end palette-svg -->
+
+
 All colours live in `@oddly/ui-tokens`. Components and share-card renderers must import from it. **No hex literals anywhere else** (lint rule, see 19).
 
 ### 2.1 Core palette
@@ -69,10 +74,10 @@ All colours live in `@oddly/ui-tokens`. Components and share-card renderers must
 
 | Tier | Percentile | Chip fill | Chip text |
 |---|---|---|---|
-| Common | 0 to 50 | `lavender` | `ink` |
-| Uncommon | 50 to 80 | `lilac` | `ink` |
-| Rare | 80 to 95 | `sun` | `ink` |
-| Mythic | 95 to 100 | rainbow strip `coral → sun → mint → violet` (45° linear) | `ink` |
+| 🟪 Common | 0 to 50 | `lavender` | `ink` |
+| 🟪 Uncommon | 50 to 80 | `lilac` | `ink` |
+| 🟨 Rare | 80 to 95 | `sun` | `ink` |
+| 🌈 Mythic | 95 to 100 | rainbow strip `coral → sun → mint → violet` (45° linear) | `ink` |
 
 Tier is always shown as **text plus colour**, never colour alone.
 
@@ -88,6 +93,19 @@ Fonts (self-host with `next/font`, no runtime Google requests; subset to Latin +
 |---|---|---|---|
 | Display | **Bricolage Grotesque** | 700, 800 | Questions, headings, buttons, chips, numbers, share-card text |
 | Body | **Inter** | 400, 500, 600 | Paragraphs, helper text, legal, admin tables |
+
+<!-- visual:start typography-specimen -->
+| Scale | Token | Specimen (Size / Leading) | Family | Usage Role |
+|---|---|---|---|---|
+| 🔠 56px | `display-xl` | **Aa** `clamp(40, 12vw, 56)` (1.0) | Bricolage Grotesque 800 | Share-card hero number ("4 of 5") |
+| 🔠 32px | `display-l` | **Aa** `clamp(26, 7vw, 32)` (1.1) | Bricolage Grotesque 800 | Question text |
+| 🔠 20px | `display-m` | **Aa** 20px (1.2) | Bricolage Grotesque 700 | Screen titles |
+| 🔠 16px | `button` | **Aa** 16px (1.0) | Bricolage Grotesque 700 | All buttons and option rows |
+| 🔡 12px | `chip` | **Aa** 12px (1.0) | Bricolage Grotesque 700 | Chips, badges |
+| 📝 16px | `body` | Aa 16px (1.5) | Inter 400 | Paragraphs |
+| 📝 14px | `body-s` | Aa 14px (1.5) | Inter 400/500 | Helper text |
+| 📝 12px | `caption` | Aa 12px (1.4) | Inter 500 | Footnotes, never below 12 |
+<!-- visual:end typography-specimen -->
 
 Type scale (mobile-first; use `clamp` where noted). Sizes in px, line-height in parentheses:
 
@@ -141,13 +159,13 @@ States (mouse and touch):
 
 | State | Behaviour |
 |---|---|
-| Rest | As above |
-| Hover (only inside `@media (hover:hover) and (pointer:fine)`) | `transform: translate(-2px,-2px)`; shadow becomes `shadow-sticker-lift` |
-| Pressed / `:active` (touch and mouse) | `transform: translate(4px,4px)`; shadow becomes `shadow-sticker-flat`. This is the signature feel. Must not depend on hover. |
-| Focus-visible | Keep the outline, add `outline: 3px solid violet; outline-offset: 3px` (a second ring outside the ink outline). Never remove focus styles. |
-| Loading | Label replaced by 3 bouncing dots (CSS only); width locked; `aria-busy="true"`; keep enabled but ignore repeat taps |
-| Disabled | **Avoid disabling.** If unavoidable: fill `lavender`, label `muted`, no shadow, outline `muted`, `aria-disabled` and a visible reason line |
-| Success flash | After a successful action, shadow flashes `mint` for 300 ms (optional) |
+| 🟢 Rest | As above |
+| 🟡 Hover (only inside `@media (hover:hover) and (pointer:fine)`) | `transform: translate(-2px,-2px)`; shadow becomes `shadow-sticker-lift` |
+| 🟠 Pressed / `:active` (touch and mouse) | `transform: translate(4px,4px)`; shadow becomes `shadow-sticker-flat`. This is the signature feel. Must not depend on hover. |
+| 🔵 Focus-visible | Keep the outline, add `outline: 3px solid violet; outline-offset: 3px` (a second ring outside the ink outline). Never remove focus styles. |
+| ⏳ Loading | Label replaced by 3 bouncing dots (CSS only); width locked; `aria-busy="true"`; keep enabled but ignore repeat taps |
+| ⚪ Disabled | **Avoid disabling.** If unavoidable: fill `lavender`, label `muted`, no shadow, outline `muted`, `aria-disabled` and a visible reason line |
+| ✨ Success flash | After a successful action, shadow flashes `mint` for 300 ms (optional) |
 
 Transition: `transform 120ms ease-out, box-shadow 120ms ease-out`. Under `prefers-reduced-motion: reduce` remove the translate and show only the shadow change.
 
