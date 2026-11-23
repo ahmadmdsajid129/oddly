@@ -25,6 +25,15 @@ export const QuestionTypeSchema = z.enum([
   "word",
 ]);
 
+export const QuestionFormatSchema = z.enum([
+  "pick1",
+  "pick2of6",
+  "rank3",
+  "slider7",
+  "scene",
+  "say_it",
+]);
+
 export const RenderVariantSchema = z.enum(["standard", "meme"]);
 
 export const TierSchema = z.enum(["Common", "Uncommon", "Rare", "Mythic"]);
@@ -76,16 +85,68 @@ export const WordAnswerPayloadSchema = z.object({
   value: z.array(z.string().min(1).max(100)).min(1).max(10),
 });
 
+/** Q-Format: Pick 2 of 6 */
+export const Pick2Of6AnswerPayloadSchema = z.object({
+  type: z.literal("pick2of6"),
+  question_id: UUIDSchema,
+  value: z
+    .array(z.string().min(1).max(100))
+    .length(2, "Must select exactly 2 options")
+    .refine(
+      (arr) => new Set(arr).size === 2,
+      "Must select 2 distinct options"
+    ),
+});
+
+/** Q-Format: Rank 3 */
+export const Rank3AnswerPayloadSchema = z.object({
+  type: z.literal("rank3"),
+  question_id: UUIDSchema,
+  value: z
+    .array(z.string().min(1).max(100))
+    .length(3, "Must rank exactly 3 items")
+    .refine(
+      (arr) => new Set(arr).size === 3,
+      "Must rank 3 distinct items"
+    ),
+});
+
+/** Q-Format: Slider 7 */
+export const Slider7AnswerPayloadSchema = z.object({
+  type: z.literal("slider7"),
+  question_id: UUIDSchema,
+  value: z.number().int().min(1).max(7),
+});
+
+/** Q-Format: Scene */
+export const SceneAnswerPayloadSchema = z.object({
+  type: z.literal("scene"),
+  question_id: UUIDSchema,
+  value: z.string().min(1).max(100),
+});
+
+/** Q-Format: Say It (Gate G4) */
+export const SayItAnswerPayloadSchema = z.object({
+  type: z.literal("say_it"),
+  question_id: UUIDSchema,
+  value: z.string().min(1).max(80),
+});
+
 export const AnswerPayloadSchema = z.discriminatedUnion("type", [
   TextAnswerPayloadSchema,
   NumberAnswerPayloadSchema,
   ColourAnswerPayloadSchema,
   ImageAnswerPayloadSchema,
   WordAnswerPayloadSchema,
+  Pick2Of6AnswerPayloadSchema,
+  Rank3AnswerPayloadSchema,
+  Slider7AnswerPayloadSchema,
+  SceneAnswerPayloadSchema,
+  SayItAnswerPayloadSchema,
 ]);
 
 // ---------------------------------------------------------------------------
-// Question question payloads (what's stored in questions.payload JSONB)
+// Question payloads (what's stored in questions.payload JSONB)
 // ---------------------------------------------------------------------------
 
 export const TextQuestionPayloadSchema = z.object({
@@ -132,12 +193,84 @@ export const WordQuestionPayloadSchema = z.object({
   max_selections: z.number().int().min(1),
 });
 
-export const QuestionPayloadSchema = z.discriminatedUnion("type", [
+export const Pick2Of6QuestionPayloadSchema = z.object({
+  type: z.literal("pick2of6").or(z.literal("text")).optional(),
+  format: z.literal("pick2of6").optional(),
+  prompt: z.string().min(1),
+  options: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        value: z.string().min(1),
+        illustration_key: z.string().nullable().optional(),
+      })
+    )
+    .length(6, "pick2of6 requires exactly 6 options"),
+});
+
+export const Rank3QuestionPayloadSchema = z.object({
+  type: z.literal("rank3").or(z.literal("text")).optional(),
+  format: z.literal("rank3").optional(),
+  prompt: z.string().min(1),
+  items: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        value: z.string().min(1),
+      })
+    )
+    .length(3, "rank3 requires exactly 3 items"),
+});
+
+export const Slider7QuestionPayloadSchema = z.object({
+  type: z.literal("slider7").or(z.literal("number")).optional(),
+  format: z.literal("slider7").optional(),
+  prompt: z.string().min(1),
+  left_label: z.string().min(1),
+  right_label: z.string().min(1),
+  mid_label: z.string().nullable().optional(),
+  min: z.number().default(1),
+  max: z.number().default(7),
+  step: z.number().default(1),
+});
+
+export const SceneQuestionPayloadSchema = z.object({
+  type: z.literal("scene").or(z.literal("image")).optional(),
+  format: z.literal("scene").optional(),
+  prompt: z.string().min(1),
+  scene_asset_key: z.string().nullable().optional(),
+  cards: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        value: z.string().min(1),
+        illustration_key: z.string().nullable().optional(),
+        caption: z.string().nullable().optional(),
+      })
+    )
+    .min(3)
+    .max(5),
+});
+
+export const SayItQuestionPayloadSchema = z.object({
+  type: z.literal("say_it").or(z.literal("text")).optional(),
+  format: z.literal("say_it").optional(),
+  prompt: z.string().min(1),
+  placeholder: z.string().optional(),
+  max_length: z.number().default(80),
+});
+
+export const QuestionPayloadSchema = z.union([
   TextQuestionPayloadSchema,
   NumberQuestionPayloadSchema,
   ColourQuestionPayloadSchema,
   ImageQuestionPayloadSchema,
   WordQuestionPayloadSchema,
+  Pick2Of6QuestionPayloadSchema,
+  Rank3QuestionPayloadSchema,
+  Slider7QuestionPayloadSchema,
+  SceneQuestionPayloadSchema,
+  SayItQuestionPayloadSchema,
 ]);
 
 // ---------------------------------------------------------------------------
@@ -173,11 +306,15 @@ export const QuestionResponseSchema = z.object({
   id: UUIDSchema,
   position: z.number().int().min(1).max(5),
   type: QuestionTypeSchema,
+  format: QuestionFormatSchema.default("pick1"),
   render_variant: RenderVariantSchema.default("standard"),
   template_id: z.string().nullable().optional(),
   template_key: z.string().nullable().optional(),
   tags: z.array(z.string()).optional(),
   payload: QuestionPayloadSchema,
+  scene_asset_key: z.string().nullable().optional(),
+  entropy_estimate: z.number().nullable().optional(),
+  tie_risk_estimate: z.number().nullable().optional(),
   answer_options: z.array(AnswerOptionResponseSchema),
 });
 
@@ -281,6 +418,19 @@ export const ResultResponseSchema = z.object({
       twin_id: z.string(),
       similarity_score: z.number().min(0).max(1),
       is_provisional: z.boolean(),
+      tie_group_size: z.number().int().min(1).optional(),
+      is_mutual: z.boolean().optional(),
+      tie_break_reason: z.string().optional(),
+      history_days: z.number().int().min(0).optional(),
+      why_you_two: z
+        .array(
+          z.object({
+            question_id: z.string(),
+            value: z.unknown(),
+            rarity_percent: z.number(),
+          })
+        )
+        .optional(),
       matched_at: z.string().datetime(),
     })
     .nullable(),

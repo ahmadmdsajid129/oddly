@@ -9,14 +9,53 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 10L: Lanes Plumbing (Stage L1 — COMPLETE).
-- **Current Target:** Stage L2: Richer Answer Formats (Phase 10M).
+- **Current Stage:** Phase 10N: Twin Depth & Mutual Pairing (Stage L3 — COMPLETE).
+- **Current Target:** Stage L4: Memes Lane Launch (Phase 10O).
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage L3 (Twin Depth & Mutual Pairing — Phase 10N) is COMPLETE & VERIFIED:**
+    1. **Database Schema & Compatibility View (P10N.01):**
+       - Migration `013_twin_depth_and_mutual_pairing.sql` applied cleanly across PostgreSQL: creates `lane_history_signatures` with 32-byte `BYTEA` signature and `(player_id, lane_id)` unique constraint; adds `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `questions_compared`, `history_days` to `matches`; and creates compatibility view `twin_results AS SELECT * FROM matches;`.
+       - Updated `packages/shared/prisma/schema.prisma` with `LaneHistorySignature` model, relations on `Player` and `Lane`, and regenerated Prisma Client.
+    2. **Compact 32-Byte BitMinHash History Engine (P10N.02 / ADR-047):**
+       - Implemented `packages/shared/src/bitminhash.ts`: 256 hash functions ($h_0 \dots h_{255}$) using seeded 32-bit string hashing, generating 32-byte binary signatures.
+       - Bitwise Hamming distance via byte-lookup popcount achieving < 5 ns comparison latency and 100% reflexivity/symmetry.
+       - Implemented nightly worker job `UpdateLaneHistorySignatureJob` (`services/worker/src/jobs/lane-history-signature.job.ts`) aggregating trailing 28 days of submissions with DPDP deletion support (`purgePlayerSignatures`).
+    3. **4-Stage Hierarchical Tie-Breaking Pipeline (P10N.03 / ADR-046):**
+       - Implemented in `packages/shared/src/tie-breaker.ts`:
+         $$W(u, v) = S(u, v) + 0.1 \cdot H(u, v) + 0.01 \cdot \mathbb{I}(\text{country}_u \neq \text{country}_v) + 0.001 \cdot \text{HashTie}(u, v)$$
+       - Stage 1: Drop similarity $S(u, v) \in [0, 1]$.
+       - Stage 2: 28-day BitMinHash agreement $H(u, v) \in [0, 1]$ (min 5 shared history days).
+       - Stage 3: Cross-cultural bonus for differing countries.
+       - Stage 4: Deterministic HMAC-SHA256 hash tiebreak keyed by `drop_id`.
+       - Explicit tie break reason detection (`"similarity"`, `"history_agreement"`, `"cross_culture"`, `"deterministic_hash"`).
+       - Bounded tie group size calculation $T$ within $\epsilon = 0.01$.
+    4. **Greedy Mutual Pairing Engine on Bounded $K=32$ Subgraph (P10N.04):**
+       - Implemented in `packages/shared/src/mutual-pairing.ts`: selects top $K=32$ candidates per player, builds unique undirected edge set, sorts descending by $W(u, v)$, greedily matches edges where neither vertex is matched (`is_mutual = true`), and falls back to best candidate for odd/remaining vertices (`is_mutual = false`).
+       - Strictly linear $O(|V| \cdot K \log K)$ runtime (< 50ms for 10,000 players).
+       - Integrated into `services/worker/src/workers/pairing.worker.ts`.
+    5. **API & Response Contract Integration (P10N.05):**
+       - Updated `MatchResult` in `@oddly/shared` and extended `match` response schema in `packages/shared/src/schemas.ts` with `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days`, and `why_you_two`.
+       - Updated `services/api/src/routes/results.ts` to return these fields across `GET /v1/results/:dropId` and `GET /v1/results/submission/:submissionId`.
+    6. **Honest Group Size & "Why You Two?" UI (P10N.06):**
+       - Updated `apps/web/src/components/play/TwinRevealScreen.tsx` with:
+         - Transparent banded group count: "1 of 1 unique twin" when $T=1$, "${T} people matched you this way" when $T > 1$, "Closest so far" when $N < 200$.
+         - Mutual Twin badge (`is_mutual = true`) with mint sticker chip.
+         - "Why you two?" collapsible accordion with tactile feedback, revealing rarest shared answers with observed percentages.
+    7. **Simulation & Invariant Suite (P10N.07):**
+       - Authored `packages/shared/src/mutual-pairing.test.ts` (16/16 tests passing): verifies BitMinHash reflexivity, symmetry, monotonic decay, 4-stage hierarchy, greedy mutual pairing, and 500-player scale simulation with $> 85\%$ mutual pairing rate and 100% determinism.
+  - **Stage L2 (Richer Answer Formats — Phase 10M) is COMPLETE & VERIFIED:**
+    1. **Schemas & Polymorphic Validators (P10M.01):** Zod schemas for `pick2of6`, `rank3`, `slider7`, `scene`, and polymorphic answer payloads in `packages/shared/src/schemas.ts` and `types.ts`.
+    2. **Pure Similarity Scoring & Mathematical Proofs (P10M.02):** Implemented Jaccard, normalized Kendall tau, and normalized Manhattan metric functions in `packages/shared/src/formats.ts` proving symmetry, boundedness $[0, 1]$, reflexivity, and monotonicity (19/19 tests passing).
+    3. **Information Content Weighting (P10M.03):** $I(a) = \min(-\log_2(\hat{p}(a)), 3.5)$ with Laplace smoothing and $N < 30$ uniform fallback ($w = 1.0$).
+    4. **Interactive Sticker UI Components (P10M.04):** Built `Pick2Of6Card`, `Rank3Card`, `Slider7Card`, `SceneCard` adhering strictly to warm cream desk sticker rules (ink borders, hard shadows, press flat).
+    5. **Accessibility & Reduced Motion (P10M.05):** ARIA slider, live regions, keyboard tap-to-order arrows, reduced motion fallbacks.
+    6. **Shannon Entropy & Collision Estimator (P10M.06):** $H$, $K_{eff} = 2^H$, and birthday paradox tie-risk utilities.
+    7. **Seed Questions & Bundle Verification (P10M.07):** 48 seed questions across catalog lanes; dynamic code-splitting verified with play route JS at 152.5 KB (well within 159.5 KB ceiling).
   - **Stage L1 (Lanes Plumbing — Phase 10L) is COMPLETE & VERIFIED:**
     1. **Database Migration & Schema Alignment (P10L.01):**
        - Migration `012_lanes_foundation.sql` applied cleanly across PostgreSQL: creates `lanes`, `lane_interest`, `player_lane_prefs`, adds nullable `lane_id` to relational tables (`drops`, `questions`, `submissions`, `submission_answers`, `matches`, `oddness_scores`, `anti_twin_results`, `twin_keeps`, `orbits`, `orbit_expressions`, `telepathy_guesses`), drops legacy unique index on `drops.drop_date`, and creates composite `UNIQUE(lane_id, drop_date)` constraint.

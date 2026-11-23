@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 64%`                                                       |
-| **Current Active Stage**        | **Phase 10L: Lanes Plumbing (COMPLETE)**                                          |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 68%`                                                       |
+| **Current Active Stage**        | **Phase 10O: Memes Lane Launch (Stage L4)**                                       |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 264 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 278 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 146 tasks                                                                        |
+| **Pending (`TODO`)**            | 132 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -71,8 +71,8 @@
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage M7              |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage M8              |
 | **Phase 10L**| Lanes Plumbing                              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage L1              |
-| **Phase 10M**| Richer Answer Formats                       | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L2              |
-| **Phase 10N**| Twin Depth & Mutual Pairing                 | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L3              |
+| **Phase 10M**| Richer Answer Formats                       | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 7 / 7              | Stage L2              |
+| **Phase 10N**| Twin Depth & Mutual Pairing                 | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 7 / 7              | Stage L3              |
 | **Phase 10O**| Memes Lane Launch                           | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 5              | Stage L4 (after M1)   |
 | **Phase 10P**| Situations Lane (Cards First)               | Medium   | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 5              | Stage L5              |
 | **Phase 10Q**| Say It: Free-Text Answers (Gate G4)         | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 8              | Stage L6 (Gate G4)    |
@@ -567,33 +567,33 @@ _Status: COMPLETE | Target: Core lanes data model, backfill, per-lane Drop sched
 
 ### Phase 10M: Richer Answer Formats (Stage L2)
 
-_Status: TODO | Target: Polymorphic validator, similarity metrics, interactive components for pick2of6, rank3, slider7, scene._
+_Status: COMPLETE | Target: Polymorphic validator, similarity metrics, interactive components for pick2of6, rank3, slider7, scene._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10M.01` | Implement polymorphic question validator and schemas for `pick2of6`, `rank3`, `slider7`, and `scene`       | 🔴 Critical  | ⚪ TODO         | P10L.10        | Agent | —         | Strict JSONSchema / Zod payloads         |
-| `[ ] P10M.02` | Implement similarity scoring functions ($s_q$) for all richer formats with symmetry and boundedness proofs  | 🔴 Critical  | ⚪ TODO         | P10M.01        | Agent | —         | Jaccard, Kendall tau, Manhattan dist     |
-| `[ ] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 3.5-bit cap     | 🟠 High      | ⚪ TODO         | P10M.02        | Agent | —         | Prevents single-answer match hijack      |
-| `[ ] P10M.04` | Build interactive frontend components for `pick2of6`, `rank3` (tap/drag), `slider7`, and `scene`        | 🟠 High      | ⚪ TODO         | P10M.01, P1.01 | Agent | —         | Physical tactile sticker styling         |
-| `[ ] P10M.05` | Implement accessibility keyboard controls, ARIA live tags, and reduced-motion fallbacks for all formats     | 🟠 High      | ⚪ TODO         | P10M.04        | Agent | —         | Tap-to-order default on mobile           |
-| `[ ] P10M.06` | Implement tie-risk and entropy estimator utility functions in `@oddly/shared`                              | 🟡 Medium    | ⚪ TODO         | P10M.02        | Agent | —         | Computes theoretical & effective entropy |
-| `[ ] P10M.07` | Create seed batches with 12 sample questions per format and verify bundle size remains $\le 159.5$ KB        | 🟠 High      | ⚪ TODO         | P10M.04        | Agent | —         | Dynamic component code-splitting         |
+| `[x] P10M.01` | Implement polymorphic question validator and schemas for `pick2of6`, `rank3`, `slider7`, and `scene`       | 🔴 Critical  | ✅ DONE         | P10L.10        | Agent | 2026-11-23| Strict JSONSchema / Zod payloads         |
+| `[x] P10M.02` | Implement similarity scoring functions ($s_q$) for all richer formats with symmetry and boundedness proofs  | 🔴 Critical  | ✅ DONE         | P10M.01        | Agent | 2026-11-23| Jaccard, Kendall tau, Manhattan dist     |
+| `[x] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 3.5-bit cap     | 🟠 High      | ✅ DONE         | P10M.02        | Agent | 2026-11-23| Prevents single-answer match hijack      |
+| `[x] P10M.04` | Build interactive frontend components for `pick2of6`, `rank3` (tap/drag), `slider7`, and `scene`        | 🟠 High      | ✅ DONE         | P10M.01, P1.01 | Agent | 2026-11-23| Physical tactile sticker styling         |
+| `[x] P10M.05` | Implement accessibility keyboard controls, ARIA live tags, and reduced-motion fallbacks for all formats     | 🟠 High      | ✅ DONE         | P10M.04        | Agent | 2026-11-23| Tap-to-order default on mobile           |
+| `[x] P10M.06` | Implement tie-risk and entropy estimator utility functions in `@oddly/shared`                              | 🟡 Medium    | ✅ DONE         | P10M.02        | Agent | 2026-11-23| Computes theoretical & effective entropy |
+| `[x] P10M.07` | Create seed batches with 12 sample questions per format and verify bundle size remains $\le 159.5$ KB        | 🟠 High      | ✅ DONE         | P10M.04        | Agent | 2026-11-23| Dynamic component code-splitting         |
 
 ---
 
 ### Phase 10N: Twin Depth & Mutual Pairing (Stage L3)
 
-_Status: TODO | Target: Bounded tie groups, 28-day BitMinHash history agreement, greedy mutual pairing, honest group size UI._
+_Status: COMPLETE | Target: Bounded tie groups, 28-day BitMinHash history agreement, greedy mutual pairing, honest group size UI._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10N.01` | Expand migration: add `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days` to `twin_results` | 🔴 Critical  | ⚪ TODO         | P10L.01 | Agent | — | Lightweight relational columns           |
-| `[ ] P10N.02` | Implement 32-byte BitMinHash history signature table and daily batch aggregation worker job                 | 🟠 High      | ⚪ TODO         | P10N.01        | Agent | —         | Compact fixed-size sketches              |
-| `[ ] P10N.03` | Implement 4-stage tie-breaking pipeline (similarity, 28-day history, different country, deterministic hash) | 🔴 Critical  | ⚪ TODO         | P10N.02        | Agent | —         | Cryptographic deterministic tiebreak     |
-| `[ ] P10N.04` | Implement greedy mutual pairing algorithm with bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$)    | 🔴 Critical  | ⚪ TODO         | P10N.03        | Agent | —         | Mutual pairing guarantee (`is_mutual`)   |
-| `[ ] P10N.05` | Update matching API to return honest group size ($T$), mutual flag, and "Why you two?" rare agreement data  | 🟠 High      | ⚪ TODO         | P10N.04        | Agent | —         | Radical mathematical honesty             |
-| `[ ] P10N.06` | Build UI for banded tie-group count ("312 people matched you this way"), $T=1$ copy, and "Why you two?"    | 🟠 High      | ⚪ TODO         | P10N.05        | Agent | —         | Accordion reveals rare shared choices    |
-| `[ ] P10N.07` | Author synthetic tie-size simulation harness and execute Stage A/B deterministic scale and idempotency tests| 🔴 Critical  | ⚪ TODO         | P10N.04        | Agent | —         | Verifies bounded latency and zero drift  |
+| `[x] P10N.01` | Expand migration: add `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days` to `twin_results` | 🔴 Critical  | ✅ DONE         | P10L.01 | Agent | 2026-11-23| Lightweight relational columns           |
+| `[x] P10N.02` | Implement 32-byte BitMinHash history signature table and daily batch aggregation worker job                 | 🟠 High      | ✅ DONE         | P10N.01        | Agent | 2026-11-23| Compact fixed-size sketches              |
+| `[x] P10N.03` | Implement 4-stage tie-breaking pipeline (similarity, 28-day history, different country, deterministic hash) | 🔴 Critical  | ✅ DONE         | P10N.02        | Agent | 2026-11-23| Cryptographic deterministic tiebreak     |
+| `[x] P10N.04` | Implement greedy mutual pairing algorithm with bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$)    | 🔴 Critical  | ✅ DONE         | P10N.03        | Agent | 2026-11-23| Mutual pairing guarantee (`is_mutual`)   |
+| `[x] P10N.05` | Update matching API to return honest group size ($T$), mutual flag, and "Why you two?" rare agreement data  | 🟠 High      | ✅ DONE         | P10N.04        | Agent | 2026-11-23| Radical mathematical honesty             |
+| `[x] P10N.06` | Build UI for banded tie-group count ("312 people matched you this way"), $T=1$ copy, and "Why you two?"    | 🟠 High      | ✅ DONE         | P10N.05        | Agent | 2026-11-23| Accordion reveals rare shared choices    |
+| `[x] P10N.07` | Author synthetic tie-size simulation harness and execute Stage A/B deterministic scale and idempotency tests| 🔴 Critical  | ✅ DONE         | P10N.04        | Agent | 2026-11-23| Verifies bounded latency and zero drift  |
 
 ---
 
@@ -1082,24 +1082,24 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Verify regression suite: Everyday lane scoring, oddness, and results 100% identical to baseline.
 - **Stage L2 Checklist (Phase 10M: Richer Answer Formats):**
   <!-- visual:start -stage-l2-checklist-phase-10m-richer-answer-formats--bar -->
-  > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/6 verification items verified)
+  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (6/6 verification items verified)
   <!-- visual:end -stage-l2-checklist-phase-10m-richer-answer-formats--bar -->
-  - [ ] Implement and test polymorphic schemas for `pick2of6`, `rank3`, `slider7`, and `scene`.
-  - [ ] Verify mathematical properties of similarity functions: symmetry, boundedness $[0, 1]$, and identity.
-  - [ ] Verify information content weighting with smoothed set frequencies and 3.5-bit cap.
-  - [ ] Verify mobile tap-to-order and desktop drag-to-rank for `rank3`.
-  - [ ] Verify accessibility keyboard navigation and ARIA tags across all new formats.
-  - [ ] Verify play route bundle size remains strictly $\le 159.5$ KB gzipped.
+  - [x] Implement and test polymorphic schemas for `pick2of6`, `rank3`, `slider7`, and `scene`.
+  - [x] Verify mathematical properties of similarity functions: symmetry, boundedness $[0, 1]$, and identity.
+  - [x] Verify information content weighting with smoothed set frequencies and 3.5-bit cap.
+  - [x] Verify mobile tap-to-order and desktop drag-to-rank for `rank3`.
+  - [x] Verify accessibility keyboard navigation and ARIA tags across all new formats.
+  - [x] Verify play route bundle size remains strictly $\le 159.5$ KB gzipped.
 - **Stage L3 Checklist (Phase 10N: Twin Depth & Mutual Pairing):**
   <!-- visual:start -stage-l3-checklist-phase-10n-twin-depth-mutual-pairing--bar -->
-  > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/6 verification items verified)
+  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (6/6 verification items verified)
   <!-- visual:end -stage-l3-checklist-phase-10n-twin-depth-mutual-pairing--bar -->
-  - [ ] Run migration for `twin_results` additions and `lane_history_signature`.
-  - [ ] Verify 32-byte BitMinHash history signature generation and daily update worker job.
-  - [ ] Test 4-stage tie-breaking pipeline: similarity, 28-day history, different country, deterministic HMAC hash.
-  - [ ] Test greedy mutual pairing on bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$).
-  - [ ] Verify transparent honest group size UI ("312 people matched you this way"), $T=1$ copy, and "Closest so far".
-  - [ ] Verify "Why you two?" accordion accurately surfaces rare shared answers.
+  - [x] Run migration for `twin_results` additions and `lane_history_signature`.
+  - [x] Verify 32-byte BitMinHash history signature generation and daily update worker job.
+  - [x] Test 4-stage tie-breaking pipeline: similarity, 28-day history, different country, deterministic HMAC hash.
+  - [x] Test greedy mutual pairing on bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$).
+  - [x] Verify transparent honest group size UI ("312 people matched you this way"), $T=1$ copy, and "Closest so far".
+  - [x] Verify "Why you two?" accordion accurately surfaces rare shared answers.
 - **Stage L4 Checklist (Phase 10O: Memes Lane Launch):**
   <!-- visual:start -stage-l4-checklist-phase-10o-memes-lane-launch--bar -->
   > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/4 verification items verified)

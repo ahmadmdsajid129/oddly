@@ -11,7 +11,7 @@
  */
 
 import {
-  batchMatch,
+  executeMutualPairing,
   type SubmissionForMatching,
 } from "@oddly/shared";
 
@@ -34,6 +34,10 @@ export interface StoredMatchRecord {
   twin_location_a: string;
   twin_location_b: string;
   is_provisional: boolean;
+  tie_group_size?: number;
+  is_mutual?: boolean;
+  tie_break_reason?: string;
+  history_days?: number;
   matched_at: Date;
 }
 
@@ -95,10 +99,10 @@ export class PairingWorker {
     const createdMatches: StoredMatchRecord[] = [];
     let totalUnmatched = 0;
 
-    // 2. Perform matching within each age band independently
+    // 2. Perform mutual matching within each age band independently
     for (const [, bandCandidates] of ageBands.entries()) {
-      const { matches, unmatched } = batchMatch(bandCandidates, optionMap);
-      totalUnmatched += unmatched.length;
+      const { matches, unmatchedIds } = executeMutualPairing(bandCandidates, dropId, optionMap);
+      totalUnmatched += unmatchedIds.length;
 
       const candidateMap = new Map(bandCandidates.map((c) => [c.submission_id, c]));
 
@@ -124,6 +128,10 @@ export class PairingWorker {
           twin_location_a: locForA,
           twin_location_b: locForB,
           is_provisional: true,
+          tie_group_size: m.tie_group_size,
+          is_mutual: m.is_mutual,
+          tie_break_reason: m.tie_break_reason,
+          history_days: m.history_days,
           matched_at: new Date(),
         };
 

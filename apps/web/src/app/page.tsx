@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BrandMark } from "@/components/icons";
@@ -13,7 +13,6 @@ import { StreakFlame } from "@/components/ui/StreakFlame";
 import { PwaInstallButton } from "@/components/ui/PwaInstallButton";
 import { useToast } from "@/components/ui/Toast";
 import { LaneChip } from "@/components/lanes/LaneChip";
-import { LanePicker } from "@/components/lanes/LanePicker";
 import { feedback } from "@/lib/feedback";
 import { api } from "@/lib/api";
 import {
@@ -31,10 +30,9 @@ import {
   useNetworkStatus,
   usePlayStore,
 } from "@/lib/play-state";
-import { AgeGateModal } from "@/components/play/AgeGateModal";
 import { OfflineBanner } from "@/components/play/OfflineBanner";
 import { FirstRunConsentBanner } from "@/components/ui/FirstRunConsentBanner";
-import { QuestionScreen, QuestionData } from "@/components/play/QuestionScreen";
+import type { QuestionData } from "@/components/play/QuestionScreen";
 import type { TwinMatchData } from "@/components/play/TwinRevealScreen";
 import type { OddnessData } from "@/components/play/OddnessScreen";
 import { DegradationBanner, type DegradationLevel } from "@/components/ui/DegradationBanner";
@@ -43,6 +41,21 @@ import { FreshnessLabel } from "@/components/ui/OverloadScreens";
 import { WidgetErrorBoundary } from "@/components/ui/ResiliencePrimitives";
 import { useResultPolling } from "@/lib/use-result-polling";
 import dynamic from "next/dynamic";
+
+const LanePicker = dynamic(
+  () => import("@/components/lanes/LanePicker").then((m) => m.LanePicker),
+  { ssr: false }
+);
+
+const AgeGateModal = dynamic(
+  () => import("@/components/play/AgeGateModal").then((m) => m.AgeGateModal),
+  { ssr: false }
+);
+
+const QuestionScreen = dynamic(
+  () => import("@/components/play/QuestionScreen").then((m) => m.QuestionScreen),
+  { ssr: false }
+);
 
 const Under18Screen = dynamic(
   () => import("@/components/play/Under18Screen").then((m) => m.Under18Screen),
@@ -164,7 +177,7 @@ interface StoredPlayResult {
   oddness: OddnessData;
 }
 
-export default function HomePage() {
+function HomePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlLane = searchParams.get("lane");
@@ -923,5 +936,19 @@ export default function HomePage() {
       {/* First Run DPDP Privacy Consent Banner */}
       <FirstRunConsentBanner />
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-cream flex items-center justify-center font-display font-bold text-ink">
+          Loading Oddly...
+        </div>
+      }
+    >
+      <HomePageInner />
+    </Suspense>
   );
 }

@@ -133,7 +133,7 @@ export function RateLimitScreen({
           </h2>
 
           <p className="font-body text-body-s text-muted max-w-xs mx-auto leading-relaxed">
-            You've made a few too many taps in a short moment. Give the desk a second to catch up before trying again.
+            You&apos;ve made a few too many taps in a short moment. Give the desk a second to catch up before trying again.
           </p>
         </div>
 
@@ -216,7 +216,7 @@ export function ServiceOverloadScreen({
           </div>
 
           <h2 className="font-display text-display-m font-extrabold text-ink">
-            Everyone's playing Oddly right now
+            Everyone&apos;s playing Oddly right now
           </h2>
 
           <p className="font-body text-body-s text-muted max-w-xs mx-auto leading-relaxed">

@@ -18,6 +18,14 @@ export type DropStatus = "pending" | "live" | "closed";
 
 export type QuestionType = "text" | "number" | "colour" | "image" | "word";
 
+export type QuestionFormat =
+  | "pick1"
+  | "pick2of6"
+  | "rank3"
+  | "slider7"
+  | "scene"
+  | "say_it";
+
 export type RenderVariant = "standard" | "meme";
 
 export type ShareFormat = "story" | "square" | "link";
@@ -29,7 +37,7 @@ export type ReportReason = "offensive" | "spam" | "incorrect" | "other";
 export type Locale = "en" | "hi" | "gu";
 
 // ---------------------------------------------------------------------------
-// Answer payloads — discriminated union by question type
+// Answer payloads — discriminated union by question type / format
 // ---------------------------------------------------------------------------
 
 /** Q-Type 1: Text (pick one label from a list) */
@@ -67,12 +75,52 @@ export interface WordAnswerPayload {
   value: string[]; // selected word values
 }
 
+/** Q-Format: Pick 2 of 6 (multiselect exactly 2 distinct items) */
+export interface Pick2Of6AnswerPayload {
+  type: "pick2of6";
+  question_id: string;
+  value: [string, string] | string[];
+}
+
+/** Q-Format: Rank 3 (ordered permutation of 3 items) */
+export interface Rank3AnswerPayload {
+  type: "rank3";
+  question_id: string;
+  value: [string, string, string] | string[];
+}
+
+/** Q-Format: Slider 7 (discrete 1-7 spectrum) */
+export interface Slider7AnswerPayload {
+  type: "slider7";
+  question_id: string;
+  value: number; // 1 to 7 integer
+}
+
+/** Q-Format: Scene (pick 1 reaction card out of 3-5) */
+export interface SceneAnswerPayload {
+  type: "scene";
+  question_id: string;
+  value: string;
+}
+
+/** Q-Format: Say It (free-text answer up to 80 chars, Gate G4) */
+export interface SayItAnswerPayload {
+  type: "say_it";
+  question_id: string;
+  value: string;
+}
+
 export type AnswerPayload =
   | TextAnswerPayload
   | NumberAnswerPayload
   | ColourAnswerPayload
   | ImageAnswerPayload
-  | WordAnswerPayload;
+  | WordAnswerPayload
+  | Pick2Of6AnswerPayload
+  | Rank3AnswerPayload
+  | Slider7AnswerPayload
+  | SceneAnswerPayload
+  | SayItAnswerPayload;
 
 // ---------------------------------------------------------------------------
 // Question question payload (what's stored in questions.payload JSONB)
@@ -116,12 +164,66 @@ export interface WordQuestionPayload {
   max_selections: number;
 }
 
+export interface Pick2Of6QuestionPayload {
+  type?: "pick2of6" | "text";
+  prompt: string;
+  options: Array<{
+    label: string;
+    value: string;
+    illustration_key?: string | null;
+  }>;
+}
+
+export interface Rank3QuestionPayload {
+  type?: "rank3" | "text";
+  prompt: string;
+  items: Array<{
+    label: string;
+    value: string;
+  }>;
+}
+
+export interface Slider7QuestionPayload {
+  type?: "slider7" | "number";
+  prompt: string;
+  left_label: string;
+  right_label: string;
+  mid_label?: string | null;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
+export interface SceneQuestionPayload {
+  type?: "scene" | "image";
+  prompt: string;
+  scene_asset_key?: string | null;
+  cards: Array<{
+    label: string;
+    value: string;
+    illustration_key?: string | null;
+    caption?: string | null;
+  }>;
+}
+
+export interface SayItQuestionPayload {
+  type?: "say_it" | "text";
+  prompt: string;
+  placeholder?: string;
+  max_length?: number;
+}
+
 export type QuestionPayload =
   | TextQuestionPayload
   | NumberQuestionPayload
   | ColourQuestionPayload
   | ImageQuestionPayload
-  | WordQuestionPayload;
+  | WordQuestionPayload
+  | Pick2Of6QuestionPayload
+  | Rank3QuestionPayload
+  | Slider7QuestionPayload
+  | SceneQuestionPayload
+  | SayItQuestionPayload;
 
 // ---------------------------------------------------------------------------
 // API response shapes
@@ -141,11 +243,17 @@ export interface QuestionResponse {
   id: string;
   position: number;
   type: QuestionType;
+  format?: QuestionFormat;
   render_variant?: RenderVariant;
   template_id?: string | null;
   template_key?: string | null;
   tags?: string[];
   payload: QuestionPayload;
+  options?: unknown;
+  subject_tags?: unknown;
+  scene_asset_key?: string | null;
+  entropy_estimate?: number | null;
+  tie_risk_estimate?: number | null;
   answer_options: AnswerOptionResponse[];
 }
 
@@ -307,6 +415,15 @@ export interface MatchResult {
   submission_a_id: string;
   submission_b_id: string;
   similarity_score: number;
+  tie_group_size?: number;
+  is_mutual?: boolean;
+  tie_break_reason?: string;
+  history_days?: number;
+  why_you_two?: Array<{
+    question_id: string;
+    value: unknown;
+    rarity_percent: number;
+  }>;
   matched_at: Date;
 }
 

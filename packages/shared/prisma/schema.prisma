@@ -117,6 +117,7 @@ model Player {
   paywallEvents    PaywallEvent[]
   laneInterests    LaneInterest[]
   lanePrefs        PlayerLanePref[]
+  laneHistorySignatures LaneHistorySignature[]
 
   @@index([account_id])
   @@index([did])
@@ -1207,6 +1208,7 @@ model Lane {
   playerLanePrefs PlayerLanePref[]
   oddnessScores   OddnessScore[]
   antiTwinResults AntiTwinResult[]
+  laneHistorySignatures LaneHistorySignature[]
 
   @@index([status])
   @@index([slug])
@@ -1252,6 +1254,27 @@ model PlayerLanePref {
   @@index([lane_id])
   @@map("player_lane_prefs")
 }
+
+// ---------------------------------------------------------------------------
+// 56. lane_history_signatures — compact 32-byte BitMinHash signatures (Stage L3 / Phase 10N / ADR-047)
+// ---------------------------------------------------------------------------
+model LaneHistorySignature {
+  id          String   @id @default(uuid())
+  player_id   String
+  lane_id     String
+  signature   Bytes    // 32 bytes (256 bits)
+  days_active Int      @default(0)
+  updated_at  DateTime @default(now())
+
+  player Player @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  lane   Lane   @relation(fields: [lane_id], references: [id], onDelete: Cascade)
+
+  @@unique([player_id, lane_id])
+  @@index([player_id])
+  @@index([lane_id])
+  @@map("lane_history_signatures")
+}
+
 
 
 

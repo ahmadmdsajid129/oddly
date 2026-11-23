@@ -78,6 +78,58 @@ export function ReviewScreen({
       );
     }
 
+    if (ans.type === "pick2of6") {
+      const vals = Array.isArray(ans.value) ? ans.value : [];
+      return (
+        <div className="flex flex-wrap gap-1.5 justify-end">
+          {vals.map((v) => {
+            const opt = q.payload.options?.find((o) => o.value === v);
+            return (
+              <span
+                key={v}
+                className="px-2 py-0.5 rounded-pill bg-sun border-[1.5px] border-ink text-xs font-bold font-display text-ink"
+              >
+                {opt ? opt.label : v}
+              </span>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (ans.type === "rank3") {
+      const vals = Array.isArray(ans.value) ? ans.value : [];
+      return (
+        <span className="font-bold text-xs text-ink">
+          {vals
+            .map((v, i) => {
+              const it = q.payload.items?.find((item) => item.value === v);
+              return `${i + 1}. ${it ? it.label : v}`;
+            })
+            .join(" → ")}
+        </span>
+      );
+    }
+
+    if (ans.type === "slider7") {
+      return (
+        <span className="px-2.5 py-0.5 rounded-pill bg-paper border-[1.5px] border-ink text-xs font-bold font-display text-ink">
+          {ans.value === 1
+            ? q.payload.left_label || "Left"
+            : ans.value === 7
+            ? q.payload.right_label || "Right"
+            : ans.value === 4 && q.payload.mid_label
+            ? q.payload.mid_label
+            : `Point ${ans.value} of 7`}
+        </span>
+      );
+    }
+
+    if (ans.type === "scene") {
+      const card = q.payload.cards?.find((c) => c.value === ans.value);
+      return <span className="font-bold text-ink">{card ? card.label : ans.value}</span>;
+    }
+
     return null;
   };
 

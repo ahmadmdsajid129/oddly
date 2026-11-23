@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { ArrowLeft, X } from "lucide-react";
 import { ProgressDots } from "@/components/ui/FeedbackPrimitives";
 import { Atmosphere } from "@/components/ui/Atmosphere";
@@ -12,6 +13,24 @@ import {
   ImageTileGrid,
   WordChipsGrid,
 } from "@/components/play/AnswerComponents";
+
+// Dynamic component code-splitting for Richer Formats (P10M.07 bundle budget guard)
+const Pick2Of6Card = dynamic(
+  () => import("@/components/play/Pick2Of6Card").then((mod) => mod.Pick2Of6Card),
+  { ssr: true }
+);
+const Rank3Card = dynamic(
+  () => import("@/components/play/Rank3Card").then((mod) => mod.Rank3Card),
+  { ssr: true }
+);
+const Slider7Card = dynamic(
+  () => import("@/components/play/Slider7Card").then((mod) => mod.Slider7Card),
+  { ssr: true }
+);
+const SceneCard = dynamic(
+  () => import("@/components/play/SceneCard").then((mod) => mod.SceneCard),
+  { ssr: true }
+);
 import { DynamicIllustration } from "@/components/illustrations";
 import { Button } from "@/components/ui/Button";
 import type { AnswerPayload } from "@oddly/shared";
@@ -33,15 +52,22 @@ const TEMPLATE_KEY_TO_ILLUSTRATION: Record<string, string> = {
 export interface QuestionData {
   id: string;
   order: number;
-  type: "text" | "number" | "colour" | "image" | "word";
+  type: string;
+  format?: string;
   render_variant?: "standard" | "meme";
   template_key?: string;
   template_illustration_key?: string;
   tags?: string[];
   payload: {
-    type: string;
+    type?: string;
+    format?: string;
     prompt: string;
-    options?: Array<{ label: string; value: string }>;
+    options?: Array<{ label: string; value: string; illustration_key?: string | null }>;
+    items?: Array<{ label: string; value: string }>;
+    left_label?: string;
+    right_label?: string;
+    mid_label?: string | null;
+    cards?: Array<{ label: string; value: string; illustration_key?: string | null; caption?: string | null }>;
     min?: number;
     max?: number;
     step?: number;
@@ -233,9 +259,128 @@ export function QuestionScreen({
 
         {/* Polymorphic Input Component */}
         <div className="w-full pt-1">
-          {/* 1. Text Question */}
-          {question.type === "text" && question.payload.options && (
-            <div className="flex flex-col gap-3 w-full">
+          {/* Rich Format 1: pick2of6 */}
+          {(question.format === "pick2of6" ||
+            question.type === "pick2of6" ||
+            question.payload.format === "pick2of6") &&
+            question.payload.options && (
+              <Pick2Of6Card
+                questionId={question.id}
+                options={question.payload.options}
+                selectedValue={
+                  currentAnswer?.type === "pick2of6"
+                    ? (currentAnswer.value as string[])
+                    : []
+                }
+                onChange={(val) => {
+                  onAnswer({
+                    type: "pick2of6",
+                    question_id: question.id,
+                    value: val,
+                  });
+                }}
+                onLockIn={(val) => {
+                  const payload: AnswerPayload = {
+                    type: "pick2of6",
+                    question_id: question.id,
+                    value: val,
+                  };
+                  scheduleAutoAdvance(payload);
+                }}
+              />
+            )}
+
+          {/* Rich Format 2: rank3 */}
+          {(question.format === "rank3" ||
+            question.type === "rank3" ||
+            question.payload.format === "rank3") &&
+            question.payload.items && (
+              <Rank3Card
+                questionId={question.id}
+                items={question.payload.items}
+                currentOrder={
+                  currentAnswer?.type === "rank3"
+                    ? (currentAnswer.value as string[])
+                    : undefined
+                }
+                onChange={(val) => {
+                  onAnswer({
+                    type: "rank3",
+                    question_id: question.id,
+                    value: val,
+                  });
+                }}
+                onLockIn={(val) => {
+                  const payload: AnswerPayload = {
+                    type: "rank3",
+                    question_id: question.id,
+                    value: val,
+                  };
+                  scheduleAutoAdvance(payload);
+                }}
+              />
+            )}
+
+          {/* Rich Format 3: slider7 */}
+          {(question.format === "slider7" ||
+            question.type === "slider7" ||
+            question.payload.format === "slider7" ||
+            Boolean(question.payload.left_label)) && (
+            <Slider7Card
+              questionId={question.id}
+              leftLabel={question.payload.left_label || "Low"}
+              rightLabel={question.payload.right_label || "High"}
+              midLabel={question.payload.mid_label}
+              value={
+                currentAnswer?.type === "slider7" ? currentAnswer.value : 4
+              }
+              onChange={(val) => {
+                onAnswer({
+                  type: "slider7",
+                  question_id: question.id,
+                  value: val,
+                });
+              }}
+              onLockIn={(val) => {
+                const payload: AnswerPayload = {
+                  type: "slider7",
+                  question_id: question.id,
+                  value: val,
+                };
+                scheduleAutoAdvance(payload);
+              }}
+            />
+          )}
+
+          {/* Rich Format 4: scene */}
+          {(question.format === "scene" ||
+            question.type === "scene" ||
+            question.payload.format === "scene") &&
+            question.payload.cards && (
+              <SceneCard
+                questionId={question.id}
+                cards={question.payload.cards}
+                selectedValue={
+                  currentAnswer?.type === "scene" ? currentAnswer.value : undefined
+                }
+                onSelect={(val) => {
+                  scheduleAutoAdvance({
+                    type: "scene",
+                    question_id: question.id,
+                    value: val,
+                  });
+                }}
+              />
+            )}
+
+          {/* 1. Text Question (Pick 1 of 2-4) */}
+          {question.type === "text" &&
+            question.format !== "pick2of6" &&
+            question.format !== "rank3" &&
+            question.payload.format !== "pick2of6" &&
+            question.payload.format !== "rank3" &&
+            question.payload.options && (
+              <div className="flex flex-col gap-3 w-full">
               {question.payload.options.map((opt) => (
                 <AnswerTile
                   key={opt.value}

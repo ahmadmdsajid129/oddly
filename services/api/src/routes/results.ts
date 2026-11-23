@@ -7,7 +7,7 @@
 
 import { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { hashTwinId } from "@oddly/shared";
+import { hashTwinId, extractWhyYouTwo } from "@oddly/shared";
 import { prisma } from "../db/client.js";
 import { SubmissionsRepository } from "../db/submissions.repo.js";
 import { MatchesRepository } from "../db/matches.repo.js";
@@ -79,6 +79,17 @@ export const resultsRoutes: FastifyPluginAsyncZod = async (app) => {
           : match.player_a_id
         : null;
 
+      let whyYouTwo: Array<{ question_id: string; value: unknown; rarity_percent: number }> = [];
+      if (match && twinId) {
+        const twinSubId = match.player_a_id === playerId ? match.submission_b_id : match.submission_a_id;
+        if (twinSubId) {
+          const twinSub = await SubmissionsRepository.getById(twinSubId);
+          if (twinSub && Array.isArray(submission.answers) && Array.isArray(twinSub.answers)) {
+            whyYouTwo = extractWhyYouTwo(submission.answers as any, twinSub.answers as any);
+          }
+        }
+      }
+
       return {
         ok: true,
         submission_id: submission.id,
@@ -93,6 +104,11 @@ export const resultsRoutes: FastifyPluginAsyncZod = async (app) => {
               twin_token: hashTwinId(twinId, req.params.dropId),
               similarity_score: match.similarity_score,
               is_provisional: match.is_provisional,
+              tie_group_size: match.tie_group_size ?? 1,
+              is_mutual: match.is_mutual ?? true,
+              tie_break_reason: match.tie_break_reason ?? "similarity",
+              history_days: match.history_days ?? 0,
+              why_you_two: whyYouTwo,
               matched_at: match.matched_at.toISOString(),
             }
           : null,
@@ -137,6 +153,17 @@ export const resultsRoutes: FastifyPluginAsyncZod = async (app) => {
           : match.player_a_id
         : null;
 
+      let whyYouTwo: Array<{ question_id: string; value: unknown; rarity_percent: number }> = [];
+      if (match && twinId) {
+        const twinSubId = match.player_a_id === submission.player_id ? match.submission_b_id : match.submission_a_id;
+        if (twinSubId) {
+          const twinSub = await SubmissionsRepository.getById(twinSubId);
+          if (twinSub && Array.isArray(submission.answers) && Array.isArray(twinSub.answers)) {
+            whyYouTwo = extractWhyYouTwo(submission.answers as any, twinSub.answers as any);
+          }
+        }
+      }
+
       return {
         ok: true,
         submission_id: submission.id,
@@ -151,6 +178,11 @@ export const resultsRoutes: FastifyPluginAsyncZod = async (app) => {
               twin_token: hashTwinId(twinId, submission.drop_id),
               similarity_score: match.similarity_score,
               is_provisional: match.is_provisional,
+              tie_group_size: match.tie_group_size ?? 1,
+              is_mutual: match.is_mutual ?? true,
+              tie_break_reason: match.tie_break_reason ?? "similarity",
+              history_days: match.history_days ?? 0,
+              why_you_two: whyYouTwo,
             }
           : null,
       };

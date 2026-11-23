@@ -308,3 +308,12 @@ export function WordChipsGrid({
     </div>
   );
 }
+
+// ==============================================================================
+// 6. Richer Answer Formats (Stage L2 / Phase 10M)
+// ==============================================================================
+export { Pick2Of6Card, type Pick2Option, type Pick2Of6CardProps } from "./Pick2Of6Card";
+export { Rank3Card, type RankItem, type Rank3CardProps } from "./Rank3Card";
+export { Slider7Card, type Slider7CardProps } from "./Slider7Card";
+export { SceneCard, type SceneOption, type SceneCardProps } from "./SceneCard";
+

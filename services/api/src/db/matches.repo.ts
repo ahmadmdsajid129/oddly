@@ -14,11 +14,16 @@ export class MatchesRepository {
   static async createMatch(data: {
     drop_id: string;
     drop_date?: Date;
+    lane_id?: string;
     player_a_id: string;
     player_b_id: string;
     submission_a_id?: string;
     submission_b_id?: string;
     similarity_score: number;
+    tie_group_size?: number;
+    is_mutual?: boolean;
+    tie_break_reason?: string;
+    history_days?: number;
     is_provisional?: boolean;
   }) {
     let dropDate = data.drop_date;
@@ -31,11 +36,16 @@ export class MatchesRepository {
       data: {
         drop_id: data.drop_id,
         drop_date: dropDate,
+        lane_id: data.lane_id,
         player_a_id: data.player_a_id,
         player_b_id: data.player_b_id,
         submission_a_id: data.submission_a_id,
         submission_b_id: data.submission_b_id,
         similarity_score: data.similarity_score,
+        tie_group_size: data.tie_group_size ?? 1,
+        is_mutual: data.is_mutual ?? true,
+        tie_break_reason: data.tie_break_reason ?? "similarity",
+        history_days: data.history_days ?? 0,
         is_provisional: data.is_provisional ?? true,
       },
       include: {
