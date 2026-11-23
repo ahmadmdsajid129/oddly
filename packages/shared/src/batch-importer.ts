@@ -256,13 +256,19 @@ export async function importBatchJson(
     const closesAt = dropClosesAt(dropDateStr);
 
     const drop = await prisma.drop.upsert({
-      where: { drop_date: dropDateObj },
+      where: {
+        lane_id_drop_date: {
+          lane_id: "00000000-0000-4000-a000-000000000001",
+          drop_date: dropDateObj,
+        },
+      },
       update: {
         opens_at: opensAt,
         closes_at: closesAt,
         theme_key: dropItem.theme_key ?? null,
       },
       create: {
+        lane_id: "00000000-0000-4000-a000-000000000001",
         drop_date: dropDateObj,
         opens_at: opensAt,
         closes_at: closesAt,

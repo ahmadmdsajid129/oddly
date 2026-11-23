@@ -57,19 +57,11 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
     },
     onSuccess: (_, laneId) => {
       setInterestedLanes((prev) => ({ ...prev, [laneId]: true }));
-      toast({
-        title: "Interest Noted!",
-        description: "We'll let you know as soon as this lane opens.",
-        variant: "success",
-      });
+      toast("Interest Noted! We'll let you know as soon as this lane opens.", "success");
       void queryClient.invalidateQueries({ queryKey: ["lanes-catalogue"] });
     },
     onError: () => {
-      toast({
-        title: "Could not save preference",
-        description: "Please check your network and try again.",
-        variant: "error",
-      });
+      toast("Could not save preference. Please check your network and try again.", "error");
     },
   });
 
@@ -261,3 +253,4 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
     </section>
   );
 }
+
