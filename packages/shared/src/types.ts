@@ -156,7 +156,44 @@ export interface DropResponse {
   status: DropStatus;
   theme_key?: string | null;
   telepathy_question_id?: string | null;
+  lane_id?: string | null;
+  is_resting?: boolean;
   questions: QuestionResponse[];
+}
+
+/** Stage L1: Subject Lane Types */
+export type LaneStatus = "planned" | "preview" | "open" | "resting" | "retired";
+
+export interface LaneSummary {
+  id: string;
+  slug: string;
+  name_key: string;
+  description_key: string;
+  accent_token: string;
+  icon_key: string;
+  status: LaneStatus;
+  sort_order: number;
+  age_rating: string;
+  formats_allowed: string[];
+  text_enabled: boolean;
+  super_twin_enabled: boolean;
+  players_today?: number;
+  subscribers_count?: number;
+  opened_at?: string | null;
+}
+
+export interface LaneDetail extends LaneSummary {
+  current_drop?: DropResponse | null;
+  is_resting?: boolean;
+}
+
+export interface PlayerLanePrefResponse {
+  lane_id: string;
+  slug: string;
+  name_key: string;
+  notify: boolean;
+  plays_count: number;
+  last_played_at: string | null;
 }
 
 /** POST /v1/submissions — request body */

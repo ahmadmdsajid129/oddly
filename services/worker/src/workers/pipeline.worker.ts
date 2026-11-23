@@ -33,6 +33,8 @@ export interface StageDropResult {
   questionCount: number;
   preCached: boolean;
   alreadyStaged?: boolean;
+  laneSlug?: string;
+  lanesStaged?: number;
 }
 
 export interface OpenDropResult {
@@ -41,6 +43,8 @@ export interface OpenDropResult {
   dropDate: string;
   status: "live";
   alreadyOpen?: boolean;
+  laneSlug?: string;
+  lanesOpened?: number;
 }
 
 export interface CloseDropResult {
@@ -49,6 +53,8 @@ export interface CloseDropResult {
   dropDate: string;
   status: "closed";
   alreadyClosed?: boolean;
+  laneSlug?: string;
+  lanesClosed?: number;
 }
 
 export interface BatchChunkProgress {
@@ -96,32 +102,56 @@ export class PipelineWorker {
   }
 
   /**
-   * Stage Drop Processor (P9.02).
-   * 06:30 IST: Verifies drop questions, pre-compiles JSON, warms Redis cache.
+   * Stage Drop Processor (P9.02, P10L.03).
+   * 06:30 IST: Verifies drop questions, pre-compiles JSON, warms Redis cache per lane.
    */
   static async executeStageDrop(
     redis: Redis,
-    targetDateStr = getTwinDay(new Date())
+    targetDateStr = getTwinDay(new Date()),
+    laneSlug?: string
   ): Promise<StageDropResult> {
+    const targetDate = new Date(`${targetDateStr}T00:00:00.000Z`);
+
     // 1. Check idempotency: check if already successfully staged
-    const cachedPre = await redis.get(`cache:drop:${targetDateStr}:pre_cache`);
-    if (cachedPre) {
-      return {
-        ok: true,
-        dropId: JSON.parse(cachedPre).id,
-        dropDate: targetDateStr,
-        questionCount: 5,
-        preCached: true,
-        alreadyStaged: true,
-      };
+    if (laneSlug) {
+      const cached = await redis.get(`lane:${laneSlug}:drop:${targetDateStr}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return {
+          ok: true,
+          dropId: parsed.id,
+          dropDate: targetDateStr,
+          questionCount: 5,
+          preCached: true,
+          alreadyStaged: true,
+          laneSlug,
+          lanesStaged: 1,
+        };
+      }
+    } else {
+      const legacyPre = await redis.get(`cache:drop:${targetDateStr}:pre_cache`);
+      if (legacyPre) {
+        return {
+          ok: true,
+          dropId: JSON.parse(legacyPre).id,
+          dropDate: targetDateStr,
+          questionCount: 5,
+          preCached: true,
+          alreadyStaged: true,
+          laneSlug: "everyday",
+          lanesStaged: 1,
+        };
+      }
     }
 
-    // 2. Fetch drop from DB
-    const drop = await prisma.drop.findFirst({
+    // 2. Fetch drops matching target date and optional lane filter
+    const drops = await prisma.drop.findMany({
       where: {
-        drop_date: new Date(`${targetDateStr}T00:00:00.000Z`),
+        drop_date: targetDate,
+        ...(laneSlug ? { lane: { slug: laneSlug } } : {}),
       },
       include: {
+        lane: true,
         questions: {
           orderBy: { position: "asc" },
           include: {
@@ -131,51 +161,81 @@ export class PipelineWorker {
       },
     });
 
-    if (!drop) {
-      throw new Error(`[Pipeline] Cannot stage drop: No drop found for date ${targetDateStr}`);
+    if (drops.length === 0) {
+      // Fallback check if single unassigned legacy drop exists
+      const fallback = await prisma.drop.findFirst({
+        where: { drop_date: targetDate },
+        include: {
+          lane: true,
+          questions: {
+            orderBy: { position: "asc" },
+            include: { answerOptions: { orderBy: { display_order: "asc" } } },
+          },
+        },
+      });
+      if (!fallback) {
+        throw new Error(`[Pipeline] Cannot stage drop: No drop found for date ${targetDateStr}`);
+      }
+      drops.push(fallback);
     }
 
-    if (drop.questions.length !== 5) {
-      throw new Error(
-        `[Pipeline] Drop ${drop.id} integrity violation: Expected 5 questions, found ${drop.questions.length}`
-      );
-    }
+    let stagedCount = 0;
+    let primaryDropId = "";
 
-    // 3. Pre-compile Drop JSON
-    const preCompiledJson = JSON.stringify({
-      id: drop.id,
-      drop_date: targetDateStr,
-      opens_at: drop.opens_at.toISOString(),
-      closes_at: drop.closes_at.toISOString(),
-      is_open: drop.status === "live",
-      questions: drop.questions.map((q) => ({
-        id: q.id,
-        position: q.position,
-        type: q.type,
-        payload: q.payload,
-        answer_options: q.answerOptions.map((opt) => ({
-          id: opt.id,
-          label: opt.label,
-          value: opt.value,
-          display_order: opt.display_order,
-          illustration_key: opt.illustration_key,
+    for (const drop of drops) {
+      if (drop.questions.length !== 5) {
+        throw new Error(
+          `[Pipeline] Drop ${drop.id} integrity violation: Expected 5 questions, found ${drop.questions.length}`
+        );
+      }
+
+      const currentLaneSlug = drop.lane?.slug || laneSlug || "everyday";
+      const preCompiledJson = JSON.stringify({
+        id: drop.id,
+        drop_date: targetDateStr,
+        lane_id: drop.lane_id,
+        lane_slug: currentLaneSlug,
+        opens_at: drop.opens_at.toISOString(),
+        closes_at: drop.closes_at.toISOString(),
+        is_open: drop.status === "live",
+        questions: drop.questions.map((q) => ({
+          id: q.id,
+          position: q.position,
+          type: q.type,
+          format: q.format || "pick1",
+          payload: q.payload,
+          options: q.options,
+          answer_options: q.answerOptions.map((opt) => ({
+            id: opt.id,
+            label: opt.label,
+            value: opt.value,
+            display_order: opt.display_order,
+            illustration_key: opt.illustration_key,
+          })),
         })),
-      })),
-    });
+      });
 
-    // 4. Warm Redis pre-cache with 24-hour TTL
-    await redis.set(`cache:drop:${targetDateStr}:pre_cache`, preCompiledJson, "EX", 86400);
+      // Warm lane-keyed Redis cache (architecture.md 18.3) with 24-hour TTL
+      await redis.set(`lane:${currentLaneSlug}:drop:${targetDateStr}`, preCompiledJson, "EX", 86400);
 
-    // 5. Record scheduler run
+      // Backwards compatibility for Everyday lane
+      if (currentLaneSlug === "everyday" || !primaryDropId) {
+        await redis.set(`cache:drop:${targetDateStr}:pre_cache`, preCompiledJson, "EX", 86400);
+        primaryDropId = drop.id;
+      }
+      stagedCount++;
+    }
+
+    const jobName = laneSlug ? `stageDrop:${laneSlug}` : "stageDrop";
     await prisma.schedulerRun.upsert({
       where: {
         job_name_run_for: {
-          job_name: "stageDrop",
+          job_name: jobName,
           run_for: targetDateStr,
         },
       },
       create: {
-        job_name: "stageDrop",
+        job_name: jobName,
         run_for: targetDateStr,
         status: "completed",
         completed_at: new Date(),
@@ -188,27 +248,35 @@ export class PipelineWorker {
 
     return {
       ok: true,
-      dropId: drop.id,
+      dropId: primaryDropId || drops[0].id,
       dropDate: targetDateStr,
-      questionCount: drop.questions.length,
+      questionCount: 5,
       preCached: true,
       alreadyStaged: false,
+      laneSlug: laneSlug || "everyday",
+      lanesStaged: stagedCount,
     };
   }
 
   /**
-   * Open Drop Processor (P9.03).
-   * 07:00 IST: Idempotently transitions drop status to 'live' and broadcasts release.
+   * Open Drop Processor (P9.03, P10L.03).
+   * 07:00 IST: Idempotently transitions drop status to 'live' and broadcasts release per lane.
    */
   static async executeOpenDrop(
     redis: Redis,
-    targetDateStr = getTwinDay(new Date())
+    targetDateStr = getTwinDay(new Date()),
+    laneSlug?: string
   ): Promise<OpenDropResult> {
-    // 1. Idempotency check: if status is already live in Redis or DB, double-firing is harmless
-    const statusInRedis = await redis.get(`cache:drop:${targetDateStr}:status`);
+    const lockKey = laneSlug ? `openDrop:${laneSlug}` : "openDrop";
+    const statusKey = laneSlug ? `lane:${laneSlug}:drop:${targetDateStr}:status` : `cache:drop:${targetDateStr}:status`;
+    const statusInRedis = await redis.get(statusKey);
+
     if (statusInRedis === "live") {
       const drop = await prisma.drop.findFirst({
-        where: { drop_date: new Date(`${targetDateStr}T00:00:00.000Z`) },
+        where: {
+          drop_date: new Date(`${targetDateStr}T00:00:00.000Z`),
+          ...(laneSlug ? { lane: { slug: laneSlug } } : {}),
+        },
         select: { id: true },
       });
       return {
@@ -217,13 +285,13 @@ export class PipelineWorker {
         dropDate: targetDateStr,
         status: "live",
         alreadyOpen: true,
+        laneSlug: laneSlug || "everyday",
+        lanesOpened: 1,
       };
     }
 
-    // 2. Acquire atomic leader lock (protects against concurrent double-fires)
-    const acquired = await PipelineWorker.acquireLeaderLock(redis, "openDrop", targetDateStr, 30);
+    const acquired = await PipelineWorker.acquireLeaderLock(redis, lockKey, targetDateStr, 30);
     if (!acquired) {
-      // Another worker is opening or already opened; verify current status
       await new Promise((r) => setTimeout(r, 200));
       return {
         ok: true,
@@ -231,38 +299,58 @@ export class PipelineWorker {
         dropDate: targetDateStr,
         status: "live",
         alreadyOpen: true,
+        laneSlug: laneSlug || "everyday",
+        lanesOpened: 1,
       };
     }
 
     try {
-      // 3. Find drop record
-      const drop = await prisma.drop.findFirst({
-        where: { drop_date: new Date(`${targetDateStr}T00:00:00.000Z`) },
+      const targetDate = new Date(`${targetDateStr}T00:00:00.000Z`);
+      const drops = await prisma.drop.findMany({
+        where: {
+          drop_date: targetDate,
+          ...(laneSlug ? { lane: { slug: laneSlug } } : {}),
+        },
+        include: { lane: true },
       });
 
-      if (!drop) {
+      if (drops.length === 0) {
         throw new Error(`[Pipeline] Cannot open drop: No drop found for date ${targetDateStr}`);
       }
 
-      // 4. Update status in PostgreSQL to live
-      await prisma.drop.update({
-        where: { id: drop.id },
-        data: { status: "live" },
-      });
+      let openedCount = 0;
+      let primaryDropId = "";
 
-      // 5. Update status in Redis with 24-hour TTL
-      await redis.set(`cache:drop:${targetDateStr}:status`, "live", "EX", 86400);
+      for (const drop of drops) {
+        await prisma.drop.update({
+          where: { id: drop.id },
+          data: { status: "live" },
+        });
 
-      // 6. Record scheduler run
+        const slug = drop.lane?.slug || "everyday";
+        await redis.set(`lane:${slug}:drop:${targetDateStr}:status`, "live", "EX", 86400);
+
+        if (slug === "everyday" || !primaryDropId) {
+          await redis.set(`cache:drop:${targetDateStr}:status`, "live", "EX", 86400);
+          primaryDropId = drop.id;
+        }
+
+        await redis.publish(
+          "drop:opened",
+          JSON.stringify({ dropId: drop.id, dropDate: targetDateStr, laneSlug: slug })
+        );
+        openedCount++;
+      }
+
       await prisma.schedulerRun.upsert({
         where: {
           job_name_run_for: {
-            job_name: "openDrop",
+            job_name: lockKey,
             run_for: targetDateStr,
           },
         },
         create: {
-          job_name: "openDrop",
+          job_name: lockKey,
           run_for: targetDateStr,
           status: "completed",
           completed_at: new Date(),
@@ -273,66 +361,73 @@ export class PipelineWorker {
         },
       });
 
-      // 7. Publish event to Redis
-      await redis.publish("drop:opened", JSON.stringify({ dropId: drop.id, dropDate: targetDateStr }));
-
       return {
         ok: true,
-        dropId: drop.id,
+        dropId: primaryDropId || drops[0].id,
         dropDate: targetDateStr,
         status: "live",
         alreadyOpen: false,
+        laneSlug: laneSlug || "everyday",
+        lanesOpened: openedCount,
       };
     } finally {
-      await PipelineWorker.releaseLeaderLock(redis, "openDrop", targetDateStr);
+      await PipelineWorker.releaseLeaderLock(redis, lockKey, targetDateStr);
     }
   }
 
   /**
-   * Close Drop Processor (P9.05).
-   * 06:59:59 IST: Locks submissions and marks drop as closed.
+   * Close Drop Processor (P9.05, P10L.03).
+   * 06:59:59 IST: Locks submissions and marks drop as closed per lane.
    */
   static async executeCloseDrop(
     redis: Redis,
-    targetDateStr = getTwinDay(new Date())
+    targetDateStr = getTwinDay(new Date()),
+    laneSlug?: string
   ): Promise<CloseDropResult> {
-    const drop = await prisma.drop.findFirst({
-      where: { drop_date: new Date(`${targetDateStr}T00:00:00.000Z`) },
+    const targetDate = new Date(`${targetDateStr}T00:00:00.000Z`);
+    const drops = await prisma.drop.findMany({
+      where: {
+        drop_date: targetDate,
+        ...(laneSlug ? { lane: { slug: laneSlug } } : {}),
+      },
+      include: { lane: true },
     });
 
-    if (!drop) {
+    if (drops.length === 0) {
       throw new Error(`[Pipeline] Cannot close drop: No drop found for date ${targetDateStr}`);
     }
 
-    if (drop.status === "closed") {
-      return {
-        ok: true,
-        dropId: drop.id,
-        dropDate: targetDateStr,
-        status: "closed",
-        alreadyClosed: true,
-      };
+    let closedCount = 0;
+    let primaryDropId = "";
+
+    for (const drop of drops) {
+      if (drop.status !== "closed") {
+        await prisma.drop.update({
+          where: { id: drop.id },
+          data: { status: "closed" },
+        });
+      }
+
+      const slug = drop.lane?.slug || "everyday";
+      await redis.set(`lane:${slug}:drop:${targetDateStr}:status`, "closed", "EX", 86400);
+
+      if (slug === "everyday" || !primaryDropId) {
+        await redis.set(`cache:drop:${targetDateStr}:status`, "closed", "EX", 86400);
+        primaryDropId = drop.id;
+      }
+      closedCount++;
     }
 
-    // 1. Update in DB
-    await prisma.drop.update({
-      where: { id: drop.id },
-      data: { status: "closed" },
-    });
-
-    // 2. Update in Redis
-    await redis.set(`cache:drop:${targetDateStr}:status`, "closed", "EX", 86400);
-
-    // 3. Record scheduler run
+    const jobName = laneSlug ? `closeDrop:${laneSlug}` : "closeDrop";
     await prisma.schedulerRun.upsert({
       where: {
         job_name_run_for: {
-          job_name: "closeDrop",
+          job_name: jobName,
           run_for: targetDateStr,
         },
       },
       create: {
-        job_name: "closeDrop",
+        job_name: jobName,
         run_for: targetDateStr,
         status: "completed",
         completed_at: new Date(),
@@ -345,10 +440,12 @@ export class PipelineWorker {
 
     return {
       ok: true,
-      dropId: drop.id,
+      dropId: primaryDropId || drops[0].id,
       dropDate: targetDateStr,
       status: "closed",
       alreadyClosed: false,
+      laneSlug: laneSlug || "everyday",
+      lanesClosed: closedCount,
     };
   }
 

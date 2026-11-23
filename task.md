@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 62%`                                                       |
-| **Current Active Stage**        | **Phase 9: Daily Pipeline & BullMQ Scheduler (COMPLETE)**                         |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 64%`                                                       |
+| **Current Active Stage**        | **Phase 10L: Lanes Plumbing (COMPLETE)**                                          |
 | **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 254 tasks (Proven by code, tests & integration test suite)                       |
+| **Completed Tasks (`DONE`)**    | 264 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 156 tasks                                                                        |
+| **Pending (`TODO`)**            | 146 tasks                                                                        |
 
 
 <!-- visual:start dashboard-visuals -->
@@ -70,7 +70,7 @@
 | **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 8 / 8              | Stage M5/M6           |
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage M7              |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage M8              |
-| **Phase 10L**| Lanes Plumbing                              | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 10             | Stage L1              |
+| **Phase 10L**| Lanes Plumbing                              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage L1              |
 | **Phase 10M**| Richer Answer Formats                       | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L2              |
 | **Phase 10N**| Twin Depth & Mutual Pairing                 | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L3              |
 | **Phase 10O**| Memes Lane Launch                           | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 5              | Stage L4 (after M1)   |
@@ -548,20 +548,20 @@ _Status: COMPLETE | Target: Provider-agnostic entitlements, feature flags for pe
 
 ### Phase 10L: Lanes Plumbing (Stage L1)
 
-_Status: TODO | Target: Core lanes data model, backfill, per-lane Drop scheduler, REST API, Lane Chip & Picker UI, regression test._
+_Status: COMPLETE | Target: Core lanes data model, backfill, per-lane Drop scheduler, REST API, Lane Chip & Picker UI, regression test._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[ ] P10L.01` | Database migrations: `lanes`, `lane_interest`, `player_lane_prefs`, and expand `lane_id` foreign keys  | 🔴 Critical  | ⚪ TODO         | P2.01, P10K.01 | Agent | —         | Expand-only migration; Rule L1/L2. Verification note: Before writing the migration, confirm against the real Prisma schema: (a) whether the player table is `players` or `users`; (b) the id type (UUID or TEXT) used by `drops`, `questions`, and the player table. Lane, bonus and badge tables in `architecture.md` 18.2.1 and 18.11.1 currently mix `players(id)` and `users(id)` and use TEXT ids. Fix the docs to match reality first. |
-| `[ ] P10L.02` | Author idempotent resumable backfill script assigning all existing historical Drops to Everyday lane        | 🔴 Critical  | ⚪ TODO         | P10L.01        | Agent | —         | Validates row counts before commit       |
-| `[ ] P10L.03` | Update Drop scheduling pipeline and daily 07:00 IST BullMQ job to run per lane with lane-keyed Redis cache  | 🔴 Critical  | ⚪ TODO         | P10L.01, P9.01 | Agent | —         | Shared Drop clock; zero stagger in v1    |
-| `[ ] P10L.04` | Implement REST endpoints `GET /v1/lanes` and `GET /v1/lanes/:id` with ETag and public cache headers        | 🟠 High      | ⚪ TODO         | P10L.01        | Agent | —         | Serves lane metadata and status chips    |
-| `[ ] P10L.05` | Implement `POST /v1/lanes/:id/interest` ("Tell me when it opens") endpoint with consent and rate limits     | 🟡 Medium    | ⚪ TODO         | P10L.01        | Agent | —         | Aggregated counts; anonymized opt-in     |
-| `[ ] P10L.06` | Build universal `LaneChip` component and responsive `LanePicker` home UI with Sticker pop styling         | 🟠 High      | ⚪ TODO         | P10L.04, P1.01 | Agent | —         | First visit bypasses to Everyday (L10)   |
-| `[ ] P10L.07` | Update result view, share card generator, and challenge links to carry lane chip and accent token           | 🟠 High      | ⚪ TODO         | P10L.06, P6.01 | Agent | —         | Lane isolation; challenge routes to lane |
-| `[ ] P10L.08` | Implement per-lane push notification opt-in preferences respecting the global 2-push/day ceiling           | 🟡 Medium    | ⚪ TODO         | P10L.01, P10.01| Agent | —         | Default ON for Everyday only             |
-| `[ ] P10L.09` | Implement Gate L-A runtime evaluation logic and resting lane countdown state                                | 🟠 High      | ⚪ TODO         | P10L.01        | Agent | —         | Rule L9; resting lanes never serve drop  |
-| `[ ] P10L.10` | Seed 9 catalog lanes (Everyday & Memes open) and run regression test proving Everyday is identical         | 🔴 Critical  | ⚪ TODO         | P10L.01-P10L.09| Agent | —         | 100% scoring parity verified             |
+| `[x] P10L.01` | Database migrations: `lanes`, `lane_interest`, `player_lane_prefs`, and expand `lane_id` foreign keys  | 🔴 Critical  | ✅ DONE         | P2.01, P10K.01 | Agent | 2026-11-23| Expand-only migration; 012_lanes_foundation.sql applied with players(id) and UUID types |
+| `[x] P10L.02` | Author idempotent resumable backfill script assigning all existing historical Drops to Everyday lane        | 🔴 Critical  | ✅ DONE         | P10L.01        | Agent | 2026-11-23| scripts/backfill-lanes.mjs batched, throttled, verified 0 NULLs, 100% idempotent |
+| `[x] P10L.03` | Update Drop scheduling pipeline and daily 07:00 IST BullMQ job to run per lane with lane-keyed Redis cache  | 🔴 Critical  | ✅ DONE         | P10L.01, P9.01 | Agent | 2026-11-23| Pipeline worker & scheduler per-lane with lane-keyed Redis cache; verified via tests |
+| `[x] P10L.04` | Implement REST endpoints `GET /v1/lanes` and `GET /v1/lanes/:id` with ETag and public cache headers        | 🟠 High      | ✅ DONE         | P10L.01        | Agent | 2026-11-23| Public catalogue, live player count, subscriber count, 60s cache, ETag/304 support |
+| `[x] P10L.05` | Implement `POST /v1/lanes/:id/interest` ("Tell me when it opens") endpoint with consent and rate limits     | 🟡 Medium    | ✅ DONE         | P10L.01        | Agent | 2026-11-23| Anonymized opt-in subscriber tracking with consent verification & rate limits |
+| `[x] P10L.06` | Build universal `LaneChip` component and responsive `LanePicker` home UI with Sticker pop styling         | 🟠 High      | ✅ DONE         | P10L.04, P1.01 | Agent | 2026-11-23| Universal LaneChip and responsive LanePicker built; Rule L10 first-run bypass verified |
+| `[x] P10L.07` | Update result view, share card generator, and challenge links to carry lane chip and accent token           | 🟠 High      | ✅ DONE         | P10L.06, P6.01 | Agent | 2026-11-23| FlipCard, TwinRevealScreen, ShareSheet updated with lane chip and &lane= challenge routing |
+| `[x] P10L.08` | Implement per-lane push notification opt-in preferences respecting the global 2-push/day ceiling           | 🟡 Medium    | ✅ DONE         | P10L.01, P10.01| Agent | 2026-11-23| GET/PUT /v1/me/lane-prefs with 2-push daily cap and Everyday default ON |
+| `[x] P10L.09` | Implement Gate L-A runtime evaluation logic and resting lane countdown state                                | 🟠 High      | ✅ DONE         | P10L.01        | Agent | 2026-11-23| Rule L9 resting evaluation; missing drop returns is_resting=true without old drop leak |
+| `[x] P10L.10` | Seed 9 catalog lanes (Everyday & Memes open) and run regression test proving Everyday is identical         | 🔴 Critical  | ✅ DONE         | P10L.01-P10L.09| Agent | 2026-11-23| 9 catalog lanes seeded, Everyday scoring & oddness verified identical across all suites |
 
 ---
 
@@ -1070,16 +1070,16 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
   - [x] Test "Meme of the Week" showcase surface without public leaderboard rankings.
 - **Stage L1 Checklist (Phase 10L: Lanes Plumbing):**
   <!-- visual:start -stage-l1-checklist-phase-10l-lanes-plumbing--bar -->
-  > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/8 verification items verified)
+  > 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 **100%** (8/8 verification items verified)
   <!-- visual:end -stage-l1-checklist-phase-10l-lanes-plumbing--bar -->
-  - [ ] Run expand migrations for `lanes`, `lane_interest`, `player_lane_prefs`, and foreign keys.
-  - [ ] Execute idempotent backfill assigning existing data to Everyday lane with row count verification.
-  - [ ] Verify Drop scheduler and daily 07:00 IST job execute cleanly per lane with lane-keyed Redis cache.
-  - [ ] Test `GET /v1/lanes` and `GET /v1/lanes/:id` endpoints with ETags and public caching.
-  - [ ] Test `POST /v1/lanes/:id/interest` subscriber tracking with rate limits and consent.
-  - [ ] Verify Lane Picker UI and Universal Lane Chip on mobile (360px) with Sticker pop styling.
-  - [ ] Verify first-time visitors route directly into Everyday Drop without lane picker screen (Rule L10).
-  - [ ] Verify regression suite: Everyday lane scoring, oddness, and results 100% identical to baseline.
+  - [x] Run expand migrations for `lanes`, `lane_interest`, `player_lane_prefs`, and foreign keys.
+  - [x] Execute idempotent backfill assigning existing data to Everyday lane with row count verification.
+  - [x] Verify Drop scheduler and daily 07:00 IST job execute cleanly per lane with lane-keyed Redis cache.
+  - [x] Test `GET /v1/lanes` and `GET /v1/lanes/:id` endpoints with ETags and public caching.
+  - [x] Test `POST /v1/lanes/:id/interest` subscriber tracking with rate limits and consent.
+  - [x] Verify Lane Picker UI and Universal Lane Chip on mobile (360px) with Sticker pop styling.
+  - [x] Verify first-time visitors route directly into Everyday Drop without lane picker screen (Rule L10).
+  - [x] Verify regression suite: Everyday lane scoring, oddness, and results 100% identical to baseline.
 - **Stage L2 Checklist (Phase 10M: Richer Answer Formats):**
   <!-- visual:start -stage-l2-checklist-phase-10m-richer-answer-formats--bar -->
   > ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ **0%** (0/6 verification items verified)

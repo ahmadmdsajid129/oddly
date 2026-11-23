@@ -107,27 +107,27 @@ export class DailyScheduler {
   }
 
   /**
-   * Trigger for staging step (R1.1 / P9.02).
+   * Trigger for staging step (R1.1 / P9.02, P10L.03).
    */
-  async triggerStageDrop(dropDate?: string) {
+  async triggerStageDrop(dropDate?: string, laneSlug?: string) {
     if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
-    return PipelineWorker.executeStageDrop(this.redisClient, dropDate);
+    return PipelineWorker.executeStageDrop(this.redisClient, dropDate, laneSlug);
   }
 
   /**
-   * Trigger for opening live drop (R1.1 / P9.03).
+   * Trigger for opening live drop (R1.1 / P9.03, P10L.03).
    */
-  async triggerOpenDrop(dropDate?: string) {
+  async triggerOpenDrop(dropDate?: string, laneSlug?: string) {
     if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
-    return PipelineWorker.executeOpenDrop(this.redisClient, dropDate);
+    return PipelineWorker.executeOpenDrop(this.redisClient, dropDate, laneSlug);
   }
 
   /**
-   * Trigger for closure (R1.1 / P9.05).
+   * Trigger for closure (R1.1 / P9.05, P10L.03).
    */
-  async triggerDropClosure(dropDate?: string) {
+  async triggerDropClosure(dropDate?: string, laneSlug?: string) {
     if (!this.redisClient) throw new Error("Redis client not initialized in scheduler");
-    return PipelineWorker.executeCloseDrop(this.redisClient, dropDate);
+    return PipelineWorker.executeCloseDrop(this.redisClient, dropDate, laneSlug);
   }
 
   /**

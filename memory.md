@@ -9,14 +9,36 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 9: Daily Pipeline & BullMQ Scheduler (COMPLETE).
-- **Current Target:** Stage L1: Lanes Data Model, Migration & Backfill (on Founder command).
+- **Current Stage:** Phase 10L: Lanes Plumbing (Stage L1 — COMPLETE).
+- **Current Target:** Stage L2: Richer Answer Formats (Phase 10M).
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage L1 (Lanes Plumbing — Phase 10L) is COMPLETE & VERIFIED:**
+    1. **Database Migration & Schema Alignment (P10L.01):**
+       - Migration `012_lanes_foundation.sql` applied cleanly across PostgreSQL: creates `lanes`, `lane_interest`, `player_lane_prefs`, adds nullable `lane_id` to relational tables (`drops`, `questions`, `submissions`, `submission_answers`, `matches`, `oddness_scores`, `anti_twin_results`, `twin_keeps`, `orbits`, `orbit_expressions`, `telepathy_guesses`), drops legacy unique index on `drops.drop_date`, and creates composite `UNIQUE(lane_id, drop_date)` constraint.
+       - Resolved architecture discrepancies: player table is `players` (UUID primary keys).
+       - Seeded 9 catalog lanes (`everyday`, `memes`, `food`, `gaming`, `work`, `movies`, `music`, `situations`, `deep`) with everyday and memes marked `open`.
+    2. **Idempotent Historical Data Backfill (P10L.02):**
+       - Created and executed `scripts/backfill-lanes.mjs` assigning all historical Drops (26 drops, 76 questions, 13 orbit expressions) to Everyday lane (`00000000-0000-4000-a000-000000000001`). Verified 0 NULLs and 100% idempotency.
+    3. **Worker Pipeline & Scheduler per Lane (P10L.03):**
+       - Updated `services/worker/src/workers/pipeline.worker.ts` and `scheduler.ts` to execute staging, opening, and closure per lane with lane-keyed Redis cache (`lane:${slug}:drop:${date}`). All worker pipeline tests pass (`lanes-pipeline.test.ts` 6/6, `pipeline.test.ts` 15/15).
+    4. **REST Endpoints & Gate L-A / Rule L9 Runtime (P10L.04, P10L.05, P10L.08, P10L.09):**
+       - Built `services/api/src/routes/lanes.ts` (`GET /v1/lanes`, `GET /v1/lanes/:id`, `POST /v1/lanes/:id/interest`, `GET /v1/me/lane-prefs`, `PUT /v1/me/lane-prefs`, `GET /v1/lanes/:id/gate-status`).
+       - Supported `?lane=slug` on `GET /v1/drop/today` and `GET /v1/drops/today`.
+       - Rule L9 resting evaluation returns `{ is_resting: true, status: 'resting' }` if open lane lacks today's 5-question drop, never leaking stale drops. All 12/12 API tests pass (`lanes.test.ts`).
+    5. **Universal LaneChip & Responsive LanePicker UI (P10L.06):**
+       - Created `apps/web/src/components/lanes/LaneChip.tsx` with Sticker Pop tokens, ink outline (`1.5px solid #14123A`), hard shadows, and accent tokens (`bg-violet`, `bg-sun`, `bg-mint`, `bg-coral`, etc.).
+       - Created `apps/web/src/components/lanes/LanePicker.tsx` with responsive grid/list, status chips (Open, Early Lane for <500 players, Resting, Coming Soon), and "Tell me when it opens" interest button.
+       - Rule L10 (First-Run Promise): First-time visitors bypass picker straight into Everyday Drop.
+    6. **Result View, Share Card & Challenge Links (P10L.07):**
+       - Updated `FlipCard.tsx` and `TwinRevealScreen.tsx` to render `LaneChip` with lane accent and name.
+       - Updated `ShareSheet.tsx` to route challenge links with `&lane=${slug}` and render lane indicator on fallback SVG.
+    7. **Regression Parity (P10L.10):**
+       - Verified Everyday lane scoring parity across web tests (`lanes-ui.test.tsx` 7/7, `play-flow.test.ts` 20/20, `reveal-oddness.test.ts` 6/6, `share-challenge.test.ts` 4/4).
   - **Stage M7 (ML Ranker for Optional Surfaces — Phase 10J) is COMPLETE & VERIFIED:**
     1. **Explainable Statistical Pointwise Ranker (P10J.02):**
        - Implemented in `packages/shared/src/ml/explainable-ranker.ts` (`trainLogisticRanker`, `predictRankScore`, `computeLoss`, `computeAuc`).

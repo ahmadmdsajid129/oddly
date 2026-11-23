@@ -11,9 +11,12 @@ import type {
   DropResponse,
   HealthCheckResult,
   ResultResponse,
+  LaneSummary,
+  LaneDetail,
+  PlayerLanePrefResponse,
 } from "@oddly/shared";
 
-export type { ResultResponse };
+export type { ResultResponse, LaneSummary, LaneDetail, PlayerLanePrefResponse };
 
 export interface OddlyClientConfig {
   baseUrl: string;
@@ -550,9 +553,39 @@ export class OddlyApiClient {
     return this.request<HealthCheckResult>("/health");
   }
 
-  /** Today's active drop and polymorphic questions */
-  async getTodayDrop(): Promise<DropResponse> {
-    return this.request<DropResponse>("/v1/drop/today");
+  /** Today's active drop and polymorphic questions (supports optional lane) */
+  async getTodayDrop(laneSlug?: string): Promise<DropResponse> {
+    const url = laneSlug && laneSlug !== "everyday"
+      ? `/v1/drop/today?lane=${encodeURIComponent(laneSlug)}`
+      : "/v1/drop/today";
+    return this.request<DropResponse>(url);
+  }
+
+  /** Stage L1: Subject Lanes Methods (P10L.04, P10L.05, P10L.08) */
+  async getLanes(): Promise<{ lanes: LaneSummary[] }> {
+    return this.request<{ lanes: LaneSummary[] }>("/v1/lanes");
+  }
+
+  async getLane(idOrSlug: string): Promise<{ lane: LaneDetail; is_resting: boolean; current_drop: DropResponse | null; message?: string }> {
+    return this.request<{ lane: LaneDetail; is_resting: boolean; current_drop: DropResponse | null; message?: string }>(`/v1/lanes/${encodeURIComponent(idOrSlug)}`);
+  }
+
+  async expressLaneInterest(laneId: string, consent = true): Promise<{ ok: boolean; message: string; lane_id: string }> {
+    return this.request<{ ok: boolean; message: string; lane_id: string }>(`/v1/lanes/${encodeURIComponent(laneId)}/interest`, {
+      method: "POST",
+      body: JSON.stringify({ consent }),
+    });
+  }
+
+  async getLanePrefs(): Promise<{ prefs: PlayerLanePrefResponse[] }> {
+    return this.request<{ prefs: PlayerLanePrefResponse[] }>("/v1/me/lane-prefs");
+  }
+
+  async updateLanePrefs(prefs: { lane_id: string; notify: boolean }[]): Promise<{ ok: boolean; count: number }> {
+    return this.request<{ ok: boolean; count: number }>("/v1/me/lane-prefs", {
+      method: "PUT",
+      body: JSON.stringify({ prefs }),
+    });
   }
 
   /** Fetch a specific drop by IST calendar date */

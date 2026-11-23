@@ -12,10 +12,13 @@ interface ShareSheetProps {
   isOpen: boolean;
   onClose: () => void;
   dropId: string;
+  laneSlug?: string;
+  laneName?: string;
+  laneAccent?: string;
   defaultFormat?: ShareFormat;
 }
 
-function getFallbackCardSvg(format: ShareFormat): string {
+function getFallbackCardSvg(format: ShareFormat, laneName = "Everyday", laneAccent = "violet"): string {
   const bg = colors.cream;
   const surface = colors.paper;
   const border = colors.ink;
@@ -30,6 +33,9 @@ function getFallbackCardSvg(format: ShareFormat): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
     <rect width="${w}" height="${h}" fill="${bg}"/>
     <rect x="${w / 2 - 360}" y="${h / 2 - 400}" width="720" height="800" rx="40" fill="${surface}" stroke="${border}" stroke-width="8"/>
+    <!-- Lane Chip Indicator -->
+    <rect x="${w / 2 - 320}" y="${h / 2 - 370}" width="180" height="44" rx="22" fill="${sun}" stroke="${border}" stroke-width="4"/>
+    <text x="${w / 2 - 230}" y="${h / 2 - 340}" font-family="sans-serif" font-size="20" font-weight="bold" fill="${text}" text-anchor="middle">${laneName.toUpperCase()} LANE</text>
     <rect x="${w / 2 - 160}" y="${h / 2 - 340}" width="320" height="52" rx="26" fill="${sun}" stroke="${border}" stroke-width="4"/>
     <text x="${w / 2}" y="${h / 2 - 305}" font-family="sans-serif" font-size="24" font-weight="bold" fill="${text}" text-anchor="middle">★ RARE TIER · 84% ODD</text>
     <text x="${w / 2}" y="${h / 2 - 120}" font-family="sans-serif" font-size="120" font-weight="bold" fill="${text}" text-anchor="middle">4 of 5</text>
@@ -47,6 +53,9 @@ export function ShareSheet({
   isOpen,
   onClose,
   dropId,
+  laneSlug = "everyday",
+  laneName = "Everyday",
+  laneAccent = "violet",
   defaultFormat = "story",
 }: ShareSheetProps) {
   const { toast } = useToast();
@@ -74,7 +83,7 @@ export function ShareSheet({
         }
       } catch {
         if (!isCancelled) {
-          setCardUrl(getFallbackCardSvg(format));
+          setCardUrl(getFallbackCardSvg(format, laneName, laneAccent));
           setShortId("daily");
         }
       } finally {
@@ -89,14 +98,15 @@ export function ShareSheet({
     return () => {
       isCancelled = true;
     };
-  }, [isOpen, dropId, format, theme]);
+  }, [isOpen, dropId, format, theme, laneName, laneAccent]);
 
   if (!isOpen) return null;
 
+  const laneQuery = laneSlug && laneSlug !== "everyday" ? `&lane=${encodeURIComponent(laneSlug)}` : "";
   const challengeUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/c/${shortId || "daily"}?challenge=1`
-      : `https://oddly.app/c/${shortId || "daily"}?challenge=1`;
+      ? `${window.location.origin}/c/${shortId || "daily"}?challenge=1${laneQuery}`
+      : `https://oddly.app/c/${shortId || "daily"}?challenge=1${laneQuery}`;
 
   const handleCopyChallengeLink = async () => {
     try {

@@ -1214,8 +1214,8 @@ flowchart TD
 
 #### 18.11.1 Relational Data Model
 
-> [!WARNING]
-> **Open issue (Schema Type & Relation Verification):** Documentation in 18.2.1 and 18.11.1 currently references TEXT IDs and mixes `players(id)` and `users(id)`. Before writing migrations at Stage L1, verify against the actual Prisma schema whether the primary player table is `players` or `users`, and whether IDs are UUID or TEXT. Align documentation before migration code.
+> [!NOTE]
+> **Schema Type & Relation Verification (Resolved at Stage L1):** Verified against `packages/shared/prisma/schema.prisma`: the player table is `players` (not `users`) with UUID primary keys (`String @id @default(uuid())`), and all drop/question/player relational tables reference `players(id)`.
 
 ```sql
 -- 1. bonus_pool_questions — Evergreen Question Pool for Tie-Breaks
@@ -1248,27 +1248,27 @@ CREATE TABLE IF NOT EXISTS bonus_rounds (
 -- 3. bonus_answers — Partitioned Player Bonus Responses
 CREATE TABLE IF NOT EXISTS bonus_answers (
   round_id TEXT NOT NULL REFERENCES bonus_rounds(id) ON DELETE CASCADE,
-  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
   question_id TEXT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
   answer JSONB NOT NULL,
   drop_date DATE NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (round_id, user_id, question_id, drop_date)
+  PRIMARY KEY (round_id, player_id, question_id, drop_date)
 ) PARTITION BY RANGE (drop_date);
 
 -- 4. bonus_results — Additive Narrowed Outcome (Never rewrites twin_results)
 CREATE TABLE IF NOT EXISTS bonus_results (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
   round_id TEXT NOT NULL REFERENCES bonus_rounds(id) ON DELETE CASCADE,
-  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  closest_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  player_id TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  closest_player_id TEXT REFERENCES players(id) ON DELETE SET NULL,
   questions_matched INT NOT NULL DEFAULT 0, -- 0 to 3
   participants INT NOT NULL DEFAULT 0,
   is_mutual BOOLEAN NOT NULL DEFAULT false,
   computed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE(round_id, user_id)
+  UNIQUE(round_id, player_id)
 );
-CREATE INDEX IF NOT EXISTS idx_bonus_results_user ON bonus_results(user_id);
+CREATE INDEX IF NOT EXISTS idx_bonus_results_player ON bonus_results(player_id);
 
 ##### Relation to M6 creator badges
 Creator badges (M6) are earned by caption quality and have their own table (`badge_definitions`, `creator_badges`) and API route (`GET /v1/badges/mine` / `/v1/me/badges`); collector badges (L10) are earned by lane twins and live in `collector_badge_definitions` and `collector_badges` accessed via `GET /v1/me/collector-badges`. They share only the `/me/badges` UI page. They never share tables or a unified score.

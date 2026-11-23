@@ -5,7 +5,8 @@ import { useReducedMotion } from "framer-motion";
 import { BrandMark, fireConfetti } from "@/components/icons";
 import { Atmosphere } from "@/components/ui/Atmosphere";
 import { Button } from "@/components/ui/Button";
-import { FlipCard } from "@/components/share/FlipCard";
+import { FlipCard, type LaneInfo } from "@/components/share/FlipCard";
+import { LaneChip } from "@/components/lanes/LaneChip";
 import { feedback } from "@/lib/feedback";
 import { Share2, ArrowRight } from "lucide-react";
 
@@ -26,6 +27,7 @@ export interface TwinMatchData {
 
 interface TwinRevealScreenProps {
   match: TwinMatchData;
+  lane?: LaneInfo;
   onSeeOddness: () => void;
   onShare?: () => void;
   onClose?: () => void;
@@ -33,6 +35,7 @@ interface TwinRevealScreenProps {
 
 export function TwinRevealScreen({
   match,
+  lane,
   onSeeOddness,
   onShare,
   onClose,
@@ -80,6 +83,15 @@ export function TwinRevealScreen({
         <div className="flex items-center gap-2">
           <BrandMark size={32} />
           <span className="font-display text-xl font-extrabold text-ink">oddly</span>
+          {lane && (
+            <LaneChip
+              name={lane.name}
+              slug={lane.slug}
+              accent={lane.accent || "lavender"}
+              iconKey={lane.iconKey}
+              size="sm"
+            />
+          )}
         </div>
 
         {onClose && (
@@ -107,6 +119,7 @@ export function TwinRevealScreen({
           matchedPicks={matchedPicks}
           totalPicks={totalPicks}
           tier={tier}
+          lane={lane}
           location={`Stranger in ${match.twin_location}`}
           rarityText={rarityText}
           pickMatches={match.pick_matches}

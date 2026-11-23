@@ -22,8 +22,15 @@ export const api = {
     getPublic: () => rawClient.getPublicConfig(),
   },
   drops: {
-    getToday: () => rawClient.getTodayDrop(),
+    getToday: (laneSlug?: string) => rawClient.getTodayDrop(laneSlug),
     getByDate: (date: string) => rawClient.getDropByDate(date),
+  },
+  lanes: {
+    list: () => rawClient.getLanes(),
+    get: (idOrSlug: string) => rawClient.getLane(idOrSlug),
+    expressInterest: (laneId: string, consent = true) => rawClient.expressLaneInterest(laneId, consent),
+    getPrefs: () => rawClient.getLanePrefs(),
+    updatePrefs: (prefs: { lane_id: string; notify: boolean }[]) => rawClient.updateLanePrefs(prefs),
   },
   identity: {
     createGuest: async () => {

@@ -21,77 +21,129 @@ import {
   getSafeRedisClient,
 } from "@oddly/shared";
 import { DropsRepository } from "../db/drops.repo.js";
+import { prisma } from "../db/client.js";
 import { handleConditionalRequest } from "../cache/etag.js";
 import { StampedeProtectedCache } from "../cache/stampede.js";
 
 export const dropsRoutes: FastifyPluginAsyncZod = async (app) => {
-  // GET /v1/drop/today
+  // GET /v1/drop/today & GET /v1/drops/today (Lanes supported via ?lane=slug)
+  const getTodayDropHandler = async (
+    req: { query: { lane?: string } },
+    reply: any
+  ) => {
+    const todayIst = getTwinDay(new Date());
+    const laneSlug = req.query?.lane || "everyday";
+
+    const cacheKey =
+      laneSlug === "everyday"
+        ? RedisKeys.cache.dropToday()
+        : `lane:${laneSlug}:drop:${todayIst}`;
+
+    const { data: drop, isStale } = await StampedeProtectedCache.readThroughWithMutex(
+      cacheKey,
+      async () => {
+        const dbDrop = await DropsRepository.getTodayDrop(todayIst, laneSlug);
+        if (!dbDrop) {
+          // If non-everyday lane, check if lane exists and is resting (Rule L9)
+          if (laneSlug !== "everyday") {
+            const lane = await prisma.lane.findFirst({
+              where: { OR: [{ slug: laneSlug }, { id: laneSlug }] },
+            });
+            if (lane) {
+              return {
+                is_resting: true,
+                status: "resting",
+                lane: {
+                  id: lane.id,
+                  slug: lane.slug,
+                  name_key: lane.name_key,
+                  accent_token: lane.accent_token,
+                },
+                message: "This lane is resting today.",
+              };
+            }
+          }
+          return null;
+        }
+
+        return {
+          id: dbDrop.id,
+          drop_date: todayIst,
+          lane_id: dbDrop.lane_id,
+          opens_at: dbDrop.opens_at.toISOString(),
+          closes_at: dbDrop.closes_at.toISOString(),
+          is_open: isDayOpen(todayIst),
+          seconds_until_open: secondsUntilNextDrop(),
+          questions: dbDrop.questions.map((q) => ({
+            id: q.id,
+            position: q.position,
+            type: q.type,
+            payload: q.payload,
+            answer_options: q.answerOptions.map((opt) => ({
+              id: opt.id,
+              label: opt.label,
+              value: opt.value,
+              display_order: opt.display_order,
+              illustration_key: opt.illustration_key,
+            })),
+          })),
+        };
+      },
+      { ttlSeconds: 5, staleTtlSeconds: 3600 }
+    );
+
+    if (!drop) {
+      return reply.status(404).send({
+        ok: false,
+        error: "DROP_NOT_FOUND",
+        message: `No active drop scheduled for ${todayIst} in lane '${laneSlug}'.`,
+      });
+    }
+
+    // Edge caching policy: Addendum Section 5.1 / Table 18.9
+    reply.header(
+      "Cache-Control",
+      "public, max-age=5, s-maxage=5, stale-while-revalidate=30, stale-if-error=3600"
+    );
+
+    if (isStale) {
+      reply.header("Warning", '110 - "Response is Stale"');
+    }
+
+    // Conditional request handling (ETag + 304 Not Modified)
+    if (handleConditionalRequest(req as any, reply, drop)) {
+      return;
+    }
+
+    return reply.send(drop);
+  };
+
   app.get(
     "/v1/drop/today",
     {
       schema: {
         description: "Fetch today's active drop with polymorphic questions and edge caching",
         tags: ["Drops"],
+        querystring: z.object({
+          lane: z.string().optional(),
+        }),
       },
     },
-    async (req, reply) => {
-      const todayIst = getTwinDay(new Date());
+    getTodayDropHandler
+  );
 
-      const { data: drop, isStale } = await StampedeProtectedCache.readThroughWithMutex(
-        RedisKeys.cache.dropToday(),
-        async () => {
-          const dbDrop = await DropsRepository.getTodayDrop(todayIst);
-          if (!dbDrop) return null;
-          return {
-            id: dbDrop.id,
-            drop_date: todayIst,
-            opens_at: dbDrop.opens_at.toISOString(),
-            closes_at: dbDrop.closes_at.toISOString(),
-            is_open: isDayOpen(todayIst),
-            seconds_until_open: secondsUntilNextDrop(),
-            questions: dbDrop.questions.map((q) => ({
-              id: q.id,
-              position: q.position,
-              type: q.type,
-              payload: q.payload,
-              answer_options: q.answerOptions.map((opt) => ({
-                id: opt.id,
-                label: opt.label,
-                value: opt.value,
-                display_order: opt.display_order,
-                illustration_key: opt.illustration_key,
-              })),
-            })),
-          };
-        },
-        { ttlSeconds: 5, staleTtlSeconds: 3600 }
-      );
-
-      if (!drop) {
-        return reply.status(404).send({
-          ok: false,
-          error: "DROP_NOT_FOUND",
-          message: `No active drop scheduled for ${todayIst}.`,
-        });
-      }
-
-      // Edge caching policy: Addendum Section 5.1
-      reply.header(
-        "Cache-Control",
-        "public, max-age=5, s-maxage=5, stale-while-revalidate=30, stale-if-error=3600"
-      );
-
-      if (isStale) {
-        reply.header("Warning", '110 - "Response is Stale"');
-      }
-
-      // Conditional request handling (ETag + 304 Not Modified)
-      if (handleConditionalRequest(req, reply, drop)) {
-        return;
-      }
-
-      return reply.send(drop);
-    }
+  app.get(
+    "/v1/drops/today",
+    {
+      schema: {
+        description: "Fetch today's active drop (alias with ?lane support)",
+        tags: ["Drops"],
+        querystring: z.object({
+          lane: z.string().optional(),
+        }),
+      },
+    },
+    getTodayDropHandler
   );
 
   // GET /v1/drops/:id.json (Immutable Drop Archive)

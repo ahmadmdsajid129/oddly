@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Check, X, Sparkles } from "lucide-react";
 import { BrandMark } from "@/components/icons";
 import { TierBadge } from "@/components/ui/Card";
+import { LaneChip } from "@/components/lanes/LaneChip";
 import { KeepButton } from "@/components/orbit/KeepButton";
 import { feedback } from "@/lib/feedback";
 import { clsx } from "clsx";
@@ -11,6 +12,13 @@ import { twMerge } from "tailwind-merge";
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
+}
+
+export interface LaneInfo {
+  name: string;
+  slug: string;
+  accent?: string;
+  iconKey?: string;
 }
 
 export interface FlipCardProps {
@@ -21,6 +29,7 @@ export interface FlipCardProps {
   rarityText?: string;
   dropId?: string;
   isProvisional?: boolean;
+  lane?: LaneInfo;
   pickMatches?: Array<{
     question_number: number;
     label: string;
@@ -39,6 +48,7 @@ export function FlipCard({
   rarityText = "Only 0.4% of players matched you today",
   dropId,
   isProvisional = false,
+  lane,
   pickMatches,
   autoFlip = true,
   className,
@@ -142,9 +152,21 @@ export function FlipCard({
             aria-hidden="true"
           />
 
-          {/* Top Row: Tier badge & Brand wordmark */}
+          {/* Top Row: Tier badge, Lane chip & Brand wordmark */}
           <div className="flex items-center justify-between w-full relative z-10">
-            <TierBadge tier={tier} />
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <TierBadge tier={tier} />
+              {lane && (
+                <LaneChip
+                  name={lane.name}
+                  slug={lane.slug}
+                  accent={lane.accent || "lavender"}
+                  iconKey={lane.iconKey}
+                  size="sm"
+                  showIcon={true}
+                />
+              )}
+            </div>
             <div className="flex items-center gap-1.5 font-display text-sm font-extrabold text-ink">
               <BrandMark size={20} />
               <span>oddly</span>
@@ -218,9 +240,20 @@ export function FlipCard({
             /* Details Back State (After user tap to inspect answers) */
             <div className="w-full h-full flex flex-col justify-between">
               <div className="flex items-center justify-between border-b-[1.5px] border-ink/20 pb-3">
-                <span className="font-display text-sm font-extrabold text-ink uppercase tracking-wider">
-                  Pick Overlap
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display text-sm font-extrabold text-ink uppercase tracking-wider">
+                    Pick Overlap
+                  </span>
+                  {lane && (
+                    <LaneChip
+                      name={lane.name}
+                      slug={lane.slug}
+                      accent={lane.accent || "lavender"}
+                      iconKey={lane.iconKey}
+                      size="sm"
+                    />
+                  )}
+                </div>
                 <span className="font-display text-xs font-bold text-muted">
                   oddly.fun
                 </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BrandMark } from "@/components/icons";
 import { Atmosphere } from "@/components/ui/Atmosphere";
@@ -12,6 +12,8 @@ import { Skeleton } from "@/components/ui/FeedbackPrimitives";
 import { StreakFlame } from "@/components/ui/StreakFlame";
 import { PwaInstallButton } from "@/components/ui/PwaInstallButton";
 import { useToast } from "@/components/ui/Toast";
+import { LaneChip } from "@/components/lanes/LaneChip";
+import { LanePicker } from "@/components/lanes/LanePicker";
 import { feedback } from "@/lib/feedback";
 import { api } from "@/lib/api";
 import {
@@ -163,9 +165,20 @@ interface StoredPlayResult {
 
 export default function HomePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlLane = searchParams.get("lane");
   const { toast } = useToast();
   const auth = useAuth();
   const isOnline = useNetworkStatus();
+
+  // Lane state (Stage L1 / Phase 10L)
+  const [currentLane, setCurrentLane] = useState({
+    slug: urlLane || "everyday",
+    name_key: urlLane ? urlLane.charAt(0).toUpperCase() + urlLane.slice(1) : "Everyday",
+    accent_token: "violet",
+  });
+  const [showLanePicker, setShowLanePicker] = useState(false);
+  const hasPlayedBefore = usePlayStore((state) => Object.keys(state.completedResults).length > 0);
 
   // Screen state
   const [step, setStep] = useState<FlowStep>("landing");
@@ -190,14 +203,14 @@ export default function HomePage() {
   const degradationLevel: DegradationLevel =
     (publicConfig?.degradation_level as DegradationLevel) || "L0";
 
-  // Fetch today's drop
+  // Fetch today's drop for active lane
   const { data: dropData, isLoading } = useQuery({
-    queryKey: ["today-drop"],
+    queryKey: ["today-drop", currentLane.slug],
     queryFn: async () => {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000);
-        const res = await api.drops.getToday();
+        const res = await api.drops.getToday(currentLane.slug);
         clearTimeout(timeoutId);
         return res;
       } catch {
@@ -590,6 +603,11 @@ export default function HomePage() {
         )}
         <TwinRevealScreen
           match={submissionResult.match}
+          lane={{
+            name: currentLane.name_key,
+            slug: currentLane.slug,
+            accent: currentLane.accent_token,
+          }}
           onSeeOddness={() => setStep("oddness")}
           onShare={() => {
             setShareFormat("story");
@@ -601,6 +619,9 @@ export default function HomePage() {
           isOpen={isShareSheetOpen}
           onClose={() => setIsShareSheetOpen(false)}
           dropId={activeDropId}
+          laneSlug={currentLane.slug}
+          laneName={currentLane.name_key}
+          laneAccent={currentLane.accent_token}
           defaultFormat={shareFormat}
         />
       </WidgetErrorBoundary>
@@ -634,6 +655,9 @@ export default function HomePage() {
           isOpen={isShareSheetOpen}
           onClose={() => setIsShareSheetOpen(false)}
           dropId={activeDropId}
+          laneSlug={currentLane.slug}
+          laneName={currentLane.name_key}
+          laneAccent={currentLane.accent_token}
           defaultFormat={shareFormat}
         />
       </WidgetErrorBoundary>
@@ -725,8 +749,15 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Live Player Counter & Drop Theme */}
+        {/* Live Player Counter, Lane Chip & Drop Theme */}
         <div className="flex flex-wrap items-center justify-center gap-2">
+          <LaneChip
+            name={currentLane.name_key}
+            slug={currentLane.slug}
+            accent={currentLane.accent_token}
+            onClick={() => setShowLanePicker((v) => !v)}
+          />
+
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-paper border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
             <span className="w-2.5 h-2.5 rounded-pill bg-mint border border-ink" />
             <span>3,482 players today</span>
@@ -738,10 +769,46 @@ export default function HomePage() {
               <span className="capitalize">{((dropData as any).theme_key as string).replace(/-/g, " ")} Drop</span>
             </div>
           )}
+
+          {hasPlayedBefore && (
+            <button
+              type="button"
+              onClick={() => setShowLanePicker((v) => !v)}
+              className="text-xs font-display font-bold text-violet underline cursor-pointer px-1 py-0.5"
+            >
+              {showLanePicker ? "Hide lanes" : "Change lane"}
+            </button>
+          )}
         </div>
 
-        {/* Completed Drop Summary or Play CTA */}
-        {submissionResult ? (
+        {/* Resting Lane Evaluation (Rule L9) */}
+        {(dropData as any)?.is_resting ? (
+          <div className="rounded-l bg-cream border-[2.5px] border-ink shadow-sticker p-6 space-y-4 text-center">
+            <div className="flex items-center justify-center gap-2 font-display font-bold text-xs uppercase tracking-wider text-muted px-3 py-1 bg-paper rounded-pill border-[1.5px] border-ink w-fit mx-auto">
+              <Sparkles className="w-4 h-4 stroke-[2]" />
+              <span>Lane Resting</span>
+            </div>
+            <p className="font-display text-base font-extrabold text-ink">
+              The {currentLane.name_key} lane is resting today.
+            </p>
+            <p className="font-body text-xs text-muted max-w-xs mx-auto">
+              {(dropData as any)?.message || "Drops cycle at 07:00 IST. You can explore today's Everyday Drop!"}
+            </p>
+            <div className="pt-1">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => {
+                  setCurrentLane({ slug: "everyday", name_key: "Everyday", accent_token: "violet" });
+                  setShowLanePicker(false);
+                }}
+              >
+                <span>Play Everyday Drop</span>
+                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+              </Button>
+            </div>
+          </div>
+        ) : submissionResult ? (
           <div className="rounded-l bg-paper border-[2.5px] border-ink shadow-sticker p-6 space-y-4 text-center">
             <div className="flex items-center justify-center gap-2 font-display font-bold text-xs uppercase tracking-wider text-ink px-3 py-1 bg-mint rounded-pill border-[1.5px] border-ink w-fit mx-auto">
               <Trophy className="w-4 h-4 stroke-[2.5]" />
@@ -797,6 +864,22 @@ export default function HomePage() {
               18+ only • No account needed • Free forever
             </p>
           </div>
+        )}
+
+        {/* Responsive Lane Picker (Home View - Rule L10 & Sec 12C.2) */}
+        {showLanePicker && (
+          <LanePicker
+            selectedSlug={currentLane.slug}
+            onSelectLane={(lane) => {
+              setCurrentLane({
+                slug: lane.slug,
+                name_key: lane.name_key,
+                accent_token: lane.accent_token,
+              });
+              setShowLanePicker(false);
+            }}
+            className="pt-4 text-left"
+          />
         )}
       </div>
 

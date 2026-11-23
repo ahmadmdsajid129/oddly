@@ -115,6 +115,8 @@ model Player {
   creatorBadges    CreatorBadge[]
   subscriptions    Subscription[]
   paywallEvents    PaywallEvent[]
+  laneInterests    LaneInterest[]
+  lanePrefs        PlayerLanePref[]
 
   @@index([account_id])
   @@index([did])
@@ -126,13 +128,15 @@ model Player {
 // ---------------------------------------------------------------------------
 model Drop {
   id                    String     @id @default(uuid())
-  drop_date             DateTime   @db.Date @unique // YYYY-MM-DD in IST
+  drop_date             DateTime   @db.Date // YYYY-MM-DD in IST
   opens_at              DateTime                    // UTC timestamp for 07:00 IST
   closes_at             DateTime                    // UTC timestamp for 23:59 IST
   status                DropStatus @default(pending)
   telepathy_question_id String?
   telepathy_question    Question?  @relation("DropTelepathyQuestion", fields: [telepathy_question_id], references: [id])
   theme_key             String?    @db.VarChar(50)
+  lane_id               String?
+  lane                  Lane?      @relation(fields: [lane_id], references: [id])
   created_at            DateTime   @default(now())
 
   questions    Question[]
@@ -142,10 +146,12 @@ model Drop {
   reports      Report[]
   batchRuns    BatchRun[]
 
+  @@unique([lane_id, drop_date])
   @@index([drop_date])
   @@index([status])
   @@index([telepathy_question_id])
   @@index([theme_key])
+  @@index([lane_id])
   @@map("drops")
 }
 
@@ -153,16 +159,24 @@ model Drop {
 // 4. questions — 5 per drop, polymorphic via JSONB payload
 // ---------------------------------------------------------------------------
 model Question {
-  id         String       @id @default(uuid())
-  drop_id    String
-  drop       Drop         @relation(fields: [drop_id], references: [id])
-  position       Int          @db.SmallInt // 1-5
-  type           QuestionType
-  render_variant String       @default("standard") @db.VarChar(20) // "standard" | "meme"
-  template_id    String?
-  memeTemplate   MemeTemplate? @relation(fields: [template_id], references: [id])
-  payload        Json         // discriminated by type (see D-006)
-  created_at     DateTime     @default(now())
+  id                 String        @id @default(uuid())
+  drop_id            String
+  drop               Drop          @relation(fields: [drop_id], references: [id])
+  lane_id            String?
+  lane               Lane?         @relation(fields: [lane_id], references: [id])
+  position           Int           @db.SmallInt // 1-5
+  type               QuestionType
+  format             String        @default("pick1") @db.VarChar(20)
+  render_variant     String        @default("standard") @db.VarChar(20) // "standard" | "meme"
+  template_id        String?
+  memeTemplate       MemeTemplate? @relation(fields: [template_id], references: [id])
+  payload            Json          // discriminated by type (see D-006)
+  options            Json?
+  subject_tags       Json?
+  scene_asset_key    String?       @db.VarChar(100)
+  entropy_estimate   Float?
+  tie_risk_estimate  Float?
+  created_at         DateTime      @default(now())
 
   answerOptions      AnswerOption[]
   telepathyForDrops  Drop[]            @relation("DropTelepathyQuestion")
@@ -172,6 +186,7 @@ model Question {
 
   @@unique([drop_id, position])
   @@index([drop_id])
+  @@index([lane_id])
   @@index([render_variant])
   @@index([template_id])
   @@map("questions")
@@ -201,6 +216,7 @@ model Submission {
   drop_id      String
   drop_date    DateTime @db.Date
   drop         Drop     @relation(fields: [drop_id], references: [id])
+  lane_id      String?
   player_id    String
   player       Player   @relation(fields: [player_id], references: [id])
   request_id   String   @db.VarChar(64) // client-generated idempotency key
@@ -219,6 +235,7 @@ model Submission {
   @@index([drop_id])
   @@index([player_id])
   @@index([submitted_at])
+  @@index([drop_date, lane_id])
   @@map("submissions")
 }
 
@@ -230,6 +247,7 @@ model SubmissionAnswer {
   submission_id String
   drop_id       String
   drop_date     DateTime   @db.Date
+  lane_id       String?
   player_id     String
   question_id   String
   value         String     @db.VarChar(200)
@@ -240,6 +258,7 @@ model SubmissionAnswer {
   @@id([id, drop_date])
   @@index([drop_date, question_id, value])
   @@index([drop_date, player_id])
+  @@index([drop_date, lane_id])
   @@map("submission_answers")
 }
 
@@ -267,20 +286,26 @@ model AnswerStat {
 // 8. matches — pairwise match for a drop partitioned by drop_date (R2.1)
 // ---------------------------------------------------------------------------
 model Match {
-  id               String    @default(uuid())
-  drop_id          String
-  drop_date        DateTime  @db.Date
-  drop             Drop      @relation(fields: [drop_id], references: [id])
-  player_a_id      String
-  player_a         Player    @relation("PlayerA", fields: [player_a_id], references: [id])
-  player_b_id      String
-  player_b         Player    @relation("PlayerB", fields: [player_b_id], references: [id])
-  submission_a_id  String?
-  submission_b_id  String?
-  similarity_score Float     // dice coefficient [0, 1]
-  is_provisional   Boolean   @default(true)  // true until drop closes
-  matched_at       DateTime  @default(now())
-  finalized_at     DateTime?
+  id                  String    @default(uuid())
+  drop_id             String
+  drop_date           DateTime  @db.Date
+  drop                Drop      @relation(fields: [drop_id], references: [id])
+  lane_id             String?
+  player_a_id         String
+  player_a            Player    @relation("PlayerA", fields: [player_a_id], references: [id])
+  player_b_id         String
+  player_b            Player    @relation("PlayerB", fields: [player_b_id], references: [id])
+  submission_a_id     String?
+  submission_b_id     String?
+  similarity_score    Float     // dice coefficient [0, 1]
+  tie_group_size      Int       @default(1)
+  is_mutual           Boolean   @default(true)
+  tie_break_reason    String    @default("similarity") @db.VarChar(30)
+  questions_compared  Int       @default(5)
+  history_days        Int       @default(0)
+  is_provisional      Boolean   @default(true)  // true until drop closes
+  matched_at          DateTime  @default(now())
+  finalized_at        DateTime?
 
   @@id([id, drop_date])
   @@unique([drop_date, player_a_id])
@@ -289,6 +314,7 @@ model Match {
   @@index([drop_id])
   @@index([player_a_id])
   @@index([player_b_id])
+  @@index([drop_date, lane_id])
   @@map("matches")
 }
 
@@ -300,6 +326,8 @@ model OddnessScore {
   submission_id String
   drop_date     DateTime   @db.Date
   submission    Submission @relation(fields: [submission_id, drop_date], references: [id, drop_date])
+  lane_id       String?
+  lane          Lane?      @relation(fields: [lane_id], references: [id])
   raw_score     Float      // weighted entropy [0, 1]
   percentile    Float      // 0-100 within day's cohort
   tier          TierEnum
@@ -307,6 +335,7 @@ model OddnessScore {
   @@unique([submission_id, drop_date])
   @@index([submission_id])
   @@index([tier])
+  @@index([lane_id])
   @@map("oddness_scores")
 }
 
@@ -536,6 +565,7 @@ model PartitionAlert {
 model TwinKeep {
   id                  String     @default(uuid())
   drop_date           DateTime   @db.Date
+  lane_id             String?
   from_player_id      String
   from_player         Player     @relation("KeepFrom", fields: [from_player_id], references: [id])
   to_player_id        String
@@ -550,6 +580,7 @@ model TwinKeep {
   @@index([drop_date])
   @@index([to_player_id, status])
   @@index([from_player_id, drop_date])
+  @@index([lane_id])
   @@map("twin_keeps")
 }
 
@@ -559,6 +590,7 @@ model TwinKeep {
 // ---------------------------------------------------------------------------
 model Orbit {
   id                String      @id @default(uuid())
+  lane_id           String?
   player_a_id       String
   player_a          Player      @relation("OrbitPlayerA", fields: [player_a_id], references: [id])
   player_b_id       String
@@ -578,6 +610,7 @@ model Orbit {
 
   @@index([player_a_id, status])
   @@index([player_b_id, status])
+  @@index([lane_id])
   @@map("orbits")
 }
 
@@ -589,6 +622,7 @@ model OrbitExpression {
   id             String   @default(uuid())
   orbit_id       String
   orbit          Orbit    @relation(fields: [orbit_id], references: [id])
+  lane_id        String?
   from_player_id String
   from_player    Player   @relation(fields: [from_player_id], references: [id])
   drop_date      DateTime @db.Date
@@ -609,6 +643,7 @@ model TelepathyGuess {
   id                 String   @default(uuid())
   orbit_id           String
   orbit              Orbit    @relation(fields: [orbit_id], references: [id], onDelete: Cascade)
+  lane_id            String?
   drop_date          DateTime @db.Date
   guesser_player_id  String
   guesser_player     Player   @relation(fields: [guesser_player_id], references: [id], onDelete: Cascade)
@@ -636,6 +671,8 @@ model AntiTwinResult {
   drop_date               DateTime @db.Date
   player_id               String
   player                  Player   @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  lane_id                 String?
+  lane                    Lane?    @relation(fields: [lane_id], references: [id])
   opposite_submission_ref String
   differed_count          Int
   sample_size             Int
@@ -644,6 +681,7 @@ model AntiTwinResult {
   @@id([drop_date, player_id])
   @@index([drop_date])
   @@index([player_id])
+  @@index([lane_id])
   @@map("anti_twin_results")
 }
 
@@ -1141,6 +1179,80 @@ model PaywallEvent {
   @@index([created_at])
   @@map("paywall_events")
 }
+
+// ---------------------------------------------------------------------------
+// 53. lanes — subject drop catalog & configuration (Stage L1 / Phase 10L)
+// ---------------------------------------------------------------------------
+model Lane {
+  id                 String    @id @default(uuid())
+  slug               String    @unique @db.VarChar(50)
+  name_key           String    @db.VarChar(100)
+  description_key    String    @db.VarChar(150)
+  accent_token       String    @db.VarChar(50)
+  icon_key           String    @db.VarChar(50)
+  status             String    @default("planned") @db.VarChar(20) // 'planned', 'preview', 'open', 'resting', 'retired'
+  sort_order         Int       @default(100)
+  age_rating         String    @default("18+") @db.VarChar(10)
+  locale_set         Json      @default("[\"en\", \"hi\"]")
+  formats_allowed    Json      @default("[\"pick1\", \"pick2of6\", \"slider7\"]")
+  text_enabled       Boolean   @default(false)
+  super_twin_enabled Boolean   @default(true)
+  gate_notes         String?   @db.Text
+  opened_at          DateTime?
+  created_at         DateTime  @default(now())
+
+  drops           Drop[]
+  questions       Question[]
+  laneInterests   LaneInterest[]
+  playerLanePrefs PlayerLanePref[]
+  oddnessScores   OddnessScore[]
+  antiTwinResults AntiTwinResult[]
+
+  @@index([status])
+  @@index([slug])
+  @@index([sort_order])
+  @@map("lanes")
+}
+
+// ---------------------------------------------------------------------------
+// 54. lane_interest — opt-ins for planned lanes ("Tell me when it opens") (Stage L1 / Phase 10L)
+// ---------------------------------------------------------------------------
+model LaneInterest {
+  id         String   @id @default(uuid())
+  lane_id    String
+  lane       Lane     @relation(fields: [lane_id], references: [id], onDelete: Cascade)
+  player_id  String?
+  player     Player?  @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  guest_id   String?  @db.VarChar(100)
+  created_at DateTime @default(now())
+
+  @@unique([lane_id, player_id])
+  @@index([lane_id])
+  @@index([lane_id, guest_id])
+  @@map("lane_interest")
+}
+
+// ---------------------------------------------------------------------------
+// 55. player_lane_prefs — per-lane notification and history toggles (Stage L1 / Phase 10L)
+// ---------------------------------------------------------------------------
+model PlayerLanePref {
+  id             String    @id @default(uuid())
+  player_id      String
+  player         Player    @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  lane_id        String
+  lane           Lane      @relation(fields: [lane_id], references: [id], onDelete: Cascade)
+  notify         Boolean   @default(false)
+  last_played_at DateTime?
+  plays_count    Int       @default(0)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @default(now()) @updatedAt
+
+  @@unique([player_id, lane_id])
+  @@index([player_id])
+  @@index([lane_id])
+  @@map("player_lane_prefs")
+}
+
 
 
 
