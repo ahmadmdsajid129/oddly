@@ -28,7 +28,7 @@ import { StampedeProtectedCache } from "../cache/stampede.js";
 export const dropsRoutes: FastifyPluginAsyncZod = async (app) => {
   // GET /v1/drop/today & GET /v1/drops/today (Lanes supported via ?lane=slug)
   const getTodayDropHandler = async (
-    req: { query: { lane?: string } },
+    req: any,
     reply: any
   ) => {
     const todayIst = getTwinDay(new Date());

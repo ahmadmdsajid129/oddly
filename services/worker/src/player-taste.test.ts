@@ -11,7 +11,7 @@
  */
 
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
-import { PrismaClient } from "@oddly/shared";
+import { PrismaClient, EVERYDAY_LANE_ID } from "@oddly/shared";
 import { PlayerTasteJob } from "./jobs/player-taste.job.js";
 import { randomUUID } from "node:crypto";
 
@@ -129,10 +129,16 @@ describe("Stage M4 (Phase 10H): Player Taste Calculation Worker (P10H.02)", () =
       // 3. Create test drop and question linking template to tag
       const dropDate = new Date("2026-11-25T00:00:00.000Z");
       const drop = await prisma.drop.upsert({
-        where: { drop_date: dropDate },
+        where: {
+          lane_id_drop_date: {
+            lane_id: EVERYDAY_LANE_ID,
+            drop_date: dropDate,
+          },
+        },
         update: {},
         create: {
           drop_date: dropDate,
+          lane_id: EVERYDAY_LANE_ID,
           opens_at: new Date("2026-11-25T01:30:00.000Z"),
           closes_at: new Date("2026-11-25T18:29:00.000Z"),
           status: "pending",

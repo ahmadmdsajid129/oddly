@@ -246,3 +246,4 @@ describe("Stage L1: Lanes Plumbing Pipeline & Scheduling (P10L.03)", () => {
     expect(typeof scheduler.triggerDropClosure).toBe("function");
   });
 });
+

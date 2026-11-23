@@ -62,8 +62,6 @@ export const lanesRoutes: FastifyPluginAsyncZod = async (app) => {
         orderBy: { sort_order: "asc" },
       });
 
-      const today = getTwinDay(new Date());
-
       const enrichedLanes = await Promise.all(
         lanes.map(async (lane) => {
           let playersToday = 0;
@@ -116,7 +114,7 @@ export const lanesRoutes: FastifyPluginAsyncZod = async (app) => {
    * GET /v1/lanes/:id
    * Single lane details with today's drop and Gate L-A resting evaluation (P10L.04, P10L.09).
    */
-  app.get(
+  app.get<{ Params: { id: string } }>(
     "/v1/lanes/:id",
     {
       schema: {
@@ -255,7 +253,10 @@ export const lanesRoutes: FastifyPluginAsyncZod = async (app) => {
    * POST /v1/lanes/:id/interest
    * "Tell me when it opens" opt-in with DPDP consent and rate limiting (P10L.05).
    */
-  app.post(
+  app.post<{
+    Params: { id: string };
+    Body: { guest_id?: string; consent_notifications: boolean };
+  }>(
     "/v1/lanes/:id/interest",
     {
       schema: {
@@ -435,7 +436,9 @@ export const lanesRoutes: FastifyPluginAsyncZod = async (app) => {
    * PUT /v1/me/lane-prefs
    * Update authenticated player's per-lane notification preference (P10L.08).
    */
-  app.put(
+  app.put<{
+    Body: { lane_id: string; notify: boolean };
+  }>(
     "/v1/me/lane-prefs",
     {
       schema: {
@@ -502,7 +505,9 @@ export const lanesRoutes: FastifyPluginAsyncZod = async (app) => {
    * GET /v1/lanes/:id/gate-status
    * Gate L-A runtime evaluation & runway inspection (P10L.09).
    */
-  app.get(
+  app.get<{
+    Params: { id: string };
+  }>(
     "/v1/lanes/:id/gate-status",
     {
       schema: {
@@ -591,3 +596,4 @@ export const lanesRoutes: FastifyPluginAsyncZod = async (app) => {
     }
   );
 };
+

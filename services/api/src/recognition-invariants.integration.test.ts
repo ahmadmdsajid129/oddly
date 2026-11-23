@@ -14,7 +14,7 @@
  */
 
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
-import { PrismaClient } from "@oddly/shared";
+import { PrismaClient, EVERYDAY_LANE_ID } from "@oddly/shared";
 import { buildServer } from "./server.js";
 import { randomUUID } from "node:crypto";
 
@@ -52,7 +52,7 @@ describe("Stage M5 & M6: Recognition & Subject Sync Invariant Integration Tests"
     testDropDate.setUTCHours(0, 0, 0, 0);
 
     // Find or create test drop for today
-    let existingDrop = await prisma.drop.findUnique({
+    let existingDrop = await prisma.drop.findFirst({
       where: { drop_date: testDropDate },
     });
     if (!existingDrop) {
@@ -61,6 +61,7 @@ describe("Stage M5 & M6: Recognition & Subject Sync Invariant Integration Tests"
         data: {
           id: testDropId,
           drop_date: testDropDate,
+          lane_id: EVERYDAY_LANE_ID,
           opens_at: new Date(testDropDate.getTime() + 7 * 3600 * 1000),
           closes_at: new Date(testDropDate.getTime() + 23 * 3600 * 1000),
           status: "live",

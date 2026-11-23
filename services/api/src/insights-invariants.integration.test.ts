@@ -14,7 +14,7 @@
  */
 
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
-import { PrismaClient } from "@oddly/shared";
+import { PrismaClient, EVERYDAY_LANE_ID } from "@oddly/shared";
 import { buildServer } from "./server.js";
 import { MemesRepository } from "./db/memes.repo.js";
 import { randomUUID } from "node:crypto";
@@ -106,10 +106,16 @@ describe("Stage M4 (Phase 10H): Insights Engine & Invariants Test Suite", () => 
     dropDate = new Date(`${dropDateStr}T00:00:00.000Z`);
 
     const drop = await prisma.drop.upsert({
-      where: { drop_date: dropDate },
+      where: {
+        lane_id_drop_date: {
+          lane_id: EVERYDAY_LANE_ID,
+          drop_date: dropDate,
+        },
+      },
       update: { status: "live" },
       create: {
         drop_date: dropDate,
+        lane_id: EVERYDAY_LANE_ID,
         opens_at: new Date(Date.now() - 3600000),
         closes_at: new Date(Date.now() + 36000000),
         status: "live",
@@ -211,10 +217,16 @@ describe("Stage M4 (Phase 10H): Insights Engine & Invariants Test Suite", () => 
     // Connect templates to tags via separate dummy drop to avoid position collision
     const tmplDropDate = new Date("2026-10-15T00:00:00.000Z");
     const tmplDrop = await prisma.drop.upsert({
-      where: { drop_date: tmplDropDate },
+      where: {
+        lane_id_drop_date: {
+          lane_id: EVERYDAY_LANE_ID,
+          drop_date: tmplDropDate,
+        },
+      },
       update: {},
       create: {
         drop_date: tmplDropDate,
+        lane_id: EVERYDAY_LANE_ID,
         opens_at: tmplDropDate,
         closes_at: tmplDropDate,
         status: "closed",
@@ -512,9 +524,14 @@ describe("Stage M4 (Phase 10H): Insights Engine & Invariants Test Suite", () => 
     const d2 = new Date("2026-11-27T00:00:00.000Z");
 
     const dropPast1 = await prisma.drop.upsert({
-      where: { drop_date: d1 },
+      where: {
+        lane_id_drop_date: {
+          lane_id: EVERYDAY_LANE_ID,
+          drop_date: d1,
+        },
+      },
       update: {},
-      create: { drop_date: d1, opens_at: d1, closes_at: d1, status: "closed" },
+      create: { drop_date: d1, lane_id: EVERYDAY_LANE_ID, opens_at: d1, closes_at: d1, status: "closed" },
     });
     // Clean any prior questions on dropPast1
     const past1Q = await prisma.question.findMany({ where: { drop_id: dropPast1.id } });
@@ -537,9 +554,14 @@ describe("Stage M4 (Phase 10H): Insights Engine & Invariants Test Suite", () => 
     await prisma.questionTag.create({ data: { question_id: q1.id, tag_id: tagHumourId } });
 
     const dropPast2 = await prisma.drop.upsert({
-      where: { drop_date: d2 },
+      where: {
+        lane_id_drop_date: {
+          lane_id: EVERYDAY_LANE_ID,
+          drop_date: d2,
+        },
+      },
       update: {},
-      create: { drop_date: d2, opens_at: d2, closes_at: d2, status: "closed" },
+      create: { drop_date: d2, lane_id: EVERYDAY_LANE_ID, opens_at: d2, closes_at: d2, status: "closed" },
     });
     // Clean any prior questions on dropPast2
     const past2Q = await prisma.question.findMany({ where: { drop_id: dropPast2.id } });

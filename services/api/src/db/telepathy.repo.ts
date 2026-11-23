@@ -80,7 +80,7 @@ export class TelepathyRepository {
     const dropDateObj = new Date(`${dateStr}T00:00:00.000Z`);
 
     // 1. Fetch drop for today
-    const drop = await prisma.drop.findUnique({
+    const drop = await prisma.drop.findFirst({
       where: { drop_date: dropDateObj },
       include: {
         questions: {
@@ -285,7 +285,7 @@ export class TelepathyRepository {
     const dropDateObj = new Date(`${dateStr}T00:00:00.000Z`);
 
     // 1. Fetch drop and designated question
-    const drop = await prisma.drop.findUnique({
+    const drop = await prisma.drop.findFirst({
       where: { drop_date: dropDateObj },
       include: {
         questions: {

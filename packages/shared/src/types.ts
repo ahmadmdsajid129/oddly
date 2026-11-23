@@ -8,6 +8,8 @@
  * in the web app without importing Prisma client.
  */
 
+export const EVERYDAY_LANE_ID = "00000000-0000-4000-a000-000000000001" as const;
+
 // ---------------------------------------------------------------------------
 // Enums (mirrored from schema.prisma)
 // ---------------------------------------------------------------------------

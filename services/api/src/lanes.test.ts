@@ -11,12 +11,11 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import type { FastifyInstance } from "fastify";
 import { buildServer } from "./server.js";
 import { prisma } from "./db/client.js";
 
 describe("Stage L1: Subject Lanes REST API (P10L.04, P10L.05, P10L.08, P10L.09)", () => {
-  let app: FastifyInstance;
+  let app: Awaited<ReturnType<typeof buildServer>>;
   let testPlayerId: string;
   let everydayLaneId: string;
   let memesLaneId: string;
@@ -328,3 +327,4 @@ describe("Stage L1: Subject Lanes REST API (P10L.04, P10L.05, P10L.08, P10L.09)"
     });
   });
 });
+
