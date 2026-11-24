@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; tag `b0-A5-done`).
-- **Not Started:** Slices A6 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; commit `e30d852`, tag `b0-A5-done`), Slice A6 (Safety Foundation: Block, Report, Sever, Consent, Kill Switches, Audit Log; tag `b0-A6-done`).
+- **Not Started:** Slices A7 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -137,6 +137,22 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
   - Displays lane badges on past sealed twin cards.
   - Supports `GET /v1/history?lane=:slug` backend filtering across historical submissions.
 - **Verification:** `apps/web/src/result-streaks.test.ts` (4 tests) and all 16 web suites pass; web bundle size stands at 148.9 KB (within 150 KB target and well below 159.5 KB limit).
+
+### 4.6 Slice A6: Safety Foundation (Block, Report, Sever, Consent, Kill Switches, Audit Log)
+- **Mutual Block Exclusion (`POST /v1/blocks`, `GET /v1/blocks`):**
+  - Allows players to block another player unconditionally.
+  - Prevents self-blocking (`CANNOT_BLOCK_SELF`).
+  - Immediately severs any active Orbit relationship between the blocker and the blocked player (`status: 'ended'`, `ended_by: blockerId`).
+  - Guarantees bidirectional exclusion in future mutual matching ($u \in \text{blocked}(v) \lor v \in \text{blocked}(u)$).
+- **Report Intake & Audit Trail (`POST /v1/reports`):**
+  - Handles issue reports across drops, questions, and twin matchups with structured categorization (`inappropriate`, `offensive`, `bot_abuse`, `technical_glitch`, `other`).
+  - Records immutable event telemetry in `audit_logs` (`action = 'report_submitted'`).
+- **Emergency Ops Tools (`pnpm ops:sever-orbit`, `pnpm ops:ban-player`):**
+  - `tools/ops-sever-orbit.mjs`: Administrative tool to immediately sever an orbit and record action in `audit_logs` (`action = 'sever_orbit'`).
+  - `tools/ops-ban-player.mjs`: Administrative tool to ban an abusive player, immediately sever all active orbits where they participate, and log to `audit_logs` (`action = 'ban_player'`).
+- **Kill Switches & Consent Gating (DPDP):**
+  - Features runtime flags (`feature.telemetry`, `feature.personalisation`) requiring explicit user consent before logging signals or personalizing content.
+- **Verification:** `packages/shared/src/safety-foundation.test.ts` (5 tests) and `@oddly/api` typecheck pass cleanly.
 
 ---
 

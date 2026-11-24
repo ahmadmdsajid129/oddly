@@ -10,6 +10,7 @@ import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { getAuthAccount } from "../auth/tokens.js";
 import { DegradationManager } from "../resilience/degradation.js";
+import { prisma } from "../db/client.js";
 
 export const reportsRoutes: FastifyPluginAsyncZod = async (app) => {
   /**
@@ -73,6 +74,20 @@ export const reportsRoutes: FastifyPluginAsyncZod = async (app) => {
         },
         "User report received for moderation intake"
       );
+
+      try {
+        await prisma.auditLog.create({
+          data: {
+            action: "report_submitted",
+            target_type,
+            target_id,
+            actor: reporterId,
+            after_data: { report_id: reportId, reason, note: note || null },
+          },
+        });
+      } catch (err) {
+        req.log.warn({ err }, "Failed to write report audit log");
+      }
 
       return reply.send({
         ok: true,
