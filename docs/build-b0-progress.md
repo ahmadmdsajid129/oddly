@@ -15,7 +15,7 @@
 | A10 | Anti-twin | done | b0-A10-done | Bounded lowest-similarity opposite, opt-in reveal, Satori flip card, /anti-twin verified |
 | A11 | Sync by subject (statistics only) | done | b0-A11-done | F28 tag-level agreement rate stats with k>=5 and Rule 19 Zero-Leak |
 | A12 | Chat unlock engine (Three Doors, Duo Trial v0, both-confirm, chat_ready) | done | b0-A12-done | Three Doors evaluation, Duo Trial v0, both-confirm state machine to chat_ready |
-| A13 | Notifications for Orbit and unlock; events; consent-gated signals | not started | - | Orbit push channel and event dictionary |
+| A13 | Notifications for Orbit and unlock; events; consent-gated signals | done | b0-A13-done | Event dictionary, strict schema allowlist, and DPDP consent-gated signals |
 | A14 | Demo seeder, the 200-player scenario test, explain:twin tool | not started | - | Synthetic seeder, scenario test, explain:twin CLI |
 | B1 | Bonus rounds | not started | - | Stage L9 additive closest-match tie-breaker |
 | B2 | Super twin | not started | - | Multi-lane twin match surface |

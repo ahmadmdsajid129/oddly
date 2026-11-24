@@ -522,6 +522,16 @@ export const SignalEventNameSchema = z.enum([
   "drop_abandoned",
   "share_clicked",
   "theme_viewed",
+  // Orbit & Chat Unlock Events (Stage B0 Slice A13)
+  "keep_sent",
+  "keep_accepted",
+  "orbit_ended",
+  "expression_sent",
+  "trial_started",
+  "doors_unlocked",
+  "chat_confirmed",
+  "chat_ready",
+  "notification_opened",
 ]);
 
 export const SignalEventPropsSchema = z
@@ -533,6 +543,12 @@ export const SignalEventPropsSchema = z
     format: z.string().max(20).optional(),
     theme_key: z.string().max(50).optional(),
     tag_key: z.string().max(50).optional(),
+    lane_id: z.string().optional(),
+    lane_slug: z.string().optional(),
+    door: z.enum(["trial", "streak", "sync"]).optional(),
+    expression_key: z.string().optional(),
+    duration_days: z.number().int().optional(),
+    channel: z.string().optional(),
   })
   .strict(); // strictly forbid any unexpected keys, arbitrary strings or PII
 
