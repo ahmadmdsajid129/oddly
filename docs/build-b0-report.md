@@ -13,8 +13,7 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`).
-- **In Progress:** Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock).
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; tag `b0-A1-done`).
 - **Not Started:** Slices A2 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
@@ -59,7 +58,15 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
 
 ## 4. Feature-by-Feature "How It Works as Built"
 
-*(Maintained and appended slice-by-slice)*
+### 4.1 Slice A1: Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Lane-Scoped Submit & Result
+- **Lane Picker as First Screen (Decision D1):** Once the user confirms the 18+ age gate, the web app directly presents `LanePicker` (`step === "lane_picker"`) rather than jumping into questions of an arbitrary default lane.
+- **Returning Player Experience:** If the user has played before, `play-store` persists `lastPlayedLaneSlug` in `localStorage` ("oddly_last_played_lane"). The top of the lane picker renders a distinct "Continue in <Last Lane>" card for quick resumption.
+- **Per-Lane Status & Multi-Lane Play (Decision D5):** For each open lane:
+  - If already completed today, a mint badge "Played today" and a "View Twin" CTA button appear. Clicking "View Twin" retrieves the cached/completed submission result and navigates directly to the reveal screen.
+  - If unplayed today, a sun-accented "Play now" CTA button allows the player to play questions for that lane.
+- **Per-Lane Drop Clock:** Drop availability cycles run strictly from 07:00 IST to 06:59:59 IST next day with recap calculation at 07:05 IST. The UI surfaces this accurate window to prevent timing ambiguity.
+- **Database Partitioning Integrity:** Migration `015_lane_id_integrity.sql` replaced the old global unique constraint `(drop_date, player_id)` with `uq_submissions_drop_lane_player (drop_date, lane_id, player_id)`. This guarantees that players can play multiple distinct lanes on the same calendar day without collisions or data crosstalk, while strictly isolating each lane's submissions, questions, and match pool.
+- **Verification:** 16 web test suites (125 tests) and 4 data safety integration tests pass; frontend play-route bundle is 148.7 KB (within the 150 KB target and well below 159.5 KB ceiling).
 
 ---
 

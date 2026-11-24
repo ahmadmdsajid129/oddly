@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/Toast";
 import { LaneChip } from "@/components/lanes/LaneChip";
 import { feedback } from "@/lib/feedback";
 import { api } from "@/lib/api";
+import type { LaneSummary } from "@oddly/shared";
 import {
   isAdultConfirmed,
   setAdultConfirmed,
@@ -163,6 +164,7 @@ const FALLBACK_QUESTIONS: QuestionData[] = [
 
 type FlowStep =
   | "landing"
+  | "lane_picker"
   | "under_18"
   | "question"
   | "review"
@@ -185,17 +187,32 @@ function HomePageInner() {
   const auth = useAuth();
   const isOnline = useNetworkStatus();
 
-  // Lane state (Stage L1 / Phase 10L)
+  // Lane state & Persistence (Stage B0 / Slice A1 / Decision D1)
+  const lastPlayedLaneSlug = usePlayStore((state) => state.lastPlayedLaneSlug);
+  const setLastPlayedLaneSlug = usePlayStore((state) => state.setLastPlayedLaneSlug);
+  const completedResults = usePlayStore((state) => state.completedResults);
+
   const [currentLane, setCurrentLane] = useState({
-    slug: urlLane || "everyday",
+    slug: urlLane || lastPlayedLaneSlug || "everyday",
     name_key: urlLane ? urlLane.charAt(0).toUpperCase() + urlLane.slice(1) : "Everyday",
     accent_token: "violet",
   });
-  const [showLanePicker, setShowLanePicker] = useState(false);
-  const hasPlayedBefore = usePlayStore((state) => Object.keys(state.completedResults).length > 0);
+  const hasPlayedBefore = Object.keys(completedResults).length > 0;
+
+  // Derive played lanes today
+  const playedLanesToday = React.useMemo(() => {
+    const list: string[] = [];
+    if (completedResults) {
+      for (const key of Object.keys(completedResults)) {
+        if (key.includes("memes")) list.push("memes");
+        else list.push("everyday");
+      }
+    }
+    return Array.from(new Set(list));
+  }, [completedResults]);
 
   // Screen state
-  const [step, setStep] = useState<FlowStep>("landing");
+  const [step, setStep] = useState<FlowStep>("lane_picker");
   const [pendingRequestId, setPendingRequestId] = useState<string | null>(null);
   const [ageGateOpen, setAgeGateOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
@@ -206,6 +223,17 @@ function HomePageInner() {
   const [startTime, setStartTime] = useState<number>(0);
   const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const [shareFormat, setShareFormat] = useState<ShareFormat>("story");
+
+  // Initial 18+ Gate Check
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (!isAdultConfirmed()) {
+        setAgeGateOpen(true);
+      } else {
+        setStep("lane_picker");
+      }
+    }
+  }, []);
 
   // Fetch runtime configuration (including degradation level)
   const { data: publicConfig } = useQuery({
@@ -387,6 +415,26 @@ function HomePageInner() {
   const handleAgeConfirm = () => {
     setAdultConfirmed();
     setAgeGateOpen(false);
+    setStep("lane_picker");
+  };
+
+  const handleSelectLane = (lane: LaneSummary, mode?: "play" | "view_twin") => {
+    setCurrentLane({
+      slug: lane.slug,
+      name_key: lane.name_key,
+      accent_token: lane.accent_token,
+    });
+    setLastPlayedLaneSlug(lane.slug);
+    if (mode === "view_twin") {
+      const stored =
+        getCompletedResult<StoredPlayResult>(lane.slug) ||
+        getCompletedResult<StoredPlayResult>(activeDropId);
+      if (stored) {
+        setSubmissionResult(stored);
+        setStep("reveal");
+        return;
+      }
+    }
     beginQuestionFlow();
   };
 
@@ -599,7 +647,7 @@ function HomePageInner() {
           requestId={pendingRequestId || undefined}
           isPolling={isMatchPolling}
           onCheckStatus={pollMatchNow}
-          onHome={() => setStep("landing")}
+          onHome={() => setStep("lane_picker")}
         />
       </WidgetErrorBoundary>
     );
@@ -627,7 +675,7 @@ function HomePageInner() {
             setShareFormat("story");
             setIsShareSheetOpen(true);
           }}
-          onClose={() => setStep("landing")}
+          onClose={() => setStep("lane_picker")}
         />
         <ShareSheet
           isOpen={isShareSheetOpen}
@@ -663,7 +711,7 @@ function HomePageInner() {
             setShareFormat("link");
             setIsShareSheetOpen(true);
           }}
-          onHome={() => setStep("landing")}
+          onHome={() => setStep("lane_picker")}
         />
         <ShareSheet
           isOpen={isShareSheetOpen}
@@ -744,157 +792,14 @@ function HomePageInner() {
         </div>
       </header>
 
-      {/* Hero Body */}
-      <div className="relative z-20 w-full max-w-md mx-auto my-auto text-center space-y-6 py-4">
-        {/* Brand visual sticker motif: three physical overlapping circles with ink outlines */}
-        <div className="relative w-28 h-20 mx-auto flex items-center justify-center">
-          <div className="absolute left-1 w-14 h-14 rounded-pill bg-violet border-[2.5px] border-ink shadow-sticker" />
-          <div className="absolute right-1 w-14 h-14 rounded-pill bg-coral border-[2.5px] border-ink shadow-sticker" />
-          <div className="relative z-10 w-7 h-7 rounded-pill bg-mint border-[2px] border-ink shadow-sm" />
-        </div>
-
-        {/* Hero headline & tagline */}
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
-            Someone out there is oddly like you
-          </h1>
-          <p className="font-body text-muted text-base leading-relaxed max-w-xs mx-auto">
-            Five picks. About 30 seconds. One stranger twin anywhere in the world.
-          </p>
-        </div>
-
-        {/* Live Player Counter, Lane Chip & Drop Theme */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <LaneChip
-            name={currentLane.name_key}
-            slug={currentLane.slug}
-            accent={currentLane.accent_token}
-            onClick={() => setShowLanePicker((v) => !v)}
-          />
-
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-paper border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-pill bg-mint border border-ink" />
-            <span>3,482 players today</span>
-          </div>
-
-          {(dropData as any)?.theme_key && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-lavender border-[1.5px] border-ink text-chip font-display font-bold text-ink shadow-sm">
-              <Sparkles className="w-3 h-3 text-violet shrink-0" />
-              <span className="capitalize">{((dropData as any).theme_key as string).replace(/-/g, " ")} Drop</span>
-            </div>
-          )}
-
-          {hasPlayedBefore && (
-            <button
-              type="button"
-              onClick={() => setShowLanePicker((v) => !v)}
-              className="text-xs font-display font-bold text-violet underline cursor-pointer px-1 py-0.5"
-            >
-              {showLanePicker ? "Hide lanes" : "Change lane"}
-            </button>
-          )}
-        </div>
-
-        {/* Resting Lane Evaluation (Rule L9) */}
-        {(dropData as any)?.is_resting ? (
-          <div className="rounded-l bg-cream border-[2.5px] border-ink shadow-sticker p-6 space-y-4 text-center">
-            <div className="flex items-center justify-center gap-2 font-display font-bold text-xs uppercase tracking-wider text-muted px-3 py-1 bg-paper rounded-pill border-[1.5px] border-ink w-fit mx-auto">
-              <Sparkles className="w-4 h-4 stroke-[2]" />
-              <span>Lane Resting</span>
-            </div>
-            <p className="font-display text-base font-extrabold text-ink">
-              The {currentLane.name_key} lane is resting today.
-            </p>
-            <p className="font-body text-xs text-muted max-w-xs mx-auto">
-              {(dropData as any)?.message || "Drops cycle at 07:00 IST. You can explore today's Everyday Drop!"}
-            </p>
-            <div className="pt-1">
-              <Button
-                variant="primary"
-                size="md"
-                onClick={() => {
-                  setCurrentLane({ slug: "everyday", name_key: "Everyday", accent_token: "violet" });
-                  setShowLanePicker(false);
-                }}
-              >
-                <span>Play Everyday Drop</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-              </Button>
-            </div>
-          </div>
-        ) : submissionResult ? (
-          <div className="rounded-l bg-paper border-[2.5px] border-ink shadow-sticker p-6 space-y-4 text-center">
-            <div className="flex items-center justify-center gap-2 font-display font-bold text-xs uppercase tracking-wider text-ink px-3 py-1 bg-mint rounded-pill border-[1.5px] border-ink w-fit mx-auto">
-              <Trophy className="w-4 h-4 stroke-[2.5]" />
-              <span>Today&apos;s Picks Sealed</span>
-            </div>
-
-            <p className="font-display text-xl font-extrabold text-ink">
-              Matched {submissionResult.match.matched_picks}/5 with a stranger in {submissionResult.match.twin_location}
-            </p>
-
-            <div className="flex items-center justify-center pt-1">
-              <Button
-                variant="primary"
-                size="md"
-                onClick={() => setStep("reveal")}
-              >
-                <span>View Twin & Oddness</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-              </Button>
-            </div>
-
-            <div className="pt-2 border-t-[1.5px] border-ink/20">
-              <p className="text-caption text-muted mb-2 font-display font-bold uppercase tracking-wider">
-                Next five drop at 07:00 IST
-              </p>
-              <Countdown />
-            </div>
-          </div>
-        ) : isLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-14 w-full" />
-          </div>
-        ) : dropStatus === "pending" ? (
-          <div className="space-y-4">
-            <p className="text-body-s font-display font-bold text-muted">
-              Today&apos;s five drop at 07:00 IST
-            </p>
-            <Countdown />
-          </div>
-        ) : (
-          <div className="w-full max-w-xs sm:max-w-sm mx-auto flex flex-col items-center gap-3">
-            <Button
-              variant="primary"
-              size="lg"
-              data-testid="play-welcome-start"
-              className="w-full"
-              onClick={handleStartPlay}
-            >
-              <Sparkles className="w-5 h-5" />
-              <span>{answers.length > 0 ? "Resume today's five" : "Play today's five"}</span>
-            </Button>
-            <p className="text-caption text-muted font-bold font-display tracking-wide">
-              18+ only • No account needed • Free forever
-            </p>
-          </div>
-        )}
-
-        {/* Responsive Lane Picker (Home View - Rule L10 & Sec 12C.2) */}
-        {showLanePicker && (
-          <LanePicker
-            selectedSlug={currentLane.slug}
-            onSelectLane={(lane) => {
-              setCurrentLane({
-                slug: lane.slug,
-                name_key: lane.name_key,
-                accent_token: lane.accent_token,
-              });
-              setShowLanePicker(false);
-            }}
-            className="pt-4 text-left"
-          />
-        )}
+      {/* Primary Lane Picker Screen (Decision D1: First screen after 18+ confirmation) */}
+      <div className="relative z-20 w-full max-w-xl mx-auto my-auto py-2">
+        <LanePicker
+          selectedSlug={currentLane.slug}
+          lastPlayedLaneSlug={lastPlayedLaneSlug}
+          playedLanesToday={playedLanesToday}
+          onSelectLane={handleSelectLane}
+        />
       </div>
 
       {/* Footer */}

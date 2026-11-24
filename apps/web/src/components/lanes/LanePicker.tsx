@@ -5,9 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { usePlayStore } from "@/lib/play-store";
 import { useToast } from "@/components/ui/Toast";
-import { Button } from "@/components/ui/Button";
 import { getLaneIcon } from "./LaneChip";
-import { Bell, Check, Clock, Users, Sparkles } from "lucide-react";
+import { Bell, Check, Clock, Users, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { LaneSummary } from "@oddly/shared";
@@ -18,7 +17,9 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 
 export interface LanePickerProps {
   selectedSlug?: string;
-  onSelectLane: (lane: LaneSummary) => void;
+  lastPlayedLaneSlug?: string;
+  playedLanesToday?: string[];
+  onSelectLane: (lane: LaneSummary, mode?: "play" | "view_twin") => void;
   className?: string;
 }
 
@@ -32,10 +33,16 @@ const ACCENT_BORDER_COLORS: Record<string, string> = {
 };
 
 /**
- * Responsive LanePicker Home UI (Design System Sec 12C.2 & P10L.06)
+ * Responsive LanePicker Home UI (Stage B0 / Slice A1 / Decision D1)
  * Follows Sticker Pop guidelines: cream desk, paper stickers, ink outlines, hard shadows.
  */
-export function LanePicker({ selectedSlug, onSelectLane, className }: LanePickerProps) {
+export function LanePicker({
+  selectedSlug,
+  lastPlayedLaneSlug,
+  playedLanesToday = [],
+  onSelectLane,
+  className,
+}: LanePickerProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const completedResults = usePlayStore((state) => state.completedResults);
@@ -81,12 +88,10 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
     );
   }
 
-  // Determine last played lane (if any) to prioritize at top per Rule L1 / Sec 12C.2
-  const playedLaneSlugs = new Set<string>();
-  Object.keys(completedResults).forEach((dropId) => {
-    // If dropId encodes lane or is stored with lane
-    playedLaneSlugs.add("everyday");
-  });
+  // Find last played lane if available
+  const lastPlayedLane = lastPlayedLaneSlug
+    ? data.find((l) => l.slug === lastPlayedLaneSlug)
+    : undefined;
 
   // Sort lanes: open/preview first, then planned; prioritize selected or last played
   const sortedLanes = [...data].sort((a, b) => {
@@ -98,15 +103,51 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
   });
 
   return (
-    <section aria-label="Subject Lanes" className={cn("w-full max-w-xl mx-auto px-4 py-2", className)}>
-      <div className="flex items-center justify-between mb-3 px-1">
+    <section aria-label="Subject Lanes" className={cn("w-full max-w-xl mx-auto px-4 py-2 space-y-4", className)}>
+      {/* Top Banner: Continue in Last Lane (D1) */}
+      {lastPlayedLane && (lastPlayedLane.status === "open" || lastPlayedLane.status === "preview") && (
+        <div className="bg-paper border-[2.5px] border-ink rounded-l shadow-sticker p-4 flex items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-violet stroke-[2.5]" />
+              <span>Welcome Back</span>
+            </span>
+            <h3 className="font-display text-base font-extrabold text-ink">
+              Continue in {lastPlayedLane.name_key}
+            </h3>
+            <p className="text-xs text-muted">
+              {playedLanesToday.includes(lastPlayedLane.slug)
+                ? "You've completed today's 5 picks in this lane."
+                : "Today's fresh 5 questions are waiting for you."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              onSelectLane(
+                lastPlayedLane,
+                playedLanesToday.includes(lastPlayedLane.slug) ? "view_twin" : "play"
+              )
+            }
+            className="px-4 py-2 bg-sun text-ink font-display text-xs font-bold rounded-pill border-[2px] border-ink shadow-sticker sticker-press flex items-center gap-1.5 shrink-0"
+          >
+            <span>
+              {playedLanesToday.includes(lastPlayedLane.slug) ? "View Twin" : "Play Now"}
+            </span>
+            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
+        </div>
+      )}
+
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-violet stroke-[2.5]" />
           <h2 className="font-display text-sm font-extrabold uppercase tracking-wider text-muted">
             Choose Your Lane
           </h2>
         </div>
-        <span className="text-xs font-mono text-muted">07:00 IST Cycle</span>
+        <span className="text-xs font-mono text-muted">07:00 IST – 06:59 IST Cycle</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -118,6 +159,7 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
           const isOpen = lane.status === "open";
           const isPreview = lane.status === "preview";
           const isEarlyLane = isOpen && (lane.players_today ?? 0) < 500;
+          const isPlayedToday = playedLanesToday.includes(lane.slug);
           const isInterested = interestedLanes[lane.id];
           const borderAccent = ACCENT_BORDER_COLORS[lane.accent_token.toLowerCase()] || "border-l-lavender";
 
@@ -180,11 +222,8 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
 
           // Active, Preview, or Resting lane card
           return (
-            <button
+            <div
               key={lane.id}
-              type="button"
-              disabled={isResting}
-              onClick={() => onSelectLane(lane)}
               data-testid={`lane-card-${lane.slug}`}
               className={cn(
                 "w-full text-left bg-paper border-[2.5px] border-ink shadow-card rounded-l p-4 flex flex-col justify-between gap-2.5 relative transition-all min-h-[120px]",
@@ -210,6 +249,11 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
                     <span className="bg-cream text-muted border-[1.5px] border-muted rounded-pill px-2 py-0.5 text-[11px] font-bold">
                       Resting
                     </span>
+                  ) : isPlayedToday ? (
+                    <span className="bg-mint text-ink border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-[11px] font-extrabold shadow-sticker-flat flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 stroke-[2.5]" />
+                      <span>Played today</span>
+                    </span>
                   ) : isEarlyLane ? (
                     <span className="bg-sun text-ink border-[1.5px] border-ink rounded-pill px-2 py-0.5 text-[11px] font-extrabold shadow-sticker-flat">
                       Early Lane
@@ -230,27 +274,34 @@ export function LanePicker({ selectedSlug, onSelectLane, className }: LanePicker
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-1 border-t border-ink/10 text-[11px] font-mono text-muted">
+              <div className="flex items-center justify-between pt-2 border-t border-ink/10 text-[11px]">
                 {isResting ? (
-                  <span>Resumes next cycle</span>
+                  <span className="font-mono text-muted">Resumes next cycle</span>
                 ) : (
                   <>
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 font-mono text-muted">
                       <Users className="w-3 h-3 text-muted" />
                       <span>{lane.players_today ?? 0} playing today</span>
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-muted" />
-                      <span>Closes 23:59 IST</span>
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onSelectLane(lane, isPlayedToday ? "view_twin" : "play")}
+                      className={cn(
+                        "px-3 py-1 rounded-pill border-[1.5px] border-ink font-display text-xs font-bold transition-all shadow-sticker sticker-press",
+                        isPlayedToday
+                          ? "bg-lavender text-ink hover:bg-lilac"
+                          : "bg-sun text-ink hover:bg-sun/90"
+                      )}
+                    >
+                      {isPlayedToday ? "View Twin" : "Play now"}
+                    </button>
                   </>
                 )}
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
     </section>
   );
 }
-

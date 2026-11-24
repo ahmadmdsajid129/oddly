@@ -27,6 +27,10 @@ export interface PlayStoreState {
   pendingSubmissions: Record<string, PendingSubmissionPayload>;
   completedResults: Record<string, unknown>;
   adultConfirmed: boolean;
+  lastPlayedLaneSlug?: string;
+
+  // Lane Preferences
+  setLastPlayedLaneSlug: (slug: string) => void;
 
   // Draft Actions
   saveDraft: (dropId: string, answers: AnswerPayload[]) => void;
@@ -61,6 +65,16 @@ export const usePlayStore = create<PlayStoreState>()(
       pendingSubmissions: {},
       completedResults: {},
       adultConfirmed: false,
+      lastPlayedLaneSlug: undefined,
+
+      setLastPlayedLaneSlug: (slug: string) => {
+        set({ lastPlayedLaneSlug: slug });
+        try {
+          if (typeof window !== "undefined") {
+            localStorage.setItem("oddly_last_played_lane", slug);
+          }
+        } catch {}
+      },
 
       saveDraft: (dropId, answers) => {
         set((state) => ({
