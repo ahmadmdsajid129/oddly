@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; tag `b0-A3-done`).
-- **Not Started:** Slices A4 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; tag `b0-A4-done`).
+- **Not Started:** Slices A5 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -108,6 +108,20 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
   - Candidate edges are bounded strictly to mutual tie groups ($u \in \text{Tie}(v) \land v \in \text{Tie}(u)$).
   - Verified on a 1,000-player synthetic pool: 0 below-tie-group pairings, 348 mutual pairs (696 players), 70.92% approximation ratio against maximum weighted matching upper bound.
 - **Verification:** `packages/shared/src/mutual-pairing.test.ts` (16 tests) and `apps/web/src/reveal-oddness.test.ts` (6 tests) pass cleanly.
+
+### 4.4 Slice A4: Memes Lane Launch
+- **Memes as a Dedicated Lane (Decision D3 & Rule L1):**
+  - Memes are not a feature or universal overlay; they exist strictly as a dedicated daily game lane (`slug = 'memes'`).
+  - Community-authored meme captions from Meme Lab are restricted exclusively to `lane_slug = 'memes'`. Calling `assertMemesLaneTarget` with any other lane throws `MEME_LAB_FEED_FORBIDDEN`.
+- **14-Drop Launch Runway (70 Questions):**
+  - `packages/shared/src/seeds/memes-lane-drops.ts` provides 14 curated, fully approved daily Drops (70 questions total).
+  - Every question has `render_variant === 'meme'`.
+  - Format balance across drops: 28 `pick1` (Hero Q1 and Telepathy Q5), 14 `pick2of6` (Q2), 14 `rank3` (Q3), 14 `slider7` (Q4).
+- **Meme Telepathy Question Selection:**
+  - `selectTelepathyQuestion` scans drop questions to identify an eligible low-cardinality meme question ($\le 4$ options) for the daily Telepathy challenge. High-cardinality multi-selections (`pick2of6`) are excluded to avoid astronomical random mismatch rates.
+- **Dedicated Satori Meme Share Card (`renderMemeShareCardPng`):**
+  - Renders a 1200x630 OpenGraph card with ink border (`#14123A`), warm cream paper styling, matched meme template, and twin similarity badge.
+- **Verification:** `packages/shared/src/memes-lane.test.ts` (11 tests), `apps/web/src/meme-corner.test.ts` (5 tests), and `apps/web/src/meme-questions.test.ts` (4 tests) pass cleanly.
 
 ---
 
