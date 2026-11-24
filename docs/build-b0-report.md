@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; tag `b0-A2-done`).
-- **Not Started:** Slices A3 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; tag `b0-A3-done`).
+- **Not Started:** Slices A4 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -85,6 +85,29 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
   - When $N < 30$, marginal option smoothing is used for `pick2of6` and `rank3` rather than a uniform fallback.
 - **Sample Seed Runway:** 12 verified sample questions per format (48 total in `scripts/seed-rich-questions.mjs`) strictly adhering to Oddly guidelines: zero politics, zero shaming, zero sensitive categories.
 - **Verification:** `packages/shared/src/formats.test.ts` (19 tests) and `apps/web/src/richer-formats.test.tsx` (11 tests) pass with 100% assertion coverage.
+
+### 4.3 Slice A3: Twin Depth & Mutual Pairing
+- **Honest Pool Scaling ("Closest so far"):**
+  - When the daily player pool for a lane is under 200 ($N < 200$), the UI surfaces a distinct sun-accented badge: `"Closest so far"`.
+  - Once the pool reaches 200+, standard match semantics take over with honest tie group sizing.
+- **Tie Group Sizing & Honest Copy:**
+  - If a player has a single unique match in their tie group ($\text{tie\_group\_size} = 1$), the reveal displays: `"1 of 1 unique pair"`.
+  - When tied with multiple candidates ($\text{tie\_group\_size} > 1$), the UI truthfully renders: `"{N} people matched you this way"`.
+- **"Why you two?" Rarest Shared Answers:**
+  - An accordion on the reveal screen lists the rarest shared choices between the two twins along with their individual rarity percentages (`Picked by X%`).
+- **28-Day BitMinHash History Signature:**
+  - Player answer patterns across up to 28 days are compacted into 64-bit MinHash signatures.
+  - History agreement $H(u, v)$ is evaluated via Hamming distance without retaining raw historic answers across players.
+- **Lexicographic Tie-Breaking (`compareTieCandidates`):**
+  - Outside $\epsilon = 0.01$: Candidate with strictly higher polymorphic similarity $S$ wins unconditionally.
+  - Inside $\epsilon = 0.01$ tie group: Strict lexicographic order:
+    1. Higher 28-day history agreement $H$
+    2. Different country code $C$ (diverse serendipity)
+    3. Deterministic HMAC hash
+- **Greedy Mutual Pairing (1/2-Approximation):**
+  - Candidate edges are bounded strictly to mutual tie groups ($u \in \text{Tie}(v) \land v \in \text{Tie}(u)$).
+  - Verified on a 1,000-player synthetic pool: 0 below-tie-group pairings, 348 mutual pairs (696 players), 70.92% approximation ratio against maximum weighted matching upper bound.
+- **Verification:** `packages/shared/src/mutual-pairing.test.ts` (16 tests) and `apps/web/src/reveal-oddness.test.ts` (6 tests) pass cleanly.
 
 ---
 
