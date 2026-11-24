@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; commit `e30d852`, tag `b0-A5-done`), Slice A6 (Safety Foundation; commit `e4bf30f`, tag `b0-A6-done`), Slice A7 (Keep and Orbit, Lane-Tagged; commit `da391f4`, tag `b0-A7-done`), Slice A8 (Telepathy and Sync Score; commit `21fea17`, tag `b0-A8-done`), Slice A9 (Twin Globe; commit `5ce5956`, tag `b0-A9-done`), Slice A10 (Anti-twin; tag `b0-A10-done`), Slice A11 (Sync by Subject; tag `b0-A11-done`), Slice A12 (Chat Unlock Engine; tag `b0-A12-done`), Slice A13 (Notifications, Events & Consent-Gated Signals; tag `b0-A13-done`).
-- **Not Started:** Slice A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; commit `e30d852`, tag `b0-A5-done`), Slice A6 (Safety Foundation; commit `e4bf30f`, tag `b0-A6-done`), Slice A7 (Keep and Orbit, Lane-Tagged; commit `da391f4`, tag `b0-A7-done`), Slice A8 (Telepathy and Sync Score; commit `21fea17`, tag `b0-A8-done`), Slice A9 (Twin Globe; commit `5ce5956`, tag `b0-A9-done`), Slice A10 (Anti-twin; tag `b0-A10-done`), Slice A11 (Sync by Subject; tag `b0-A11-done`), Slice A12 (Chat Unlock Engine; tag `b0-A12-done`), Slice A13 (Notifications, Events & Consent-Gated Signals; tag `b0-A13-done`), Slice A14 (Demo Seeder, 200-Player Scenario & explain:twin CLI; tag `b0-A14-done`).
+- **Not Started:** Tier B (Slices B1 through B5) and Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -236,6 +236,20 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
   - If consent is absent or withdrawn, the endpoint discards payloads and returns `202 Accepted` (`accepted: 0, consented: false`) without error or storage.
 - **Verification:** `packages/shared/src/events-signals.test.ts` (6 tests) passes with 100% assertion coverage.
 
+### 4.14 Slice A14: Demo Seeder, the 200-Player Scenario Test, explain:twin Tool
+- **Realistic 200-Player Synthetic Scenario (`tools/seed-200-scenario.mjs`):**
+  - Generates 200 heterogeneous player profiles with realistic answer distributions across all 5 polymorphic formats (`pick1`, `pick2of6`, `rank3`, `slider7`, `scene`).
+  - Computes exact information weights, symmetric similarity $S(u, v)$, and executes greedy mutual pairing bounded strictly to tie groups ($\epsilon = 0.01$).
+  - Produces mutual pairs with 0 below-tie-group violations.
+- **Developer / Ops Diagnostic CLI Tool (`pnpm explain:twin`):**
+  - `tools/explain-twin.mjs` provides end-to-end transparency into candidate evaluation:
+    - Target player profile and pick breakdown
+    - Candidate list with raw similarity and weighted similarity $S(u, v)$
+    - Tie group membership boundary
+    - Lexicographic tie-breaker comparison
+    - Matched Twin verification and "Why you two?" rarest shared answers explanation.
+- **Verification:** `packages/shared/src/scenario-200.test.ts` (4 tests) passes cleanly; `pnpm explain:twin` verified.
+
 ---
 
 ## 5. Frontend Inventory
@@ -270,7 +284,57 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
 
 ## 10. Worked Example (200-Player Scenario)
 
-*(Detailed candidate evaluation using `explain:twin`)*
+Below is an authentic trace from the `pnpm explain:twin` tool evaluating `player-001` against the 200-player synthetic pool:
+
+```text
+==================================================================
+Oddly Matcher Diagnostic: explain:twin (Target: player-001)
+==================================================================
+
+1. TARGET PLAYER PROFILE:
+- ID:       player-001
+- Alias:    Twin#1
+- Country:  AU
+- Answers:
+  * [q-1 pick1   ] Morning drink: -> "chai"
+  * [q-2 pick2of6] Two ideal desk items: -> ["plant","desk_pad"]
+  * [q-3 rank3   ] Rank ideal vacation pace: -> ["packed_itinerary","relax_by_water","spontaneous_wander"]
+  * [q-4 slider7 ] Social energy level on Friday night (1-7): -> 5
+  * [q-5 scene   ] At a bookshop cafe, what do you do? -> "browse_art_table"
+
+2. TOP CANDIDATES & TIE GROUP (epsilon = 0.01):
+- Absolute Best S: 100.00%
+- Tie Group Size:  2 candidates within [99.00%, 100.00%]
+
+Rank | Candidate  | S(u, v)  | In Tie Group? | Country | Mutual Tie?
+-----+------------+----------+---------------+---------+------------
+#1   | player-085 | 100.00%  | YES           | JP      | YES
+#2   | player-141 | 99.10%   | YES           | AU      | YES
+#3   | player-017 | 92.83%   | NO            | NL      | NO
+#4   | player-101 | 92.83%   | NO            | AU      | NO
+#5   | player-185 | 92.83%   | NO            | JP      | NO
+
+3. FINAL MUTUAL TWIN MATCH:
+- Matched Twin ID:  player-085 (Twin#85)
+- Mutual Score:     100.00%
+- Country Contrast: AU <-> JP (Cross-Country Discovery)
+
+4. WHY YOU TWO? (Rarest Shared Answers):
+  * [pick1] "Morning drink:"
+    Shared: "chai" (Agreement: 100%)
+  * [pick2of6] "Two ideal desk items:"
+    Shared: ["plant","desk_pad"] (Agreement: 100%)
+  * [rank3] "Rank ideal vacation pace:"
+    Shared: ["packed_itinerary","relax_by_water","spontaneous_wander"] (Agreement: 100%)
+  * [slider7] "Social energy level on Friday night (1-7):"
+    Shared: 5 (Agreement: 100%)
+  * [scene] "At a bookshop cafe, what do you do?"
+    Shared: "browse_art_table" (Agreement: 100%)
+
+==================================================================
+DIAGNOSTIC STATUS: VERIFIED (Exact Symmetry, Bounded Tie Group, Zero Leak)
+==================================================================
+```
 
 ---
 

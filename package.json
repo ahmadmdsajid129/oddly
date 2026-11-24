@@ -19,6 +19,8 @@
     "bench:partition": "pnpm --filter @oddly/shared exec tsx scripts/bench-partition.ts",
     "ops:sever-orbit": "node tools/ops-sever-orbit.mjs",
     "ops:ban-player": "node tools/ops-ban-player.mjs",
+    "explain:twin": "node tools/explain-twin.mjs",
+    "seed:200-scenario": "node tools/seed-200-scenario.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\"",
     "db:migrate": "echo 'Stage 2 task: prisma migrate dev'",
     "db:seed": "echo 'Stage 2 task: prisma db seed'"
