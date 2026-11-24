@@ -9,13 +9,22 @@ import { api } from "@/lib/api";
 import type { HistoryResponse } from "@oddly/api-client";
 import { ArrowLeft, Calendar, Trophy, Share2, Sparkles, Flame } from "lucide-react";
 
+function cn(...inputs: (string | undefined | null | false)[]) {
+  return inputs.filter(Boolean).join(" ");
+}
+
 export default function HistoryPage() {
   const router = useRouter();
   const [selectedCardUrl, setSelectedCardUrl] = useState<string | null>(null);
+  const [selectedLane, setSelectedLane] = useState<"all" | "everyday" | "memes">("all");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["player-history"],
-    queryFn: () => api.history.get({ limit: 30 }),
+    queryKey: ["player-history", selectedLane],
+    queryFn: () =>
+      api.history.get({
+        limit: 30,
+        lane: selectedLane === "all" ? undefined : selectedLane,
+      }),
     staleTime: 60 * 1000,
   });
 
@@ -77,6 +86,25 @@ export default function HistoryPage() {
         </div>
       </div>
 
+      {/* Lane Filter Strip */}
+      <div className="flex items-center gap-2 mb-4">
+        {(["all", "everyday", "memes"] as const).map((lane) => (
+          <button
+            key={lane}
+            type="button"
+            onClick={() => setSelectedLane(lane)}
+            className={cn(
+              "px-3 py-1 rounded-pill text-xs font-display font-extrabold border-[1.5px] border-ink transition-all sticker-press shadow-sticker",
+              selectedLane === lane
+                ? "bg-ink text-cream"
+                : "bg-paper text-ink hover:bg-lavender"
+            )}
+          >
+            {lane === "all" ? "All Lanes" : lane === "everyday" ? "Everyday" : "Memes"}
+          </button>
+        ))}
+      </div>
+
       {/* Content */}
       <div className="flex-1 space-y-3">
         {isLoading ? (
@@ -123,6 +151,18 @@ export default function HistoryPage() {
                       {item.dropDate}
                     </span>
                     <TierBadge tier={item.sharerTier} />
+                    {item.laneSlug && (
+                      <span
+                        className={cn(
+                          "text-[10px] font-display font-extrabold px-2 py-0.5 rounded-pill border-[1.5px] border-ink shadow-sticker-flat",
+                          item.laneSlug === "memes"
+                            ? "bg-sun text-ink"
+                            : "bg-lavender text-ink"
+                        )}
+                      >
+                        {item.laneSlug === "memes" ? "Memes" : "Everyday"}
+                      </span>
+                    )}
                   </div>
 
                   <div className="font-display text-base font-extrabold text-ink">

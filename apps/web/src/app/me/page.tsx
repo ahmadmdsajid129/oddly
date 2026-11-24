@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   Activity,
   Sparkles,
+  Flame,
 } from "lucide-react";
 
 export default function MePage() {
@@ -189,6 +190,29 @@ export default function MePage() {
               </span>
             </div>
           )}
+        </div>
+
+        {/* Streaks & Milestones Link Card */}
+        <div
+          onClick={() => router.push("/me/streaks")}
+          className="p-4 rounded-m bg-paper border-[2.5px] border-ink shadow-sticker hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-pointer flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-pill bg-coral/20 border-[1.5px] border-ink flex items-center justify-center text-coral">
+              <Flame className="w-5 h-5 stroke-[2.5] text-coral fill-coral/30" />
+            </div>
+            <div>
+              <h3 className="font-display text-sm font-extrabold text-ink">
+                Streaks &amp; Milestones
+              </h3>
+              <p className="font-body text-caption text-muted">
+                View per-lane momentum, best records, and badge targets
+              </p>
+            </div>
+          </div>
+          <Button variant="secondary" size="sm" className="text-xs">
+            View
+          </Button>
         </div>
 
         {/* Rituals & Notification Preferences */}

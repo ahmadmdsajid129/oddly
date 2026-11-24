@@ -18,6 +18,7 @@ export interface HistoryItem {
   twinCity: string;
   shareCardUrl: string | null;
   answersCount: number;
+  laneSlug?: string;
 }
 
 // In-memory fallback for test and offline environments
@@ -36,10 +37,11 @@ export class HistoryRepository {
    */
   static async getPlayerHistory(
     playerId: string,
-    options: { limit?: number; offset?: number } = {}
+    options: { limit?: number; offset?: number; lane?: string } = {}
   ): Promise<{ items: HistoryItem[]; total: number }> {
     const limit = options.limit ?? 30;
     const offset = options.offset ?? 0;
+    const laneFilter = options.lane;
 
     try {
       return await executeReplicaQueryWithFallback(async (db) => {
@@ -59,9 +61,22 @@ export class HistoryRepository {
           }
         }
 
+        // Target lane ID
+        let targetLaneId: string | undefined;
+        if (laneFilter === "memes") {
+          targetLaneId = "00000000-0000-4000-a000-000000000002";
+        } else if (laneFilter === "everyday") {
+          targetLaneId = "00000000-0000-4000-a000-000000000001";
+        }
+
+        const whereCondition: any = {
+          player_id: { in: playerIds },
+          ...(targetLaneId ? { lane_id: targetLaneId } : {}),
+        };
+
         // 2. Query submissions with drop, oddnessScore, and shareCards
         const submissions = await db.submission.findMany({
-          where: { player_id: { in: playerIds } },
+          where: whereCondition,
           include: {
             drop: true,
             oddnessScore: true,
@@ -73,7 +88,7 @@ export class HistoryRepository {
         });
 
         const total = await db.submission.count({
-          where: { player_id: { in: playerIds } },
+          where: whereCondition,
         });
 
         // 3. Map into HistoryItem
@@ -90,6 +105,9 @@ export class HistoryRepository {
             ? sub.drop.drop_date.toISOString().slice(0, 10)
             : sub.submitted_at.toISOString().slice(0, 10);
 
+          const laneSlug =
+            sub.lane_id === "00000000-0000-4000-a000-000000000002" ? "memes" : "everyday";
+
           items.push({
             submissionId: sub.id,
             dropId: sub.drop_id,
@@ -103,13 +121,17 @@ export class HistoryRepository {
               ? `http://localhost:3000/cards/${sub.shareCards[0].storage_key}`
               : null,
             answersCount: 5,
+            laneSlug,
           });
         }
 
         return { items, total };
       });
     } catch {
-      const items = inMemoryHistory.get(playerId) || [];
+      let items = inMemoryHistory.get(playerId) || [];
+      if (laneFilter) {
+        items = items.filter((i) => i.laneSlug === laneFilter);
+      }
       return {
         items: items.slice(offset, offset + limit),
         total: items.length,

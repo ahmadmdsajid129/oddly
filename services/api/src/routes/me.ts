@@ -10,6 +10,7 @@ import { z } from "zod";
 import { prisma } from "../db/client.js";
 import { getAuthAccount, clearAuthCookies } from "../auth/tokens.js";
 import { StreaksRepository } from "../db/streaks.repo.js";
+import { calculateStreak, getTwinDay } from "@oddly/shared";
 
 // In-memory fallback preferences
 const inMemoryPrefs = new Map<
@@ -63,6 +64,110 @@ export const meRoutes: FastifyPluginAsyncZod = async (app) => {
       return reply.send({
         ok: true,
         preferences: prefs,
+      });
+    }
+  );
+
+  /**
+   * GET /v1/me/streaks
+   * Retrieve overall streak and per-lane streaks (Slice A5 / Decision D4).
+   */
+  app.get(
+    "/v1/me/streaks",
+    {
+      schema: {
+        tags: ["Settings"],
+        summary: "Get overall and per-lane streaks for the player",
+        response: {
+          200: z.object({
+            ok: z.boolean(),
+            overall: z.object({
+              current: z.number(),
+              longest: z.number(),
+              total_played: z.number(),
+              next_milestone: z.number(),
+              days_to_next_milestone: z.number(),
+            }),
+            lanes: z.record(
+              z.object({
+                current: z.number(),
+                longest: z.number(),
+                total_played: z.number(),
+                next_milestone: z.number(),
+              })
+            ),
+          }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const auth = await getAuthAccount(req);
+      let playerId = req.cookies.oddly_session;
+      if (!playerId && auth?.accountId) {
+        const linked = await prisma.player.findFirst({
+          where: { account_id: auth.accountId },
+        });
+        if (linked) playerId = linked.id;
+      }
+      if (!playerId && req.cookies.oddly_did) {
+        const guest = await prisma.player.findFirst({
+          where: { did: req.cookies.oddly_did },
+        });
+        if (guest) playerId = guest.id;
+      }
+
+      const overall = playerId
+        ? await StreaksRepository.getStreakSummary(playerId)
+        : { currentStreak: 0, longestStreak: 0, totalActiveDays: 0, nextMilestone: 7, daysToNextMilestone: 7 };
+
+      const lanes: Record<string, { current: number; longest: number; total_played: number; next_milestone: number }> = {
+        everyday: {
+          current: overall.currentStreak,
+          longest: overall.longestStreak,
+          total_played: overall.totalActiveDays,
+          next_milestone: overall.nextMilestone,
+        },
+        memes: {
+          current: 0,
+          longest: 0,
+          total_played: 0,
+          next_milestone: 7,
+        },
+      };
+
+      if (playerId) {
+        try {
+          const memeSubs = await prisma.submission.findMany({
+            where: {
+              player_id: playerId,
+              lane_id: "00000000-0000-4000-a000-000000000002",
+            },
+            include: { drop: true },
+          });
+          const memeDates = new Set<string>();
+          for (const s of memeSubs) {
+            if (s.drop?.drop_date) memeDates.add(s.drop.drop_date.toISOString().slice(0, 10));
+          }
+          const memeStreak = calculateStreak(Array.from(memeDates), getTwinDay(new Date()));
+          lanes.memes = {
+            current: memeStreak,
+            longest: Math.max(memeStreak, memeDates.size),
+            total_played: memeDates.size,
+            next_milestone: 7,
+          };
+        } catch {}
+      }
+
+      return reply.send({
+        ok: true,
+        overall: {
+          current: overall.currentStreak,
+          longest: overall.longestStreak,
+          total_played: overall.totalActiveDays,
+          next_milestone: overall.nextMilestone,
+          days_to_next_milestone: overall.daysToNextMilestone,
+        },
+        lanes,
       });
     }
   );

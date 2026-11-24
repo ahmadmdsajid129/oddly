@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; tag `b0-A4-done`).
-- **Not Started:** Slices A5 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; tag `b0-A5-done`).
+- **Not Started:** Slices A6 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -122,6 +122,21 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
 - **Dedicated Satori Meme Share Card (`renderMemeShareCardPng`):**
   - Renders a 1200x630 OpenGraph card with ink border (`#14123A`), warm cream paper styling, matched meme template, and twin similarity badge.
 - **Verification:** `packages/shared/src/memes-lane.test.ts` (11 tests), `apps/web/src/meme-corner.test.ts` (5 tests), and `apps/web/src/meme-questions.test.ts` (4 tests) pass cleanly.
+
+### 4.5 Slice A5: Result Hub, Share Cards, Streaks & History
+- **Result Hub per Lane (`/result/[lane]/[date]`):**
+  - Displays lane chip and drop date, today's Oddness percentile badge, twin match likeness percentage, mutual twin status, and "Why you two?" rarest shared answer breakdown.
+  - Features the primary "Play Another Lane" CTA button (Decision D5) allowing immediate participation in other open lanes on the same calendar day.
+  - Integrates direct Satori `ShareSheet` modal for generating lane-specific story/square/link cards with lane accents.
+- **Per-Lane Streaks & Milestones (`/me/streaks` & `GET /v1/me/streaks`):**
+  - Implements independent per-lane streak counters (Everyday vs Memes) alongside an overall active days counter (Decision D4).
+  - Enforces notification invariant: at most 1 streak reminder push per day across all active lanes.
+  - Visualizes milestone roadmap (7 days, 30 days, 100 days, 365 days) with tactile sticker styling.
+- **Twin History Archive with Lane Filter (`/history`):**
+  - Adds interactive lane filter tabs: `[All Lanes]`, `[Everyday]`, `[Memes]`.
+  - Displays lane badges on past sealed twin cards.
+  - Supports `GET /v1/history?lane=:slug` backend filtering across historical submissions.
+- **Verification:** `apps/web/src/result-streaks.test.ts` (4 tests) and all 16 web suites pass; web bundle size stands at 148.9 KB (within 150 KB target and well below 159.5 KB limit).
 
 ---
 

@@ -118,7 +118,7 @@ export const api = {
     refresh: () => rawClient.refreshToken(),
   },
   history: {
-    get: (params?: { limit?: number; offset?: number }) =>
+    get: (params?: { limit?: number; offset?: number; lane?: string }) =>
       rawClient.getHistory(params),
   },
   me: {
@@ -127,6 +127,7 @@ export const api = {
       rawClient.updatePreferences(prefs),
     exportData: () => rawClient.exportData(),
     deleteAccount: () => rawClient.deleteAccount(),
+    getStreaks: () => rawClient.getStreaks(),
   },
   reports: {
     submit: (data: Parameters<typeof rawClient.submitReport>[0]) =>

@@ -24,6 +24,7 @@ export const historyRoutes: FastifyPluginAsyncZod = async (app) => {
     Querystring: {
       limit?: string;
       offset?: string;
+      lane?: string;
     };
   }>(
     "/v1/history",
@@ -34,6 +35,7 @@ export const historyRoutes: FastifyPluginAsyncZod = async (app) => {
         querystring: z.object({
           limit: z.string().optional(),
           offset: z.string().optional(),
+          lane: z.string().optional(),
         }),
         response: {
           200: z.object({
@@ -50,6 +52,7 @@ export const historyRoutes: FastifyPluginAsyncZod = async (app) => {
                 twinCity: z.string(),
                 shareCardUrl: z.string().nullable(),
                 answersCount: z.number(),
+                laneSlug: z.string().optional(),
               })
             ),
             total: z.number(),
@@ -109,6 +112,7 @@ export const historyRoutes: FastifyPluginAsyncZod = async (app) => {
       const { items, total } = await HistoryRepository.getPlayerHistory(playerId, {
         limit,
         offset,
+        lane: req.query.lane,
       });
 
       const streakSummary = await StreaksRepository.getStreakSummary(playerId);

@@ -182,6 +182,7 @@ export interface HistoryResponse {
     twinCity: string;
     shareCardUrl: string | null;
     answersCount: number;
+    laneSlug?: string;
   }>;
   total: number;
   streak: {
@@ -190,6 +191,26 @@ export interface HistoryResponse {
     total_played: number;
     next_milestone: number;
   };
+}
+
+export interface StreaksResponse {
+  ok: boolean;
+  overall: {
+    current: number;
+    longest: number;
+    total_played: number;
+    next_milestone: number;
+    days_to_next_milestone: number;
+  };
+  lanes: Record<
+    string,
+    {
+      current: number;
+      longest: number;
+      total_played: number;
+      next_milestone: number;
+    }
+  >;
 }
 
 export interface PreferencesResponse {
@@ -745,12 +766,18 @@ export class OddlyApiClient {
   }
 
   /** Player historical gameplay and past sealed drops */
-  async getHistory(params?: { limit?: number; offset?: number }): Promise<HistoryResponse> {
+  async getHistory(params?: { limit?: number; offset?: number; lane?: string }): Promise<HistoryResponse> {
     const query = new URLSearchParams();
     if (params?.limit) query.set("limit", String(params.limit));
     if (params?.offset) query.set("offset", String(params.offset));
+    if (params?.lane) query.set("lane", String(params.lane));
     const qs = query.toString() ? `?${query.toString()}` : "";
     return this.request<HistoryResponse>(`/v1/history${qs}`);
+  }
+
+  /** Player overall and per-lane streaks */
+  async getStreaks(): Promise<StreaksResponse> {
+    return this.request<StreaksResponse>("/v1/me/streaks");
   }
 
   /** Retrieve user preferences */

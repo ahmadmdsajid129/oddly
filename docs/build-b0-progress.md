@@ -7,7 +7,7 @@
 | A2 | Question formats and similarity per format | done | b0-A2-done | pick1, pick2of6, rank3, slider7, scene verified with proofs and 12 questions/format |
 | A3 | Twin depth: closest so far, tie groups, history signature, mutual pairing, group size copy | done | b0-A3-done | Closest so far (<200), tie groups, BitMinHash history, and greedy mutual pairing verified |
 | A4 | Memes lane: meme presentation, template registry, seed Drops, lane config | done | b0-A4-done | 14-drop runway (70 meme Qs), strict lane isolation, Satori meme share cards verified |
-| A5 | Result hub, share cards per lane, per-lane streaks, history, "play another lane" | not started | - | Lane-aware result view, streaks and Satori cards |
+| A5 | Result hub, share cards per lane, per-lane streaks, history, "play another lane" | done | b0-A5-done | /result/[lane]/[date], /me/streaks, lane history filter, and "play another lane" verified |
 | A6 | Safety foundation: block, report, sever, consent, kill switches, audit log | not started | - | Blocks table, ops CLI tools, consent toggles |
 | A7 | Keep and Orbit, lane-tagged | not started | - | Extends F1 Orbit foundation with lane awareness |
 | A8 | Telepathy and Sync score | not started | - | F3 Telepathy integration inside active Orbit |
