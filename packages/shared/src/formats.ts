@@ -262,8 +262,65 @@ export function computeInformationWeight(
 }
 
 /**
+ * Compute information weight I(a) with format-aware smoothing (B0 / B4).
+ *
+ * For pick2of6 and rank3:
+ *   When sample N >= 30: exact-set frequency with Laplace smoothing.
+ *   When sample N < 30: smoothed estimate from item marginal frequencies.
+ * For other formats: Laplace Bayesian smoothing.
+ * Clamped at maxBits (default 3.5).
+ */
+export function computeFormatInformationWeight(
+  format: QuestionFormat | string,
+  answer: unknown,
+  totalN: number,
+  itemCounts?: Map<string, number>,
+  exactCount?: number,
+  maxBits: number = MAX_WEIGHT_BITS
+): number {
+  if (totalN <= 0) return 1.0;
+
+  if (format === "pick2of6" && Array.isArray(answer)) {
+    if (totalN >= 30 && exactCount !== undefined) {
+      const p = (exactCount + 1) / (totalN + 15);
+      return Math.min(-Math.log2(p), maxBits);
+    }
+    // N < 30: smoothed estimate from item marginal frequencies
+    if (itemCounts && answer.length >= 2) {
+      const [i1, i2] = answer as [string, string];
+      const c1 = itemCounts.get(i1) ?? 0;
+      const c2 = itemCounts.get(i2) ?? 0;
+      const p1 = (c1 + 1) / (2 * totalN + 6);
+      const p2 = (c2 + 1) / (2 * totalN + 6);
+      const pPair = Math.min(1.0, 2 * p1 * p2);
+      return Math.min(-Math.log2(Math.max(1e-4, pPair)), maxBits);
+    }
+  }
+
+  if (format === "rank3" && Array.isArray(answer)) {
+    if (totalN >= 30 && exactCount !== undefined) {
+      const p = (exactCount + 1) / (totalN + 6);
+      return Math.min(-Math.log2(p), maxBits);
+    }
+    // N < 30: smoothed Laplace estimate over 6 permutations
+    const p = ((exactCount ?? 0) + 1) / (totalN + 6);
+    return Math.min(-Math.log2(p), maxBits);
+  }
+
+  // General fallback
+  if (totalN < 30) return 1.0;
+  if (exactCount !== undefined) {
+    const kOutcomes = formatOutcomesCount(format);
+    const p = (exactCount + 1) / (totalN + kOutcomes);
+    return Math.min(-Math.log2(p), maxBits);
+  }
+  return 1.0;
+}
+
+/**
  * Calculate symmetric weighted match similarity across 5 questions.
- * Ensures S(P, Q) === S(Q, P) strictly by evaluating symmetric average weight.
+ * Ensures S(P, Q) === S(Q, P) strictly by evaluating symmetric average weight:
+ *   w_k = (I(a_u, k) + I(a_v, k)) / 2
  */
 export function computeWeightedPolymorphicSimilarity(
   questions: Array<{
@@ -272,7 +329,9 @@ export function computeWeightedPolymorphicSimilarity(
     weight?: number;
   }>,
   answersA: Map<string, unknown>,
-  answersB: Map<string, unknown>
+  answersB: Map<string, unknown>,
+  answerWeightsA?: Map<string, number>,
+  answerWeightsB?: Map<string, number>
 ): {
   overallSimilarity: number;
   perQuestionSimilarities: Array<{ questionId: string; similarity: number; weight: number }>;
@@ -294,7 +353,14 @@ export function computeWeightedPolymorphicSimilarity(
     }
 
     const sim = computeQuestionSimilarity(q.format, valA, valB);
-    const weight = q.weight != null ? q.weight : 1.0;
+    
+    // Evaluate strictly symmetric question weight
+    let weight = q.weight != null ? q.weight : 1.0;
+    if (answerWeightsA && answerWeightsB) {
+      const wA = answerWeightsA.get(q.id) ?? 1.0;
+      const wB = answerWeightsB.get(q.id) ?? 1.0;
+      weight = (wA + wB) / 2.0; // Strictly symmetric average information
+    }
 
     weightedSum += sim * weight;
     totalWeight += weight;

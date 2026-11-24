@@ -15,6 +15,7 @@
     "test": "turbo run test",
     "test:integration": "turbo run test:integration",
     "size-limit": "node scripts/check-bundle-budget.mjs",
+    "verify:matching": "node tools/verify-math-logic.mjs",
     "bench:partition": "pnpm --filter @oddly/shared exec tsx scripts/bench-partition.ts",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\"",
     "db:migrate": "echo 'Stage 2 task: prisma migrate dev'",

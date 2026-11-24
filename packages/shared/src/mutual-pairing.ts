@@ -31,8 +31,10 @@ import type { SubmissionForMatching } from "./types.js";
 import { submissionSimilarity } from "./scoring.js";
 import {
   computeTieBreakWeight,
+  compareTieCandidates,
   determineTieBreakReason,
   computeTieGroupSize,
+  TIE_EPSILON,
   type CandidateHistoryProfile,
   type TieBreakReason,
 } from "./tie-breaker.js";
@@ -198,6 +200,9 @@ export function executeMutualPairing(
   const playerTopCandidates = new Map<string, InternalEdge[]>();
   // Store all similarity scores per player to compute tie group size T
   const playerSimScores = new Map<string, number[]>();
+  // Store tie group candidates IDs for mutual check
+  const playerTieCandidatesMap = new Map<string, Set<string>>();
+  const playerEdgesList: InternalEdge[] = [];
 
   for (const target of submissions) {
     const candidatePool = submissions.length <= 200
@@ -242,18 +247,39 @@ export function executeMutualPairing(
       });
     }
 
-    // Sort by weight descending
-    scoredCandidates.sort((a, b) => b.weight - a.weight);
-
-    // Keep top K candidates
-    const topK = scoredCandidates.slice(0, K);
-    playerTopCandidates.set(target.player_id, topK);
+    const peakSim = simScores.length > 0 ? Math.max(...simScores) : 0;
     playerSimScores.set(target.player_id, simScores);
 
-    // Register into unique undirected edges
-    for (const edge of topK) {
-      const p1 = edge.u.player_id < edge.v.player_id ? edge.u.player_id : edge.v.player_id;
-      const p2 = edge.u.player_id < edge.v.player_id ? edge.v.player_id : edge.u.player_id;
+    // Sort all candidates lexicographically descending
+    scoredCandidates.sort((a, b) => compareTieCandidates(b, a, TIE_EPSILON));
+    playerTopCandidates.set(target.player_id, scoredCandidates.slice(0, K));
+
+    // Mutual pairing candidate edges are strictly limited to the player's tie group:
+    // candidates whose similarity is within TIE_EPSILON of target's best candidate
+    const tieGroupThreshold = peakSim - TIE_EPSILON;
+    const tieGroupCandidates = scoredCandidates
+      .filter((c) => c.todaySimilarity >= tieGroupThreshold)
+      .slice(0, K);
+
+    // Register candidate tie group for two-way mutual check
+    const tieGroupCandidateIds = new Set(tieGroupCandidates.map((c) => c.v.player_id));
+    playerTieCandidatesMap.set(target.player_id, tieGroupCandidateIds);
+
+    for (const edge of tieGroupCandidates) {
+      playerEdgesList.push(edge);
+    }
+  }
+
+  // Register into unique undirected edges ONLY if mutually in each other's tie group
+  for (const edge of playerEdgesList) {
+    const uId = edge.u.player_id;
+    const vId = edge.v.player_id;
+    const uTie = playerTieCandidatesMap.get(uId);
+    const vTie = playerTieCandidatesMap.get(vId);
+
+    if (uTie?.has(vId) && vTie?.has(uId)) {
+      const p1 = uId < vId ? uId : vId;
+      const p2 = uId < vId ? vId : uId;
       const edgeKey = `${p1}:${p2}`;
       if (!uniqueEdges.has(edgeKey)) {
         uniqueEdges.set(edgeKey, edge);
@@ -286,7 +312,7 @@ export function executeMutualPairing(
       const topU = playerTopCandidates.get(uId) || [];
       const runnerUp = topU.find((cand) => cand.v.player_id !== vId);
       const reason = runnerUp
-        ? determineTieBreakReason(edge, runnerUp)
+        ? determineTieBreakReason(edge, runnerUp, TIE_EPSILON)
         : "similarity";
 
       const historyDays = Math.min(edge.u.historyDays || 0, edge.v.historyDays || 0);
@@ -329,7 +355,7 @@ export function executeMutualPairing(
 
       const runnerUp = topK.length > 1 ? topK[1] : undefined;
       const reason = runnerUp
-        ? determineTieBreakReason(best, runnerUp)
+        ? determineTieBreakReason(best, runnerUp, TIE_EPSILON)
         : "similarity";
 
       const historyDays = Math.min(p.historyDays || 0, partner.historyDays || 0);

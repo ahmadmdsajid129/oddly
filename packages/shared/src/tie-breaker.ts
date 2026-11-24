@@ -107,7 +107,9 @@ export function evaluateCrossCultureBonus(
 /**
  * Computes the unified edge weight W(u, v) combining all 4 stages.
  *
- * W(u, v) = S(u, v) + 0.1 * H(u, v) + 0.01 * I(country_u != country_v) + 0.001 * HashTie(u, v)
+ * Uses scaled stage coefficients so that tie-break adjustments never exceed epsilon (0.01),
+ * guaranteeing that higher Drop similarity S strictly dominates whenever candidates differ
+ * by more than epsilon. Inside the epsilon tie group, sorting is strictly lexicographic.
  */
 export function computeTieBreakWeight(
   dropId: string,
@@ -127,11 +129,12 @@ export function computeTieBreakWeight(
   const crossCulture = evaluateCrossCultureBonus(profileA?.country, profileB?.country);
   const hashTie = computeHmacPairTie(dropId, playerAId, playerBId);
 
+  // Maximum tie bonus is 0.001 + 0.00001 + 0.0000001 = ~0.00101 < epsilon (0.01)
   const weight =
     todaySimilarity +
-    0.1 * historyAgreement +
-    0.01 * crossCulture +
-    0.001 * hashTie;
+    0.001 * historyAgreement +
+    0.00001 * crossCulture +
+    0.0000001 * hashTie;
 
   return {
     weight,
@@ -140,6 +143,62 @@ export function computeTieBreakWeight(
     crossCulture,
     hashTie,
   };
+}
+
+/**
+ * Strict Lexicographic Candidate Comparator (ADR-046 / Stage B0).
+ *
+ * Rules:
+ * 1. Outside the epsilon tie group (|S_A - S_B| > epsilon):
+ *    Higher Drop similarity S always strictly wins. (Lower stages H, C, Hash CANNOT override).
+ * 2. Inside the epsilon tie group (|S_A - S_B| <= epsilon):
+ *    Similarity differences inside epsilon are ignored. Tie is broken strictly lexicographically:
+ *      - Stage 2: History agreement H(u, v) (higher wins)
+ *      - Stage 3: Cross-cultural bonus C(u, v) (different countries preferred: 1 > 0)
+ *      - Stage 4: Deterministic HMAC-SHA256 HashTie(u, v) (higher hash wins)
+ *
+ * Returns:
+ *   > 0 if candidate A is preferred over candidate B
+ *   < 0 if candidate B is preferred over candidate A
+ *   0 if completely identical across all 4 stages
+ */
+export function compareTieCandidates(
+  scoreA: {
+    todaySimilarity: number;
+    historyAgreement: number;
+    crossCulture: number;
+    hashTie: number;
+  },
+  scoreB: {
+    todaySimilarity: number;
+    historyAgreement: number;
+    crossCulture: number;
+    hashTie: number;
+  },
+  epsilon = TIE_EPSILON
+): number {
+  const diffS = scoreA.todaySimilarity - scoreB.todaySimilarity;
+  if (Math.abs(diffS) > epsilon) {
+    return diffS > 0 ? 1 : -1;
+  }
+
+  // Inside epsilon tie group: lexicographic evaluation
+  const diffH = scoreA.historyAgreement - scoreB.historyAgreement;
+  if (Math.abs(diffH) > 1e-6) {
+    return diffH > 0 ? 1 : -1;
+  }
+
+  const diffC = scoreA.crossCulture - scoreB.crossCulture;
+  if (Math.abs(diffC) > 1e-6) {
+    return diffC > 0 ? 1 : -1;
+  }
+
+  const diffHash = scoreA.hashTie - scoreB.hashTie;
+  if (Math.abs(diffHash) > 1e-9) {
+    return diffHash > 0 ? 1 : -1;
+  }
+
+  return 0;
 }
 
 /**
@@ -158,9 +217,10 @@ export function determineTieBreakReason(
     historyAgreement: number;
     crossCulture: number;
     hashTie: number;
-  }
+  },
+  epsilon = TIE_EPSILON
 ): TieBreakReason {
-  if (Math.abs(scoreA.todaySimilarity - scoreB.todaySimilarity) > 1e-6) {
+  if (Math.abs(scoreA.todaySimilarity - scoreB.todaySimilarity) > epsilon) {
     return "similarity";
   }
   if (Math.abs(scoreA.historyAgreement - scoreB.historyAgreement) > 1e-6) {
