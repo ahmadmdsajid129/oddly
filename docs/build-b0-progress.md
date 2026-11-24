@@ -12,7 +12,7 @@
 | A7 | Keep and Orbit, lane-tagged | done | b0-A7-done | Lane-tagged Keep creation, Orbit formation with lane_id, and lane badge on Orbit rows verified |
 | A8 | Telepathy and Sync score | done | b0-A8-done | Daily blind instinct prediction, luck baseline, and Sync score verified with 19 tests |
 | A9 | Twin Globe | done | b0-A9-done | Flat SVG world map, k-anonymity aggregated arcs, time jitter, /globe verified |
-| A10 | Anti-twin | not started | - | F21 bounded candidate lowest-similarity match |
+| A10 | Anti-twin | done | b0-A10-done | Bounded lowest-similarity opposite, opt-in reveal, Satori flip card, /anti-twin verified |
 | A11 | Sync by subject (statistics only) | not started | - | F28 tag-level agreement rate stats |
 | A12 | Chat unlock engine (Three Doors, Duo Trial v0, both-confirm, chat_ready) | not started | - | State machine to chat_ready with Duo Trial v0 |
 | A13 | Notifications for Orbit and unlock; events; consent-gated signals | not started | - | Orbit push channel and event dictionary |
