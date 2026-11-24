@@ -10,13 +10,23 @@
 
 ## 1. Executive Summary
 
-This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence. All existing unit and integration tests pass, and initial play route JS bundle remains within the approved 159.5 KB compressed exception.
+This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
-**Status Counts:**
-- **Verified:** Slices A0, A1, A2, A3, A4 (preflight, lanes, formats, twin depth, memes lane).
-- **Implemented-untested:** In progress across subsequent slices.
-- **Stubbed:** 0
-- **Not built:** Out-of-scope surfaces (chat screen, party rooms, paid lives, leaderboards).
+**Slice Implementation Status:**
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`).
+- **In Progress:** Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock).
+- **Not Started:** Slices A2 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
+
+### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
+As required by the Founder instructions, the codebase was audited for legacy Stages M3 through M8 features:
+1. **M3 (Meme Lab user captions & moderation queue):** Tables `meme_submissions`, `meme_ratings`, `meme_stats`, and web routes (`/memes/new`) exist from earlier stages. In Stage B0, Meme Lab is excluded by the scope fence (memes exist strictly as a lane). The runtime flag `feature.meme_lab` is set to `false` (OFF).
+2. **M4 (Insights engine):** Tables `question_stats_daily`, `tag_stats_daily`, and admin routes `/v1/admin/insights/*` exist in code for aggregate statistical telemetry (no DPDP sensitive inferences).
+3. **M5 & M6 (Recognition Engine & Creator Badges):** Tables `badge_definitions`, `creator_badges`, `featured_memes` exist in schema from migration 009. These represent caption creator badges, which are distinct from Stage B0/B3 collector badges (`collector_badge_definitions`, `collector_badges`). Creator badge awarding is inactive in consumer flows.
+4. **M7 (ML Ranker):** Tables `ml_models`, `ml_shadow_predictions` exist. The feature flag `feature.ml_ranker` is confirmed `false` (OFF) and `ml_ranker.mode` is set to `"off"`.
+5. **M8 (Premium & Monetization Groundwork):** Tables `subscriptions`, `payment_transactions`, and entitlement checks exist. The feature flag `feature.premium` is confirmed `false` (OFF). No premium UI surfaces exist in the web app.
+
+All such out-of-scope features are confirmed behind OFF feature flags, recorded in `docs/build-b0-conflicts.md` (C-11).
 
 ---
 
@@ -140,3 +150,4 @@ This report documents the lanes-first architectural transformation and end-to-en
 ## 19. Changes the Documentation Files Will Need
 
 *(Itemized list for the subsequent prompt that rewrites markdown files)*
+

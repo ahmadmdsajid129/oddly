@@ -76,3 +76,4 @@ All IDs are UUID strings (`String @default(uuid())`). The player entity is `play
   - `@oddly/web`: 16/16 test files passed, 125/125 tests passed.
   - `@oddly/shared`: 229 unit tests passing across all algorithmic and pure-scoring suites.
   - Monorepo Typecheck: Clean pass (`tsc --noEmit` on `@oddly/shared`, `@oddly/api`, `@oddly/worker`, `@oddly/web` passed with 0 errors).
+
