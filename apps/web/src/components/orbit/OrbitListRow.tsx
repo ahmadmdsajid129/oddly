@@ -52,6 +52,18 @@ export function OrbitListRow({ orbit, index, className }: OrbitListRowProps) {
                   <span>{orbit.co_streak_current}d</span>
                 </span>
               )}
+              {orbit.lane_slug && (
+                <span
+                  className={cn(
+                    "text-[10px] font-display font-extrabold px-2 py-0.5 rounded-pill border-[1.5px] border-ink shadow-sticker-flat",
+                    orbit.lane_slug === "memes"
+                      ? "bg-sun text-ink"
+                      : "bg-lavender text-ink"
+                  )}
+                >
+                  {orbit.lane_slug === "memes" ? "Memes" : "Everyday"}
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-xs font-display font-bold text-muted mt-1 truncate">

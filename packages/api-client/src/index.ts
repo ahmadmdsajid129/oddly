@@ -291,6 +291,7 @@ export interface OrbitListItem {
   co_streak_current: number;
   co_streak_best: number;
   last_co_date: string | null;
+  lane_slug?: string;
   partner: {
     region: string;
     age_band: string;

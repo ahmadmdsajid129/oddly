@@ -208,7 +208,7 @@ export const keepsRoutes: FastifyPluginAsyncZod = async (app) => {
       if (reverseKeep) {
         // Mutual Keep! Accept reverse keep and form Orbit immediately
         await KeepsRepository.respondToKeep(reverseKeep.id, reverseKeep.drop_date, player.id, "accept");
-        await OrbitsRepository.createOrbit(player.id, targetPlayerId);
+        await OrbitsRepository.createOrbit(player.id, targetPlayerId, new Date(), match.lane_id || undefined);
 
         return reply.status(201).send({
           ok: true,
@@ -406,7 +406,22 @@ export const keepsRoutes: FastifyPluginAsyncZod = async (app) => {
         }
 
         await KeepsRepository.respondToKeep(keep.id, keep.drop_date, player.id, "accept");
-        const orbit = await OrbitsRepository.createOrbit(keep.from_player_id, player.id);
+        const originMatch = await prisma.match.findFirst({
+          where: {
+            drop_date: keep.drop_date,
+            OR: [
+              { player_a_id: keep.from_player_id, player_b_id: player.id },
+              { player_a_id: player.id, player_b_id: keep.from_player_id },
+            ],
+          },
+          select: { lane_id: true },
+        });
+        const orbit = await OrbitsRepository.createOrbit(
+          keep.from_player_id,
+          player.id,
+          new Date(),
+          originMatch?.lane_id || undefined
+        );
 
         // Dispatch push notification to sender (P10A.07)
         void sendOrbitNotification({

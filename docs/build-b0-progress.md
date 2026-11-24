@@ -9,7 +9,7 @@
 | A4 | Memes lane: meme presentation, template registry, seed Drops, lane config | done | b0-A4-done | 14-drop runway (70 meme Qs), strict lane isolation, Satori meme share cards verified |
 | A5 | Result hub, share cards per lane, per-lane streaks, history, "play another lane" | done | b0-A5-done | /result/[lane]/[date], /me/streaks, lane history filter, and "play another lane" verified |
 | A6 | Safety foundation: block, report, sever, consent, kill switches, audit log | done | b0-A6-done | POST /v1/blocks, audit_logs, ops:sever-orbit, ops:ban-player, and consent verified |
-| A7 | Keep and Orbit, lane-tagged | not started | - | Extends F1 Orbit foundation with lane awareness |
+| A7 | Keep and Orbit, lane-tagged | done | b0-A7-done | Lane-tagged Keep creation, Orbit formation with lane_id, and lane badge on Orbit rows verified |
 | A8 | Telepathy and Sync score | not started | - | F3 Telepathy integration inside active Orbit |
 | A9 | Twin Globe | not started | - | F18 flat SVG world map with delayed aggregated arcs |
 | A10 | Anti-twin | not started | - | F21 bounded candidate lowest-similarity match |

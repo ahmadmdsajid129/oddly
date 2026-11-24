@@ -41,6 +41,7 @@ export const orbitsRoutes: FastifyPluginAsyncZod = async (app) => {
                 co_streak_current: z.number(),
                 co_streak_best: z.number(),
                 last_co_date: z.string().nullable(),
+                lane_slug: z.string().optional(),
                 partner: z.object({
                   region: z.string(),
                   age_band: z.string(),

@@ -32,6 +32,7 @@ export interface SanitizedOrbitPartner {
   co_streak_current: number;
   co_streak_best: number;
   last_co_date: string | null;
+  lane_slug?: string;
   partner: {
     region: string;
     age_band: string;
@@ -67,7 +68,12 @@ export class OrbitsRepository {
    * Create an Orbit between two players.
    * Strictly enforces player_a_id < player_b_id.
    */
-  static async createOrbit(player1Id: string, player2Id: string, startedOn: Date = new Date()) {
+  static async createOrbit(
+    player1Id: string,
+    player2Id: string,
+    startedOn: Date = new Date(),
+    laneId?: string
+  ) {
     const pA = player1Id < player2Id ? player1Id : player2Id;
     const pB = player1Id < player2Id ? player2Id : player1Id;
 
@@ -76,6 +82,7 @@ export class OrbitsRepository {
         id: randomUUID(),
         player_a_id: pA,
         player_b_id: pB,
+        lane_id: laneId,
         status: "active",
         started_on: startedOn,
         co_streak_current: 0,
@@ -137,6 +144,9 @@ export class OrbitsRepository {
 
     return orbits.map((o) => {
       const partner = o.player_a_id === playerId ? o.player_b : o.player_a;
+      const lane_slug =
+        o.lane_id === "00000000-0000-4000-a000-000000000002" ? "memes" : "everyday";
+
       return {
         orbit_id: o.id,
         status: o.status as "active" | "ended",
@@ -144,6 +154,7 @@ export class OrbitsRepository {
         co_streak_current: o.co_streak_current,
         co_streak_best: o.co_streak_best,
         last_co_date: o.last_co_date ? o.last_co_date.toISOString().split("T")[0]! : null,
+        lane_slug,
         partner: {
           region: partner?.region || "Unknown",
           age_band: partner?.age_band || "18-24",
