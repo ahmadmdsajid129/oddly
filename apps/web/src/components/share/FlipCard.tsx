@@ -143,7 +143,7 @@ export function FlipCard({
             isMythic && "border-[3px] border-ink ring-4 ring-sun/40"
           )}
           aria-hidden={isBackSide}
-          inert={isBackSide}
+          inert={(isBackSide ? "" : undefined) as unknown as boolean}
         >
           {/* Holographic Sheen Pseudo-Element (Transform-only, max 22% opacity) */}
           <div
@@ -179,8 +179,15 @@ export function FlipCard({
               {matchedPicks} of {totalPicks}
             </span>
             <span className="font-display text-sm font-bold text-muted uppercase tracking-wider">
-              Shared Answers
+              {lane?.slug === "memes" ? "Meme Twin" : "Shared Answers"}
             </span>
+            {lane?.slug === "memes" && (
+              <div className="mt-2 px-3 py-1.5 bg-cream border-2 border-ink rounded-m shadow-sticker text-center">
+                <span className="font-display text-xs font-extrabold text-violet uppercase tracking-wide">
+                  Meme Sync
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Bottom Section: Location, rarity line, Tap to flip hint */}
@@ -221,7 +228,7 @@ export function FlipCard({
               : "bg-paper text-ink text-left"
           )}
           aria-hidden={!isBackSide}
-          inert={!isBackSide}
+          inert={(!isBackSide ? "" : undefined) as unknown as boolean}
         >
           {currentSide === "sealed" ? (
             /* Sealed Back State (Initial arrival before flip) */

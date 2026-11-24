@@ -17,6 +17,8 @@ export interface QuestionLike {
   id: string;
   type: string;
   position?: number;
+  format?: string;
+  render_variant?: string;
   payload?: unknown;
   answer_options?: Array<{
     id?: string;
@@ -56,7 +58,13 @@ export interface TelepathySyncSummary {
  * - Must have between 2 and 4 options (low-cardinality)
  */
 export function isEligibleTelepathyQuestion(question: QuestionLike): boolean {
-  if (!question || (question.type !== "text" && question.type !== "image")) {
+  if (
+    !question ||
+    (question.type !== "text" &&
+      question.type !== "image" &&
+      question.type !== "meme" &&
+      question.render_variant !== "meme")
+  ) {
     return false;
   }
 
@@ -71,6 +79,11 @@ export function isEligibleTelepathyQuestion(question: QuestionLike): boolean {
       optionCount = p.options.length;
     } else if (question.type === "image" && Array.isArray(p.illustrations)) {
       optionCount = p.illustrations.length;
+    } else if (
+      (question.type === "meme" || question.render_variant === "meme") &&
+      Array.isArray(p.options)
+    ) {
+      optionCount = p.options.length;
     }
   }
 
@@ -82,6 +95,7 @@ export function isEligibleTelepathyQuestion(question: QuestionLike): boolean {
  * Priority:
  * 1. The first eligible Type 1 ("text") question.
  * 2. If no Type 1 question qualifies, the first eligible Type 4 ("image") question.
+ * 3. If no image question qualifies, the first eligible meme question (render_variant === 'meme').
  * Returns null if no question meets the eligibility criteria.
  */
 export function selectTelepathyQuestion<T extends QuestionLike>(questions: T[]): T | null {
@@ -100,6 +114,14 @@ export function selectTelepathyQuestion<T extends QuestionLike>(questions: T[]):
     (q) => q.type === "image" && isEligibleTelepathyQuestion(q)
   );
   if (imageCandidate) return imageCandidate;
+
+  // Next try meme question (render_variant === 'meme' or type === 'meme')
+  const memeCandidate = questions.find(
+    (q) =>
+      (q.type === "meme" || q.render_variant === "meme") &&
+      isEligibleTelepathyQuestion(q)
+  );
+  if (memeCandidate) return memeCandidate;
 
   return null;
 }

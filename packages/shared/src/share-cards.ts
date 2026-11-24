@@ -2388,6 +2388,8 @@ export async function renderAntiTwinCardPng(data: AntiTwinShareCardData): Promis
   return resvg.render().asPng();
 }
 
+
+
 /**
  * Renders Orbit Milestone Satori share card PNG for Day 14 and Day 30 (P10D.06).
  */
@@ -2423,6 +2425,8 @@ export async function renderOrbitCardPng(data: OrbitShareCardData): Promise<Buff
 
   return resvg.render().asPng();
 }
+
+
 
 export interface AchievementShareCardData {
   badgeTitle: string;
@@ -2895,6 +2899,326 @@ export async function renderAchievementCardPng(
     data.side === "back"
       ? buildAchievementBackTree(data)
       : buildAchievementFrontTree(data, qrDataUrl);
+
+  const svg = await satori(vdom as unknown as Parameters<typeof satori>[0], {
+    width: 1080,
+    height: 1490,
+    fonts: [
+      {
+        name: "Noto Sans",
+        data: fontBuffer,
+        weight: 400,
+        style: "normal",
+      },
+    ],
+  });
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1080 },
+  });
+
+  return resvg.render().asPng();
+}
+
+// ============================================================================
+// Stage L4 (Phase 10O): Dedicated Memes Share Card (P10O.03)
+// ============================================================================
+
+export interface MemeShareCardData {
+  score: number;
+  total?: number;
+  tier: Tier;
+  percentile: number;
+  templateKey?: string;
+  caption?: string;
+  twinCity?: string;
+  shortId: string;
+  appDomain?: string;
+  side?: "front" | "back";
+  pickMatches?: Array<{
+    question_number: number;
+    label: string;
+    matched: boolean;
+  }>;
+}
+
+function buildMemeCardFrontTree(data: MemeShareCardData, qrDataUrl: string) {
+  const total = data.total ?? 5;
+  const caption = data.caption || "When the alarm rings and reality hits";
+  const templateKey = data.templateKey || "snooze-battle";
+
+  return {
+    type: "div",
+    props: {
+      style: {
+        width: "1080px",
+        height: "1490px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        backgroundColor: colors.cream,
+        padding: "64px",
+      },
+      children: [
+        // Physical paper card with ink border and hard shadow
+        {
+          type: "div",
+          props: {
+            style: {
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              backgroundColor: colors.paper,
+              borderRadius: "32px",
+              border: `6px solid ${colors.ink}`,
+              boxShadow: `12px 12px 0 ${colors.ink}`,
+              padding: "56px",
+            },
+            children: [
+              // Header Row: LaneChip + Brand Mark
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          backgroundColor: colors.lavender,
+                          border: `4px solid ${colors.ink}`,
+                          borderRadius: "999px",
+                          padding: "10px 24px",
+                        },
+                        children: [
+                          {
+                            type: "span",
+                            props: {
+                              style: {
+                                fontSize: "28px",
+                                fontWeight: "800",
+                                color: colors.violet,
+                              },
+                              children: "MEMES LANE",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                        },
+                        children: [
+                          {
+                            type: "span",
+                            props: {
+                              style: {
+                                fontSize: "36px",
+                                fontWeight: "800",
+                                color: colors.ink,
+                              },
+                              children: "oddly",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Hero Meme Frame (Physical sticker inside card)
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    backgroundColor: colors.cream,
+                    border: `5px solid ${colors.ink}`,
+                    borderRadius: "24px",
+                    boxShadow: `8px 8px 0 ${colors.ink}`,
+                    padding: "36px 28px",
+                    margin: "24px 0",
+                  },
+                  children: [
+                    {
+                      type: "span",
+                      props: {
+                        style: {
+                          fontSize: "24px",
+                          fontWeight: "800",
+                          textTransform: "uppercase",
+                          color: colors.muted,
+                          letterSpacing: "2px",
+                          marginBottom: "12px",
+                        },
+                        children: `TEMPLATE: ${templateKey.toUpperCase()}`,
+                      },
+                    },
+                    {
+                      type: "span",
+                      props: {
+                        style: {
+                          fontSize: "38px",
+                          fontWeight: "800",
+                          color: colors.ink,
+                          textAlign: "center",
+                          lineHeight: "1.3",
+                        },
+                        children: `"${caption}"`,
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Match Result Callout
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                  children: [
+                    {
+                      type: "span",
+                      props: {
+                        style: {
+                          fontSize: "110px",
+                          fontWeight: "800",
+                          color: colors.ink,
+                          lineHeight: "1",
+                        },
+                        children: `${data.score} of ${total}`,
+                      },
+                    },
+                    {
+                      type: "span",
+                      props: {
+                        style: {
+                          fontSize: "30px",
+                          fontWeight: "700",
+                          color: colors.violet,
+                          marginTop: "8px",
+                        },
+                        children: `${data.tier.toUpperCase()} MEME TWIN`,
+                      },
+                    },
+                    {
+                      type: "span",
+                      props: {
+                        style: {
+                          fontSize: "26px",
+                          fontWeight: "500",
+                          color: colors.muted,
+                          marginTop: "6px",
+                        },
+                        children: data.twinCity ? `Stranger in ${data.twinCity}` : "One stranger twin in the world",
+                      },
+                    },
+                  ],
+                },
+              },
+
+              // Footer: QR Code & Call to Action
+              {
+                type: "div",
+                props: {
+                  style: {
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                    borderTop: `4px solid ${colors.ink}`,
+                    paddingTop: "24px",
+                  },
+                  children: [
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          flexDirection: "column",
+                        },
+                        children: [
+                          {
+                            type: "span",
+                            props: {
+                              style: {
+                                fontSize: "28px",
+                                fontWeight: "800",
+                                color: colors.ink,
+                              },
+                              children: "Find your Meme Twin",
+                            },
+                          },
+                          {
+                            type: "span",
+                            props: {
+                              style: {
+                                fontSize: "22px",
+                                color: colors.muted,
+                              },
+                              children: `${data.appDomain || "oddly.app"}/c/${data.shortId}?lane=memes`,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      type: "img",
+                      props: {
+                        src: qrDataUrl,
+                        width: "120",
+                        height: "120",
+                        style: {
+                          borderRadius: "16px",
+                          border: `3px solid ${colors.ink}`,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+}
+
+export async function renderMemeShareCardPng(data: MemeShareCardData): Promise<Buffer> {
+  const fontBuffer = getFontBuffer();
+  const shortUrl = `https://${data.appDomain || "oddly.app"}/c/${data.shortId}?lane=memes`;
+  const qrDataUrl = await generateQrCodeDataUrl(shortUrl, {
+    width: 200,
+    color: {
+      dark: colors.ink,
+      light: "#00000000",
+    },
+  });
+
+  const vdom = buildMemeCardFrontTree(data, qrDataUrl);
 
   const svg = await satori(vdom as unknown as Parameters<typeof satori>[0], {
     width: 1080,

@@ -9,14 +9,32 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 10N: Twin Depth & Mutual Pairing (Stage L3 — COMPLETE).
-- **Current Target:** Stage L4: Memes Lane Launch (Phase 10O).
+- **Current Stage:** Phase 10O: Memes Lane Launch (Stage L4 — COMPLETE).
+- **Current Target:** Stage L9: Bonus Rounds (Phase 10T) / Stage L5: Situations Lane (Phase 10P).
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage L4 (Memes Lane Launch — Phase 10O) is COMPLETE & VERIFIED:**
+    1. **Meme Lab Inflow Curator & Ingestion Invariant (P10O.01 / Rule L1 / Section 8.1):**
+       - Implemented `services/worker/src/jobs/meme-lane-curator.job.ts` and `assertMemesLaneTarget` in `@oddly/shared`: queries approved community memes from Meme Lab (`status === 'approved'`) with Wilson lower bound $\ge 0.65$ or $\ge 20$ raters.
+       - Enforces strict invariant: Community memes feed exclusively into the Memes lane (`slug = 'memes'`), throwing `MEME_LAB_FEED_FORBIDDEN` if targeted at Everyday or any non-memes lane.
+    2. **Mixed-Format Memes Drops Engine (P10O.02):**
+       - Implemented `packages/shared/src/memes-lane.ts` providing `buildMixedFormatMemesDrop` and `validateMemesLaneDrop`.
+       - Enforces exactly 5 questions per drop, all questions having `render_variant === 'meme'`, multi-format variety combining `pick1`, `pick2of6`, `rank3`, and `slider7`, and exactly one designated Telepathy question with $\le 4$ options.
+    3. **Dedicated Memes Share Card (P10O.03):**
+       - Implemented `renderMemeShareCardPng` and `MemeShareCardData` in `packages/shared/src/share-cards.ts`: generates crisp high-resolution 1080x1490 Satori card with cream desk background, paper sticker card, ink outline (`6px solid #14123A`), hard offset shadow (`12px 12px 0 #14123A`), MEMES LANE chip, hero meme frame, score callout, and QR code with `?lane=memes`.
+       - Updated `apps/web/src/components/share/FlipCard.tsx` to render the tactile Meme Twin callout and Meme Sync badge when `lane?.slug === 'memes'`.
+    4. **Lane-Isolated Telepathy for Memes Questions (P10O.04 / Rule L2):**
+       - Updated `packages/shared/src/telepathy.ts`: `isEligibleTelepathyQuestion` supports `render_variant === 'meme'` with $2 \le \text{options} \le 4$; `selectTelepathyQuestion` selects eligible meme questions.
+       - Updated `services/api/src/db/telepathy.repo.ts`: `getRoundState` and `lockInGuess` isolate drop search by `orbit.lane_id` when present, recording `lane_id` on `telepathy_guesses`.
+    5. **14 Seed Memes Drops Runway & Integration Suite (P10O.05):**
+       - Authored `packages/shared/src/seeds/memes-lane-drops.ts` providing 14 complete daily Drops (70 questions total, 2-week launch runway) covering relatable lifestyle & internet culture themes.
+       - Authored `packages/shared/src/memes-lane.test.ts` (11/11 tests passing): verifies inflow invariant, multi-format validation, share card PNG export with magic bytes, telepathy eligibility, and 100% compliance across all 14 seed drops.
+       - Full monorepo typecheck (`@oddly/shared`, `@oddly/api`, `@oddly/worker`, `@oddly/web`) passes with 0 errors.
+       - Frontend bundle budget check: Initial play route JS is 152.5 KB compressed (within 159.5 KB limit).
   - **Stage L3 (Twin Depth & Mutual Pairing — Phase 10N) is COMPLETE & VERIFIED:**
     1. **Database Schema & Compatibility View (P10N.01):**
        - Migration `013_twin_depth_and_mutual_pairing.sql` applied cleanly across PostgreSQL: creates `lane_history_signatures` with 32-byte `BYTEA` signature and `(player_id, lane_id)` unique constraint; adds `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `questions_compared`, `history_days` to `matches`; and creates compatibility view `twin_results AS SELECT * FROM matches;`.

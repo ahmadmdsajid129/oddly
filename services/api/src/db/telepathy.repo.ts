@@ -79,9 +79,13 @@ export class TelepathyRepository {
     const dateStr = targetDateStr || getTwinDay(new Date());
     const dropDateObj = new Date(`${dateStr}T00:00:00.000Z`);
 
-    // 1. Fetch drop for today
+    // 1. Fetch drop for today (isolated by lane_id if orbit has lane_id)
+    const dropWhere: Record<string, unknown> = { drop_date: dropDateObj };
+    if (orbit.lane_id) {
+      dropWhere.lane_id = orbit.lane_id;
+    }
     const drop = await prisma.drop.findFirst({
-      where: { drop_date: dropDateObj },
+      where: dropWhere,
       include: {
         questions: {
           include: { answerOptions: true },
@@ -284,9 +288,13 @@ export class TelepathyRepository {
     const dateStr = targetDateStr || getTwinDay(new Date());
     const dropDateObj = new Date(`${dateStr}T00:00:00.000Z`);
 
-    // 1. Fetch drop and designated question
+    // 1. Fetch drop and designated question (isolated by lane_id if orbit has lane_id)
+    const dropWhere: Record<string, unknown> = { drop_date: dropDateObj };
+    if (orbit.lane_id) {
+      dropWhere.lane_id = orbit.lane_id;
+    }
     const drop = await prisma.drop.findFirst({
-      where: { drop_date: dropDateObj },
+      where: dropWhere,
       include: {
         questions: {
           include: { answerOptions: true },
@@ -386,6 +394,7 @@ export class TelepathyRepository {
       data: {
         id: randomUUID(),
         orbit_id: orbitId,
+        lane_id: orbit.lane_id ?? null,
         drop_date: dropDateObj,
         guesser_player_id: playerId,
         question_id: designatedQ.id,
