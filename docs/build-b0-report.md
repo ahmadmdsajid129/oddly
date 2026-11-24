@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; commit `e30d852`, tag `b0-A5-done`), Slice A6 (Safety Foundation; commit `e4bf30f`, tag `b0-A6-done`), Slice A7 (Keep and Orbit, Lane-Tagged; commit `da391f4`, tag `b0-A7-done`), Slice A8 (Telepathy and Sync Score; tag `b0-A8-done`).
-- **Not Started:** Slices A9 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; commit `e30d852`, tag `b0-A5-done`), Slice A6 (Safety Foundation; commit `e4bf30f`, tag `b0-A6-done`), Slice A7 (Keep and Orbit, Lane-Tagged; commit `da391f4`, tag `b0-A7-done`), Slice A8 (Telepathy and Sync Score; commit `21fea17`, tag `b0-A8-done`), Slice A9 (Twin Globe; tag `b0-A9-done`).
+- **Not Started:** Slices A10 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -178,6 +178,18 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
   - Computes non-negative normalized Sync score: $\text{Sync} = \max\left(0, \frac{\text{Hits} - \text{Expected}}{\text{Total} - \text{Expected}}\right)$.
   - Sync score feeds directly into Door 3 of the chat unlock engine ($\ge 65\%$ Sync threshold).
 - **Verification:** `packages/shared/src/telepathy.test.ts` (13 tests) and `apps/web/src/telepathy.test.ts` (6 tests) pass with 100% assertion coverage.
+
+### 4.9 Slice A9: Twin Globe
+- **Ambient World Visualization (F18 & ADR-037):**
+  - Accessible via `/globe`, rendering a warm tactile SVG world map populated by aggregated, delayed connection arcs between stranger twins.
+- **Privacy & k-Anonymity Invariant ($k \ge 5$):**
+  - Individual coordinates are never stored, exposed, or transmitted.
+  - Arcs aggregate at coarse macro-regional centroids (e.g., "Western Europe", "South Asia", "North America") and require a minimum count threshold before appearing publicly.
+  - Timestamp jitter and delayed batching decouple arc visualization from real-time player presence.
+- **Live vs Replay Mode & Synthetic Isolation:**
+  - Automatically toggles between `live` and `replay` mode depending on active volume.
+  - In demo mode, synthetic arcs carry `is_synthetic = true` to preserve separation from genuine connection telemetry.
+- **Verification:** `apps/web/src/orbit-globe.test.ts` (11 tests) passes cleanly.
 
 ---
 

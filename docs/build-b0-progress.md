@@ -11,7 +11,7 @@
 | A6 | Safety foundation: block, report, sever, consent, kill switches, audit log | done | b0-A6-done | POST /v1/blocks, audit_logs, ops:sever-orbit, ops:ban-player, and consent verified |
 | A7 | Keep and Orbit, lane-tagged | done | b0-A7-done | Lane-tagged Keep creation, Orbit formation with lane_id, and lane badge on Orbit rows verified |
 | A8 | Telepathy and Sync score | done | b0-A8-done | Daily blind instinct prediction, luck baseline, and Sync score verified with 19 tests |
-| A9 | Twin Globe | not started | - | F18 flat SVG world map with delayed aggregated arcs |
+| A9 | Twin Globe | done | b0-A9-done | Flat SVG world map, k-anonymity aggregated arcs, time jitter, /globe verified |
 | A10 | Anti-twin | not started | - | F21 bounded candidate lowest-similarity match |
 | A11 | Sync by subject (statistics only) | not started | - | F28 tag-level agreement rate stats |
 | A12 | Chat unlock engine (Three Doors, Duo Trial v0, both-confirm, chat_ready) | not started | - | State machine to chat_ready with Duo Trial v0 |
