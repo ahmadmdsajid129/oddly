@@ -10,7 +10,7 @@
 | A5 | Result hub, share cards per lane, per-lane streaks, history, "play another lane" | done | b0-A5-done | /result/[lane]/[date], /me/streaks, lane history filter, and "play another lane" verified |
 | A6 | Safety foundation: block, report, sever, consent, kill switches, audit log | done | b0-A6-done | POST /v1/blocks, audit_logs, ops:sever-orbit, ops:ban-player, and consent verified |
 | A7 | Keep and Orbit, lane-tagged | done | b0-A7-done | Lane-tagged Keep creation, Orbit formation with lane_id, and lane badge on Orbit rows verified |
-| A8 | Telepathy and Sync score | not started | - | F3 Telepathy integration inside active Orbit |
+| A8 | Telepathy and Sync score | done | b0-A8-done | Daily blind instinct prediction, luck baseline, and Sync score verified with 19 tests |
 | A9 | Twin Globe | not started | - | F18 flat SVG world map with delayed aggregated arcs |
 | A10 | Anti-twin | not started | - | F21 bounded candidate lowest-similarity match |
 | A11 | Sync by subject (statistics only) | not started | - | F28 tag-level agreement rate stats |
