@@ -1,0 +1,16 @@
+# Stage B0: Conflicts & Reconciled Decisions Log
+
+This document records every point where existing documentation files (`rules.md`, `product.md`, `architecture.md`, `task.md`) and the Founder's Stage B0 prompt diverge, along with the action taken during the build.
+
+| ID | Where (File & Section) | What the Docs Say | What the Prompt or Code Says | What I Did | Needs Founder Answer (Yes/No) |
+|---|---|---|---|---|---|
+| C-01 | `rules.md` (Rule L10), `task.md` (Stage L1) | New player goes directly into Everyday Drop; lane picker is shown only after first result | Prompt D1: Lane picker is the **first screen** after 18+ confirmation for all players (with a "Continue in <last lane>" top card for returning players) | Built D1: Lane picker rendered as first screen after 18+ gate | No (Founder approved in prompt D1) |
+| C-02 | `product.md` (F24), `rules.md` (Rule L1) | Meme questions can appear in Everyday Drops (at most 1 of 5); themed drops exist | Prompt D3: Memes is a dedicated lane (`slug = 'memes'`). Meme content lives **only** in the Memes lane. `drops.theme_key` is not built. | Strictly enforced: Meme Lab and meme render variants feed exclusively into Memes lane | No (Founder approved in prompt D3) |
+| C-03 | `blueprint.md`, `architecture.md` (Section 4) | Single global streak across the entire application | Prompt D4: Streak per lane, plus one overall counter "days you played any lane". Max 1 reminder push per day across whole app. | Built per-lane streaks + overall days played counter | No (Founder approved in prompt D4) |
+| C-04 | `product.md` (Non-Goals) | "No chat between players" | Prompt D7: Chat unlock engine with Three Doors leading to state `chat_ready`. Messaging UI itself is out of scope for B0. | Built unlock state machine up to `chat_ready` (calm placeholder, no messaging screen) | No (Founder approved in prompt D7) |
+| C-05 | `architecture.md` (Open Issue 1) | Uncertainty whether player table is `players` or `users`, and IDs are UUID or INT | Prompt 3.2: Follow the real schema | Used `players` table and UUID string IDs everywhere | No (Follows real schema) |
+| C-06 | `product.md` (F40, Q8) | Founder Question Q8 (Additive vs Replace in Bonus Rounds) | Prompt D6: Bonus rounds are additive (`bonus_results`), never touching `twin_results` or changing the locked twin | Implemented additive bonus results | No (Founder approved in prompt D6) |
+| C-07 | `product.md` (F31) | Earlier idea of 3 purchasable lives for unlocking connection | Prompt D7: No paid lives, no purchase of any kind, chat is never paywalled | Built Three Doors without payment or lives | No (Founder approved in prompt D7) |
+| C-08 | `product.md` (F41), `rules.md` (Rule L10) | Badges are strictly private | Prompt D8: Badges private by default, but shareable via explicit opt-in flip card if population >= 500 | Built private default with opt-in share card | No (Founder approved in prompt D8) |
+| C-09 | `package.json` vs `.npmrc` | CI pnpm 10 build map error | Prompt 3.1: Remove `.npmrc` string, use root `package.json` array | Already fixed and verified in preflight | No |
+| C-10 | `product.md` (F35, F36) | Situations and Brain lanes mentioned in earlier roadmaps | Prompt 0.2: Situations lane, Brain lane, and Say It (typed answers) are strictly OUT OF SCOPE for Stage B0 | Excluded from Stage B0 scope | No (Founder scope fence) |

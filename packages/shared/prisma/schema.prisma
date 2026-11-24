@@ -92,6 +92,7 @@ model Player {
   age_band        String    @db.VarChar(10)   // "18-24", "25-34", etc.
   push_token_enc  String?   @db.Text          // AES-256-GCM encrypted push token
   created_at      DateTime  @default(now())
+  is_synthetic    Boolean?  @default(false)
 
   submissions      Submission[]
   streakLogs       StreakLog[]
@@ -118,6 +119,9 @@ model Player {
   laneInterests    LaneInterest[]
   lanePrefs        PlayerLanePref[]
   laneHistorySignatures LaneHistorySignature[]
+  blocksInitiated  Block[]    @relation("Blocker")
+  blocksReceived   Block[]    @relation("Blocked")
+  collectorBadges  CollectorBadge[]
 
   @@index([account_id])
   @@index([did])
@@ -224,6 +228,7 @@ model Submission {
   answers      Json     // array of {question_id, value} — matches AnswerPayload[]
   submitted_at DateTime @default(now())
   is_bot_flagged Boolean @default(false)
+  is_synthetic Boolean? @default(false)
 
   oddnessScore      OddnessScore?
   shareCards        ShareCard[]
@@ -305,6 +310,7 @@ model Match {
   questions_compared  Int       @default(5)
   history_days        Int       @default(0)
   is_provisional      Boolean   @default(true)  // true until drop closes
+  is_synthetic        Boolean?  @default(false)
   matched_at          DateTime  @default(now())
   finalized_at        DateTime?
 
@@ -606,8 +612,17 @@ model Orbit {
   created_at        DateTime    @default(now())
   updated_at        DateTime    @default(now()) @updatedAt
 
+  unlock_state      String      @default("locked") @db.VarChar(20)
+  unlocked_by       String?     @db.VarChar(20)
+  unlocked_at       DateTime?
+  chat_state        String      @default("closed") @db.VarChar(20)
+  consent_player_id String?
+  consent_at        DateTime?
+
   expressions       OrbitExpression[]
   telepathyGuesses  TelepathyGuess[]
+  subjectSyncs      OrbitSubjectSync[]
+  trials            OrbitTrial[]
 
   @@index([player_a_id, status])
   @@index([player_b_id, status])
@@ -1273,6 +1288,222 @@ model LaneHistorySignature {
   @@index([player_id])
   @@index([lane_id])
   @@map("lane_history_signatures")
+}
+
+// ---------------------------------------------------------------------------
+// 58. blocks — mutual safety exclusion
+// ---------------------------------------------------------------------------
+model Block {
+  id         String   @id @default(uuid())
+  blocker_id String
+  blocker    Player   @relation("Blocker", fields: [blocker_id], references: [id], onDelete: Cascade)
+  blocked_id String
+  blocked    Player   @relation("Blocked", fields: [blocked_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now())
+
+  @@unique([blocker_id, blocked_id])
+  @@index([blocker_id])
+  @@index([blocked_id])
+  @@map("blocks")
+}
+
+// ---------------------------------------------------------------------------
+// 59. globe_arcs — coarse time-bucketed twin formation paths
+// ---------------------------------------------------------------------------
+model GlobeArc {
+  id           String   @id @default(uuid())
+  lane_id      String?
+  region_a     String   @db.VarChar(10)
+  region_b     String   @db.VarChar(10)
+  bucket_time  DateTime
+  count        Int      @default(1)
+  is_synthetic Boolean? @default(false)
+  created_at   DateTime @default(now())
+
+  @@index([bucket_time])
+  @@index([lane_id, bucket_time])
+  @@map("globe_arcs")
+}
+
+// ---------------------------------------------------------------------------
+// 60. orbit_subject_sync — tag-level agreement rate stats (Stage F28)
+// ---------------------------------------------------------------------------
+model OrbitSubjectSync {
+  id         String   @id @default(uuid())
+  orbit_id   String
+  orbit      Orbit    @relation(fields: [orbit_id], references: [id], onDelete: Cascade)
+  tag_slug   String   @db.VarChar(50)
+  agreed     Int      @default(0)
+  total      Int      @default(0)
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@unique([orbit_id, tag_slug])
+  @@index([orbit_id])
+  @@map("orbit_subject_sync")
+}
+
+// ---------------------------------------------------------------------------
+// 61. trial_prompts — 2-option neutral lifestyle prompt bank for Duo Trial
+// ---------------------------------------------------------------------------
+model TrialPrompt {
+  id          String   @id @default(uuid())
+  prompt_text String   @db.VarChar(300)
+  option_a    String   @db.VarChar(100)
+  option_b    String   @db.VarChar(100)
+  category    String   @default("lifestyle") @db.VarChar(50)
+  created_at  DateTime @default(now())
+
+  @@map("trial_prompts")
+}
+
+// ---------------------------------------------------------------------------
+// 62. orbit_trials — Duo Trial v0 attempt records (Door 1 of Chat Unlock)
+// ---------------------------------------------------------------------------
+model OrbitTrial {
+  id             String             @id @default(uuid())
+  orbit_id       String
+  orbit          Orbit              @relation(fields: [orbit_id], references: [id], onDelete: Cascade)
+  attempt_number Int                @default(1)
+  started_by     String
+  started_at     DateTime           @default(now())
+  window_ends_at DateTime
+  status         String             @default("pending") @db.VarChar(20) // pending | completed | expired
+  score          Int?
+  passed         Boolean?
+  pass_mark      Int                @default(5)
+  answers        OrbitTrialAnswer[]
+
+  @@unique([orbit_id, attempt_number])
+  @@index([orbit_id])
+  @@map("orbit_trials")
+}
+
+// ---------------------------------------------------------------------------
+// 63. orbit_trial_answers — detailed picks during 24h trial attempt window
+// ---------------------------------------------------------------------------
+model OrbitTrialAnswer {
+  id         String     @id @default(uuid())
+  trial_id   String
+  trial      OrbitTrial @relation(fields: [trial_id], references: [id], onDelete: Cascade)
+  player_id  String
+  prompt_id  String
+  choice     String     @db.VarChar(50)
+  created_at DateTime   @default(now())
+
+  @@unique([trial_id, player_id, prompt_id])
+  @@index([trial_id])
+  @@map("orbit_trial_answers")
+}
+
+// ---------------------------------------------------------------------------
+// 64. bonus_rounds — Additive tie group bonus competition (Stage L9 / Slice B1)
+// ---------------------------------------------------------------------------
+model BonusRound {
+  id             String             @id @default(uuid())
+  drop_id        String
+  lane_id        String
+  round_number   Int                @default(1)
+  tie_group_hash String             @db.VarChar(64)
+  question_ids   Json               // array of 3 question ids
+  status         String             @default("open") @db.VarChar(20) // open | closed
+  created_at     DateTime           @default(now())
+  closes_at      DateTime
+  participants   BonusParticipant[]
+  answers        BonusAnswer[]
+  results        BonusResult[]
+
+  @@unique([drop_id, tie_group_hash, round_number])
+  @@index([drop_id])
+  @@map("bonus_rounds")
+}
+
+model BonusParticipant {
+  id        String     @id @default(uuid())
+  round_id  String
+  round     BonusRound @relation(fields: [round_id], references: [id], onDelete: Cascade)
+  player_id String
+  joined_at DateTime   @default(now())
+
+  @@unique([round_id, player_id])
+  @@index([round_id])
+  @@map("bonus_participants")
+}
+
+model BonusAnswer {
+  id           String     @id @default(uuid())
+  round_id     String
+  round        BonusRound @relation(fields: [round_id], references: [id], onDelete: Cascade)
+  player_id    String
+  answers      Json
+  submitted_at DateTime   @default(now())
+
+  @@unique([round_id, player_id])
+  @@index([round_id])
+  @@map("bonus_answers")
+}
+
+model BonusResult {
+  id               String     @id @default(uuid())
+  round_id         String
+  round            BonusRound @relation(fields: [round_id], references: [id], onDelete: Cascade)
+  player_id        String
+  closest_peer_id  String?
+  similarity_score Float      @default(0)
+  bonus_matches    Int        @default(0)
+  created_at       DateTime   @default(now())
+
+  @@unique([round_id, player_id])
+  @@index([round_id])
+  @@map("bonus_results")
+}
+
+// ---------------------------------------------------------------------------
+// 65. collector_badges — non-evaluative collector badges (Stage L10 / Slice B3)
+// ---------------------------------------------------------------------------
+model CollectorBadgeDefinition {
+  id          String           @id // e.g. "collector_tier1", "all_lanes", "super_twin"
+  name        String           @db.VarChar(100)
+  description String           @db.VarChar(300)
+  icon_key    String           @db.VarChar(50)
+  created_at  DateTime         @default(now())
+  badges      CollectorBadge[]
+
+  @@map("collector_badge_definitions")
+}
+
+model CollectorBadge {
+  id            String                   @id @default(uuid())
+  player_id     String
+  player        Player                   @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  definition_id String
+  definition    CollectorBadgeDefinition @relation(fields: [definition_id], references: [id])
+  evidence_data Json?                    // references to twin results / lanes
+  is_shared     Boolean                  @default(false)
+  share_id      String?                  @unique @db.VarChar(64)
+  awarded_at    DateTime                 @default(now())
+  revoked_at    DateTime?
+
+  @@unique([player_id, definition_id])
+  @@index([player_id])
+  @@map("collector_badges")
+}
+
+// ---------------------------------------------------------------------------
+// 66. audit_logs — immutable ops and moderation audit log
+// ---------------------------------------------------------------------------
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String   @db.VarChar(50) // sever_orbit, ban_player, pull_question, disable_feature
+  target_type String   @db.VarChar(50)
+  target_id   String   @db.VarChar(128)
+  actor       String   @default("system") @db.VarChar(50)
+  before_data Json?
+  after_data  Json?
+  created_at  DateTime @default(now())
+
+  @@index([action])
+  @@index([target_type, target_id])
+  @@map("audit_logs")
 }
 
 

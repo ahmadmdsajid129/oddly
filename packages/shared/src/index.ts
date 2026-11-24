@@ -25,6 +25,7 @@ export * from "./memes-lane.js";
 export * from "./formats.js";
 export * from "./seeds/rich-questions.js";
 export * from "./seeds/memes-lane-drops.js";
+export * from "./demo-mode.js";
 export * from "./bitminhash.js";
 export * from "./tie-breaker.js";
 export * from "./mutual-pairing.js";
