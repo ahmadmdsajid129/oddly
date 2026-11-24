@@ -13,8 +13,8 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; tag `b0-A1-done`).
-- **Not Started:** Slices A2 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
+- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; tag `b0-A2-done`).
+- **Not Started:** Slices A3 through A14 (Tier A) and B1 through B5 (Tier B), plus Slice Z.
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -67,6 +67,24 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
 - **Per-Lane Drop Clock:** Drop availability cycles run strictly from 07:00 IST to 06:59:59 IST next day with recap calculation at 07:05 IST. The UI surfaces this accurate window to prevent timing ambiguity.
 - **Database Partitioning Integrity:** Migration `015_lane_id_integrity.sql` replaced the old global unique constraint `(drop_date, player_id)` with `uq_submissions_drop_lane_player (drop_date, lane_id, player_id)`. This guarantees that players can play multiple distinct lanes on the same calendar day without collisions or data crosstalk, while strictly isolating each lane's submissions, questions, and match pool.
 - **Verification:** 16 web test suites (125 tests) and 4 data safety integration tests pass; frontend play-route bundle is 148.7 KB (within the 150 KB target and well below 159.5 KB ceiling).
+
+### 4.2 Slice A2: Question Formats and Similarity per Format
+- **Polymorphic Formats Supported:**
+  - `pick1` & `scene`: Exact equality metric ($s = 1.0$ if identical, $0.0$ otherwise).
+  - `pick2of6`: Jaccard set similarity $s(A, B) = \frac{|A \cap B|}{|A \cup B|}$, producing exact fractions $\{0, 1/3, 1\}$.
+  - `rank3`: Normalized Kendall Tau distance $s(R1, R2) = 1 - \frac{d_K(R1, R2)}{3}$, producing outcomes $\{0, 1/3, 2/3, 1\}$.
+  - `slider7`: Normalized Manhattan distance $s(v1, v2) = 1 - \frac{|v1 - v2|}{6}$, producing steps $\{0, 1/6, 2/6, 3/6, 4/6, 5/6, 1.0\}$.
+- **Mathematical Invariants Guaranteed:**
+  - Symmetry: $s(x, y) = s(y, x)$ strictly enforced across all format scoring functions.
+  - Reflexivity: $s(x, x) = 1.0$ identically.
+  - Boundedness: $0.0 \le s(x, y) \le 1.0$.
+  - Monotonicity: Diverging answers produce strictly monotonically non-increasing similarity.
+- **Information Weighting ($w_k$) & Smoothing:**
+  - Symmetric average weighting $w_k = \frac{I(a_u, k) + I(a_v, k)}{2}$ ensures $S(u, v) = S(v, u)$.
+  - Laplace smoothing applied with 3.5-bit cap ($w_{\max} = 3.5$).
+  - When $N < 30$, marginal option smoothing is used for `pick2of6` and `rank3` rather than a uniform fallback.
+- **Sample Seed Runway:** 12 verified sample questions per format (48 total in `scripts/seed-rich-questions.mjs`) strictly adhering to Oddly guidelines: zero politics, zero shaming, zero sensitive categories.
+- **Verification:** `packages/shared/src/formats.test.ts` (19 tests) and `apps/web/src/richer-formats.test.tsx` (11 tests) pass with 100% assertion coverage.
 
 ---
 

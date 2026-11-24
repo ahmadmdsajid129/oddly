@@ -4,7 +4,7 @@
 |---|---|---|---|---|
 | A0 | Pre-flight, baseline, CI, demo mode scaffolding | done | b0-A0-done | Preflight audit complete, demo mode & synthetic guardrails verified |
 | A1 | Lanes foundation, lane picker first, per-lane Drop clock, lane-scoped submit and result | done | b0-A1-done | D1 first-screen lane picker, 07:00-06:59 IST daily clock, multi-lane persistence verified |
-| A2 | Question formats and similarity per format | not started | - | Builds on Phase 10M richer formats |
+| A2 | Question formats and similarity per format | done | b0-A2-done | pick1, pick2of6, rank3, slider7, scene verified with proofs and 12 questions/format |
 | A3 | Twin depth: closest so far, tie groups, history signature, mutual pairing, group size copy | not started | - | Builds on Phase 10N mutual pairing and BitMinHash |
 | A4 | Memes lane: meme presentation, template registry, seed Drops, lane config | not started | - | Builds on Phase 10O dedicated Memes lane |
 | A5 | Result hub, share cards per lane, per-lane streaks, history, "play another lane" | not started | - | Lane-aware result view, streaks and Satori cards |
