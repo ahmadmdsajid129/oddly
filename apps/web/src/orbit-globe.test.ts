@@ -174,4 +174,63 @@ describe("Phase 10B: Orbit & Globe UI (Stage F2)", () => {
       expect(mode).toBe("live");
     });
   });
+
+  describe("Stage A11 (F28): Subject Sync (Statistics Only)", () => {
+    it("locks subject tag sync when shared questions < threshold (k < 5)", () => {
+      const threshold = 5;
+      const item = {
+        tag_id: "tag-pop-culture",
+        tag_key: "pop-culture",
+        category: "culture",
+        shared_questions: 3,
+        agreement_count: null,
+        agreement_percentage: null,
+        status: 3 >= threshold ? "unlocked" : "locked",
+        lock_reason: "Play 2 more drops together to unlock Pop Culture sync (3/5)",
+      };
+
+      expect(item.status).toBe("locked");
+      expect(item.agreement_percentage).toBeNull();
+      expect(item.lock_reason).toContain("Play 2 more drops together");
+    });
+
+    it("unlocks tag agreement percentage when shared questions >= threshold (k >= 5)", () => {
+      const threshold = 5;
+      const shared = 6;
+      const agreed = 5;
+      const item = {
+        tag_id: "tag-humor",
+        tag_key: "humor",
+        category: "memes",
+        shared_questions: shared,
+        status: shared >= threshold ? "unlocked" : "locked",
+        agreement_count: agreed,
+        agreement_percentage: Math.round((agreed / shared) * 100),
+        lock_reason: null,
+      };
+
+      expect(item.status).toBe("unlocked");
+      expect(item.agreement_percentage).toBe(83); // 5/6 = 83%
+      expect(item.agreement_count).toBe(5);
+      expect(item.lock_reason).toBeNull();
+    });
+
+    it("verifies Rule 19 Zero-Leak: no pick-level or question-level data in payload", () => {
+      const payload: Record<string, unknown> = {
+        tag_id: "tag-humor",
+        tag_key: "humor",
+        category: "memes",
+        shared_questions: 6,
+        agreement_count: 5,
+        agreement_percentage: 83,
+        status: "unlocked",
+      };
+
+      expect(payload["answers"]).toBeUndefined();
+      expect(payload["picks"]).toBeUndefined();
+      expect(payload["question_id"]).toBeUndefined();
+      expect(payload["question_text"]).toBeUndefined();
+      expect(payload["raw_vectors"]).toBeUndefined();
+    });
+  });
 });

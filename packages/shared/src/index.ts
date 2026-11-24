@@ -23,6 +23,7 @@ export * from "./taxonomy.js";
 export * from "./memes.js";
 export * from "./memes-lane.js";
 export * from "./formats.js";
+export * from "./chat-unlock.js";
 export * from "./seeds/rich-questions.js";
 export * from "./seeds/memes-lane-drops.js";
 export * from "./demo-mode.js";

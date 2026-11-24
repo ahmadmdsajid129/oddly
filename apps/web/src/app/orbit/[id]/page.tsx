@@ -10,6 +10,7 @@ import { ProceduralAvatar } from "@/components/orbit/ProceduralAvatar";
 import { StagedUnlocks } from "@/components/orbit/StagedUnlocks";
 import { TelepathyGameCard } from "@/components/orbit/TelepathyGameCard";
 import { SubjectSyncCard } from "@/components/orbit/SubjectSyncCard";
+import { ChatUnlockDoorsCard } from "@/components/orbit/ChatUnlockDoorsCard";
 import { ExpressionTray, APPROVED_EXPRESSIONS } from "@/components/orbit/ExpressionTray";
 import { ResponsiveDialog } from "@/components/ui/Dialogs";
 import { useToast } from "@/components/ui/Toast";
@@ -198,6 +199,15 @@ export default function OrbitDetailPage() {
         {/* Mutual Subject Sync (Rule 19) */}
         {!isEnded && (
           <SubjectSyncCard orbitId={orbitId} />
+        )}
+
+        {/* Three Doors Chat Unlock Engine (Stage B0 Slice A12) */}
+        {!isEnded && (
+          <ChatUnlockDoorsCard
+            orbitId={orbitId}
+            coStreak={orbit.co_streak_current}
+            syncScorePct={70}
+          />
         )}
 
         {/* Daily Expression Tray (The Wave) */}

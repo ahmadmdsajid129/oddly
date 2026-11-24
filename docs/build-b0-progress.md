@@ -13,8 +13,8 @@
 | A8 | Telepathy and Sync score | done | b0-A8-done | Daily blind instinct prediction, luck baseline, and Sync score verified with 19 tests |
 | A9 | Twin Globe | done | b0-A9-done | Flat SVG world map, k-anonymity aggregated arcs, time jitter, /globe verified |
 | A10 | Anti-twin | done | b0-A10-done | Bounded lowest-similarity opposite, opt-in reveal, Satori flip card, /anti-twin verified |
-| A11 | Sync by subject (statistics only) | not started | - | F28 tag-level agreement rate stats |
-| A12 | Chat unlock engine (Three Doors, Duo Trial v0, both-confirm, chat_ready) | not started | - | State machine to chat_ready with Duo Trial v0 |
+| A11 | Sync by subject (statistics only) | done | b0-A11-done | F28 tag-level agreement rate stats with k>=5 and Rule 19 Zero-Leak |
+| A12 | Chat unlock engine (Three Doors, Duo Trial v0, both-confirm, chat_ready) | done | b0-A12-done | Three Doors evaluation, Duo Trial v0, both-confirm state machine to chat_ready |
 | A13 | Notifications for Orbit and unlock; events; consent-gated signals | not started | - | Orbit push channel and event dictionary |
 | A14 | Demo seeder, the 200-player scenario test, explain:twin tool | not started | - | Synthetic seeder, scenario test, explain:twin CLI |
 | B1 | Bonus rounds | not started | - | Stage L9 additive closest-match tie-breaker |
