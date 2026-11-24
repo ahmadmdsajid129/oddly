@@ -3,7 +3,7 @@
 > **The Reliability Promise:**  
 > *"No acknowledged submission is ever lost, the Drop is always reachable, and when we are overloaded we shed non-essential work first and say so honestly."*
 
-**Project:** Oddly v1 | **Last updated:** 2026-11-22 | **Owner:** Senior System Designer & SRE + Founder  
+**Project:** Oddly v1 | **Last updated:** 2026-11-25 | **Owner:** Senior System Designer & SRE + Founder  
 **Purpose of this file:** Authoritative project roadmap, task tracking, progress bars, phase dependencies, scale readiness gates, and verification criteria across all 17 phases (Phase 0 to Phase 16).
 
 ---
@@ -12,13 +12,16 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 69%`                                                       |
-| **Current Active Stage**        | **Phase 10T: Bonus Rounds (Stage L9)**                                           |
-| **Total Tasks Tracked**         | 410 tasks across 38 phases                                                       |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 66%`                                                       |
+| **Current Active Stage**        | **Phase 10V: Stage C0, Make the Core Real (from 2026-11-25 deep dive)**          |
+| **Total Tasks Tracked**         | 430 tasks across 39 phases                                                       |
 | **Completed Tasks (`DONE`)**    | 283 tasks (Proven by code, tests & integration test suite)                       |
 | **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 127 tasks                                                                        |
+| **Pending (`TODO`)**            | 147 tasks                                                                        |
+
+> [!WARNING]
+> **Deep dive 2026-11-25:** several phases marked COMPLETE (10L–10O, 10B–10E and the B0 slices) have code that the running app doesn't call, or screens that show invented values. Those gaps are tracked as new tasks in **Phase 10V (Stage C0)** instead of reopening old rows. See `docs/audit/b0-deep-dive-2026-11-25.md`.
 
 
 <!-- visual:start dashboard-visuals -->
@@ -80,6 +83,7 @@
 | **Phase 10S**| Brain Lane (Documented Only)                | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 1              | Stage L8              |
 | **Phase 10T**| Bonus Rounds (Stage L9)                     | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L9              |
 | **Phase 10U**| Badges (Stage L10)                           | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 6              | Stage L10             |
+| **Phase 10V**| Make the Core Real (Stage C0)                | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 20             | Stage C0 (next)       |
 | **Phase 11** | Admin Panel ("Mission Control")             | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 50             | Stage 11 (Addenda A+B+C)|
 | **Phase 12** | Observability, Telemetry & Security         | High     | 🟡 PARTIAL  | `🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜ 9%` | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 12             | Stage 13              |
@@ -702,6 +706,35 @@ _Status: TODO | Target: Architecture specification for knowledge questions, anti
 
 ---
 
+### Phase 10V: Make the Core Real (Stage C0, from the 2026-11-25 deep dive)
+
+_Status: TODO | Target: a real player can go from the lane picker to a locked, correctly scored twin and on to `chat_ready` with no invented data. Source: `docs/audit/b0-deep-dive-2026-11-25.md`. Rules 36–41._
+
+| ID          | Task Description | Priority | Status | Depends On | Owner | Done Date | Notes |
+| ----------- | ---------------- | -------- | ------ | ---------- | ----- | --------- | ----- |
+| `[ ] P10V.01` | Remove every invented value from play, result, orbit and globe screens (hardcoded city, age band, 3,482 players, "4 of 5", Luminous Violet, offline fake result, tier from matched picks); honest empty or waiting states | 🔴 Critical | ⚪ TODO | — | Agent | — | Rule 36 |
+| `[ ] P10V.02` | Build-fail test that scans player components for literal stand-in values | 🟠 High | ⚪ TODO | P10V.01 | Agent | — | Rule 36 |
+| `[ ] P10V.03` | Lock `/v1/results` and `/v1/me` to the signed session; reject unsigned cookies and `player_id` query for other players | 🔴 Critical | ⚪ TODO | — | Agent | — | Rule 39 |
+| `[ ] P10V.04` | Exclude blocked pairs (both directions) from submit match, provisional refresh, final batch, anti-twin, Keep and Orbit; integration test | 🔴 Critical | ⚪ TODO | — | Agent | — | Rule 38 |
+| `[ ] P10V.05` | Record 18+ confirmation on the server with timestamp; API refuses submit without it | 🟠 High | ⚪ TODO | — | Agent | — | product §0.1 |
+| `[ ] P10V.06` | Anti-twin `min_pool` and sample size read from `app_config` only (remove query params) | 🟠 High | ⚪ TODO | — | Agent | — | Rule 39 |
+| `[ ] P10V.07` | Make the weighted, format-aware, symmetric similarity the only production formula; delete the Dice path; tests for slider step, rank swap, pick-2 overlap, rare-answer weight | 🔴 Critical | ⚪ TODO | — | Agent | — | Rule 37, product §0.2 |
+| `[ ] P10V.08` | Remove the age-band pool split; one pool per lane and Drop | 🟠 High | ⚪ TODO | P10V.07 | Agent | — | Rule 40 |
+| `[ ] P10V.09` | Pairing order strictly lexicographic (S, history, country, hash); 500-player pairing within the test limit | 🟠 High | ⚪ TODO | P10V.07 | Agent | — | C7, C8 |
+| `[ ] P10V.10` | Schedule provisional refresh every 5 min per lane with real candidates (no empty list) | 🔴 Critical | ⚪ TODO | P10V.07 | Agent | — | C9 |
+| `[ ] P10V.11` | Schedule the 07:00 final batch per lane using mutual pairing and tie-break; mark matches final; exactly one locked twin per player per lane | 🔴 Critical | ⚪ TODO | P10V.09 | Agent | — | C10 |
+| `[ ] P10V.12` | 07:05 recap job and recap push (max one per day) | 🟠 High | ⚪ TODO | P10V.11 | Agent | — | C10 |
+| `[ ] P10V.13` | Result API returns real `matched_picks`, lane player count, twin coarse region and age band, tie-group size, `is_mutual`; deterministic twin lookup; "Closest so far" below 200 | 🔴 Critical | ⚪ TODO | P10V.11 | Agent | — | product §0.2 |
+| `[ ] P10V.14` | Oddness percentile per lane pool with "Early" state below minimum pool; fix final-batch percentile | 🟠 High | ⚪ TODO | P10V.07 | Agent | — | product §0.2 |
+| `[ ] P10V.15` | Chat unlock backend: trial start/answer/score on server, Door 2 and 3 evaluation, both-confirm and `chat_ready` stored; UI reads server state (remove hardcoded Sync 70 and local trial pass) | 🔴 Critical | ⚪ TODO | P10V.11 | Agent | — | product §0.5 |
+| `[ ] P10V.16` | Per-lane streaks (lane column) plus overall days played, for every open lane | 🟠 High | ⚪ TODO | — | Agent | — | Rule 28 |
+| `[ ] P10V.17` | Twin Globe: k ≥ 20 filter, scheduled aggregation, coarse regions only, no invented replay arcs | 🟠 High | ⚪ TODO | P10V.11 | Agent | — | product §0.3 |
+| `[ ] P10V.18` | Wire bonus rounds (job, routes, UI), Super twin and collector badges with opt-in share | 🟡 Medium | ⚪ TODO | P10V.11 | Agent | — | product §0.4, §0.6 |
+| `[ ] P10V.19` | Report categories harassment, underage_suspected, contact_attempt; twin location coarse region only (no exact city) | 🟡 Medium | ⚪ TODO | — | Agent | — | Safety |
+| `[ ] P10V.20` | End-to-end test on real Postgres and Redis: 50-player Memes lane from submit to locked twin, Keep, Orbit, one door, both confirm, `chat_ready` | 🔴 Critical | ⚪ TODO | P10V.01–P10V.15 | Agent | — | Rule 41 |
+
+---
+
 ### Phase 11: Admin Tool: "Mission Control" (Stage 11)
 
 > **Before any admin panel work, read `docs/admin-panel-spec.md` in full. It is the authoritative description of what to build in Phase 11.**  
@@ -1194,6 +1227,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-25` | Phase 10V (Stage C0) | Code deep dive found the live twin uses an unweighted formula, the result screen shows invented values, no job locks twins (so Keep, Orbit and chat unlock are unreachable), and blocks are not applied to matching. Added Phase 10V with 20 tasks. Dashboard updated to 283/430 (66%) across 39 phases. | Founder request: deep dive and docs reset. |
 | `2026-11-22` | Phase 9 Complete (P9.15)  | Completed remaining task for Phase 9: implemented BullMQ dead-letter queue (DLQ) poison job quarantine manager (`DLQManager`), automated error classification, alert trigger hooks (`triggerDeadLetterAlert`), programmatic and CLI replay tooling (`scripts/dlq-tool.mjs`), and Prometheus metrics instrumentation (P9.15). Phase 9 now 100% COMPLETE (15/15). Dashboard updated to 254/410 (62%). | Phase 9 completion & queue DLQ quarantine. |
 | `2026-11-22` | Phase 8 Complete (P8.11)  | Completed remaining task for Phase 8: routed player history archive (`GET /v1/history`) and aggregate world statistics (`GET /v1/world/:dropId`) to dedicated PostgreSQL read replica (`prismaReplica`) with transparent primary failover on replica timeout/error, and enforced Level L2+ load shedding (503 OVERLOADED) and extended 10m caching (P8.11). Phase 8 now 100% COMPLETE (12/12). Dashboard updated to 253/410 (62%). | Phase 8 completion & read replica routing. |
 | `2026-11-22` | Phase 7 Complete (P7.10–P7.11) | Completed remaining 2 tasks for Phase 7: enforced guest-play-only behavior under Level L3 degradation and protected against token refresh storms via single-flight promise coalescing, 10/min rate limits, and short-circuit reuse (P7.10), and implemented Cloudflare Turnstile fail-open policy for low-risk actions during gateway outage with fail-closed signups (P7.11). Phase 7 now 100% COMPLETE (11/11). Dashboard updated to 252/410 (61%). | Phase 7 completion & auth resilience. |

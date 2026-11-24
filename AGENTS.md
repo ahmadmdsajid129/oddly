@@ -1,5 +1,9 @@
 # Agent Instructions for Oddly
 
+## Start Here (2026-11-25)
+
+Read `product.md §0` (the current product definition up to chat unlock) and `task.md` Phase 10V (Stage C0) before any work. Rules 36–41 in `rules.md` apply: no invented data on player screens, one matching formula, blocks are absolute, the server decides thresholds, age band is display only, and "done" means a real player can reach it. When asked for a report, change nothing except the report file.
+
 ## Permanent Design System & UI Pattern Rule
 
 Before any UI change read `design.md`; use only `@oddly/ui-tokens`; follow the sticker rules; do not add colours, fonts, radii or shadows.

@@ -1,6 +1,6 @@
 # Product Specification — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-22 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-25 | Owner: Founder + AI agent
 Purpose of this file: Definitive product blueprint, scope, user personas, brand identity, matching mechanics, feature definitions (F1–F17), edge cases, and legal/safety boundaries.
 
 ---
@@ -9,11 +9,86 @@ Purpose of this file: Definitive product blueprint, scope, user personas, brand 
 > [!NOTE]
 > **Oddly at a Glance**
 > - **Core Loop:** Five instinct-based picks in under 30 seconds every morning at 07:00 IST.
-> - **Lanes:** Choose your universe (Everyday, Memes, Situations); matching is strictly lane-isolated.
-> - **Honest Matching:** Find your Twin and your Oddness rarity percentile with zero profiles, feeds, or chat.
+> - **Lanes:** Pick a lane first (Everyday and Memes open today); each lane has its own daily Drop, twin and streak, and matching never crosses lanes.
+> - **Honest Matching:** Find your Twin and your Oddness rarity percentile with no profiles or feeds. Chat can only unlock inside a mutual Orbit (unlock flow only; no messaging screen yet).
 > - **Safe by Design:** Structured answers, 18+ only, zero shaming, no sensitive inference, non-political.
 > - **Tactile Pop:** Physical paper sticker aesthetic on warm cream desk (`#FFF8F0`) with ink outlines and hard shadows.
 <!-- visual:end product-at-a-glance -->
+
+## 0. Product Definition (Founder-confirmed, 2026-11-25): read this first
+
+> [!IMPORTANT]
+> This section is the current definition of the product up to chat unlock. Where any later section of this file, `rules.md`, `architecture.md` or a stage report disagrees, **this section wins**. Sources: the Oddly Walkthrough (24 Nov 2026), founder decisions D1–D8 (`docs/build-b0-conflicts.md`), and the code deep dive `docs/audit/b0-deep-dive-2026-11-25.md`.
+
+### 0.1 How the app is organised
+
+1. Player opens the web app → confirms 18+ (recorded on the server with a timestamp) → **lane picker is the first screen** (returning players also see "Continue in <last lane>").
+2. A lane is the whole structure, not a feature. **Every lane has its own daily Drop of 5 questions at 07:00 IST**, its own twin, its own recap and its own streak.
+3. A player may play several lanes on the same day: one Drop per lane per day.
+4. **Memes is a lane** (`slug = memes`). Meme content lives only in the Memes lane. There are no meme questions inside other lanes and no "themed Drops".
+5. Open lanes today: Everyday, Memes. Others are planned.
+
+### 0.2 How a twin is found (inside one lane)
+
+- **Pool:** only players of the same lane and the same Drop. No age-band split: age band is shown on the twin card but never splits the pool *(default; founder may override)*.
+- **Score per question** (0 to 1): pick-one same = 1, else 0. Slider loses 1/6 per step. Pick-2-of-6 uses overlap. Rank-3 loses 1/3 per swapped pair.
+- **Weight:** each question is weighted by how rare the answers are, I = log2(1/share), averaged over both players' answers so S(u,v) = S(v,u). **S = Σ(w·s) / Σw.** Sharing a rare answer counts more than sharing a popular one. This weighted formula is the only one production may use.
+- **Conditions, in order:**
+  - C1: alone in the lane → no twin, nothing invented.
+  - C2: fewer than 20 players, or fewer than 20 in a region → region widened.
+  - C3: fewer than 200 → "Closest so far", no "1 in N".
+  - C4: never a candidate: yourself, same device or network, blocked either way, flagged.
+  - C5: a question is pulled → compare on the rest.
+  - C6: highest S wins.
+  - C7: everyone within 0.01 of the best is a tie group (up to 32). Break the tie in strict order: 28-day lane history (at least 5 shared days), then a different country, then a reproducible hash.
+  - C8: mutual pairs; with an odd number, one player keeps the best non-mutual twin.
+  - C9: the provisional twin refreshes about every 5 minutes. An upgrade push goes out only for +0.10 or for 3→4 of 5 matched picks, at most once a day.
+  - C10: the 07:00 batch locks every twin, the recap arrives at 07:05, and a locked twin never changes.
+- **Result screen shows only real data:** the real count of exact matches ("N of 5"), the lane's real player count, the twin's coarse region and age band, the real tie-group size and the real mutual flag. **Never a placeholder, a default number or a sample city.**
+- **Oddness tier:** percentile of today's pool in that lane; shows "Early" until the pool reaches the minimum size *(default; founder may override)*.
+
+### 0.3 After the twin (all lane-tagged)
+
+Share card (no name, photo or exact city) · per-lane streak plus an overall "days played" count · play another lane · **Keep** (one per Drop, only to your own locked twin, Google sign-in, a decline is silent) · **Orbit** (aliases, max 3, end with one tap, unlocks on Day 1/3/7/14/30, stickers, 30-day re-request cooldown) · **Telepathy** (one question per Drop, guess the partner, Sync score after 5 rounds) · **Sync by subject** (counting by tag inside the Orbit; at least 5 shared questions) · **Anti-twin** (sample up to 2,000, hidden below 200 players, no contact path) · **Twin Globe** (flat map, coarse regions, delayed, k ≥ 20, empty state or clearly labelled real replay, never invented arcs) · **Super twin** (same twin in 2 lanes, or S ≥ 0.8 in two lanes).
+Documented only (not to be switched on): Meme Lab, Oddly Deck, Friend-invite Orbit and Friends Compare.
+
+### 0.4 Bonus round (additive)
+
+Offered at the 07:05 recap when the tie group is at least `bonus.min_tie_size` (default 3). It has 3 questions from an evergreen pool of about 40 per lane, chosen by a seeded draw. It is open for 24 hours. Questions that at least half of the tie group answered in the last 28 days are skipped. Results come at 07:01 the next day and need `bonus.min_participants` (default 3). At most 2 rounds. The result is an extra line, "Closest in your group", and **never changes the locked twin**. No Keep to the bonus person. Answers are deleted after 28 days.
+
+### 0.5 Chat unlock (up to "Chat is ready", no messaging screen)
+
+Twin locked → Keep → Orbit formed → **any one of the Three Doors** → both tap "Start chatting?" → `chat_ready` (stored on the server).
+- **Door 1, Duo Trial:** both answer 8 two-option prompts within 24 hours. Pass = at least 5 of 8 the same; the pass mark drops by 1 after each fail, down to 3. Unlimited attempts, 10-minute cooldown, progress saved. **Scored on the server.**
+- **Door 2, Streak:** 3 days where both play the lane's Drop and each sends a sticker. A missed day pauses the count; it doesn't reset it.
+- **Door 3, Sync:** Sync score of at least 0.60 over 5 Telepathy rounds.
+- **Blockers:** the Orbit ended, a block or report, a flagged account, not 18+, the kill switch, guests. No countdown, no pressure copy, **no payment or lives of any kind**.
+
+### 0.6 Badges
+
+Collector (twins in 2, 3 or 5 lanes with S ≥ 0.6), All-Lanes, Super-twin badge. **Private by default, shared only by opt-in** through a flip card with your alias. "Earned by X%" appears only from real counts above a minimum group; otherwise the card says "Early badge". Never ranked, bought or shown in a public list.
+
+### 0.7 Later stages (not now)
+
+Chat messaging screen → party rooms and games (Room Twins, Odd One Wins, Rank Together, Who Picked It?, Pin the Pick, Hot Seat; twin games; solo games). Leaderboards only as room, Orbit or friend boards and "top X% today" bands, unless the founder changes the rule.
+
+### 0.8 Open founder decisions (defaults in force until answered)
+
+| # | Question | Default used |
+|---|---|---|
+| 1 | Age bands split the pool? | No: one pool per lane |
+| 2 | Oddness tiers | Percentile per lane, "Early" below minimum pool |
+| 3 | Erasure: delete answers too, or only the account? | Not decided: currently account soft-delete only |
+| 4 | Profile contents | Alias, region, age band, badges, no photo |
+
+### 0.9 Superseded statements
+
+- §4.2 "NO chat": amended. Chat may unlock inside a mutual Orbit (D7). Handle/contact exchange remains not planned.
+- F9 single streak: superseded by per-lane streaks plus overall days played (D4).
+- F24 "meme questions inside other Drops / themed Drops": superseded. Memes is its own lane (D3).
+- Rule L10 "new player goes straight into Everyday": superseded. The lane picker comes first (D1).
+
+---
 
 ## 1. What We Are Making
 

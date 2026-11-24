@@ -1,13 +1,13 @@
 # Living Project Memory — Oddly v1
 
-Project: Oddly v1 | Last updated: 2026-11-22 | Owner: Founder + AI agent
+Project: Oddly v1 | Last updated: 2026-11-25 | Owner: Founder + AI agent
 Purpose of this file: Persistent institutional memory across coding sessions: system snapshot, real-time status, architectural decisions, defect logs, learnings, environment parameters, and next actions.
 
 ---
 
 ## 1. Project Snapshot
 
-**Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
+**Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app prohibits profiles, leaderboards and fake data; the result itself is the product. Chat may only unlock inside a mutual Orbit (unlock flow only; see `product.md §0`). **Current product definition: `product.md §0` (2026-11-25).**
 
 - **Current Stage:** Stage B0: Lanes-First Build, From First Screen to Chat Unlock — COMPLETE & FULLY VERIFIED.
 - **Current Target:** Reviewer handoff with `docs/build-b0-report.md`, `docs/build-b0-progress.md`, and `docs/build-b0-inventory.json`. Tag: `stage-B0-complete`.
@@ -1913,3 +1913,28 @@ All 15 tasks in Phase 9 (Stage 9: Daily Pipeline & BullMQ Scheduler) are now com
 - Re-verified pipeline test suite: `pipeline.test.ts` (15/15 tests passing) and `submit-persist.test.ts` (6/6 tests passing).
 - Ran typechecks across monorepo packages (`@oddly/worker`, `@oddly/api`, `@oddly/web`): clean pass with zero errors (`tsc --noEmit`).
 - Phase 9 is now **100% COMPLETE (15/15 tasks done)**. Master progress dashboard updated to **254/410 completed tasks (62%)**.
+
+## 47. Code Deep Dive and Docs Reset (2026-11-25)
+
+### 47.1 Why
+The founder asked for the real state of the code against the product they want (the Oddly Walkthrough, 24 Nov 2026). Earlier B0 reports called every slice "Verified". A direct code read showed that much of it is library code the app does not call, or screens with invented values. Full report: `docs/audit/b0-deep-dive-2026-11-25.md`.
+
+### 47.2 Key facts learned (verify before relying on them; they describe commit `54a4b27`)
+- **Live twin formula is wrong.** Submit, final batch, anti-twin and mutual pairing all use `submissionSimilarity` (`packages/shared/src/scoring.ts`): an unweighted Dice average. Rank-3 reversed = 1.0, slider one step off = 0, no rarity weighting. The spec formula `computeWeightedPolymorphicSimilarity` (`formats.ts`) is never called.
+- **Twins never lock.** The final batch (`executeMatchFinal`) and `finalizeMatches` are never scheduled. The provisional-pairing cron runs with an empty list (`services/worker/src/index.ts:93`). `provisional.worker.ts` is not wired. A twin is picked once at submit, from players who submitted earlier.
+- **Keep is therefore unreachable** (it requires a locked twin), and so are Orbit, Telepathy, Sync by subject and chat unlock for real players.
+- **Result screen shows invented data**: `apps/web/src/app/page.tsx` hardcodes "Berlin, Germany", "25 to 34", 3,482 players and "Luminous Violet", and shows a full fake result on error.
+- **Chat unlock is UI only**: no API. `orbit/[id]/page.tsx` passes `syncScorePct={70}`, and Door 1 passes locally.
+- **Globe**: no k filter; with no data it returns hardcoded arcs labelled as a replay.
+- **Security**: blocks are not used by matching, Keep or Orbit. `/v1/results/:dropId?player_id=` exposes any player's result. Invalid cookie signatures are accepted. 18+ is stored only in the browser. Anti-twin thresholds can be set by the client.
+- **Correct:** lane picker first; per-lane Drops; Orbit re-request cooldown of 30 days is enforced in Keep; Telepathy baseline uses Σp².
+- **Tests:** web 132/132; shared 283 pass, 2 fail (mutual pairing at 500 players takes 8 s); ui-tokens 16/17 (hex in `Pick2Of6Card.tsx`). API and worker tests write to the dev database: run them only on a throwaway database.
+
+### 47.3 Docs changed
+- `product.md`: new §0 Product Definition (overrides older sections), plus at-a-glance bullets.
+- `rules.md`: Rules 27, 28 and 33 amended (D1, D4, D8). New Rules 36–41 (No Invented Data, One Matching Formula, Blocks Are Absolute, Server Decides, Age Band Display Only, "Done" Means Reachable).
+- `task.md`: new Phase 10V (Stage C0, 20 tasks). Dashboard 283/430 (66%), 39 phases.
+- `docs/build-b0-progress.md`: statuses rewritten with honest status words.
+
+### 47.4 Next action
+Start Stage C0 in order: P10V.01 (remove invented data), P10V.03/04 (security), P10V.07 (one formula), then P10V.10/11/13 (real daily cycle and honest result), then P10V.15 (chat unlock backend).
