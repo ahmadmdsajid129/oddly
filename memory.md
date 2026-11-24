@@ -9,14 +9,36 @@ Purpose of this file: Persistent institutional memory across coding sessions: sy
 
 **Oddly** (working title _Twin_) is a daily five-pick game web application designed to deliver a genuine moment of unexpected human connection in under 30 seconds. Every day at 07:00 IST, Oddly drops five instinct-driven questions (text, number, colour, image, word). Players answer with zero sign-up barrier. Immediately upon submission, Oddly matches the player with their **Twin** (the closest matching stranger in the world today) and calculates their **Oddness** (an information-theoretic rarity score based on real observed probability $p(a)$). The app strictly prohibits chat, profiles, leaderboards, and fake data—the result itself is the product.
 
-- **Current Stage:** Phase 10O: Memes Lane Launch (Stage L4 — COMPLETE).
-- **Current Target:** Stage L9: Bonus Rounds (Phase 10T) / Stage L5: Situations Lane (Phase 10P).
+- **Current Stage:** Stage B0: Lanes-First Build, From First Screen to Chat Unlock — COMPLETE & FULLY VERIFIED.
+- **Current Target:** Reviewer handoff with `docs/build-b0-report.md`, `docs/build-b0-progress.md`, and `docs/build-b0-inventory.json`. Tag: `stage-B0-complete`.
 
 ---
 
 ## 2. Current State
 
 - **What works now:**
+  - **Stage B0 (Lanes-First Build, From First Screen to Chat Unlock) is FULLY COMPLETE & VERIFIED:**
+    1. **Pre-flight & Foundation (Slice A0):** Applied migration `014_stage_b0_foundation.sql`, verified demo mode guardrails, synthetic isolation, and preflight checklist.
+    2. **Lanes Foundation & First Screen Lane Picker (Slice A1):** Implemented Decision D1 (18+ confirmation gate followed immediately by first-screen Lane Picker on `/`), "Continue in Last Lane" localStorage card, per-lane status badges ("Played today" vs "Play now").
+    3. **Polymorphic Question Formats (Slice A2):** Full schema and similarity math for `pick1`, `pick2of6`, `rank3`, `slider7`, and `scene` with 48 rich polymorphic seed questions.
+    4. **Twin Depth & Mutual Pairing (Slice A3):** Bounded tie groups within $\epsilon = 0.01$, lexicographic tie-breaking, greedy mutual pairing ($0$ below-tie-group violations), and "Why you two?" rarest shared answers.
+    5. **Memes Lane Launch (Slice A4):** Dedicated Memes lane (`slug = 'memes'`), 14-day runway (70 meme Qs), strict inflow isolation, and Satori meme cards.
+    6. **Result Hub, Streaks & History (Slice A5):** Per-lane Result Hub (`/result/[lane]/[date]`) with Decision D5 "Play Another Lane" CTA, dedicated Per-Lane Streaks dashboard (`/me/streaks`, Decision D4), and lane-filtered history archive.
+    7. **Safety Foundation (Slice A6):** Mutual block exclusion table (`blocks`), emergency ops tools (`pnpm ops:sever-orbit`, `pnpm ops:ban-player`), and immutable audit logging.
+    8. **Keep and Orbit (Slice A7):** Lane-tagged Keep creation and Orbit formation with `lane_id` persistence and lane badge stickers on Orbit rows.
+    9. **Telepathy & Sync Score (Slice A8):** Daily blind instinct prediction in active Orbits, empirical luck baseline $P_{\text{luck}}$, and normalized Sync score.
+    10. **Twin Globe (Slice A9):** Flat SVG world map (`/globe`) with $k$-anonymity aggregated connection arcs ($k \ge 5$) and time jitter.
+    11. **Anti-twin (Slice A10):** Bounded lowest-similarity opposite match, non-shaming playful framing, and Satori flip card (`/anti-twin`).
+    12. **Sync by Subject (Slice A11):** Mutual tag agreement statistics via `GET /v1/orbits/:id/subject-sync` ($k \ge 5$, Rule 19 Zero-Leak).
+    13. **Chat Unlock Engine (Slice A12):** Three Doors evaluation (Duo Trial v0, 3-day Co-Streak, 60% Sync), both-confirm state machine to terminal state `chat_ready`, with chat messaging UI strictly out of scope.
+    14. **Notifications, Event Dictionary & Signals (Slice A13):** Allowlisted telemetry schemas, strict property validation, and DPDP consent-gating (default OFF).
+    15. **200-Player Scenario & explain:twin CLI (Slice A14):** Synthetic 200-player seeder, scenario verification tests, and interactive `pnpm explain:twin` diagnostic CLI.
+    16. **Bonus Rounds Additive Tie-Breaker (Slice B1):** Stage L9 additive tie-breaker logic in `bonus-rounds.ts` with flag OFF by default.
+    17. **Super Twin (Slice B2):** Multi-lane alignment engine requiring $\ge 2$ shared lanes with mean similarity $\ge 0.80$.
+    18. **Collector Badges & Opt-In Sharing (Slice B3):** Non-evaluative milestone badges with cryptographic evidence hashing and opt-in sharing (`is_shared = false` by default).
+    19. **Oddly Deck Lite (Slice B4):** Card binder scaffolding behind feature flag `feature.oddly_deck = false` (OFF).
+    20. **Friend-Invite Orbit Lite (Slice B5):** Single-use 7-day friend invite code and group compare behind feature flag `feature.friend_orbit = false` (OFF).
+    21. **Hardening & Inventory (Slice Z):** `docs/build-b0-inventory.json` generated, `docs/build-b0-report.md` completed, bundle budget verified at 148.9 KB compressed (margin 1.1 KB below target 150 KB).
   - **Stage L4 (Memes Lane Launch — Phase 10O) is COMPLETE & VERIFIED:**
     1. **Meme Lab Inflow Curator & Ingestion Invariant (P10O.01 / Rule L1 / Section 8.1):**
        - Implemented `services/worker/src/jobs/meme-lane-curator.job.ts` and `assertMemesLaneTarget` in `@oddly/shared`: queries approved community memes from Meme Lab (`status === 'approved'`) with Wilson lower bound $\ge 0.65$ or $\ge 20$ raters.

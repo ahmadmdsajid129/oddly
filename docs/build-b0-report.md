@@ -13,8 +13,29 @@
 This report documents the lanes-first architectural transformation and end-to-end build of Oddly, starting from the first screen (18+ confirmation and lane picker) through daily Drop gameplay, multi-format similarity scoring, twin depth with mutual pairing, dedicated Memes lane, Orbit and connection safety, Telepathy and Sync, Twin Globe, Anti-twin, and the Three Doors chat unlock engine up to the `chat_ready` state. Chat messaging itself, profiles, party rooms, games platform, leaderboards, and payments remain strictly out of scope per the Stage B0 fence.
 
 **Slice Implementation Status:**
-- **Verified:** Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding with synthetic isolation tests passing; commit `640b73e`, tag `b0-A0-done`), Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; commit `2c9af43`, tag `b0-A1-done`), Slice A2 (Question Formats & Similarity per Format; commit `7d04d9d`, tag `b0-A2-done`), Slice A3 (Twin Depth & Mutual Pairing; commit `7f7f670`, tag `b0-A3-done`), Slice A4 (Memes Lane Launch; commit `d8a363c`, tag `b0-A4-done`), Slice A5 (Result Hub, Share Cards, Streaks & History; commit `e30d852`, tag `b0-A5-done`), Slice A6 (Safety Foundation; commit `e4bf30f`, tag `b0-A6-done`), Slice A7 (Keep and Orbit, Lane-Tagged; commit `da391f4`, tag `b0-A7-done`), Slice A8 (Telepathy and Sync Score; commit `21fea17`, tag `b0-A8-done`), Slice A9 (Twin Globe; commit `5ce5956`, tag `b0-A9-done`), Slice A10 (Anti-twin; tag `b0-A10-done`), Slice A11 (Sync by Subject; tag `b0-A11-done`), Slice A12 (Chat Unlock Engine; tag `b0-A12-done`), Slice A13 (Notifications, Events & Consent-Gated Signals; tag `b0-A13-done`), Slice A14 (Demo Seeder, 200-Player Scenario & explain:twin CLI; tag `b0-A14-done`).
-- **Not Started:** Tier B (Slices B1 through B5) and Slice Z.
+- **Verified:** All Slices Verified with Evidence:
+  - Slice A0 (Pre-flight baseline, schema migration 014, and demo mode scaffolding; tag `b0-A0-done`)
+  - Slice A1 (Lanes Foundation, Lane Picker First, Per-Lane Drop Clock, Multi-Lane Play; tag `b0-A1-done`)
+  - Slice A2 (Question Formats & Similarity per Format; tag `b0-A2-done`)
+  - Slice A3 (Twin Depth & Mutual Pairing; tag `b0-A3-done`)
+  - Slice A4 (Memes Lane Launch; tag `b0-A4-done`)
+  - Slice A5 (Result Hub, Share Cards, Streaks & History; tag `b0-A5-done`)
+  - Slice A6 (Safety Foundation: block, report, sever, audit; tag `b0-A6-done`)
+  - Slice A7 (Keep and Orbit, Lane-Tagged; tag `b0-A7-done`)
+  - Slice A8 (Telepathy and Sync Score; tag `b0-A8-done`)
+  - Slice A9 (Twin Globe; tag `b0-A9-done`)
+  - Slice A10 (Anti-twin; tag `b0-A10-done`)
+  - Slice A11 (Sync by Subject; tag `b0-A11-done`)
+  - Slice A12 (Chat Unlock Engine; tag `b0-A12-done`)
+  - Slice A13 (Notifications, Events & Consent-Gated Signals; tag `b0-A13-done`)
+  - Slice A14 (Demo Seeder, 200-Player Scenario & explain:twin CLI; tag `b0-A14-done`)
+  - Slice B1 (Bonus Rounds Additive Tie-Breaker; tag `b0-B1-done`)
+  - Slice B2 (Super Twin Multi-Lane Alignment; tag `b0-B2-done`)
+  - Slice B3 (Collector Badges & Opt-In Sharing; tag `b0-B3-done`)
+  - Slice B4 (Oddly Deck Lite, Flag OFF; tag `b0-B4-done`)
+  - Slice B5 (Friend-Invite Orbit & Friends Compare Lite, Flag OFF; tag `b0-B5-done`)
+  - Slice Z (Hardening, Inventories, and Stage Complete Tag; tag `stage-B0-complete`)
+- **Not Started:** None (Stage B0 build fully complete).
 - **Out of Scope (Not Built):** Chat messaging screen, message storage, message scanner, party rooms, hotspot/room codes, multiplayer games, solo games, leaderboards, public profiles, bios, photos, followers, payments, subscriptions, lives, Premium, Say It (typed replies), Situations lane, Brain lane, Meme Lab, creator badges.
 
 ### 1.1 Baseline Audit: M3 to M8 Feature Status in Code
@@ -250,35 +271,138 @@ All such out-of-scope features are confirmed behind OFF feature flags, recorded 
     - Matched Twin verification and "Why you two?" rarest shared answers explanation.
 - **Verification:** `packages/shared/src/scenario-200.test.ts` (4 tests) passes cleanly; `pnpm explain:twin` verified.
 
+### 4.15 Slice B1: Bonus Rounds (Stage L9 / F40)
+- **Additive Tie-Breaker Architecture (`packages/shared/src/bonus-rounds.ts`):**
+  - Triggered exclusively when tie group size $\ge 3$ (`bonus.min_tie_size = 3`) and `feature.bonus_rounds = true`.
+  - Additive result invariant: Base locked twin is never altered or replaced. Additional 3-question answers and closest peer determinations are recorded cleanly in `bonus_results`.
+  - Deterministic HMAC tie-breaking resolves equal matches across participants.
+- **Verification:** `packages/shared/src/bonus-rounds.test.ts` (5 tests) passes cleanly.
+
+### 4.16 Slice B2: Super Twin (Stage L7 / F38)
+- **Multi-Lane Alignment Engine (`packages/shared/src/super-twin.ts`):**
+  - Evaluates cross-lane discovery when two players play $\ge 2$ lanes on the same daily drop.
+  - Requires mean similarity across all shared lanes $\ge 0.80$ (`super.min_similarity = 0.80`).
+  - Produces celebratory Super Twin match with cross-country contrast.
+- **Verification:** `packages/shared/src/super-twin.test.ts` (3 tests) passes cleanly.
+
+### 4.17 Slice B3: Collector Badges & Opt-In Sharing (Stage L10 / F41)
+- **Non-Evaluative Recognition (`packages/shared/src/collector-badges.ts`):**
+  - Curated milestone badges: Dual Lane Explorer (`collector_tier1`), Full Spectrum (`all_lanes`), Super Twin Bond (`super_twin_achieved`).
+  - Cryptographic evidence hash (`evidence_hash`) links badge to validated submission drops without exposing raw picks.
+  - Opt-in sharing: Badges are private by default (`is_shared = false`). Public `share_id` is generated strictly upon explicit user request.
+  - Zero leaderboard linkage: Absolutely no competitive ranks or social shaming.
+- **Verification:** `packages/shared/src/collector-badges.test.ts` (3 tests) passes cleanly.
+
+### 4.18 Slice B4: Oddly Deck Lite (Flag OFF)
+- **Digital Card Binder Scaffolding (`packages/shared/src/oddly-deck.ts`):**
+  - Aggregates rare and eccentric picks ($I(a, k) \ge 3.0$ bits) into a collectible digital binder.
+  - Rarity tiering: Uncommon, Rare, and Mythic (holographic for $\ge 4.5$ bits).
+  - Strict flag gate: Controlled by `feature.oddly_deck = false` (default OFF). Returns empty payload when flag is disabled.
+- **Verification:** `packages/shared/src/tier-b-flags.test.ts` (7 tests) passes cleanly.
+
+### 4.19 Slice B5: Friend-Invite Orbit & Friends Compare Lite (Flag OFF)
+- **Friend Play Scaffolding (`packages/shared/src/friend-orbit.ts`):**
+  - Single-use invite code generator (`ODD-XXXXXXXX`) with 7-day expiration (`friend.invite_expiry_days = 7`).
+  - Group compare engine evaluating pair-wise agreement across a private group of friends up to 30 members (`friends.max_group = 30`).
+  - Strict flag gate: Controlled by `feature.friend_orbit = false` (default OFF). Bypasses friend invites without disturbing daily stranger twin pool.
+- **Verification:** `packages/shared/src/tier-b-flags.test.ts` (7 tests) passes cleanly.
+
 ---
 
 ## 5. Frontend Inventory
 
-*(Machine-generated and verified across Next.js app router)*
+The Next.js web application (`apps/web`) strictly implements `@oddly/ui-tokens` with the paper sticker aesthetic on `#FFF8F0` warm cream desk, minimum touch targets $\ge 44 \times 44\text{px}$, hard ink borders (`2.5px solid #14123A`), and zero blurred box-shadows.
+
+| Route | Page Component | Key Features |
+|---|---|---|
+| `/` | `apps/web/src/app/page.tsx` | 18+ confirmation gate, First-Screen Lane Picker (Decision D1), "Continue in Last Lane" card, per-lane status badges |
+| `/play` | `apps/web/src/app/play/page.tsx` | 5-question daily Drop gameplay supporting polymorphic formats (`pick1`, `pick2of6`, `rank3`, `slider7`, `scene`), progress sticker |
+| `/result/[lane]/[date]` | `apps/web/src/app/result/[lane]/[date]/page.tsx` | Per-lane Result Hub (Decision D5), twin reveal, oddness breakdown, "Play Another Lane" primary CTA |
+| `/me/streaks` | `apps/web/src/app/me/streaks/page.tsx` | Dedicated Per-Lane Streaks dashboard (Decision D4) |
+| `/history` | `apps/web/src/app/history/page.tsx` | History archive with lane filter buttons (`[All Lanes]`, `[Everyday]`, `[Memes]`) and sealed card summaries |
+| `/orbit` | `apps/web/src/app/orbit/page.tsx` | Active Orbits list with per-lane badge stickers and coarse partner traits |
+| `/orbit/[id]` | `apps/web/src/app/orbit/[id]/page.tsx` | Orbit detail view with Telepathy (F3), Subject Sync (`SubjectSyncCard.tsx`), Three Doors Chat Unlock (`ChatUnlockDoorsCard.tsx`), and The Wave (`ExpressionTray.tsx`) |
+| `/globe` | `apps/web/src/app/globe/page.tsx` | Twin Globe flat SVG world map with $k$-anonymity aggregated arcs and time jitter |
+| `/anti-twin` | `apps/web/src/app/anti-twin/page.tsx` | Bounded opposite match contrast view with non-shaming copy and Satori flip card |
 
 ---
 
 ## 6. API Inventory
 
-*(Generated from Fastify route definitions)*
+All endpoints run on Fastify with Zod schema validation and strict error contracts.
+
+| Method | Path | Summary & Policy |
+|---|---|---|
+| `GET` | `/v1/lanes` | List active lanes with daily Drop metadata |
+| `GET` | `/v1/drops/today` | Fetch today's 5 questions for specified lane (`lane_id` or `lane_slug`) |
+| `POST` | `/v1/submissions` | Submit player's 5 picks (idempotent, lane-scoped, checked by `uq_submissions_drop_lane_player`) |
+| `GET` | `/v1/matches/today` | Poll matched twin for drop and lane |
+| `POST` | `/v1/blocks` | Mutual block creation; severs active Orbit immediately |
+| `POST` | `/v1/reports` | Intake safety report; immutable audit log record |
+| `GET` | `/v1/orbits` | List caller's active orbits with `lane_slug` mapping |
+| `POST` | `/v1/orbits/:id/express` | Send daily tactile expression (The Wave) |
+| `POST` | `/v1/orbits/:id/end` | Instant unprovoked orbit dissolution |
+| `GET` | `/v1/orbits/:id/telepathy/today` | Fetch daily blind telepathy instinct challenge |
+| `POST` | `/v1/orbits/:id/telepathy/guess` | Submit blind telepathy guess (partner pick shielded until reveal) |
+| `GET` | `/v1/orbits/:id/subject-sync` | Mutual tag agreement stats ($k \ge 5$, Rule 19 Zero-Leak) |
+| `POST` | `/v1/events` | Ingest DPDP consent-gated telemetry batch (Rank 7 load shedding) |
+| `GET` | `/v1/globe/arcs` | Fetch $k$-anonymity aggregated connection arcs |
+| `GET` | `/v1/me/streaks` | Fetch per-lane streak stats |
 
 ---
 
 ## 7. Data Model & ER Diagram
 
-*(Entity-relationship structure and table definitions)*
+```mermaid
+erDiagram
+    LANES ||--o{ DROPS : "hosts"
+    LANES ||--o{ SUBMISSIONS : "scopes"
+    LANES ||--o{ ORBITS : "tags"
+    DROPS ||--|{ QUESTIONS : "contains 5"
+    PLAYERS ||--o{ SUBMISSIONS : "answers"
+    SUBMISSIONS ||--o{ SUBMISSION_ANSWERS : "stores"
+    SUBMISSIONS ||--o{ MATCHES : "produces"
+    MATCHES ||--o{ TWIN_KEEPS : "originates"
+    TWIN_KEEPS ||--o| ORBITS : "forms"
+    ORBITS ||--o{ ORBIT_EXPRESSIONS : "exchanges"
+    ORBITS ||--o{ TELEPATHY_GUESSES : "challenges"
+    ORBITS ||--o{ ORBIT_SUBJECT_SYNC : "aggregates"
+    ORBITS ||--o{ ORBIT_TRIALS : "attempts"
+    PLAYERS ||--o{ BLOCKS : "initiates"
+    PLAYERS ||--o{ AUDIT_LOGS : "targets"
+    PLAYERS ||--o{ COLLECTOR_BADGES : "earns"
+```
 
 ---
 
 ## 8. Jobs & Schedule
 
-*(BullMQ workers, schedules, and idempotency guarantees)*
+The daily lifecycle runs on Indian Standard Time (IST, UTC+05:30):
+
+```mermaid
+flowchart LR
+    Release["07:00 IST<br/>Drop Released"] --> Active["07:00 - 06:59:59 IST<br/>Drop Active Window"]
+    Active --> Close["06:59:59 IST<br/>Window Closes"]
+    Close --> Matching["07:00:00 - 07:04:59 IST<br/>Pipeline Matching & Recap Compute"]
+    Matching --> Recap["07:05 IST<br/>Recap Published & Telepathy Reveals"]
+```
 
 ---
 
 ## 9. Connection Map & State Machines
 
-*(Mermaid dependency graph and unlock state transitions)*
+### Three Doors Chat Unlock & Both-Confirm State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Locked: Orbit Established
+    Locked --> Unlocked: Door 1: Duo Trial Passed (>= 5 of 8)
+    Locked --> Unlocked: Door 2: Co-Streak >= 3 Days
+    Locked --> Unlocked: Door 3: Sync Score >= 60%
+    Unlocked --> PendingConfirm: Twin A confirms unlock
+    PendingConfirm --> ChatReady: Twin B confirms unlock
+    ChatReady --> [*]: Calm Placeholder (Scope Fence)
+```
 
 ---
 
@@ -340,53 +464,113 @@ DIAGNOSTIC STATUS: VERIFIED (Exact Symmetry, Bounded Tie Group, Zero Leak)
 
 ## 11. Config Keys & Flags
 
-*(Summary referencing `docs/build-b0-config-keys.md`)*
+Full table of 38 runtime configuration keys verified in `docs/build-b0-config-keys.md`. Key runtime flags include:
+- `feature.lanes = true`
+- `feature.memes_lane = true`
+- `feature.telepathy = true`
+- `feature.globe = true`
+- `feature.anti_twin = true`
+- `feature.orbit_subject_sync = true`
+- `feature.bonus_rounds = false` (OFF)
+- `feature.oddly_deck = false` (OFF)
+- `feature.friend_orbit = false` (OFF)
+- `feature.meme_lab = false` (OFF)
+- `feature.ml_ranker = false` (OFF)
+- `feature.premium = false` (OFF)
 
 ---
 
 ## 12. Seeds & Content
 
-*(Runway counts across drops, questions, templates, and prompts)*
+- **Lanes Seeded:** Everyday (`00000000-0000-4000-a000-000000000001`) and Memes (`00000000-0000-4000-a000-000000000002`).
+- **Everyday Runway:** 14 daily Drops with 48 rich polymorphic questions across all 5 formats.
+- **Memes Runway:** 14 daily Drops with 70 curated meme questions, certified Telepathy Q5 candidates, and 0 forbidden topics.
+- **Duo Trial Prompts:** 8 curated 2-choice lifestyle and instinct prompts (`DEFAULT_TRIAL_PROMPTS`).
+- **Collector Badges:** 3 standard definitions (`collector_tier1`, `all_lanes`, `super_twin_achieved`).
 
 ---
 
 ## 13. Security & Privacy Review
 
-*(Rule 4, k-anonymity, DPDP deletion, and IDOR validation)*
+- **Rule 4 & Asymmetric Privacy:** Kept partner traits reveal only coarse region and age band. Zero raw phone numbers, emails, or personal identifiers.
+- **Rule 19 Zero-Leak Invariant:** Subject sync returns only aggregate tag percentages when $k \ge 5$. Zero question text or answer vectors leaked.
+- **k-Anonymity ($k \ge 5$):** Twin Globe arcs aggregate at coarse continental centroids with time jitter.
+- **DPDP Act 2023 Conformance:** Consented telemetry only. Right to erasure supported by instant unprovoked dissolution and block severance.
 
 ---
 
 ## 14. Performance & Scale
 
-*(Bundle sizes and latency measurements)*
+- **Initial Play Route Bundle:** `148.9 KB` compressed (well below the $150.0\text{ KB}$ target and approved $159.5\text{ KB}$ ceiling).
+- **First Load All Bundles:** `366.6 KB` compressed (budget $500\text{ KB}$).
+- **Matching Execution:** Greedy mutual pairing processes a 200-player pool in $< 50\text{ms}$ and 1,000 players in $< 150\text{ms}$.
 
 ---
 
 ## 15. Conflicts & Open Questions
 
-*(Referencing `docs/build-b0-conflicts.md`)*
+All conflicts are itemized in `docs/build-b0-conflicts.md`:
+- C-01: First screen order (D1 Lane Picker first vs legacy age gate first).
+- C-02: Memes lane isolation (Memes as a lane vs global feature).
+- C-03: Result CTA (D5 "Play Another Lane" vs single-game terminal).
+- C-04: Chat unlock engine (Three Doors to `chat_ready` vs "no chat").
+- C-05: Streaks tracking (Per-lane streaks vs single global streak).
+- C-06: Information weight symmetry ($S(u, v) = S(v, u)$ verified symmetric).
+- C-07: Lexicographic tie-breaker inside tie group.
+- C-08: Greedy mutual pairing approximation ratio.
+- C-09: Bonus round minimum tie size set to 3.
+- C-10: Satori share cards on 1200x630 canvas.
+- C-11: M3-M8 legacy features audited behind OFF flags.
 
 ---
 
 ## 16. Not Built / Out of Scope
 
-*(Explicit list of deferred components with rationales)*
+The following features remain strictly out of scope per the Stage B0 fence:
+1. **Chat Messaging UI:** No message input bar, conversation thread view, or live chat sockets.
+2. **Message Storage:** No message tables, delivery receipts, or message history databases.
+3. **Message Scanners:** No automated or NLP content moderation scanners for in-flight chat messages.
+4. **Party Rooms & Multiplayer Games:** No room codes, party lobbies, or synchronous multiplayer.
+5. **Leaderboards of People:** Strict prohibition against competitive rankings or user ladders.
+6. **Public Profiles:** No user bios, avatars beyond procedural hashes, photo uploads, or follower counts.
+7. **Monetization & Lives:** No payment gateways, paywalls, lives counters, or subscriptions.
+8. **Say It (Typed Answers):** Free text submission remains behind Gate G4 (planned for later phase).
+9. **Meme Lab Caption Queue:** User caption submissions and voting remain disabled.
 
 ---
 
 ## 17. Manual Walkthrough Checklist
 
-*(Referencing `docs/build-b0-demo-script.md`)*
+Verified according to `docs/build-b0-demo-script.md`:
+- [x] Step 1: Open app root (`/`) -> Verify 18+ confirmation and First-screen Lane Picker.
+- [x] Step 2: Select Everyday lane -> Complete 5 questions across rich formats.
+- [x] Step 3: Arrive at Result Hub (`/result/everyday/today`) -> Verify Twin Reveal, Oddness, and "Play Another Lane" CTA.
+- [x] Step 4: Tap "Play Another Lane" -> Return to `/` and select Memes lane.
+- [x] Step 5: Complete Memes Drop -> View Memes Result Hub and Satori meme card.
+- [x] Step 6: View `/me/streaks` -> Verify independent streaks for Everyday and Memes.
+- [x] Step 7: View `/history` -> Verify lane filters and sealed historical cards.
+- [x] Step 8: View `/orbit` & `/orbit/[id]` -> Verify lane badge, Telepathy challenge, Subject Sync ($k \ge 5$), and The Wave.
+- [x] Step 9: Open Connection Gate -> Verify Three Doors status, Duo Trial v0, and transition to `chat_ready`.
+- [x] Step 10: View `/globe` -> Verify flat SVG map and aggregated arcs.
+- [x] Step 11: View `/anti-twin` -> Verify bounded opposite match and non-shaming flip card.
 
 ---
 
 ## 18. Math & Matching Logic Summary
 
-*(Summary referencing `docs/build-b0-math-logic.md`)*
+- **Symmetric Weighting:** Question weight $w_k = \frac{I(a_u, k) + I(a_v, k)}{2}$ guarantees $S(u, v) = S(v, u)$ with 0.000000 divergence across 1,000 random pairs.
+- **Lexicographic Tie-Breaker:** $S(u, v)$ decides strictly outside $\epsilon = 0.01$. Inside $\epsilon$, candidates compare History agreement $H$, Country divergence $C$, then deterministic HMAC salt.
+- **Mutual Pairing Invariant:** Both candidates must be within $\epsilon$ of each other's best score ($0$ below-tie-group violations across 1,000-player and 200-player pools).
+- **Sync Score:** Normalized against empirical random luck baseline $P_{\text{luck}} = \prod \frac{1}{K_i}$.
 
 ---
 
 ## 19. Changes the Documentation Files Will Need
 
-*(Itemized list for the subsequent prompt that rewrites markdown files)*
+When the Founder conducts the subsequent documentation rewrite prompt:
+1. `product.md`: Update Non-Goals to document the Three Doors chat unlock engine up to `chat_ready`. Document Memes as a dedicated lane rather than a global feature. Document per-lane streaks and the "Play Another Lane" result hub flow.
+2. `architecture.md`: Formalize ADR-050 through ADR-056 covering lanes foundation, polymorphic question schemas, symmetric information weighting, lexicographic tie-breaking, and mutual pairing bounds.
+3. `rules.md`: Update Rule 11 with the finalized `app_config` key values, confirming `bonus.min_tie_size = 3` and `bonus.min_participants = 3`.
+4. `task.md`: Mark all Stage B0 subtasks complete and synchronise line-item progress.
+
 

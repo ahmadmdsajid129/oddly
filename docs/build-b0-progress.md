@@ -17,9 +17,9 @@
 | A12 | Chat unlock engine (Three Doors, Duo Trial v0, both-confirm, chat_ready) | done | b0-A12-done | Three Doors evaluation, Duo Trial v0, both-confirm state machine to chat_ready |
 | A13 | Notifications for Orbit and unlock; events; consent-gated signals | done | b0-A13-done | Event dictionary, strict schema allowlist, and DPDP consent-gated signals |
 | A14 | Demo seeder, the 200-player scenario test, explain:twin tool | done | b0-A14-done | 200-player scenario seeder, tie-group invariant tests, and pnpm explain:twin CLI |
-| B1 | Bonus rounds | not started | - | Stage L9 additive closest-match tie-breaker |
-| B2 | Super twin | not started | - | Multi-lane twin match surface |
-| B3 | Collector badges and opt-in sharing | not started | - | Collector badges with evidence and opt-in flip cards |
-| B4 | Oddly Deck lite (flag off) | not started | - | Procedural unusual pick card binder |
-| B5 | Friend-invite Orbit and Friends Compare lite (flag off) | not started | - | Single-use invite code Orbit and group compare |
-| Z | Final report, inventories, hardening, tag stage-B0-complete | not started | - | Full report and inventory json |
+| B1 | Bonus rounds | done | b0-B1-done | Stage L9 additive closest-match tie-breaker; bonus_results; flag OFF |
+| B2 | Super twin | done | b0-B2-done | Multi-lane twin match surface; >= 2 lanes with mean similarity >= 0.80 |
+| B3 | Collector badges and opt-in sharing | done | b0-B3-done | Non-evaluative badges with tamper-evident evidence and opt-in sharing |
+| B4 | Oddly Deck lite (flag off) | done | b0-B4-done | Procedural unusual pick card binder; rare pick extraction; flag OFF |
+| B5 | Friend-invite Orbit and Friends Compare lite (flag off) | done | b0-B5-done | Single-use 7-day invite code and group compare up to 30 members; flag OFF |
+| Z | Final report, inventories, hardening, tag stage-B0-complete | done | stage-B0-complete | Full report, build-b0-inventory.json, budget passed, all tests verified |

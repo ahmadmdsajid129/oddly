@@ -1,0 +1,78 @@
+{
+  "stage": "B0",
+  "generated_at": "2026-11-24T14:31:00.000Z",
+  "branch": "stage-B0-build",
+  "bundle_budget": {
+    "target_kb": 150.0,
+    "ceiling_kb": 159.5,
+    "actual_initial_route_kb": 148.9,
+    "margin_kb": 1.1,
+    "status": "PASSED"
+  },
+  "slices": [
+    { "slice": "A0", "name": "Baseline pre-flight & demo mode scaffolding", "status": "Verified", "tag": "b0-A0-done", "tests": 10 },
+    { "slice": "A1", "name": "Lanes foundation & first-screen lane picker", "status": "Verified", "tag": "b0-A1-done", "tests": 125 },
+    { "slice": "A2", "name": "Question formats & polymorphic similarity", "status": "Verified", "tag": "b0-A2-done", "tests": 30 },
+    { "slice": "A3", "name": "Twin depth, tie groups & mutual pairing", "status": "Verified", "tag": "b0-A3-done", "tests": 22 },
+    { "slice": "A4", "name": "Memes lane launch & Satori meme cards", "status": "Verified", "tag": "b0-A4-done", "tests": 20 },
+    { "slice": "A5", "name": "Result hub, streaks & history archive", "status": "Verified", "tag": "b0-A5-done", "tests": 8 },
+    { "slice": "A6", "name": "Safety foundation (block, report, sever, audit)", "status": "Verified", "tag": "b0-A6-done", "tests": 5 },
+    { "slice": "A7", "name": "Keep and Orbit (lane-tagged)", "status": "Verified", "tag": "b0-A7-done", "tests": 11 },
+    { "slice": "A8", "name": "Telepathy & Sync score", "status": "Verified", "tag": "b0-A8-done", "tests": 19 },
+    { "slice": "A9", "name": "Twin Globe (k-anonymity arcs)", "status": "Verified", "tag": "b0-A9-done", "tests": 14 },
+    { "slice": "A10", "name": "Anti-twin bounded opposite match", "status": "Verified", "tag": "b0-A10-done", "tests": 8 },
+    { "slice": "A11", "name": "Sync by subject (statistics only, k>=5)", "status": "Verified", "tag": "b0-A11-done", "tests": 3 },
+    { "slice": "A12", "name": "Chat unlock engine (Three Doors to chat_ready)", "status": "Verified", "tag": "b0-A12-done", "tests": 10 },
+    { "slice": "A13", "name": "Notifications, Event Dictionary & DPDP Signals", "status": "Verified", "tag": "b0-A13-done", "tests": 6 },
+    { "slice": "A14", "name": "200-Player Scenario & explain:twin CLI", "status": "Verified", "tag": "b0-A14-done", "tests": 4 },
+    { "slice": "B1", "name": "Bonus rounds additive tie-breaker (flag OFF)", "status": "Verified", "tag": "b0-B1-done", "tests": 5 },
+    { "slice": "B2", "name": "Super twin multi-lane alignment", "status": "Verified", "tag": "b0-B2-done", "tests": 3 },
+    { "slice": "B3", "name": "Collector badges & opt-in sharing", "status": "Verified", "tag": "b0-B3-done", "tests": 3 },
+    { "slice": "B4", "name": "Oddly Deck lite (flag OFF)", "status": "Verified", "tag": "b0-B4-done", "tests": 3 },
+    { "slice": "B5", "name": "Friend-invite Orbit & Friends Compare lite (flag OFF)", "status": "Verified", "tag": "b0-B5-done", "tests": 4 },
+    { "slice": "Z", "name": "Final report, inventories, hardening", "status": "Verified", "tag": "stage-B0-complete", "tests": 305 }
+  ],
+  "frontend_routes": [
+    { "path": "/", "type": "page", "description": "18+ confirmation and First-screen Lane Picker" },
+    { "path": "/play", "type": "page", "description": "5-question Daily Drop gameplay flow" },
+    { "path": "/result/[lane]/[date]", "type": "page", "description": "Per-lane Result Hub with Twin Reveal, Oddness breakdown, and Play Another Lane CTA" },
+    { "path": "/me/streaks", "type": "page", "description": "Dedicated Per-Lane Streaks dashboard" },
+    { "path": "/history", "type": "page", "description": "History archive with lane filter tabs" },
+    { "path": "/orbit", "type": "page", "description": "Active Orbits list with lane badges and partner traits" },
+    { "path": "/orbit/[id]", "type": "page", "description": "Orbit detail view with Telepathy, Subject Sync, Three Doors Chat Unlock, and The Wave" },
+    { "path": "/globe", "type": "page", "description": "Twin Globe flat SVG map with k-anonymity connection arcs" },
+    { "path": "/anti-twin", "type": "page", "description": "Anti-twin playful contrast reveal and Satori flip card" }
+  ],
+  "api_endpoints": [
+    { "method": "GET", "path": "/v1/lanes", "summary": "List active lanes with daily drop metadata" },
+    { "method": "GET", "path": "/v1/drops/today", "summary": "Fetch today's drop for specified lane" },
+    { "method": "POST", "path": "/v1/submissions", "summary": "Submit player drop picks (idempotent, lane-scoped)" },
+    { "method": "GET", "path": "/v1/matches/today", "summary": "Poll matched twin for drop and lane" },
+    { "method": "POST", "path": "/v1/blocks", "summary": "Block a player and immediately sever mutual orbit" },
+    { "method": "POST", "path": "/v1/reports", "summary": "Report safety violation and record in audit log" },
+    { "method": "GET", "path": "/v1/orbits", "summary": "List caller's active orbits with lane tagging" },
+    { "method": "POST", "path": "/v1/orbits/:id/express", "summary": "Send daily non-verbal sticker expression (The Wave)" },
+    { "method": "POST", "path": "/v1/orbits/:id/end", "summary": "Instantly sever an orbit" },
+    { "method": "GET", "path": "/v1/orbits/:id/telepathy/today", "summary": "Fetch daily telepathy guess challenge" },
+    { "method": "POST", "path": "/v1/orbits/:id/telepathy/guess", "summary": "Submit blind telepathy guess" },
+    { "method": "GET", "path": "/v1/orbits/:id/subject-sync", "summary": "Fetch tag agreement rates with k>=5 threshold" },
+    { "method": "POST", "path": "/v1/events", "summary": "Ingest DPDP consent-gated telemetry batch (Rank 7)" },
+    { "method": "GET", "path": "/v1/globe/arcs", "summary": "Fetch k-anonymity aggregated connection arcs" },
+    { "method": "GET", "path": "/v1/me/streaks", "summary": "Fetch per-lane streak stats" }
+  ],
+  "data_models_count": 66,
+  "config_keys_count": 38,
+  "scope_fence": {
+    "strictly_out_of_scope": [
+      "Chat messaging UI",
+      "Message storage & tables",
+      "Message content scanners",
+      "Party rooms / multiplayer games",
+      "Leaderboards of people",
+      "Public profiles / bios / photos / followers",
+      "Payments / subscriptions / lives / Premium",
+      "Say It (typed answers behind Gate G4)",
+      "Meme Lab captioning queue"
+    ]
+  }
+}

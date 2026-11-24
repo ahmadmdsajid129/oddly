@@ -1,0 +1,318 @@
+{
+  "summary": {
+    "generatedAt": "2026-11-24T09:04:20.167Z",
+    "playerCount": 200,
+    "mutualPairsCount": 85,
+    "matchedPlayersCount": 170,
+    "unmatchedCount": 30,
+    "samplePair": {
+      "u": "player-001",
+      "v": "player-085",
+      "weight": 1
+    }
+  },
+  "players": [
+    {
+      "id": "player-001",
+      "alias": "Twin#1",
+      "country": "AU",
+      "historySignature": "c1c42ec4f3be3f0d",
+      "answers": {
+        "q-1": "chai",
+        "q-2": [
+          "plant",
+          "desk_pad"
+        ],
+        "q-3": [
+          "packed_itinerary",
+          "relax_by_water",
+          "spontaneous_wander"
+        ],
+        "q-4": 5,
+        "q-5": "browse_art_table"
+      }
+    },
+    {
+      "id": "player-002",
+      "alias": "Twin#2",
+      "country": "CA",
+      "historySignature": "59239a22fa60139a",
+      "answers": {
+        "q-1": "chai",
+        "q-2": [
+          "notebook",
+          "fountain_pen"
+        ],
+        "q-3": [
+          "packed_itinerary",
+          "spontaneous_wander",
+          "relax_by_water"
+        ],
+        "q-4": 2,
+        "q-5": "chat_barista"
+      }
+    },
+    {
+      "id": "player-003",
+      "alias": "Twin#3",
+      "country": "GB",
+      "historySignature": "ed2daa693ebbec80",
+      "answers": {
+        "q-1": "espresso",
+        "q-2": [
+          "plant",
+          "desk_pad"
+        ],
+        "q-3": [
+          "spontaneous_wander",
+          "packed_itinerary",
+          "relax_by_water"
+        ],
+        "q-4": 6,
+        "q-5": "people_watch_window"
+      }
+    },
+    {
+      "id": "player-004",
+      "alias": "Twin#4",
+      "country": "SG",
+      "historySignature": "7af98a3c24a7de8d",
+      "answers": {
+        "q-1": "espresso",
+        "q-2": [
+          "notebook",
+          "fountain_pen"
+        ],
+        "q-3": [
+          "spontaneous_wander",
+          "relax_by_water",
+          "packed_itinerary"
+        ],
+        "q-4": 3,
+        "q-5": "corner_armchair"
+      }
+    },
+    {
+      "id": "player-005",
+      "alias": "Twin#5",
+      "country": "JP",
+      "historySignature": "92b348fd645ddebe",
+      "answers": {
+        "q-1": "latte",
+        "q-2": [
+          "plant",
+          "desk_pad"
+        ],
+        "q-3": [
+          "relax_by_water",
+          "spontaneous_wander",
+          "packed_itinerary"
+        ],
+        "q-4": 7,
+        "q-5": "browse_art_table"
+      }
+    },
+    {
+      "id": "player-006",
+      "alias": "Twin#6",
+      "country": "DE",
+      "historySignature": "c1f7b35a63538e61",
+      "answers": {
+        "q-1": "latte",
+        "q-2": [
+          "notebook",
+          "fountain_pen"
+        ],
+        "q-3": [
+          "relax_by_water",
+          "packed_itinerary",
+          "spontaneous_wander"
+        ],
+        "q-4": 4,
+        "q-5": "chat_barista"
+      }
+    },
+    {
+      "id": "player-007",
+      "alias": "Twin#7",
+      "country": "NL",
+      "historySignature": "15a8650a4df5a85b",
+      "answers": {
+        "q-1": "cold_brew",
+        "q-2": [
+          "plant",
+          "desk_pad"
+        ],
+        "q-3": [
+          "packed_itinerary",
+          "relax_by_water",
+          "spontaneous_wander"
+        ],
+        "q-4": 1,
+        "q-5": "people_watch_window"
+      }
+    },
+    {
+      "id": "player-008",
+      "alias": "Twin#8",
+      "country": "FR",
+      "historySignature": "f7c889ac6fff5a6c",
+      "answers": {
+        "q-1": "chai",
+        "q-2": [
+          "notebook",
+          "fountain_pen"
+        ],
+        "q-3": [
+          "packed_itinerary",
+          "spontaneous_wander",
+          "relax_by_water"
+        ],
+        "q-4": 5,
+        "q-5": "corner_armchair"
+      }
+    },
+    {
+      "id": "player-009",
+      "alias": "Twin#9",
+      "country": "US",
+      "historySignature": "e2f7a490d530eceb",
+      "answers": {
+        "q-1": "chai",
+        "q-2": [
+          "plant",
+          "desk_pad"
+        ],
+        "q-3": [
+          "spontaneous_wander",
+          "packed_itinerary",
+          "relax_by_water"
+        ],
+        "q-4": 2,
+        "q-5": "browse_art_table"
+      }
+    },
+    {
+      "id": "player-010",
+      "alias": "Twin#10",
+      "country": "IN",
+      "historySignature": "a8ea2b9ada78e52e",
+      "answers": {
+        "q-1": "chai",
+        "q-2": [
+          "notebook",
+          "fountain_pen"
+        ],
+        "q-3": [
+          "spontaneous_wander",
+          "relax_by_water",
+          "packed_itinerary"
+        ],
+        "q-4": 6,
+        "q-5": "chat_barista"
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "u": "player-001",
+      "v": "player-085",
+      "weight": 1
+    },
+    {
+      "u": "player-002",
+      "v": "player-086",
+      "weight": 1
+    },
+    {
+      "u": "player-004",
+      "v": "player-088",
+      "weight": 1
+    },
+    {
+      "u": "player-006",
+      "v": "player-090",
+      "weight": 1
+    },
+    {
+      "u": "player-009",
+      "v": "player-093",
+      "weight": 1
+    },
+    {
+      "u": "player-010",
+      "v": "player-094",
+      "weight": 1
+    },
+    {
+      "u": "player-011",
+      "v": "player-095",
+      "weight": 1
+    },
+    {
+      "u": "player-012",
+      "v": "player-096",
+      "weight": 1
+    },
+    {
+      "u": "player-014",
+      "v": "player-098",
+      "weight": 1
+    },
+    {
+      "u": "player-015",
+      "v": "player-099",
+      "weight": 1
+    },
+    {
+      "u": "player-016",
+      "v": "player-100",
+      "weight": 1
+    },
+    {
+      "u": "player-017",
+      "v": "player-101",
+      "weight": 1
+    },
+    {
+      "u": "player-018",
+      "v": "player-102",
+      "weight": 1
+    },
+    {
+      "u": "player-019",
+      "v": "player-103",
+      "weight": 1
+    },
+    {
+      "u": "player-020",
+      "v": "player-104",
+      "weight": 1
+    },
+    {
+      "u": "player-021",
+      "v": "player-105",
+      "weight": 1
+    },
+    {
+      "u": "player-023",
+      "v": "player-107",
+      "weight": 1
+    },
+    {
+      "u": "player-024",
+      "v": "player-108",
+      "weight": 1
+    },
+    {
+      "u": "player-025",
+      "v": "player-109",
+      "weight": 1
+    },
+    {
+      "u": "player-027",
+      "v": "player-111",
+      "weight": 1
+    }
+  ]
+}
