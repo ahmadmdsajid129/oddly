@@ -14,14 +14,14 @@
 | ------------------------------- | -------------------------------------------------------------------------------- |
 | **Overall Project Progress**    | `🟩🟩🟩🟩🟩⬜⬜⬜⬜⬜ 54%`                                                       |
 | **Current Active Stage**        | **Phase 10V: Stage C0, Make the Core Real (from 2026-11-25 deep dive)**          |
-| **Total Tasks Tracked**         | 434 tasks across 39 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 235 tasks (49 reopened on 2026-11-25 after app audit against running reality)    |
+| **Total Tasks Tracked**         | 435 tasks across 39 phases                                                       |
+| **Completed Tasks (`DONE`)**    | 235 tasks (49 reopened on 2026-11-25 after checking the code and the running app)|
 | **In Progress (`IN PROGRESS`)** | 49 tasks                                                                         |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 199 tasks not done (150 TODO + 49 IN PROGRESS)                                   |
+| **Pending (`TODO`)**            | 200 tasks not done (151 TODO + 49 IN PROGRESS)                                   |
 
 > [!WARNING]
-> **Deep dive 2026-11-25:** several phases marked COMPLETE (10L–10O, 10B–10E and the B0 slices) have code that the running app doesn't call, or screens that show invented values. Those gaps are tracked as new tasks in **Phase 10V (Stage C0)** instead of reopening old rows. See `docs/audit/b0-deep-dive-2026-11-25.md`.
+> **Deep dive 2026-11-25:** several phases marked COMPLETE (10L–10O, 10B–10E and the B0 slices) have code that the running app doesn't call, or screens that show invented values. 49 such tasks were reopened as IN PROGRESS with a reason in Notes, and the fixes are tracked in **Phase 10V (Stage C0)**. See `docs/audit/b0-deep-dive-2026-11-25.md`.
 
 
 <!-- visual:start dashboard-visuals -->
@@ -83,7 +83,7 @@
 | **Phase 10S**| Brain Lane (Documented Only)                | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 1              | Stage L8              |
 | **Phase 10T**| Bonus Rounds (Stage L9)                     | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L9              |
 | **Phase 10U**| Badges (Stage L10)                           | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 6              | Stage L10             |
-| **Phase 10V**| Make the Core Real (Stage C0)                | Critical | 🟡 PARTIAL   | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 4%` | 1 / 24             | Stage C0 (next)       |
+| **Phase 10V**| Make the Core Real (Stage C0)                | Critical | 🟡 PARTIAL   | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 4%` | 1 / 25             | Stage C0 (next)       |
 | **Phase 11** | Admin Panel ("Mission Control")             | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 50             | Stage 11 (Addenda A+B+C)|
 | **Phase 12** | Observability, Telemetry & Security         | High     | 🟡 PARTIAL  | `🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜ 9%` | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 12             | Stage 13              |
@@ -307,14 +307,6 @@ _Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Header Fla
 | `[x] P8.10` | Write automated test suite verifying streak calculations, history pagination, and erasure   | 🟠 High      | ✅ DONE         | P8.01-P8.09 | Agent | 2026-11-09  | Settings & history test suite   |
 | `[x] P8.11` | Route history archive and world stats queries to database read replicas                     | 🟠 High      | ✅ DONE         | P8.03       | Agent | 2026-11-22  | Read replica routing (Sec 8.1)  |
 | `[x] P8.12` | Implement 90-day answer data retention compaction and cold archive worker job               | 🟠 High      | ✅ DONE         | P2.01       | Agent | 2026-11-11  | RetentionWorker automated partition drop older than retention_days (R2.1) |
-| `[x] P8.05` | Build S14 Settings Screen with theme selector, audio/haptic toggles, and notification prefs | 🟠 High      | ✅ DONE         | P1.16, P1.18| Agent | 2026-11-09  | User preferences view           |
-| `[x] P8.06` | Implement one-click JSON data export generating downloadable archive under DPDP Act         | 🟠 High      | ✅ DONE         | P7.07       | Agent | 2026-11-09  | Data portability feature        |
-| `[x] P8.07` | Implement complete account erasure workflow purging personal data within 7-day grace period | 🔴 Critical  | ✅ DONE         | P7.07       | Agent | 2026-11-09  | DPDP Right to Erasure execution |
-| `[x] P8.08` | Build report submission bottom sheet (`POST /v1/reports`) with 140-character note limit     | 🟠 High      | ✅ DONE         | P1.05, P3.01| Agent | 2026-11-09  | User content moderation intake  |
-| `[x] P8.09` | Implement regional privacy toggle allowing players to conceal coarse geographical region    | 🟠 High      | ✅ DONE         | P2.09       | Agent | 2026-11-09  | Granular privacy control        |
-| `[x] P8.10` | Write automated test suite verifying streak calculations, history pagination, and erasure   | 🟠 High      | ✅ DONE         | P8.01-P8.09 | Agent | 2026-11-09  | Settings & history test suite   |
-| `[x] P8.11` | Route history archive and world stats queries to database read replicas                     | 🟠 High      | ✅ DONE         | P8.03       | Agent | 2026-11-22  | Read replica routing (Sec 8.1)  |
-| `[x] P8.12` | Implement 90-day answer data retention compaction and cold archive worker job               | 🟠 High      | ✅ DONE         | P2.01       | Agent | 2026-11-11  | RetentionWorker automated partition drop older than retention_days (R2.1) |
 
 ---
 
@@ -425,9 +417,9 @@ _Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Asynchrono
 | ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date  | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ---------------------------------------- |
 | `[x] P10D.01` | Expand migration: `anti_twin_results` table with 7-day rolling retention                                    | 🟠 High      | ✅ DONE         | P2.01        | Agent | 2026-11-15 | Lightweight relational cache             |
-| `[~] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | 🔴 Critical  | 🟡 IN PROGRESS | P9.01, P10D.01 | Agent | —          | Reopened 2026-11-25: ComputeAntiTwinJob not scheduled by any daily job (P10V.06) |
+| `[~] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | 🔴 Critical  | 🟡 IN PROGRESS | P9.01, P10D.01 | Agent | —          | Reopened 2026-11-25: no ComputeAntiTwinJob exists; anti-twin is computed per request in routes/antitwin.ts with the unweighted formula and client-set min_pool (P10V.06, P10V.07) |
 | `[~] P10D.03` | Implement endpoint `GET /v1/results/:dropId/anti-twin` and low-pool (< 200 players) graceful hide logic     | 🟠 High      | 🟡 IN PROGRESS | P10D.02      | Agent | —          | Reopened 2026-11-25: client can bypass min_pool privacy floor via query param (antitwin.ts:62) (P10V.06) |
-| `[~] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | 🟠 High      | 🟡 IN PROGRESS | P10D.03, P1.01 | Agent | —          | Reopened 2026-11-25: recap screen not reached because recap job is not scheduled (P10V.12) |
+| `[~] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | 🟠 High      | 🟡 IN PROGRESS | P10D.03, P1.01 | Agent | —          | Reopened 2026-11-25: card is on /anti-twin (reachable) but shows data from the flawed anti-twin route (P10V.06, P10V.07) |
 | `[x] P10D.05` | Build Anti-twin Satori share card PNG exports (`renderAntiTwinCardPng`) matching token constants            | 🟠 High      | ✅ DONE         | P6.01, P10D.04 | Agent | 2026-11-15 | Flip card anatomy with coral face        |
 | `[x] P10D.06` | Build Orbit milestone & anniversary Satori share card PNG exports (`renderOrbitCardPng`)                    | 🟠 High      | ✅ DONE         | P6.01, P10B.05 | Agent | 2026-11-15 | Day 14 and Day 30 commemorative cards    |
 | `[x] P10D.07` | Run automated axe-core accessibility suite across all new screens (Globe, Orbit, Telepathy, Anti-twin)      | 🟠 High      | ✅ DONE         | P10B.07, P10D.04| Agent | 2026-11-15 | WCAG 2.1 AA compliance; $\ge 44\text{px}$|
@@ -744,6 +736,7 @@ _Status: TODO | Target: a real player can go from the lane picker to a locked, c
 | `[ ] P10V.22` | Lane cards show real names and descriptions (resolve `lane.*.name` / `lane.*.desc` keys); `/v1/lanes` and `/v1/lanes/:id` agree on lane status | 🟠 High | ⚪ TODO | — | Agent | — | Seen in browser 2026-11-25 |
 | `[ ] P10V.23` | Fix the Memes Drop endpoint 500 (Redis key-prefix rule vs `lane:` keys) and keep Memes Drops seeded for current dates | 🔴 Critical | ⚪ TODO | — | Agent | — | Seen in browser 2026-11-25 |
 | `[x] P10V.24` | API client: wrap global `fetch` so browser calls don't throw "Illegal invocation" (every web API call failed before this) | 🔴 Critical | ✅ DONE | — | Agent | 2026-11-25 | Fixed and checked in browser |
+| `[ ] P10V.25` | Remove or switch off everything that is documented only, so a player can't reach it: Meme Lab pages (`/memes/new`, `/featured`), the Meme corner card on `/recap`, player `/v1/memes/*` routes, creator badges in `/v1/badges/mine`; delete the unused dark-mode `ThemeProvider` | 🟠 High | ⚪ TODO | — | Agent | — | product.md §0.3 and §0.6; superseded P1.16, P10E, P10I.04, P10I.06 |
 
 ---
 
@@ -1239,6 +1232,7 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-25` | Phase 8, 10D, 10V | Review of the task audit: removed 8 duplicated Phase 8 rows (P8.05–P8.12), corrected wrong file paths in reopen notes, corrected P10D.02 and P10D.04 reasons, and added P10V.25 (remove or switch off documented-only features still reachable in the app). Dashboard 235/435 (54%). | Founder review of task-audit-report.md. |
 | `2026-11-25` | Comprehensive App Audit | Reopened 37 tasks across Phases 3, 4, 5, 6, 7, 8, 9, 10A, 10B, 10C, 10D, 10I whose code is not wired, not scheduled, or shows fake data. Documented superseded items in P1.16, Phase 10E (D3), and Phase 10I (D3, D8). Dashboard updated to 235 DONE, 49 IN PROGRESS, 199 pending (54%). | Founder request: Part A task audit against running reality. |
 | `2026-11-25` | Phases 10L–10O, 10V | Browser check of the running app: the lane picker never loaded (api-client fetch bug, fixed as P10V.24), every lane showed the same built-in fallback questions, and the Memes Drop endpoint returned 500. Reopened 12 tasks in 10L–10O as IN PROGRESS with reasons, and added P10V.21–P10V.24. Dashboard 272/434 (63%). | Founder request: make the table match the real app. |
 | `2026-11-25` | Phase 10V (Stage C0) | Code deep dive found the live twin uses an unweighted formula, the result screen shows invented values, no job locks twins (so Keep, Orbit and chat unlock are unreachable), and blocks are not applied to matching. Added Phase 10V with 20 tasks. Dashboard updated to 283/430 (66%) across 39 phases. | Founder request: deep dive and docs reset. |

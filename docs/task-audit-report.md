@@ -26,7 +26,7 @@ A total of **37 additional tasks** (in addition to the 12 previously reopened in
 |---|---|---|---|---|
 | `P3.07` | Phase 3 | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/results.ts:36`: Query param `?player_id=` accepts arbitrary IDs; `matches.repo.ts:61` uses unordered `findFirst`; production scores with unweighted Dice. |
 | `P4.01` | Phase 4 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/page.tsx:215-233`: Direct landing screen flow superseded by Lane Picker first (Decision D1); requires cleanup and honest resting states (P10V.21). |
-| `P4.03` | Phase 4 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/drop/Countdown.tsx`: Countdown screen lacks per-lane resting and drop window awareness (P10V.21). |
+| `P4.03` | Phase 4 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/ui/Countdown.tsx`: Countdown screen lacks per-lane resting and drop window awareness (P10V.21). |
 | `P4.04` | Phase 4 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/page.tsx:102-140`: Home page serves hardcoded `FALLBACK_QUESTIONS` across all lanes when API fails or during initial paint instead of lane-specific drops (P10V.21). |
 | `P4.08` | Phase 4 | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/submissions.ts:405-445`: Submission route accepts answers without server-side 18+ check and matches using unweighted Dice (P10V.05, P10V.07). |
 | `P5.02` | Phase 5 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/page.tsx:314-318, 519-523`: Result state hardcodes twin location "Berlin, Germany", age "25 to 34", and 3,482 players (Rule 36 violation, P10V.01). |
@@ -34,31 +34,31 @@ A total of **37 additional tasks** (in addition to the 12 previously reopened in
 | `P5.06` | Phase 5 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/page.tsx:323-327, 528-532`: Hardcodes rarest pick "Luminous Violet" at 3.1% (Rule 36 violation, P10V.01). |
 | `P5.07` | Phase 5 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/page.tsx:317, 522`: Low-density (<200) messaging is completely unreachable because `total_players_today: 3482` is hardcoded (P10V.01, P10V.13). |
 | `P6.02` | Phase 6 | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/workers/pairing.worker.ts:60`: Emits exact city ("Stranger in Berlin, Germany") into card payload, violating coarse-region privacy (P10V.19). |
-| `P7.03` | Phase 7 | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/lib/identity.ts:102`: Accepts unsigned or invalid cookies, allowing impersonation of other player IDs (P10V.03). |
+| `P7.03` | Phase 7 | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/identity.ts:102`: Accepts unsigned or invalid cookies, allowing impersonation of other player IDs (P10V.03). |
 | `P8.02` | Phase 8 | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/me.ts:140-155`: `calculateStreak` computes single global streak; per-lane streaks missing and `longest` is computed incorrectly from Set size (P10V.16). |
 | `P8.04` | Phase 8 | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/history/page.tsx`: Shows provisional or missing twin because no cron job locks twins at 07:00 IST (P10V.11). |
 | `P9.04` | Phase 9 | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/index.ts:93`: Scheduled `provisional-pairing` worker calls `runPairingSweep(job.data?.dropId, [])` with an empty array `[]` (P10V.10). |
 | `P9.06` | Phase 9 | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/scheduler.ts:60-80`: `matchFinal` job is not in `getScheduledJobs()`, so final batch never runs and twins never lock (P10V.11). |
 | `P9.07` | Phase 9 | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/scheduler.ts`: Recap job is not scheduled; locked twin recap screen is unreachable for a real player (P10V.12). |
-| `P9.10` | Phase 9 | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/pipeline.worker.ts`: Streak progression is tied to final match batch, which is not scheduled in the daily clock (P10V.11, P10V.16). |
+| `P9.10` | Phase 9 | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/workers/pipeline.worker.ts`: Streak progression is tied to final match batch, which is not scheduled in the daily clock (P10V.11, P10V.16). |
 | `P10A.04` | Phase 10A | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/keeps.ts`: Keep route requires an existing locked twin; because twins never lock, players always receive "cannot keep until 07:05" (P10V.11). |
 | `P10A.05` | Phase 10A | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/orbits.ts`: Orbit state machine is unreachable for real players because Keep requests cannot be created (P10V.11). |
 | `P10A.06` | Phase 10A | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/scheduler.ts`: Co-streak computation is omitted from scheduled daily clock jobs (P10V.11). |
-| `P10B.01` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/twin/FlipCard.tsx`: "Keep this twin" button is disabled/unreachable because twins never reach final locked status (P10V.11). |
+| `P10B.01` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/share/FlipCard.tsx`: "Keep this twin" button is disabled/unreachable because twins never reach final locked status (P10V.11). |
 | `P10B.03` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/app/orbit/[id]/page.tsx`: Orbit detail view is unreachable for real players because Keeps cannot complete (P10V.11). |
-| `P10B.04` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/orbit/ExpressionPicker.tsx`: Unreachable for real players until Orbit relationships can form (P10V.11). |
-| `P10B.05` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/orbit/MilestoneTrack.tsx`: Unreachable for real players until Orbit relationships can form (P10V.11). |
+| `P10B.04` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/orbit/ExpressionTray.tsx`: Unreachable for real players until Orbit relationships can form (P10V.11). |
+| `P10B.05` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/orbit/StagedUnlocks.tsx`: Unreachable for real players until Orbit relationships can form (P10V.11). |
 | `P10B.06` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/workers/globe.worker.ts:51`: Worker is not scheduled in `scheduler.ts` and aggregator has no $k$-anonymity filter (P10V.17). |
 | `P10B.07` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/globe.ts`: When empty, route returns hardcoded fake arcs with counts 38, 24, 19, 15 (Rule 36 violation, P10V.01, P10V.17). |
 | `P10B.08` | Phase 10B | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/globe.ts`: Live/Replay fallback loop serves hardcoded invented replay arcs (P10V.01, P10V.17). |
 | `P10C.04` | Phase 10C | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/telepathy.ts`: Telepathy API endpoints require an active Orbit, which real players cannot reach (P10V.11). |
 | `P10C.05` | Phase 10C | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/telepathy.ts`: Telepathy lock-in and partner pick reveal unreachable until Orbit can form (P10V.11). |
 | `P10C.06` | Phase 10C | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/scheduler.ts`: Closure worker does not schedule random luck baseline computation (P10V.11). |
-| `P10C.07` | Phase 10C | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/telepathy/TelepathyGame.tsx`: UI is inside `/orbit/:id`, which cannot be reached by real players (P10V.11). |
+| `P10C.07` | Phase 10C | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/orbit/TelepathyGameCard.tsx`: UI is inside `/orbit/:id`, which cannot be reached by real players (P10V.11). |
 | `P10C.08` | Phase 10C | `✅ DONE` | `🟡 IN PROGRESS` | `packages/shared/src/telepathy.ts`: Composite Sync summary unreachable until 5 Telepathy rounds are played in an Orbit (P10V.11). |
-| `P10D.02` | Phase 10D | `✅ DONE` | `🟡 IN PROGRESS` | `services/worker/src/workers/antitwin.worker.ts`: `ComputeAntiTwinJob` is not scheduled by any daily worker job (P10V.06). |
+| `P10D.02` | Phase 10D | `✅ DONE` | `🟡 IN PROGRESS` | No `ComputeAntiTwinJob` exists. The anti-twin is computed on each request by `services/api/src/routes/antitwin.ts` with the unweighted formula and client-settable thresholds (P10V.06, P10V.07). |
 | `P10D.03` | Phase 10D | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/antitwin.ts:62`: Query parameter `?min_pool=` allows client to override and bypass the 200-player privacy floor (P10V.06). |
-| `P10D.04` | Phase 10D | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/twin/AntiTwinCard.tsx`: Mounted on recap screen, which real players cannot reach because recap job is not scheduled (P10V.12). |
+| `P10D.04` | Phase 10D | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/results/AntiTwinCard.tsx` is mounted on `/anti-twin` (`apps/web/src/app/anti-twin/page.tsx`). The page is reachable, but its data comes from the flawed route above (P10V.06, P10V.07). |
 | `P10I.01` | Phase 10I | `✅ DONE` | `🟡 IN PROGRESS` | `services/api/src/routes/orbits.ts`: Subject Sync route `/v1/orbits/:id/subject-sync` is unreachable until Orbit can form (P10V.11). |
 | `P10I.02` | Phase 10I | `✅ DONE` | `🟡 IN PROGRESS` | `apps/web/src/components/orbit/SubjectSyncCard.tsx`: Subject Sync UI inside Orbit view is unreachable until Orbit can form (P10V.11). |
 
@@ -170,3 +170,14 @@ All reopened work is mapped to existing, actionable tasks in Phase 10V (Stage C0
 | **Phase 16** | Scale Readiness Gate (T1, T2, T3) | ⚪ TODO | 0 / 5 | 0% |
 
 All validation invariants enforced by `scripts/docs-visuals/build.mjs` have passed cleanly.
+
+---
+
+## 6. Review Corrections (2026-11-25, after founder review)
+
+- **File paths:** 10 of the 26 file paths first cited in this report didn't exist (for example `components/twin/FlipCard.tsx` and `services/api/src/lib/identity.ts`). They have been replaced with the real files, and every path in this report now exists.
+- **Anti-twin rows (P10D.02, P10D.04):** there is no `ComputeAntiTwinJob`. The anti-twin is computed per request in `services/api/src/routes/antitwin.ts`, and the card lives on `/anti-twin`, not on the recap screen. Both rows stay IN PROGRESS for the correct reason (P10V.06, P10V.07).
+- **Duplicate rows:** Phase 8 rows P8.05–P8.12 had been pasted twice into `task.md`. The copies were identical and have been removed. Counts were unaffected.
+- **Old features still reachable:** marking features "superseded" didn't remove them. Added **P10V.25**: remove or switch off documented-only features a player can still reach (Meme Lab `/memes/new`, `/featured`, the Meme corner on `/recap`, player `/v1/memes/*` routes, creator badges in `/v1/badges/mine`, the unused dark-mode `ThemeProvider`).
+- **Browser checks:** this report describes no browser observations. The reopen reasons come from reading the code.
+- **Dashboard after corrections:** 235 / 435 done (54%), 49 IN PROGRESS, 151 TODO. Phase 10V: 1 / 25.
