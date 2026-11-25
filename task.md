@@ -12,13 +12,13 @@
 
 | Metric                          | Current Value                                                                    |
 | ------------------------------- | -------------------------------------------------------------------------------- |
-| **Overall Project Progress**    | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 66%`                                                       |
+| **Overall Project Progress**    | `🟩🟩🟩🟩🟩⬜⬜⬜⬜⬜ 54%`                                                       |
 | **Current Active Stage**        | **Phase 10V: Stage C0, Make the Core Real (from 2026-11-25 deep dive)**          |
-| **Total Tasks Tracked**         | 430 tasks across 39 phases                                                       |
-| **Completed Tasks (`DONE`)**    | 283 tasks (Proven by code, tests & integration test suite)                       |
-| **In Progress (`IN PROGRESS`)** | 0 tasks                                                                          |
+| **Total Tasks Tracked**         | 434 tasks across 39 phases                                                       |
+| **Completed Tasks (`DONE`)**    | 235 tasks (49 reopened on 2026-11-25 after app audit against running reality)    |
+| **In Progress (`IN PROGRESS`)** | 49 tasks                                                                         |
 | **Blocked (`BLOCKED`)**         | 0 tasks                                                                          |
-| **Pending (`TODO`)**            | 147 tasks                                                                        |
+| **Pending (`TODO`)**            | 199 tasks not done (150 TODO + 49 IN PROGRESS)                                   |
 
 > [!WARNING]
 > **Deep dive 2026-11-25:** several phases marked COMPLETE (10L–10O, 10B–10E and the B0 slices) have code that the running app doesn't call, or screens that show invented values. Those gaps are tracked as new tasks in **Phase 10V (Stage C0)** instead of reopening old rows. See `docs/audit/b0-deep-dive-2026-11-25.md`.
@@ -54,36 +54,36 @@
 | **Phase 0**  | Documentation & Skeleton Initialisation     | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 0 & Stage 0.5   |
 | **Phase 1**  | Design System & UI Kit                      | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 23 / 23            | Stage 1 & Stage 0.5   |
 | **Phase 2**  | Database & Shared Core Scoring              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 17 / 17            | Stage 2 & Stage R2    |
-| **Phase 3**  | Fastify REST API Core                       | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 16 / 16            | Stage 3 & Stage R2    |
-| **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 4 & Stage 0.5   |
-| **Phase 5**  | Reveal, Matching UX & Oddness               | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 5 & Stage 0.5   |
-| **Phase 6**  | Server-Rendered Share Cards & Links         | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 6 & Stage 0.5   |
-| **Phase 7**  | Authentication & Guest Merge                | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 7 & Stage 0.5   |
-| **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 12 / 12            | Stage 8 & Stage R2    |
-| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 15 / 15            | Stage 9 & Stage R2    |
+| **Phase 3**  | Fastify REST API Core                       | Critical | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 94%` | 15 / 16            | Stage 3 & Stage R2    |
+| **Phase 4**  | Play Flow Frontend (PWA)                    | Critical | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 73%` | 11 / 15            | Stage 4 & Stage 0.5   |
+| **Phase 5**  | Reveal, Matching UX & Oddness               | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 64%` | 7 / 11             | Stage 5 & Stage 0.5   |
+| **Phase 6**  | Server-Rendered Share Cards & Links         | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 92%` | 11 / 12            | Stage 6 & Stage 0.5   |
+| **Phase 7**  | Authentication & Guest Merge                | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩🟩🟩⬜ 91%` | 10 / 11            | Stage 7 & Stage 0.5   |
+| **Phase 8**  | Streaks, History, Settings & Privacy        | Medium   | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 83%` | 10 / 12            | Stage 8 & Stage R2    |
+| **Phase 9**  | Daily Pipeline & BullMQ Scheduler           | Critical | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 73%` | 11 / 15            | Stage 9 & Stage R2    |
 | **Phase 10** | Web Push Notifications & PWA Caching        | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 11 / 11            | Stage 10 & Stage R2   |
-| **Phase 10A**| Orbit Foundation (Backend)                  | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage F1              |
-| **Phase 10B**| Orbit and Globe UI                          | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage F2              |
-| **Phase 10C**| Telepathy (Instinct Sync)                   | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 9 / 9              | Stage F3              |
-| **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 9 / 9              | Stage F4              |
+| **Phase 10A**| Orbit Foundation (Backend)                  | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 70%` | 7 / 10             | Stage F1              |
+| **Phase 10B**| Orbit and Globe UI                          | High     | 🟡 PARTIAL   | `🟩🟩🟩⬜⬜⬜⬜⬜⬜⬜ 30%` | 3 / 10             | Stage F2              |
+| **Phase 10C**| Telepathy (Instinct Sync)                   | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩⬜⬜⬜⬜⬜⬜ 44%` | 4 / 9              | Stage F3              |
+| **Phase 10D**| Anti-Twin, Share Faces & Verification Gate  | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 67%` | 6 / 9              | Stage F4              |
 | **Phase 10E**| Meme Questions & Themed Drops               | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 9 / 9              | Stage M1 (after F4)   |
 | **Phase 10F**| Signals Foundation                          | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage M2 (after M1)   |
 | **Phase 10G**| Meme Lab (User Captions & Moderation Queue) | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 9 / 9              | Stage M3              |
 | **Phase 10H**| Insights Engine (Statistics Only)           | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 9 / 9              | Stage M4              |
-| **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 8 / 8              | Stage M5/M6           |
+| **Phase 10I**| Taste Dimension & Recognition (Badges)      | Medium   | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩🟩⬜⬜ 75%` | 6 / 8              | Stage M5/M6           |
 | **Phase 10J**| ML Ranker for Optional Surfaces             | Low      | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage M7              |
 | **Phase 10K**| Premium Groundwork (Monetisation Gate G3)   | Low      | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage M8              |
-| **Phase 10L**| Lanes Plumbing                              | Critical | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 10 / 10            | Stage L1              |
-| **Phase 10M**| Richer Answer Formats                       | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 7 / 7              | Stage L2              |
-| **Phase 10N**| Twin Depth & Mutual Pairing                 | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 7 / 7              | Stage L3              |
-| **Phase 10O**| Memes Lane Launch                           | High     | ✅ COMPLETE  | `🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 100%` | 5 / 5              | Stage L4 (after M1)   |
+| **Phase 10L**| Lanes Plumbing                              | Critical | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 70%` | 7 / 10            | Stage L1              |
+| **Phase 10M**| Richer Answer Formats                       | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩🟩⬜⬜⬜ 71%` | 5 / 7              | Stage L2              |
+| **Phase 10N**| Twin Depth & Mutual Pairing                 | High     | 🟡 PARTIAL   | `🟩🟩🟩⬜⬜⬜⬜⬜⬜⬜ 29%` | 2 / 7              | Stage L3              |
+| **Phase 10O**| Memes Lane Launch                           | High     | 🟡 PARTIAL   | `🟩🟩🟩🟩🟩🟩⬜⬜⬜⬜ 60%` | 3 / 5              | Stage L4 (after M1)   |
 | **Phase 10P**| Situations Lane (Cards First)               | Medium   | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 5              | Stage L5              |
 | **Phase 10Q**| Say It: Free-Text Answers (Gate G4)         | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 8              | Stage L6 (Gate G4)    |
 | **Phase 10R**| Super Twin & Lane-Aware Connection Features | Medium   | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 6              | Stage L7              |
 | **Phase 10S**| Brain Lane (Documented Only)                | Low      | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 1              | Stage L8              |
 | **Phase 10T**| Bonus Rounds (Stage L9)                     | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 7              | Stage L9              |
 | **Phase 10U**| Badges (Stage L10)                           | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 6              | Stage L10             |
-| **Phase 10V**| Make the Core Real (Stage C0)                | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 20             | Stage C0 (next)       |
+| **Phase 10V**| Make the Core Real (Stage C0)                | Critical | 🟡 PARTIAL   | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 4%` | 1 / 24             | Stage C0 (next)       |
 | **Phase 11** | Admin Panel ("Mission Control")             | High     | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 50             | Stage 11 (Addenda A+B+C)|
 | **Phase 12** | Observability, Telemetry & Security         | High     | 🟡 PARTIAL  | `🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜ 9%` | 1 / 11             | Stage 12 & Stage R2   |
 | **Phase 13** | End-to-End QA, Load Tests & Audits          | Critical | ⚪ TODO      | `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0%` | 0 / 12             | Stage 13              |
@@ -142,7 +142,7 @@ _Status: COMPLETE | Target: Token foundation, accessible UI primitives, 28 custo
 | `[x] P1.13` | Build `Confetti` canvas celebration wrapper using `canvas-confetti`                         | 🟢 Low       | ✅ DONE         | P1.01       | Agent | 2026-11-07  | S6 Twin Reveal celebration      |
 | `[x] P1.14` | Build `Toast` notification primitive for non-blocking feedback                             | 🟡 Medium    | ✅ DONE         | P1.01       | Agent | 2026-11-07  | Ephemeral system messages       |
 | `[x] P1.15` | Author 28 custom SVGs (doors, items, mood glyphs) into `apps/web/public/illustrations/`     | 🟠 High      | ✅ DONE         | P1.01       | Agent | 2026-11-07  | Full vector illustration pack   |
-| `[x] P1.16` | Build `ThemeProvider` and theme toggle supporting System, Dark, and Light modes             | 🟡 Medium    | ✅ DONE         | P1.01       | Agent | 2026-11-07  | Theme management system         |
+| `[x] P1.16` | Build `ThemeProvider` and theme toggle supporting System, Dark, and Light modes             | 🟡 Medium    | ✅ DONE         | P1.01       | Agent | 2026-11-07  | Superseded by product.md §0 (Cream-only in v1; no dark mode) |
 | `[x] P1.17` | Create visual design showcase page at `apps/web/src/app/design/page.tsx`                    | 🟠 High      | ✅ DONE         | P1.03-P1.16 | Agent | 2026-11-07  | Component verification gallery  |
 | `[x] P1.18` | Implement haptic vibration and sound effect hooks with user preference toggles              | 🟢 Low       | ✅ DONE         | P1.03       | Agent | 2026-11-07  | Sensory feedback system         |
 | `[x] P1.19` | Run automated accessibility audit with `@axe-core/playwright` on all UI components          | 🟠 High      | ✅ DONE         | P1.17       | Agent | 2026-11-12  | Playwright axe-core e2e suite with 11 tests verifying zero critical/serious violations across all routes & play flow |
@@ -181,7 +181,7 @@ _Status: PARTIAL | Target: PostgreSQL schema, pure scoring algorithms, partition
 
 ### Phase 3: Fastify REST API Core (Stage 3)
 
-_Status: COMPLETE | Target: REST routes, Swagger docs, guest identity, load shedding, route policies._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: REST routes, Swagger docs, guest identity, load shedding, route policies._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
@@ -191,7 +191,7 @@ _Status: COMPLETE | Target: REST routes, Swagger docs, guest identity, load shed
 | `[x] P3.04` | Implement anonymous guest identity via `oddly_did` cookie and `players` table registration  | 🔴 Critical  | ✅ DONE         | P2.01, P3.02| Agent | 2026-11-08  | Zero-signup player identity     |
 | `[x] P3.05` | Implement `POST /v1/submissions` with idempotent `request_id` check and atomic increments   | 🔴 Critical  | ✅ DONE         | P2.05, P3.04| Agent | 2026-11-08  | Core submission endpoint        |
 | `[x] P3.06` | Implement instant Stage A provisional twin calculation over Redis answer vectors            | 🔴 Critical  | ✅ DONE         | P3.05       | Agent | 2026-11-08  | Real-time matching engine       |
-| `[x] P3.07` | Implement `GET /v1/results/:dropId` returning provisional twin and oddness percentile       | 🔴 Critical  | ✅ DONE         | P3.06       | Agent | 2026-11-08  | Player result retrieval         |
+| `[~] P3.07` | Implement `GET /v1/results/:dropId` returning provisional twin and oddness percentile       | 🔴 Critical  | 🟡 IN PROGRESS | P3.06       | Agent | —           | Reopened 2026-11-25: allows query player_id without signed session; findFirst arbitrary twin; unweighted similarity (P10V.03, P10V.07, P10V.13) |
 | `[x] P3.08` | Implement `GET /v1/content/:locale` dynamic copy endpoint with content-hash cache header    | 🟠 High      | ✅ DONE         | P2.01, P3.02| Agent | 2026-11-08  | Dynamic UI copy delivery        |
 | `[x] P3.09` | Implement `@fastify/rate-limit` with Redis store (120 req/min general, 30 req/min submit)  | 🟠 High      | ✅ DONE         | P3.01       | Agent | 2026-11-10  | Redis-backed rate limit, dedicated 30 req/min on submissions, no prod localhost bypass (R1.4) |
 | `[x] P3.10` | Implement Cloudflare Turnstile token validation plugin for anti-bot protection              | 🟠 High      | ✅ DONE         | P3.01       | Agent | 2026-11-08  | Bot challenge verification      |
@@ -206,18 +206,18 @@ _Status: COMPLETE | Target: REST routes, Swagger docs, guest identity, load shed
 
 ### Phase 4: Play Flow Frontend (Stage 4)
 
-_Status: COMPLETE | Target: S1 to S4 responsive flow, TanStack Query, offline persistence, budget CI._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: S1 to S4 responsive flow, TanStack Query, offline persistence, budget CI._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
-| `[x] P4.01` | Build S1 Landing Screen with dynamic copy, active player count, and "Play today's five" CTA | 🔴 Critical  | ✅ DONE         | P1.17, P3.12| Agent | 2026-11-08  | Game entrance view              |
+| `[~] P4.01` | Build S1 Landing Screen with dynamic copy, active player count, and "Play today's five" CTA | 🔴 Critical  | 🟡 IN PROGRESS | P1.17, P3.12| Agent | —           | Reopened 2026-11-25: superseded by lane picker first (D1); landing flow needs cleanup (P10V.21) |
 | `[x] P4.02` | Build Age Gate bottom sheet requiring explicit 18+ confirmation before initial play        | 🔴 Critical  | ✅ DONE         | P1.05, P3.04| Agent | 2026-11-08  | DPDP legal compliance gate      |
-| `[x] P4.03` | Build S2 Countdown Screen displayed when drop is scheduled or completed today               | 🟠 High      | ✅ DONE         | P1.12, P3.03| Agent | 2026-11-08  | Between-drop waiting screen     |
-| `[x] P4.04` | Build S3 Question Answering Flow dynamically rendering polymorphic questions (Q1 to Q5)     | 🔴 Critical  | ✅ DONE         | P1.06-P1.10 | Agent | 2026-11-08  | Core question answering loop    |
+| `[~] P4.03` | Build S2 Countdown Screen displayed when drop is scheduled or completed today               | 🟠 High      | 🟡 IN PROGRESS | P1.12, P3.03| Agent | —           | Reopened 2026-11-25: between-drop countdown needs per-lane resting and drop window awareness (P10V.21) |
+| `[~] P4.04` | Build S3 Question Answering Flow dynamically rendering polymorphic questions (Q1 to Q5)     | 🔴 Critical  | 🟡 IN PROGRESS | P1.06-P1.10 | Agent | —           | Reopened 2026-11-25: home page uses hardcoded FALLBACK_QUESTIONS for every lane instead of real per-lane drop (P10V.21) |
 | `[x] P4.05` | Implement question transition animations (horizontal slide with subtle fade, <300ms)        | 🟡 Medium    | ✅ DONE         | P4.04       | Agent | 2026-11-08  | Smooth fluid interactions       |
 | `[x] P4.06` | Build S4 Review Screen displaying player's five choices with tap-to-edit capability        | 🟠 High      | ✅ DONE         | P4.04       | Agent | 2026-11-08  | Pre-submission confirmation     |
 | `[x] P4.07` | Implement local draft persistence in Zustand store so accidental refresh preserves picks   | 🟠 High      | ✅ DONE         | P4.04       | Agent | 2026-11-08  | Pick resilience & draft recovery|
-| `[x] P4.08` | Wire submission flow to `POST /v1/submissions` with idempotent `request_id` handling        | 🔴 Critical  | ✅ DONE         | P3.05, P4.06| Agent | 2026-11-08  | Submission integration          |
+| `[~] P4.08` | Wire submission flow to `POST /v1/submissions` with idempotent `request_id` handling        | 🔴 Critical  | 🟡 IN PROGRESS | P3.05, P4.06| Agent | —           | Reopened 2026-11-25: submission flow does not enforce server-side 18+ check and uses unweighted Dice (P10V.05, P10V.07) |
 | `[x] P4.09` | Implement offline detection banner with automatic retry when network reconnects            | 🟠 High      | ✅ DONE         | P1.14, P4.08| Agent | 2026-11-08  | Flaky network resilience        |
 | `[x] P4.10` | Implement sound and haptic sensory feedback triggers across all question interactions      | 🟢 Low       | ✅ DONE         | P1.18, P4.04| Agent | 2026-11-08  | Delightful sensory experience   |
 | `[x] P4.11` | Write Playwright E2E test verifying complete S1->S4 answering flow on mobile viewport       | 🔴 Critical  | ✅ DONE         | P4.01-P4.08 | Agent | 2026-11-08  | End-to-end flow verification    |
@@ -230,17 +230,17 @@ _Status: COMPLETE | Target: S1 to S4 responsive flow, TanStack Query, offline pe
 
 ### Phase 5: Reveal, Matching UX & Oddness (Stage 5)
 
-_Status: COMPLETE | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarity, degraded UI._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarity, degraded UI._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P5.01` | Build S5 Searching Animation Screen (pulsing concentric radar, 2.0s duration, skippable)   | 🟠 High      | ✅ DONE         | P1.01, P4.08| Agent | 2026-11-08  | Engaging search transition      |
-| `[x] P5.02` | Build S6 Twin Reveal Screen displaying matched pick count, coarse region, and age band      | 🔴 Critical  | ✅ DONE         | P1.04, P3.07| Agent | 2026-11-08  | Core outcome reveal view        |
+| `[~] P5.02` | Build S6 Twin Reveal Screen displaying matched pick count, coarse region, and age band      | 🔴 Critical  | 🟡 IN PROGRESS | P1.04, P3.07| Agent | —           | Reopened 2026-11-25: page.tsx hardcodes 'Berlin, Germany', age '25 to 34', and 3,482 players (P10V.01) |
 | `[x] P5.03` | Implement sequential pick-dot illumination animation (green match / gray mismatch)          | 🟠 High      | ✅ DONE         | P5.02       | Agent | 2026-11-08  | Suspenseful match reveal        |
 | `[x] P5.04` | Wire celebratory confetti burst on reveal (moderate particle count, auto-stops after 2.5s) | 🟢 Low       | ✅ DONE         | P1.13, P5.02| Agent | 2026-11-08  | Delightful celebration          |
-| `[x] P5.05` | Build S7 Oddness Rarity Screen displaying animated count-up percentile and tier badge       | 🔴 Critical  | ✅ DONE         | P1.04, P3.07| Agent | 2026-11-08  | Rarity score visualization      |
-| `[x] P5.06` | Implement Rarest Pick highlight card detailing exact percentage of players who chose it     | 🟠 High      | ✅ DONE         | P5.05       | Agent | 2026-11-08  | Statistical highlight feature   |
-| `[x] P5.07` | Implement honest low-density messaging when total players < 200                             | 🟠 High      | ✅ DONE         | P5.02, P5.05| Agent | 2026-11-08  | Ethical honesty standard        |
+| `[~] P5.05` | Build S7 Oddness Rarity Screen displaying animated count-up percentile and tier badge       | 🔴 Critical  | 🟡 IN PROGRESS | P1.04, P3.07| Agent | —           | Reopened 2026-11-25: page.tsx hardcodes 84th percentile; TwinRevealScreen derives tier from matched picks (P10V.01, P10V.14) |
+| `[~] P5.06` | Implement Rarest Pick highlight card detailing exact percentage of players who chose it     | 🟠 High      | 🟡 IN PROGRESS | P5.05       | Agent | —           | Reopened 2026-11-25: page.tsx hardcodes 'Luminous Violet' (3.1%) (P10V.01) |
+| `[~] P5.07` | Implement honest low-density messaging when total players < 200                             | 🟠 High      | 🟡 IN PROGRESS | P5.02, P5.05| Agent | —           | Reopened 2026-11-25: unreachable because total_players_today is hardcoded to 3,482 in page.tsx (P10V.01, P10V.13) |
 | `[x] P5.08` | Implement share trigger buttons opening S8 Share Sheet                                      | 🟠 High      | ✅ DONE         | P5.02, P5.05| Agent | 2026-11-08  | Viral loop entry point          |
 | `[x] P5.09` | Write unit and integration tests verifying reveal animations and percentile formatting      | 🟠 High      | ✅ DONE         | P5.02-P5.07 | Agent | 2026-11-08  | Reveal screen test suite        |
 | `[x] P5.10` | Implement pending-result polling with ETag 304 backoff and tab visibility pausing           | 🟠 High      | ✅ DONE         | P5.02       | Agent | 2026-11-22  | Polling discipline (Sec 6.3)    |
@@ -250,12 +250,12 @@ _Status: COMPLETE | Target: S5 Searching radar, S6 Twin Reveal, S7 Oddness rarit
 
 ### Phase 6: Server-Rendered Share Cards & Links (Stage 6)
 
-_Status: COMPLETE | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId`, worker threads._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId`, worker threads._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P6.01` | Build server-side Satori JSX templates for Story (9:16), Square (1:1), and Link (1.91:1)   | 🔴 Critical  | ✅ DONE         | P1.01, P2.08| Agent | 2026-11-08  | Visual card templates           |
-| `[x] P6.02` | Integrate `@resvg/resvg-js` in BullMQ worker compiling SVG to PNG at 2x pixel density       | 🔴 Critical  | ✅ DONE         | P0.06, P6.01| Agent | 2026-11-08  | High-resolution PNG compilation |
+| `[~] P6.02` | Integrate `@resvg/resvg-js` in BullMQ worker compiling SVG to PNG at 2x pixel density       | 🔴 Critical  | 🟡 IN PROGRESS | P0.06, P6.01| Agent | —           | Reopened 2026-11-25: card compilation and worker emit exact city instead of coarse region (P10V.19) |
 | `[x] P6.03` | Implement dynamic QR code generator embedding `/c/:shortId?challenge=1` into cards         | 🟠 High      | ✅ DONE         | P6.01       | Agent | 2026-11-08  | Scannable viral loop            |
 | `[x] P6.04` | Implement content-hash storage key computation and Cloudflare R2 upload pipeline            | 🔴 Critical  | ✅ DONE         | P6.02       | Agent | 2026-11-08  | Immutable asset storage         |
 | `[x] P6.05` | Build short link generator (`POST /v1/shares`) creating 8-character nanoid slugs            | 🟠 High      | ✅ DONE         | P2.01, P3.02| Agent | 2026-11-08  | Clean shareable URLs            |
@@ -271,13 +271,13 @@ _Status: COMPLETE | Target: Satori/Resvg PNG generator, R2 storage, `/c/:shortId
 
 ### Phase 7: Authentication & Guest Merge (Stage 7)
 
-_Status: COMPLETE | Target: Google Identity, soft sign-in modal, guest submission merge, L3 guest mode._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Google Identity, soft sign-in modal, guest submission merge, L3 guest mode._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P7.01` | Scaffold Google Identity Services (GIS) button and credential receiver on client           | 🟠 High      | ✅ DONE         | P4.01       | Agent | 2026-11-09  | Client-side Google SSO          |
 | `[x] P7.02` | Implement `POST /v1/auth/oauth` verifying Google ID tokens with `google-auth-library`       | 🔴 Critical  | ✅ DONE         | P3.01       | Agent | 2026-11-09  | Token verification endpoint     |
-| `[x] P7.03` | Issue 15-minute access JWTs and rotating 30-day refresh tokens via secure httpOnly cookies   | 🔴 Critical  | ✅ DONE         | P7.02       | Agent | 2026-11-09  | Session cookie architecture     |
+| `[~] P7.03` | Issue 15-minute access JWTs and rotating 30-day refresh tokens via secure httpOnly cookies   | 🔴 Critical  | 🟡 IN PROGRESS | P7.02       | Agent | —           | Reopened 2026-11-25: unsigned or invalid session cookies accepted in identity.ts:102 (P10V.03) |
 | `[x] P7.04` | Implement `POST /v1/auth/merge-guest` seamlessly linking anonymous guest history to account | 🔴 Critical  | ✅ DONE         | P7.02       | Agent | 2026-11-09  | History preservation engine     |
 | `[x] P7.05` | Build soft sign-in modal (Login Panel) triggered contextually from results and streak views | 🟠 High      | ✅ DONE         | P1.05, P7.01| Agent | 2026-11-09  | Non-blocking auth entry point   |
 | `[x] P7.06` | Build `POST /v1/auth/refresh` rotating refresh tokens and issuing fresh access tokens       | 🟠 High      | ✅ DONE         | P7.03       | Agent | 2026-11-09  | Transparent session renewal     |
@@ -291,14 +291,22 @@ _Status: COMPLETE | Target: Google Identity, soft sign-in modal, guest submissio
 
 ### Phase 8: Streaks, History, Settings & Privacy (Stage 8)
 
-_Status: COMPLETE | Target: Header Flame, History archive, Settings & Privacy, replica reads, 90d retention._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Header Flame, History archive, Settings & Privacy, replica reads, 90d retention._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P8.01` | Build `StreakFlame` component with tier-based SVG flames and milestone celebration          | 🟠 High      | ✅ DONE         | P1.01       | Agent | 2026-11-09  | Visual streak indicator         |
-| `[x] P8.02` | Implement streak calculation algorithm detecting active, broken, and milestone streaks      | 🔴 Critical  | ✅ DONE         | P2.01, P3.05| Agent | 2026-11-09  | Streak verification engine      |
+| `[~] P8.02` | Implement streak calculation algorithm detecting active, broken, and milestone streaks      | 🔴 Critical  | 🟡 IN PROGRESS | P2.01, P3.05| Agent | —           | Reopened 2026-11-25: streak algorithm only tracks single global streak; no per-lane streaks and longest is flawed (me.ts:154) (P10V.16) |
 | `[x] P8.03` | Build `GET /v1/history` endpoint with cursor pagination returning player's past submissions | 🟠 High      | ✅ DONE         | P2.01, P3.04| Agent | 2026-11-09  | Archive retrieval endpoint      |
-| `[x] P8.04` | Build S10 History Screen displaying past drops, locked twins, and oddness tiers             | 🟠 High      | ✅ DONE         | P8.03       | Agent | 2026-11-09  | Player history archive view     |
+| `[~] P8.04` | Build S10 History Screen displaying past drops, locked twins, and oddness tiers             | 🟠 High      | 🟡 IN PROGRESS | P8.03       | Agent | —           | Reopened 2026-11-25: locked twin is never locked/finalized by any job (P10V.11) |
+| `[x] P8.05` | Build S14 Settings Screen with theme selector, audio/haptic toggles, and notification prefs | 🟠 High      | ✅ DONE         | P1.16, P1.18| Agent | 2026-11-09  | User preferences view           |
+| `[x] P8.06` | Implement one-click JSON data export generating downloadable archive under DPDP Act         | 🟠 High      | ✅ DONE         | P7.07       | Agent | 2026-11-09  | Data portability feature        |
+| `[x] P8.07` | Implement complete account erasure workflow purging personal data within 7-day grace period | 🔴 Critical  | ✅ DONE         | P7.07       | Agent | 2026-11-09  | DPDP Right to Erasure execution |
+| `[x] P8.08` | Build report submission bottom sheet (`POST /v1/reports`) with 140-character note limit     | 🟠 High      | ✅ DONE         | P1.05, P3.01| Agent | 2026-11-09  | User content moderation intake  |
+| `[x] P8.09` | Implement regional privacy toggle allowing players to conceal coarse geographical region    | 🟠 High      | ✅ DONE         | P2.09       | Agent | 2026-11-09  | Granular privacy control        |
+| `[x] P8.10` | Write automated test suite verifying streak calculations, history pagination, and erasure   | 🟠 High      | ✅ DONE         | P8.01-P8.09 | Agent | 2026-11-09  | Settings & history test suite   |
+| `[x] P8.11` | Route history archive and world stats queries to database read replicas                     | 🟠 High      | ✅ DONE         | P8.03       | Agent | 2026-11-22  | Read replica routing (Sec 8.1)  |
+| `[x] P8.12` | Implement 90-day answer data retention compaction and cold archive worker job               | 🟠 High      | ✅ DONE         | P2.01       | Agent | 2026-11-11  | RetentionWorker automated partition drop older than retention_days (R2.1) |
 | `[x] P8.05` | Build S14 Settings Screen with theme selector, audio/haptic toggles, and notification prefs | 🟠 High      | ✅ DONE         | P1.16, P1.18| Agent | 2026-11-09  | User preferences view           |
 | `[x] P8.06` | Implement one-click JSON data export generating downloadable archive under DPDP Act         | 🟠 High      | ✅ DONE         | P7.07       | Agent | 2026-11-09  | Data portability feature        |
 | `[x] P8.07` | Implement complete account erasure workflow purging personal data within 7-day grace period | 🔴 Critical  | ✅ DONE         | P7.07       | Agent | 2026-11-09  | DPDP Right to Erasure execution |
@@ -312,20 +320,20 @@ _Status: COMPLETE | Target: Header Flame, History archive, Settings & Privacy, r
 
 ### Phase 9: Daily Pipeline & BullMQ Scheduler (Stage 9)
 
-_Status: COMPLETE | Target: Staging, live window, final recap batch, S9 Recap screen, final batch isolation._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Staging, live window, final recap batch, S9 Recap screen, final batch isolation._
 
 | ID          | Task Description                                                                            | Priority | Status | Depends On  | Owner | Done Date   | Notes                           |
 | ----------- | ------------------------------------------------------------------------------------------- | -------- | ------ | ----------- | ----- | ----------- | ------------------------------- |
 | `[x] P9.01` | Configure BullMQ scheduler registering daily crons for 06:30 staging, 07:00 open, and close | 🔴 Critical  | ✅ DONE         | P0.06       | Agent | 2026-11-09  | Core daily clock orchestration  |
 | `[x] P9.02` | Build `stageDrop` worker pre-compiling Drop JSON and warming Redis cache at 06:30 IST        | 🔴 Critical  | ✅ DONE         | P9.01, P3.03| Agent | 2026-11-10  | Live pre-caching, warming cache:drop:{date}:pre_cache (R1.1) |
 | `[x] P9.03` | Build `openDrop` worker transitioning drop status to `live` at exactly 07:00:00 IST         | 🔴 Critical  | ✅ DONE         | P9.01       | Agent | 2026-11-10  | Redis leader-locked transition, harmless double-fire idempotency (R1.1) |
-| `[x] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | 🟠 High      | ✅ DONE         | P3.06       | Agent | 2026-11-11  | ProvisionalRefreshWorker periodic sweep, quiet hours & 1/day cap (R2.10) |
+| `[~] P9.04` | Build `pairingWorker` running incremental provisional matching every 5 minutes during drop  | 🟠 High      | 🟡 IN PROGRESS | P3.06       | Agent | —           | Reopened 2026-11-25: scheduled worker calls runPairingSweep with empty list (index.ts:93) (P10V.10) |
 | `[x] P9.05` | Build `closureWorker` locking submissions at 06:59:59 IST and rejecting late requests (409) | 🔴 Critical  | ✅ DONE         | P9.01       | Agent | 2026-11-10  | DB drop closure, status: closed, freezes distributions (R1.1) |
-| `[x] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | 🔴 Critical  | ✅ DONE         | P9.05, P2.05| Agent | 2026-11-10  | Chunked cursor pagination (5,000/batch), tracks in batch_runs (R1.1) |
-| `[x] P9.07` | Build S9 Morning Recap Screen displaying locked twin, final oddness, and world stats        | 🔴 Critical  | ✅ DONE         | P9.06       | Agent | 2026-11-09  | Daily recap experience          |
+| `[~] P9.06` | Build `matchFinal` worker finalizing exact probabilities $p(a)$ and locking immutable twins | 🔴 Critical  | 🟡 IN PROGRESS | P9.05, P2.05| Agent | —           | Reopened 2026-11-25: match-final is not in getScheduledJobs() (scheduler.ts:60-80); twins never lock (P10V.11) |
+| `[~] P9.07` | Build S9 Morning Recap Screen displaying locked twin, final oddness, and world stats        | 🔴 Critical  | 🟡 IN PROGRESS | P9.06       | Agent | —           | Reopened 2026-11-25: recap worker is not scheduled and twins never lock (P10V.12) |
 | `[x] P9.08` | Implement `GET /v1/world/:dropId` endpoint returning aggregated drop stats                  | 🟠 High      | ✅ DONE         | P9.06       | Agent | 2026-11-09  | Global drop statistics          |
 | `[x] P9.09` | Implement `CLOCK_ACCELERATION=true` staging mode compressing 24-hour cycle to 10 minutes    | 🟠 High      | ✅ DONE         | P9.01-P9.06 | Agent | 2026-11-09  | Accelerated testing harness     |
-| `[x] P9.10` | Implement streak increment and freeze logic executed in final recap batch                   | 🟠 High      | ✅ DONE         | P8.02, P9.06| Agent | 2026-11-09  | Automated streak progression    |
+| `[~] P9.10` | Implement streak increment and freeze logic executed in final recap batch                   | 🟠 High      | 🟡 IN PROGRESS | P8.02, P9.06| Agent | —           | Reopened 2026-11-25: final batch is not scheduled, so streak increment does not run (P10V.11, P10V.16) |
 | `[x] P9.11` | Run automated test suite simulating full 24-hour cycle via accelerated clock                | 🔴 Critical  | ✅ DONE         | P9.07       | Agent | 2026-11-09  | Full lifecycle validation       |
 | `[x] P9.12` | Isolate final batch worker pool with max 25% DB connection limit and separate queue         | 🔴 Critical  | ✅ DONE         | P9.06       | Agent | 2026-11-11  | Bulkhead queue isolation & separate longer statement timeout (R1.1, R2.0) |
 | `[x] P9.13` | Implement chunked resumable final batch (5,000 users/chunk) with progressive publishing     | 🔴 Critical  | ✅ DONE         | P9.06       | Agent | 2026-11-10  | Cursor pagination, batch_runs resumable tracking, zero full memory loads (R1.1) |
@@ -356,16 +364,16 @@ _Status: PARTIAL | Target: Web Push sender, 2-per-day cap, quiet hours, installa
 
 ### Phase 10A: Orbit Foundation (Backend) (Stage F1)
 
-_Status: COMPLETE | Target: Database entities, partitions, repositories, Keep/Orbit API, state machine, co-streak pipeline, Orbit push channel, tests._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Database entities, partitions, repositories, Keep/Orbit API, state machine, co-streak pipeline, Orbit push channel, tests._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------------- |
 | `[x] P10A.01` | Expand migrations: `twin_keeps` (partitioned by `drop_date`), `orbits`, `orbit_expressions` (partitioned)   | 🔴 Critical  | ✅ DONE         | P2.01, P2.02 | Agent | 2026-11-15  | Expand-and-contract, range partitions    |
 | `[x] P10A.02` | Implement repositories and entity queries for Keeps, Orbits, and Expressions                                 | 🔴 Critical  | ✅ DONE         | P10A.01      | Agent | 2026-11-15  | Strict isolation; sorted pair indexing   |
 | `[x] P10A.03` | Add `app_config` keys and feature flag `feature.orbit` with cached loader fallback                          | 🟠 High      | ✅ DONE         | P3.02        | Agent | 2026-11-15  | Configurable caps and TTLs               |
-| `[x] P10A.04` | Implement Keep API: `POST /v1/keeps`, `GET /v1/keeps/incoming`, `POST /v1/keeps/:id/respond`                 | 🔴 Critical  | ✅ DONE         | P10A.02      | Agent | 2026-11-15  | Single Keep/drop cap, Google Auth guard  |
-| `[x] P10A.05` | Implement Orbit state machine: mutual acceptance, silent decline, 48h expiry, 30-day cooldown, 3-orbit cap  | 🔴 Critical  | ✅ DONE         | P10A.04      | Agent | 2026-11-15  | Anti-stalking & anti-spam invariants     |
-| `[x] P10A.06` | Integrate co-streak computation into daily pipeline worker (consecutive Drop completions)                   | 🟠 High      | ✅ DONE         | P9.01, P10A.02| Agent | 2026-11-15 | Quiet resets; zero guilt/nagging copy    |
+| `[~] P10A.04` | Implement Keep API: `POST /v1/keeps`, `GET /v1/keeps/incoming`, `POST /v1/keeps/:id/respond`                 | 🔴 Critical  | 🟡 IN PROGRESS | P10A.02      | Agent | —           | Reopened 2026-11-25: locked twin requirement blocks real player from keeping (cannot keep until 07:05) (P10V.11) |
+| `[~] P10A.05` | Implement Orbit state machine: mutual acceptance, silent decline, 48h expiry, 30-day cooldown, 3-orbit cap  | 🔴 Critical  | 🟡 IN PROGRESS | P10A.04      | Agent | —           | Reopened 2026-11-25: unreachable for real player because keeps cannot complete (P10V.11) |
+| `[~] P10A.06` | Integrate co-streak computation into daily pipeline worker (consecutive Drop completions)                   | 🟠 High      | 🟡 IN PROGRESS | P9.01, P10A.02| Agent | —          | Reopened 2026-11-25: daily pipeline job not scheduled (P10V.11) |
 | `[x] P10A.07` | Implement "Orbit" push notification channel (request received, accepted) respecting 2/day quiet-hour caps    | 🟠 High      | ✅ DONE         | P10.04, P10A.05| Agent| 2026-11-15 | Templates stored in database             |
 | `[x] P10A.08` | Implement instant unprovoked dissolution: `POST /v1/orbits/:id/end` and admin sever tool                     | 🔴 Critical  | ✅ DONE         | P10A.05      | Agent | 2026-11-15  | Safety invariant; zero blame attribution |
 | `[x] P10A.09` | Implement DPDP deletion and export hooks purging Orbit linkages within 7 days                                | 🟠 High      | ✅ DONE         | P10A.02      | Agent | 2026-11-15  | Compliant with DPDP Section 12           |
@@ -375,18 +383,18 @@ _Status: COMPLETE | Target: Database entities, partitions, repositories, Keep/Or
 
 ### Phase 10B: Orbit and Globe UI (Stage F2)
 
-_Status: COMPLETE | Target: "Keep this twin" UX, Orbit list/detail screens, expression sticker picker, SVG Twin Globe map, 4th tab._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: "Keep this twin" UX, Orbit list/detail screens, expression sticker picker, SVG Twin Globe map, 4th tab._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------------- |
-| `[x] P10B.01` | Add "Keep this twin" button on flip-card back and recap screen with guest soft sign-in modal                 | 🟠 High      | ✅ DONE         | P10A.04, P1.01 | Agent | 2026-11-15  | Only available on locked final twin      |
+| `[~] P10B.01` | Add "Keep this twin" button on flip-card back and recap screen with guest soft sign-in modal                 | 🟠 High      | 🟡 IN PROGRESS | P10A.04, P1.01 | Agent | —           | Reopened 2026-11-25: unreachable for real player because twins are never locked (P10V.11) |
 | `[x] P10B.02` | Build Orbit incoming request card component with anonymous coarse region, age band, Accept / Not now       | 🟠 High      | ✅ DONE         | P10B.01      | Agent | 2026-11-15  | Accessible touch targets $\ge 44\text{px}$|
-| `[x] P10B.03` | Build Orbit list row and detail screen (`/orbit/:id`) with procedural geometric pick avatars and co-streaks | 🟠 High      | ✅ DONE         | P10A.05, P1.01 | Agent | 2026-11-15  | Anonymous title "Twin #N"                |
-| `[x] P10B.04` | Implement expression sticker picker (The Wave) with 6 curated database stickers and 1/day direction limit   | 🟠 High      | ✅ DONE         | P10B.03      | Agent | 2026-11-15  | Tactile sticker-press interaction        |
-| `[x] P10B.05` | Build staged unlocks visual track (5 milestone dots: Day 1, 3, 7, 14, 30) driven by `app_content` data      | 🟡 Medium    | ✅ DONE         | P10B.03      | Agent | 2026-11-15  | Content-driven progression               |
-| `[x] P10B.06` | Build Twin Globe 5-minute batch aggregation worker and edge-cached endpoint `/v1/globe` (`s-maxage=60`)     | 🟠 High      | ✅ DONE         | P9.01, P3.02 | Agent | 2026-11-15  | Regional k-anonymity aggregation         |
-| `[x] P10B.07` | Build Twin Globe screen (`/globe`) with static SVG map, k-anonymity arcs ($k \ge 20$), and Orbit lines      | 🟠 High      | ✅ DONE         | P10B.06      | Agent | 2026-11-15  | Zero WebGL; violet glowing Orbit strokes |
-| `[x] P10B.08` | Implement Twin Globe Live / Replay loop toggle with automatic fallback when volume < 50 submissions/window   | 🟠 High      | ✅ DONE         | P10B.07      | Agent | 2026-11-15  | Transparent labeling; zero fake arcs     |
+| `[~] P10B.03` | Build Orbit list row and detail screen (`/orbit/:id`) with procedural geometric pick avatars and co-streaks | 🟠 High      | 🟡 IN PROGRESS | P10A.05, P1.01 | Agent | —           | Reopened 2026-11-25: unreachable until Keep works (P10V.11) |
+| `[~] P10B.04` | Implement expression sticker picker (The Wave) with 6 curated database stickers and 1/day direction limit   | 🟠 High      | 🟡 IN PROGRESS | P10B.03      | Agent | —           | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
+| `[~] P10B.05` | Build staged unlocks visual track (5 milestone dots: Day 1, 3, 7, 14, 30) driven by `app_content` data      | 🟡 Medium    | 🟡 IN PROGRESS | P10B.03      | Agent | —           | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
+| `[~] P10B.06` | Build Twin Globe 5-minute batch aggregation worker and edge-cached endpoint `/v1/globe` (`s-maxage=60`)     | 🟠 High      | 🟡 IN PROGRESS | P9.01, P3.02 | Agent | —           | Reopened 2026-11-25: worker is not scheduled and aggregator has no k filter (globe.worker.ts:51) (P10V.17) |
+| `[~] P10B.07` | Build Twin Globe screen (`/globe`) with static SVG map, k-anonymity arcs ($k \ge 20$), and Orbit lines      | 🟠 High      | 🟡 IN PROGRESS | P10B.06      | Agent | —           | Reopened 2026-11-25: displays hardcoded fake arcs (38, 24, 19, 15) when empty (P10V.01, P10V.17) |
+| `[~] P10B.08` | Implement Twin Globe Live / Replay loop toggle with automatic fallback when volume < 50 submissions/window   | 🟠 High      | 🟡 IN PROGRESS | P10B.07      | Agent | —           | Reopened 2026-11-25: shows hardcoded invented replay arcs (P10V.01, P10V.17) |
 | `[x] P10B.09` | Mount "Globe" as 4th tab in main navigation bar (Today, Globe, History, Me) with keyboard focus rings       | 🟠 High      | ✅ DONE         | P10B.07      | Agent | 2026-11-15  | Preserves initial route bundle           |
 | `[x] P10B.10` | Implement degradation handling (L1-L4): doubled refresh interval, replay loop switch, and read-only banners | 🟠 High      | ✅ DONE         | P10B.07, P10B.03 | Agent | 2026-11-15| Dynamic copy from `app_content`          |
 
@@ -394,32 +402,32 @@ _Status: COMPLETE | Target: "Keep this twin" UX, Orbit list/detail screens, expr
 
 ### Phase 10C: Telepathy (Instinct Sync) (Stage F3)
 
-_Status: COMPLETE | Target: Designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Designated question selection, lock-in guessing, partner pick reveal exception, baseline luck math, Sync score._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date   | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ----------- | ---------------------------------------- |
 | `[x] P10C.01` | Add `telepathy_question_id` to `drops` table schema and implement question selection logic (Type 1 or 4)   | 🟠 High      | ✅ DONE         | P2.01        | Agent | 2026-11-15  | Eligible low-cardinality questions ($\le 4$) |
 | `[x] P10C.02` | Add admin validation rule rejecting Drops lacking an eligible Telepathy question                            | 🟠 High      | ✅ DONE         | P10C.01      | Agent | 2026-11-15  | Content safety gate                      |
 | `[x] P10C.03` | Expand migration: `telepathy_guesses` range-partitioned by `drop_date` with 90-day retention                | 🔴 Critical  | ✅ DONE         | P10A.01      | Agent | 2026-11-15  | Zero-downtime expand migration           |
-| `[x] P10C.04` | Implement Telepathy endpoints: `GET /v1/orbits/:id/telepathy`, `POST /v1/orbits/:id/telepathy/guess`        | 🔴 Critical  | ✅ DONE         | P10C.03      | Agent | 2026-11-15  | Active only after both players submit    |
-| `[x] P10C.05` | Implement permanent guess lock-in and Rule 4 scoped reveal exception (partner pick shown only after lock)   | 🔴 Critical  | ✅ DONE         | P10C.04      | Agent | 2026-11-15  | Single question; zero other picks exposed|
-| `[x] P10C.06` | Implement final batch random luck baseline calculation ($\sum [p(a)]^2$) in closure worker                  | 🟠 High      | ✅ DONE         | P9.01, P10C.04 | Agent | 2026-11-15  | Mathematical chance baseline             |
-| `[x] P10C.07` | Build Telepathy UI: option rows, side-by-side sticker pair, check/slash icons, baseline comparison caption  | 🟠 High      | ✅ DONE         | P10C.04, P1.01 | Agent | 2026-11-15  | Shape + icon indicators (not color alone)|
-| `[x] P10C.08` | Implement composite Sync summary calculation and display after 5 completed rounds                           | 🟡 Medium    | ✅ DONE         | P10C.07      | Agent | 2026-11-15  | Eliminates early sample noise            |
+| `[~] P10C.04` | Implement Telepathy endpoints: `GET /v1/orbits/:id/telepathy`, `POST /v1/orbits/:id/telepathy/guess`        | 🔴 Critical  | 🟡 IN PROGRESS | P10C.03      | Agent | —           | Reopened 2026-11-25: unreachable until Keep and Orbit work (P10V.11) |
+| `[~] P10C.05` | Implement permanent guess lock-in and Rule 4 scoped reveal exception (partner pick shown only after lock)   | 🔴 Critical  | 🟡 IN PROGRESS | P10C.04      | Agent | —           | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
+| `[~] P10C.06` | Implement final batch random luck baseline calculation ($\sum [p(a)]^2$) in closure worker                  | 🟠 High      | 🟡 IN PROGRESS | P9.01, P10C.04 | Agent | —           | Reopened 2026-11-25: closure worker is not scheduled (P10V.11) |
+| `[~] P10C.07` | Build Telepathy UI: option rows, side-by-side sticker pair, check/slash icons, baseline comparison caption  | 🟠 High      | 🟡 IN PROGRESS | P10C.04, P1.01 | Agent | —           | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
+| `[~] P10C.08` | Implement composite Sync summary calculation and display after 5 completed rounds                           | 🟡 Medium    | 🟡 IN PROGRESS | P10C.07      | Agent | —           | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
 | `[x] P10C.09` | Author automated tests for Telepathy guessing lifecycle, baseline math correctness, and Sync aggregation   | 🟠 High      | ✅ DONE         | P10C.06      | Agent | 2026-11-15  | Unit and route integration test suite    |
 
 ---
 
 ### Phase 10D: Anti-Twin, Share Faces & Verification Gate (Stage F4)
 
-_Status: TODO | Target: Asynchronous Anti-twin worker, candidate scan, result card, Satori share cards, a11y & bundle audit._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Asynchronous Anti-twin worker, candidate scan, result card, Satori share cards, a11y & bundle audit._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On   | Owner | Done Date  | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------ | ----- | ---------- | ---------------------------------------- |
 | `[x] P10D.01` | Expand migration: `anti_twin_results` table with 7-day rolling retention                                    | 🟠 High      | ✅ DONE         | P2.01        | Agent | 2026-11-15 | Lightweight relational cache             |
-| `[x] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | 🔴 Critical  | ✅ DONE         | P9.01, P10D.01 | Agent | 2026-11-15 | Completely decoupled from submit path    |
-| `[x] P10D.03` | Implement endpoint `GET /v1/results/:dropId/anti-twin` and low-pool (< 200 players) graceful hide logic     | 🟠 High      | ✅ DONE         | P10D.02      | Agent | 2026-11-15 | Honest notice when pool is sparse        |
-| `[x] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | 🟠 High      | ✅ DONE         | P10D.03, P1.01 | Agent | 2026-11-15 | Coral accent chip, kind playful tone     |
+| `[~] P10D.02` | Build asynchronous `ComputeAntiTwinJob` scanning bounded 2,000 candidate sample for minimum similarity       | 🔴 Critical  | 🟡 IN PROGRESS | P9.01, P10D.01 | Agent | —          | Reopened 2026-11-25: ComputeAntiTwinJob not scheduled by any daily job (P10V.06) |
+| `[~] P10D.03` | Implement endpoint `GET /v1/results/:dropId/anti-twin` and low-pool (< 200 players) graceful hide logic     | 🟠 High      | 🟡 IN PROGRESS | P10D.02      | Agent | —          | Reopened 2026-11-25: client can bypass min_pool privacy floor via query param (antitwin.ts:62) (P10V.06) |
+| `[~] P10D.04` | Build Anti-twin result card UI: "Differed on N of 5", own question breakdown, zero opposite picks exposed   | 🟠 High      | 🟡 IN PROGRESS | P10D.03, P1.01 | Agent | —          | Reopened 2026-11-25: recap screen not reached because recap job is not scheduled (P10V.12) |
 | `[x] P10D.05` | Build Anti-twin Satori share card PNG exports (`renderAntiTwinCardPng`) matching token constants            | 🟠 High      | ✅ DONE         | P6.01, P10D.04 | Agent | 2026-11-15 | Flip card anatomy with coral face        |
 | `[x] P10D.06` | Build Orbit milestone & anniversary Satori share card PNG exports (`renderOrbitCardPng`)                    | 🟠 High      | ✅ DONE         | P6.01, P10B.05 | Agent | 2026-11-15 | Day 14 and Day 30 commemorative cards    |
 | `[x] P10D.07` | Run automated axe-core accessibility suite across all new screens (Globe, Orbit, Telepathy, Anti-twin)      | 🟠 High      | ✅ DONE         | P10B.07, P10D.04| Agent | 2026-11-15 | WCAG 2.1 AA compliance; $\ge 44\text{px}$|
@@ -434,12 +442,12 @@ _Status: DONE (100%) | Target: Taxonomy and template migrations, question schema
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[x] P10E.01` | Expand migrations: `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key` | 🔴 Critical  | ✅ DONE         | P2.01, P10D.01 | Agent | 2026-11-15 | Zero-downtime expand migration completed |
+| `[x] P10E.01` | Expand migrations: `tags`, `question_tags`, `meme_templates`, `questions.render_variant`, `questions.template_id`, `drops.theme_key` | 🔴 Critical  | ✅ DONE         | P2.01, P10D.01 | Agent | 2026-11-15 | Superseded by product.md §0 (D3: Memes is a lane; themed Drops superseded) |
 | `[x] P10E.02` | Seed neutral subject taxonomy (14 tags) and vector meme template library with licenses and alt text         | 🟠 High      | ✅ DONE         | P10E.01        | Agent | 2026-11-15 | Extends D-015 registry; seeded in DB     |
 | `[x] P10E.03` | Extend question Zod schemas and validation engine: require >= 1 tag and valid template for meme variant    | 🔴 Critical  | ✅ DONE         | P10E.01        | Agent | 2026-11-15 | Strict boundary validation in schemas.ts |
-| `[x] P10E.04` | Extend JSON batch importer to parse `tags`, `render_variant`, and `template_key` with dry run validation   | 🟠 High      | ✅ DONE         | P10E.03        | Agent | 2026-11-15 | Pre-admin panel authoring path & tests   |
-| `[x] P10E.05` | Implement `meme` render variant in polymorphic question renderer using Type 1 / Type 4 components & tokens  | 🟠 High      | ✅ DONE         | P10E.02        | Agent | 2026-11-15 | DOM live text captions; token imports    |
-| `[x] P10E.06` | Author 12 sample meme questions across neutral tags in a verified seed batch                                | 🟡 Medium    | ✅ DONE         | P10E.04        | Agent | 2026-11-15 | Original-to-Oddly policy (15 questions)  |
+| `[x] P10E.04` | Extend JSON batch importer to parse `tags`, `render_variant`, and `template_key` with dry run validation   | 🟠 High      | ✅ DONE         | P10E.03        | Agent | 2026-11-15 | Superseded by product.md §0 (D3: Memes is a lane; themed Drops superseded) |
+| `[x] P10E.05` | Implement `meme` render variant in polymorphic question renderer using Type 1 / Type 4 components & tokens  | 🟠 High      | ✅ DONE         | P10E.02        | Agent | 2026-11-15 | Superseded by product.md §0 (D3: Memes is a lane; meme questions only in Memes lane) |
+| `[x] P10E.06` | Author 12 sample meme questions across neutral tags in a verified seed batch                                | 🟡 Medium    | ✅ DONE         | P10E.04        | Agent | 2026-11-15 | Superseded by product.md §0 (D3: Memes is a lane; generic themed drops superseded) |
 | `[x] P10E.07` | Automated regression test proving matching math, similarity, and oddness remain 100% identical              | 🔴 Critical  | ✅ DONE         | P2.04, P10E.05 | Agent | 2026-11-15 | Mathematical parity invariant verified   |
 | `[x] P10E.08` | Automated build-fail linter verifying zero tag keys match Section 9.1 forbidden topics                      | 🔴 Critical  | ✅ DONE         | P10E.02        | Agent | 2026-11-15 | Strict safety invariant build-fail tests |
 | `[x] P10E.09` | Accessibility (a11y) verification, >= 44px touch targets, and play route bundle check (<= 159.5 KB)         | 🟠 High      | ✅ DONE         | P10E.05        | Agent | 2026-11-15 | WCAG AA touch targets & budget verified  |
@@ -503,16 +511,16 @@ _Status: COMPLETE | Target: Consented tag affinity (`player_taste`), category pe
 
 ### Phase 10I: Taste Dimension & Recognition (Stage M5 & M6)
 
-_Status: COMPLETE | Target: Orbit Subject Sync, creator badges, Satori achievement cards, featured memes showcase._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Orbit Subject Sync, creator badges, Satori achievement cards, featured memes showcase._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
-| `[x] P10I.01` | Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold)          | 🟠 High      | ✅ DONE         | P10A.04, P10E.01| Agent| 2026-11-21| Rule 19 agreement percentage; 0 pick leakage |
-| `[x] P10I.02` | Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view             | 🟡 Medium    | ✅ DONE         | P10I.01        | Agent | 2026-11-21| SubjectSyncCard.tsx warm celebratory copy|
+| `[~] P10I.01` | Build Orbit Subject Sync API `GET /v1/orbits/:id/subject-sync` (min 5 shared questions threshold)          | 🟠 High      | 🟡 IN PROGRESS | P10A.04, P10E.01| Agent| —         | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
+| `[~] P10I.02` | Build Orbit Subject Sync UI: agreement percentage progress row per tag inside Orbit detail view             | 🟡 Medium    | 🟡 IN PROGRESS | P10I.01        | Agent | —         | Reopened 2026-11-25: unreachable until Orbit works (P10V.11) |
 | `[x] P10I.03` | Database migrations: `badge_definitions`, `creator_badges`, `featured_memes`                               | 🟡 Medium    | ✅ DONE         | P10G.01        | Agent | 2026-11-21| 009_recognition_engine.sql & Prisma schema|
-| `[x] P10I.04` | Creator badge award worker: evaluate Wilson scores and rater benchmarks (e.g. 500 raters, 70% Funny)       | 🟡 Medium    | ✅ DONE         | P10I.03        | Agent | 2026-11-21| CreatorBadgeJob runs benchmarks idempotently|
+| `[x] P10I.04` | Creator badge award worker: evaluate Wilson scores and rater benchmarks (e.g. 500 raters, 70% Funny)       | 🟡 Medium    | ✅ DONE         | P10I.03        | Agent | 2026-11-21| Superseded by product.md §0.3, §0.6 (Meme Lab creator badges superseded by collector/super-twin badges) |
 | `[x] P10I.05` | Build achievement card renderer: Satori 3D flip card with alias + macro-region ($k \ge 20$)                 | 🟠 High      | ✅ DONE         | P10I.04, P6.01 | Agent | 2026-11-21| Token palette; 3D flip Satori PNG card   |
-| `[x] P10I.06` | Build featured meme showcase surface (`/featured`): curated "Meme of the Week"                              | 🟡 Medium    | ✅ DONE         | P10I.03        | Agent | 2026-11-21| Editorial showcase; zero leaderboards    |
+| `[x] P10I.06` | Build featured meme showcase surface (`/featured`): curated "Meme of the Week"                              | 🟡 Medium    | ✅ DONE         | P10I.03        | Agent | 2026-11-21| Superseded by product.md §0.3 (Meme Lab showcase superseded; Memes is a lane) |
 | `[x] P10I.07` | Build opt-in achievement sharing sheet and creator deletion revocation flow                                 | 🟠 High      | ✅ DONE         | P10I.05        | Agent | 2026-11-21| DELETE /v1/memes cleans featured_memes   |
 | `[x] P10I.08` | Author integration tests proving zero raw answer vector exposure and zero public leaderboard rankings       | 🔴 Critical  | ✅ DONE         | P10I.01, P10I.06| Agent| 2026-11-21| 6/6 tests passing in recognition suite   |
 
@@ -552,32 +560,32 @@ _Status: COMPLETE | Target: Provider-agnostic entitlements, feature flags for pe
 
 ### Phase 10L: Lanes Plumbing (Stage L1)
 
-_Status: COMPLETE | Target: Core lanes data model, backfill, per-lane Drop scheduler, REST API, Lane Chip & Picker UI, regression test._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Core lanes data model, backfill, per-lane Drop scheduler, REST API, Lane Chip & Picker UI, regression test._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
 | `[x] P10L.01` | Database migrations: `lanes`, `lane_interest`, `player_lane_prefs`, and expand `lane_id` foreign keys  | 🔴 Critical  | ✅ DONE         | P2.01, P10K.01 | Agent | 2026-11-23| Expand-only migration; 012_lanes_foundation.sql applied with players(id) and UUID types |
 | `[x] P10L.02` | Author idempotent resumable backfill script assigning all existing historical Drops to Everyday lane        | 🔴 Critical  | ✅ DONE         | P10L.01        | Agent | 2026-11-23| scripts/backfill-lanes.mjs batched, throttled, verified 0 NULLs, 100% idempotent |
-| `[x] P10L.03` | Update Drop scheduling pipeline and daily 07:00 IST BullMQ job to run per lane with lane-keyed Redis cache  | 🔴 Critical  | ✅ DONE         | P10L.01, P9.01 | Agent | 2026-11-23| Pipeline worker & scheduler per-lane with lane-keyed Redis cache; verified via tests |
+| `[~] P10L.03` | Update Drop scheduling pipeline and daily 07:00 IST BullMQ job to run per lane with lane-keyed Redis cache  | 🔴 Critical  | 🟡 IN PROGRESS | P10L.01, P9.01 | Agent | — | Reopened 2026-11-25: Memes Drop endpoint returns 500 (Redis key 'lane:memes:drop:…' rejected by key-prefix rule) |
 | `[x] P10L.04` | Implement REST endpoints `GET /v1/lanes` and `GET /v1/lanes/:id` with ETag and public cache headers        | 🟠 High      | ✅ DONE         | P10L.01        | Agent | 2026-11-23| Public catalogue, live player count, subscriber count, 60s cache, ETag/304 support |
 | `[x] P10L.05` | Implement `POST /v1/lanes/:id/interest` ("Tell me when it opens") endpoint with consent and rate limits     | 🟡 Medium    | ✅ DONE         | P10L.01        | Agent | 2026-11-23| Anonymized opt-in subscriber tracking with consent verification & rate limits |
-| `[x] P10L.06` | Build universal `LaneChip` component and responsive `LanePicker` home UI with Sticker pop styling         | 🟠 High      | ✅ DONE         | P10L.04, P1.01 | Agent | 2026-11-23| Universal LaneChip and responsive LanePicker built; Rule L10 first-run bypass verified |
+| `[~] P10L.06` | Build universal `LaneChip` component and responsive `LanePicker` home UI with Sticker pop styling         | 🟠 High      | 🟡 IN PROGRESS | P10L.04, P1.01 | Agent | — | Reopened 2026-11-25: picker never loaded in a browser (api-client fetch bug, fixed); lane names still show raw i18n keys |
 | `[x] P10L.07` | Update result view, share card generator, and challenge links to carry lane chip and accent token           | 🟠 High      | ✅ DONE         | P10L.06, P6.01 | Agent | 2026-11-23| FlipCard, TwinRevealScreen, ShareSheet updated with lane chip and &lane= challenge routing |
 | `[x] P10L.08` | Implement per-lane push notification opt-in preferences respecting the global 2-push/day ceiling           | 🟡 Medium    | ✅ DONE         | P10L.01, P10.01| Agent | 2026-11-23| GET/PUT /v1/me/lane-prefs with 2-push daily cap and Everyday default ON |
 | `[x] P10L.09` | Implement Gate L-A runtime evaluation logic and resting lane countdown state                                | 🟠 High      | ✅ DONE         | P10L.01        | Agent | 2026-11-23| Rule L9 resting evaluation; missing drop returns is_resting=true without old drop leak |
-| `[x] P10L.10` | Seed 9 catalog lanes (Everyday & Memes open) and run regression test proving Everyday is identical         | 🔴 Critical  | ✅ DONE         | P10L.01-P10L.09| Agent | 2026-11-23| 9 catalog lanes seeded, Everyday scoring & oddness verified identical across all suites |
+| `[~] P10L.10` | Seed 9 catalog lanes (Everyday & Memes open) and run regression test proving Everyday is identical         | 🔴 Critical  | 🟡 IN PROGRESS | P10L.01-P10L.09| Agent | — | Reopened 2026-11-25: /v1/lanes says Memes 'open' while /v1/lanes/memes says 'resting' with no Drop today |
 
 ---
 
 ### Phase 10M: Richer Answer Formats (Stage L2)
 
-_Status: COMPLETE | Target: Polymorphic validator, similarity metrics, interactive components for pick2of6, rank3, slider7, scene._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Polymorphic validator, similarity metrics, interactive components for pick2of6, rank3, slider7, scene._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
 | `[x] P10M.01` | Implement polymorphic question validator and schemas for `pick2of6`, `rank3`, `slider7`, and `scene`       | 🔴 Critical  | ✅ DONE         | P10L.10        | Agent | 2026-11-23| Strict JSONSchema / Zod payloads         |
-| `[x] P10M.02` | Implement similarity scoring functions ($s_q$) for all richer formats with symmetry and boundedness proofs  | 🔴 Critical  | ✅ DONE         | P10M.01        | Agent | 2026-11-23| Jaccard, Kendall tau, Manhattan dist     |
-| `[x] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 3.5-bit cap     | 🟠 High      | ✅ DONE         | P10M.02        | Agent | 2026-11-23| Prevents single-answer match hijack      |
+| `[~] P10M.02` | Implement similarity scoring functions ($s_q$) for all richer formats with symmetry and boundedness proofs  | 🔴 Critical  | 🟡 IN PROGRESS | P10M.01        | Agent | — | Reopened 2026-11-25: format similarity exists but production scores with unweighted Dice (P10V.07) |
+| `[~] P10M.03` | Implement information content weighting $I(a)$ with smoothing for set/rank frequencies and 3.5-bit cap     | 🟠 High      | 🟡 IN PROGRESS | P10M.02        | Agent | — | Reopened 2026-11-25: information weighting not used by any matching path (P10V.07) |
 | `[x] P10M.04` | Build interactive frontend components for `pick2of6`, `rank3` (tap/drag), `slider7`, and `scene`        | 🟠 High      | ✅ DONE         | P10M.01, P1.01 | Agent | 2026-11-23| Physical tactile sticker styling         |
 | `[x] P10M.05` | Implement accessibility keyboard controls, ARIA live tags, and reduced-motion fallbacks for all formats     | 🟠 High      | ✅ DONE         | P10M.04        | Agent | 2026-11-23| Tap-to-order default on mobile           |
 | `[x] P10M.06` | Implement tie-risk and entropy estimator utility functions in `@oddly/shared`                              | 🟡 Medium    | ✅ DONE         | P10M.02        | Agent | 2026-11-23| Computes theoretical & effective entropy |
@@ -587,31 +595,31 @@ _Status: COMPLETE | Target: Polymorphic validator, similarity metrics, interacti
 
 ### Phase 10N: Twin Depth & Mutual Pairing (Stage L3)
 
-_Status: COMPLETE | Target: Bounded tie groups, 28-day BitMinHash history agreement, greedy mutual pairing, honest group size UI._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: Bounded tie groups, 28-day BitMinHash history agreement, greedy mutual pairing, honest group size UI._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
 | `[x] P10N.01` | Expand migration: add `lane_id`, `tie_group_size`, `is_mutual`, `tie_break_reason`, `history_days` to `twin_results` | 🔴 Critical  | ✅ DONE         | P10L.01 | Agent | 2026-11-23| Lightweight relational columns           |
-| `[x] P10N.02` | Implement 32-byte BitMinHash history signature table and daily batch aggregation worker job                 | 🟠 High      | ✅ DONE         | P10N.01        | Agent | 2026-11-23| Compact fixed-size sketches              |
-| `[x] P10N.03` | Implement 4-stage tie-breaking pipeline (similarity, 28-day history, different country, deterministic hash) | 🔴 Critical  | ✅ DONE         | P10N.02        | Agent | 2026-11-23| Cryptographic deterministic tiebreak     |
-| `[x] P10N.04` | Implement greedy mutual pairing algorithm with bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$)    | 🔴 Critical  | ✅ DONE         | P10N.03        | Agent | 2026-11-23| Mutual pairing guarantee (`is_mutual`)   |
-| `[x] P10N.05` | Update matching API to return honest group size ($T$), mutual flag, and "Why you two?" rare agreement data  | 🟠 High      | ✅ DONE         | P10N.04        | Agent | 2026-11-23| Radical mathematical honesty             |
-| `[x] P10N.06` | Build UI for banded tie-group count ("312 people matched you this way"), $T=1$ copy, and "Why you two?"    | 🟠 High      | ✅ DONE         | P10N.05        | Agent | 2026-11-23| Accordion reveals rare shared choices    |
+| `[~] P10N.02` | Implement 32-byte BitMinHash history signature table and daily batch aggregation worker job                 | 🟠 High      | 🟡 IN PROGRESS | P10N.01        | Agent | — | Reopened 2026-11-25: history-signature job is never scheduled |
+| `[~] P10N.03` | Implement 4-stage tie-breaking pipeline (similarity, 28-day history, different country, deterministic hash) | 🔴 Critical  | 🟡 IN PROGRESS | P10N.02        | Agent | — | Reopened 2026-11-25: tie-break not called by any live path; pairing uses a weighted sum (P10V.09) |
+| `[~] P10N.04` | Implement greedy mutual pairing algorithm with bounded $K=32$ candidate subgraph ($O(N \cdot K \log K)$)    | 🔴 Critical  | 🟡 IN PROGRESS | P10N.03        | Agent | — | Reopened 2026-11-25: pairing cron runs with an empty list; final batch doesn't use it (P10V.11) |
+| `[~] P10N.05` | Update matching API to return honest group size ($T$), mutual flag, and "Why you two?" rare agreement data  | 🟠 High      | 🟡 IN PROGRESS | P10N.04        | Agent | — | Reopened 2026-11-25: API returns defaults (is_mutual true, tie size 1) instead of stored values (P10V.13) |
+| `[~] P10N.06` | Build UI for banded tie-group count ("312 people matched you this way"), $T=1$ copy, and "Why you two?"    | 🟠 High      | 🟡 IN PROGRESS | P10N.05        | Agent | — | Reopened 2026-11-25: result screen uses hardcoded 3,482 players, so 'Closest so far' never shows (P10V.01) |
 | `[x] P10N.07` | Author synthetic tie-size simulation harness and execute Stage A/B deterministic scale and idempotency tests| 🔴 Critical  | ✅ DONE         | P10N.04        | Agent | 2026-11-23| Verifies bounded latency and zero drift  |
 
 ---
 
 ### Phase 10O: Memes Lane Launch (Stage L4)
 
-_Status: COMPLETE | Target: End-to-end Memes lane launch, mixed-format Drops, lane-aware meme share card, Telepathy in Memes._
+_Status: PARTIAL (tasks reopened 2026-11-25, see Phase 10V) | Target: End-to-end Memes lane launch, mixed-format Drops, lane-aware meme share card, Telepathy in Memes._
 
 | ID           | Task Description                                                                                            | Priority | Status | Depends On     | Owner | Done Date | Notes                                    |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | -------------- | ----- | --------- | ---------------------------------------- |
 | `[x] P10O.01` | Configure Memes lane content flow feeding approved meme templates and captions from Meme Lab (F24)          | 🟠 High      | ✅ DONE         | P10E.01, P10L.10| Agent | 2026-11-24| Core launch lane; feeds from Meme Lab    |
-| `[x] P10O.02` | Build mixed-format Memes Drops combining `pick1`, `pick2of6`, and `rank3` meme questions                 | 🟠 High      | ✅ DONE         | P10M.01, P10O.01| Agent | 2026-11-24| Dynamic multi-format engagement          |
+| `[~] P10O.02` | Build mixed-format Memes Drops combining `pick1`, `pick2of6`, and `rank3` meme questions                 | 🟠 High      | 🟡 IN PROGRESS | P10M.01, P10O.01| Agent | — | Reopened 2026-11-25: Memes lane serves no Drop today; the page shows built-in fallback questions instead (P10V.21) |
 | `[x] P10O.03` | Build dedicated Memes Share Card face with hero template frame and sticker ink outline                      | 🟠 High      | ✅ DONE         | P10O.01, P6.01 | Agent | 2026-11-24| Distinct tactile card face               |
 | `[x] P10O.04` | Enable lane-isolated Telepathy for Memes lane questions with $\le 4$ options                                 | 🟡 Medium    | ✅ DONE         | P10C.01, P10O.01| Agent | 2026-11-24| Rule L2 isolation                        |
-| `[x] P10O.05` | Author seed batch of 14 approved Memes Drops and end-to-end integration test suite                          | 🟠 High      | ✅ DONE         | P10O.01-P10O.04| Agent | 2026-11-24| 2-week launch content runway             |
+| `[~] P10O.05` | Author seed batch of 14 approved Memes Drops and end-to-end integration test suite                          | 🟠 High      | 🟡 IN PROGRESS | P10O.01-P10O.04| Agent | — | Reopened 2026-11-25: no Memes Drop for current dates; no end-to-end test through the browser |
 
 ---
 
@@ -732,6 +740,10 @@ _Status: TODO | Target: a real player can go from the lane picker to a locked, c
 | `[ ] P10V.18` | Wire bonus rounds (job, routes, UI), Super twin and collector badges with opt-in share | 🟡 Medium | ⚪ TODO | P10V.11 | Agent | — | product §0.4, §0.6 |
 | `[ ] P10V.19` | Report categories harassment, underage_suspected, contact_attempt; twin location coarse region only (no exact city) | 🟡 Medium | ⚪ TODO | — | Agent | — | Safety |
 | `[ ] P10V.20` | End-to-end test on real Postgres and Redis: 50-player Memes lane from submit to locked twin, Keep, Orbit, one door, both confirm, `chat_ready` | 🔴 Critical | ⚪ TODO | P10V.01–P10V.15 | Agent | — | Rule 41 |
+| `[ ] P10V.21` | Remove `FALLBACK_QUESTIONS` and the hardcoded initial Drop from the home page; each lane shows only its own Drop, or an honest Resting/not-open-yet state | 🔴 Critical | ⚪ TODO | — | Agent | — | product §0.1, Rule 36 |
+| `[ ] P10V.22` | Lane cards show real names and descriptions (resolve `lane.*.name` / `lane.*.desc` keys); `/v1/lanes` and `/v1/lanes/:id` agree on lane status | 🟠 High | ⚪ TODO | — | Agent | — | Seen in browser 2026-11-25 |
+| `[ ] P10V.23` | Fix the Memes Drop endpoint 500 (Redis key-prefix rule vs `lane:` keys) and keep Memes Drops seeded for current dates | 🔴 Critical | ⚪ TODO | — | Agent | — | Seen in browser 2026-11-25 |
+| `[x] P10V.24` | API client: wrap global `fetch` so browser calls don't throw "Illegal invocation" (every web API call failed before this) | 🔴 Critical | ✅ DONE | — | Agent | 2026-11-25 | Fixed and checked in browser |
 
 ---
 
@@ -1227,6 +1239,8 @@ _Status: TODO | Target: Tier certifications (T1, T2, T3), breaking point measure
 
 | Date         | Phase / Task              | Description of Change                                                                                          | Reason                                        |
 | ------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `2026-11-25` | Comprehensive App Audit | Reopened 37 tasks across Phases 3, 4, 5, 6, 7, 8, 9, 10A, 10B, 10C, 10D, 10I whose code is not wired, not scheduled, or shows fake data. Documented superseded items in P1.16, Phase 10E (D3), and Phase 10I (D3, D8). Dashboard updated to 235 DONE, 49 IN PROGRESS, 199 pending (54%). | Founder request: Part A task audit against running reality. |
+| `2026-11-25` | Phases 10L–10O, 10V | Browser check of the running app: the lane picker never loaded (api-client fetch bug, fixed as P10V.24), every lane showed the same built-in fallback questions, and the Memes Drop endpoint returned 500. Reopened 12 tasks in 10L–10O as IN PROGRESS with reasons, and added P10V.21–P10V.24. Dashboard 272/434 (63%). | Founder request: make the table match the real app. |
 | `2026-11-25` | Phase 10V (Stage C0) | Code deep dive found the live twin uses an unweighted formula, the result screen shows invented values, no job locks twins (so Keep, Orbit and chat unlock are unreachable), and blocks are not applied to matching. Added Phase 10V with 20 tasks. Dashboard updated to 283/430 (66%) across 39 phases. | Founder request: deep dive and docs reset. |
 | `2026-11-22` | Phase 9 Complete (P9.15)  | Completed remaining task for Phase 9: implemented BullMQ dead-letter queue (DLQ) poison job quarantine manager (`DLQManager`), automated error classification, alert trigger hooks (`triggerDeadLetterAlert`), programmatic and CLI replay tooling (`scripts/dlq-tool.mjs`), and Prometheus metrics instrumentation (P9.15). Phase 9 now 100% COMPLETE (15/15). Dashboard updated to 254/410 (62%). | Phase 9 completion & queue DLQ quarantine. |
 | `2026-11-22` | Phase 8 Complete (P8.11)  | Completed remaining task for Phase 8: routed player history archive (`GET /v1/history`) and aggregate world statistics (`GET /v1/world/:dropId`) to dedicated PostgreSQL read replica (`prismaReplica`) with transparent primary failover on replica timeout/error, and enforced Level L2+ load shedding (503 OVERLOADED) and extended 10m caching (P8.11). Phase 8 now 100% COMPLETE (12/12). Dashboard updated to 253/410 (62%). | Phase 8 completion & read replica routing. |

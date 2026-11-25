@@ -400,6 +400,10 @@ All components strictly use existing `@oddly/ui-tokens` constants, 4 approved ra
 
 All components strictly use existing `@oddly/ui-tokens` constants, 4 approved radii (`sm: 8px`, `m: 14px`, `l: 20px`, `pill: 9999px`), hard sticker shadows (`shadow-sticker`: `4px 4px 0 #14123A`), and Bricolage Grotesque / Inter typography. Strictly no new colours or soft blur shadows.
 
+> [!NOTE]
+> **Superseded by product.md §0 (2026-11-25):** Memes is a dedicated lane (`slug = memes`). Meme content lives only in the Memes lane; there are no meme questions inside other lanes and no "Meme Corner" card on generic post-Drop surfaces (Decision D3).
+
+
 ### 12B.1 Meme Question Card (`render_variant = "meme"`)
 
 1. **Card Layout:**

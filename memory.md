@@ -1930,6 +1930,8 @@ The founder asked for the real state of the code against the product they want (
 - **Correct:** lane picker first; per-lane Drops; Orbit re-request cooldown of 30 days is enforced in Keep; Telepathy baseline uses Σp².
 - **Tests:** web 132/132; shared 283 pass, 2 fail (mutual pairing at 500 players takes 8 s); ui-tokens 16/17 (hex in `Pick2Of6Card.tsx`). API and worker tests write to the dev database: run them only on a throwaway database.
 
+- **Browser check (same day):** `packages/api-client` stored the global `fetch` and called it as a method, so **every web API call failed in a browser** with "Illegal invocation" (unit tests mock fetch, so they never caught it). Fixed by wrapping fetch. After the fix the lane picker loads, but lane names show raw i18n keys. The home page shows the built-in `FALLBACK_QUESTIONS` for every lane (used as initial data and on any error), and `GET /v1/drops/today?lane=memes` returns 500 (Redis key-prefix rule). Reopened 12 tasks in Phases 10L–10O; added P10V.21–P10V.24.
+
 ### 47.3 Docs changed
 - `product.md`: new §0 Product Definition (overrides older sections), plus at-a-glance bullets.
 - `rules.md`: Rules 27, 28 and 33 amended (D1, D4, D8). New Rules 36–41 (No Invented Data, One Matching Formula, Blocks Are Absolute, Server Decides, Age Band Display Only, "Done" Means Reachable).

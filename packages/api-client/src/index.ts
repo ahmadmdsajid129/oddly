@@ -489,7 +489,9 @@ export class OddlyApiClient {
 
   constructor(config: OddlyClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
-    this.fetchFn = config.fetchFn ?? fetch;
+    // Wrap the global fetch: calling it as `this.fetchFn(...)` would bind `this`
+    // to the client and browsers throw "Illegal invocation".
+    this.fetchFn = config.fetchFn ?? ((input, init) => fetch(input, init));
     this.defaultHeaders = {
       "Content-Type": "application/json",
       ...(config.headers || {}),

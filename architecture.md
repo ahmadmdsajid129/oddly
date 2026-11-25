@@ -458,6 +458,10 @@ oddly/
 
 In addition to core tables (`users`, `drops`, `questions`, `submissions`, `answers`, `matches`, `streak_log`, `shares`, `app_content`, `app_config`, `tier_definitions`, `reports`), the schema includes scale-governance tables:
 
+> [!NOTE]
+> **Superseded by product.md §0 (2026-11-25):** Streaks are tracked per lane plus one overall "days played" count (Decision D4, Rule 28). Single global streak is superseded.
+
+
 1. **`batch_runs`:** Tracks chunked resumable final batch progress per drop.
    - Columns: `id` (UUID, PK), `drop_id` (UUID, FK), `chunk_index` (INT), `status` (ENUM: pending, running, completed, failed), `player_count` (INT), `error` (TEXT, nullable), `started_at` (TIMESTAMPTZ), `completed_at` (TIMESTAMPTZ). Unique: `(drop_id, chunk_index)`.
 2. **`scheduler_runs`:** Distributed leader lock preventing duplicate cron executions.
@@ -610,6 +614,10 @@ All daily tables are range-partitioned by `drop_date` from day one, matching exi
 
 ### ADR 001 to ADR 008: Preserved Baseline
 *(See original sections: Monorepo with Turborepo, TypeScript Strict Mode, Web-First PWA, Prohibition of Chat, PostgreSQL + Redis Split, Satori Share Cards, Everything Dynamic from DB, Polymorphic Question Renderer).*
+
+> [!NOTE]
+> **Superseded by product.md §0 (2026-11-25):** The absolute prohibition of chat is amended. Chat may unlock inside a mutual Orbit after passing one of the Three Doors (unlock flow and `chat_ready` state only; no open messaging screen in v1). Contact and handle exchange remains permanently not planned.
+
 
 ### ADR 009: Scale Tiers (T0 to T4) Progression Model
 - **Date:** 2026-11-10
